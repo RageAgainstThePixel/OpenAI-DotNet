@@ -6,12 +6,6 @@ namespace OpenAI_Tests
 {
     public class SearchEndpointTests
     {
-        [SetUp]
-        public void Setup()
-        {
-            Authentication.Default = new Authentication(Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY"));
-        }
-
         private readonly string query = "Washington DC";
         private readonly string[] documents = { "Canada", "China", "USA", "Spain" };
 

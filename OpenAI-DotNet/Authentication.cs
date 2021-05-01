@@ -56,9 +56,14 @@ namespace OpenAI_DotNet
         {
             var key = Environment.GetEnvironmentVariable("OPENAI_KEY");
 
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrWhiteSpace(key))
             {
                 key = Environment.GetEnvironmentVariable("OPENAI_SECRET_KEY");
+            }
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                key = Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY");
             }
 
             return string.IsNullOrEmpty(key) ? null : new Authentication(key);

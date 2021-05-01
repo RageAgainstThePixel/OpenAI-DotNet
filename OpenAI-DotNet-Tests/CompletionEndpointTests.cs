@@ -9,12 +9,6 @@ namespace OpenAI_Tests
 {
     public class CompletionEndpointTests
     {
-        [SetUp]
-        public void Setup()
-        {
-            Authentication.Default = new Authentication(Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY"));
-        }
-
         private readonly string prompts = "One Two Three Four Five Six Seven Eight Nine One Two Three Four Five Six Seven Eight";
 
         [Test]

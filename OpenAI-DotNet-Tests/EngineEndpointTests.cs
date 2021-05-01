@@ -1,17 +1,10 @@
 ﻿using NUnit.Framework;
 using OpenAI_DotNet;
-using System;
 
 namespace OpenAI_Tests
 {
     public class EngineEndpointTests
     {
-        [SetUp]
-        public void Setup()
-        {
-            Authentication.Default = new Authentication(Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY"));
-        }
-
         [Test]
         public void GetEngines()
         {
