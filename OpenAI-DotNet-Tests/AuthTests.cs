@@ -65,6 +65,8 @@ namespace OpenAI_Tests
             Assert.IsNotNull(shouldBeManualAuth);
             Assert.IsNotNull(shouldBeManualAuth.ApiKey);
             Assert.AreEqual(manualAuth.ApiKey, shouldBeManualAuth.ApiKey);
+
+            Authentication.Default = defaultAuth;
         }
 
         [Test]
