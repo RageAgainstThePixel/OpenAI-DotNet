@@ -16,7 +16,7 @@
     <PackageTags>OpenAI, AI, ML, API</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
