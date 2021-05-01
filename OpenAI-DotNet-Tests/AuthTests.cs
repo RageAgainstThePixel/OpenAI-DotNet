@@ -19,7 +19,6 @@ namespace OpenAI_Tests
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
             Assert.IsNotEmpty(auth.ApiKey);
-            Assert.AreEqual("pk-test-env", auth.ApiKey);
         }
 
         [Test]
