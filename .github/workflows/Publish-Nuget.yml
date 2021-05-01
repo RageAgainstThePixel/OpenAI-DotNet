@@ -56,12 +56,6 @@ jobs:
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
-    env:
-      # Replace with your solution name, i.e. MyWpfApp.sln.
-      Project_Path:  OpenAI-DotNet\OpenAI-DotNet
-      # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Test_Project_Path:  ${{ github.workspace }}OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj
-
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -86,11 +80,12 @@ jobs:
 
     # Publish
     - name: Publish on version change
+      if: github.ref == 'refs/heads/main'
       id: publish_nuget
       uses: rohith/publish-nuget@v2
       with:
         # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: ${{ env.Project_Path }}.csproj
+        PROJECT_FILE_PATH: OpenAI-DotNet\OpenAI-DotNet.csproj
 
         # NuGet package id, used for version detection & defaults to project name
         # PACKAGE_NAME: Core
