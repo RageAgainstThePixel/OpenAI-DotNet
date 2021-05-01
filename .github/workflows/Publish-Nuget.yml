@@ -83,8 +83,6 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration Release --no-build
-      env:
-        OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
 
     # Publish
     - name: publish on version change
