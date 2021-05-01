@@ -1,6 +1,7 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using OpenAI_DotNet;
+using System;
+using System.Threading.Tasks;
 
 namespace OpenAI_Tests
 {
@@ -10,37 +11,37 @@ namespace OpenAI_Tests
         private readonly string[] documents = { "Canada", "China", "USA", "Spain" };
 
         [Test]
-        public void GetSearchResults()
+        public async Task GetSearchResults()
         {
-            var api = new OpenAI(Engine.Curie);
+            var api = new OpenAI();
 
             Assert.IsNotNull(api.SearchEndpoint);
 
-            var results = api.SearchEndpoint.GetSearchResultsAsync(query, documents).Result;
+            var results = await api.SearchEndpoint.GetSearchResultsAsync(query, documents, Engine.Curie);
             Assert.IsNotNull(results);
             Assert.IsNotEmpty(results);
         }
 
         [Test]
-        public void GetBestMatch()
+        public async Task GetBestMatch()
         {
-            var api = new OpenAI(Engine.Curie);
+            var api = new OpenAI();
 
             Assert.IsNotNull(api.SearchEndpoint);
 
-            var result = api.SearchEndpoint.GetBestMatchAsync(query, documents).Result;
+            var result = await api.SearchEndpoint.GetBestMatchAsync(query, documents, Engine.Curie);
             Assert.IsNotNull(result);
             Assert.AreEqual("USA", result);
         }
 
         [Test]
-        public void GetBestMatchWithScore()
+        public async Task GetBestMatchWithScore()
         {
-            var api = new OpenAI(Engine.Curie);
+            var api = new OpenAI();
 
             Assert.IsNotNull(api.SearchEndpoint);
 
-            var result = api.SearchEndpoint.GetBestMatchWithScoreAsync(query, documents).Result;
+            var result = await api.SearchEndpoint.GetBestMatchWithScoreAsync(query, documents, Engine.Curie);
             Assert.IsNotNull(result);
             var (match, score) = result;
             Assert.AreEqual("USA", match);
