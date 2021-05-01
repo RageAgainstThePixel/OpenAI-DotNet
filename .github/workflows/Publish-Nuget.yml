@@ -78,14 +78,14 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Build
+    - name: Build Package
       run: dotnet build --configuration Release
 
-    - name: Test
+    - name: Test Package
       run: dotnet test --configuration Release --no-build
 
     # Publish
-    - name: publish on version change
+    - name: Publish on version change
       id: publish_nuget
       uses: rohith/publish-nuget@v2
       with:
