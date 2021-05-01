@@ -44,10 +44,11 @@ on:
   pull_request:
     branches: [ main ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 jobs:
-
   build:
-
     strategy:
       matrix:
         configuration: [Debug, Release]
@@ -58,7 +59,7 @@ jobs:
     env:
       # Replace with your solution name, i.e. MyWpfApp.sln.
       Solution_Name: OpenAI-DotNet.sln
-      Project_Directory: OpenAI-DotNet\OpenAI-DotNet
+      Project_Path: OpenAI-DotNet\OpenAI-DotNet
       # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       Test_Project_Path: OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj
 
@@ -86,7 +87,7 @@ jobs:
     - name: Decode the pfx
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
+        $certificatePath = Join-Path -Path $env:Project_Path -ChildPath GitHubActionsWorkflow.pfx
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
 
     - name: Build Package
@@ -96,14 +97,14 @@ jobs:
 
     # Remove the pfx
     - name: Remove the pfx
-      run: Remove-Item -path $env:Project_Directory\$env:Signing_Certificate
+      run: Remove-Item -path $env:Project_Path\$env:Signing_Certificate
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Nuget Package
-        path: ${{ env.Project_Directory }}/bin
+        path: ${{ env.Project_Path }}/bin
 
     # Publish Nuget
     #- name: Build Nuget package
