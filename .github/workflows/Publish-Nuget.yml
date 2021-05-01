@@ -80,8 +80,8 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     # Execute all unit tests in the solution
-    - name: Execute unit tests
-      run: dotnet test
+    #- name: Execute unit tests
+    #  run: dotnet test
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
