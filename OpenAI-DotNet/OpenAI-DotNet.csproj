@@ -1,28 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1;net5</TargetFramework>
-		<LangVersion>8.0</LangVersion>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Authors>Stephen Hodgson</Authors>
-		<Product>OpenAI-DotNet</Product>
-		<Description>A simple C# / .NET wrapper library to use with OpenAI's GPT-3 API (currently in beta).  Independently developed, this is not an official library and I am not affiliated with OpenAI.  An OpenAI API account is required.
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Stephen Hodgson</Authors>
+    <Product>OpenAI-DotNet</Product>
+    <Description>A simple C# / .NET wrapper library to use with OpenAI's GPT-3 API (currently in beta).  Independently developed, this is not an official library and I am not affiliated with OpenAI.  An OpenAI API account is required.
 
-Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
-		<Copyright></Copyright>
-		<PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/StephenHodgson/OpenAI-DotNet</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/StephenHodgson/OpenAI-DotNet</RepositoryUrl>
-		<PackageTags>OpenAI, AI, ML, API</PackageTags>
-		<Title>OpenAI API</Title>
-		<PackageReleaseNotes>Initial Release</PackageReleaseNotes>
-		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
-		<DelaySign>false</DelaySign>
-		<PackageId>OpenAI-DotNet</PackageId>
-		<Version>1.0.0</Version>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
-	</PropertyGroup>
+    Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
+    <Copyright></Copyright>
+    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/StephenHodgson/OpenAI-DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/StephenHodgson/OpenAI-DotNet</RepositoryUrl>
+    <PackageTags>OpenAI, AI, ML, API</PackageTags>
+    <Title>OpenAI API</Title>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
+    <DelaySign>true</DelaySign>
+    <PackageId>OpenAI-DotNet</PackageId>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
 
 </Project>

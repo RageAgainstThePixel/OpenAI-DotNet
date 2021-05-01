@@ -1,8 +1,6 @@
-using System;
-using System.IO;
-using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using OpenAI_DotNet;
+using System.IO;
 
 namespace OpenAI_Tests
 {
@@ -12,8 +10,6 @@ namespace OpenAI_Tests
         public void Setup()
         {
             File.WriteAllText(".openai", "OPENAI_KEY=pk-test12");
-            Environment.SetEnvironmentVariable("OPENAI_KEY", "pk-test-env");
-            //Environment.SetEnvironmentVariable("OPENAI_SECRET_KEY", "sk-test-env");
         }
 
         [Test]
@@ -23,7 +19,6 @@ namespace OpenAI_Tests
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
             Assert.IsNotEmpty(auth.ApiKey);
-            Assert.AreEqual("pk-test-env", auth.ApiKey);
         }
 
         [Test]
@@ -69,6 +64,8 @@ namespace OpenAI_Tests
             Assert.IsNotNull(shouldBeManualAuth);
             Assert.IsNotNull(shouldBeManualAuth.ApiKey);
             Assert.AreEqual(manualAuth.ApiKey, shouldBeManualAuth.ApiKey);
+
+            Authentication.Default = defaultAuth;
         }
 
         [Test]

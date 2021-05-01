@@ -34,7 +34,7 @@ namespace OpenAI_DotNet
 
             if (Auth?.ApiKey is null)
             {
-                throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/OkGoDoIt/OpenAI-API-dotnet#authentication for details.");
+                throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/StephenHodgson/OpenAI-DotNet#authentication for details.");
             }
 
             DefaultEngine = engine ?? Engine.Default;
