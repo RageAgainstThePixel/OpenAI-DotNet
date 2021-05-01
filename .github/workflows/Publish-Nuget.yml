@@ -77,6 +77,8 @@ jobs:
 
     - name: Test Package
       run: dotnet test --configuration Release --no-build
+        env:
+          TEST_OPENAI_SECRET_KEY: ${{ secrets.TEST_OPENAI_SECRET_KEY }}
 
     # Publish
     - name: Publish on version change
