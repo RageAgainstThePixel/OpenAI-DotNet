@@ -58,10 +58,10 @@ jobs:
 
     env:
       # Replace with your solution name, i.e. MyWpfApp.sln.
-      Solution_Name: ${{ GITHUB_WORKSPACE }}OpenAI-DotNet.sln
-      Project_Path:  ${{ GITHUB_WORKSPACE }}OpenAI-DotNet\OpenAI-DotNet
+      Solution_Name: ${{ env.GITHUB_WORKSPACE }}OpenAI-DotNet.sln
+      Project_Path:  ${{ env.GITHUB_WORKSPACE }}OpenAI-DotNet\OpenAI-DotNet
       # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Test_Project_Path:  ${{ GITHUB_WORKSPACE }}OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj
+      Test_Project_Path:  ${{ env.GITHUB_WORKSPACE }}OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj
 
     steps:
     - name: Checkout
