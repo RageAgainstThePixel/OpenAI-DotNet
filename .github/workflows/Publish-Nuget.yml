@@ -76,8 +76,8 @@ jobs:
         dotnet-version: 5.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@1.0.2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
