@@ -165,7 +165,7 @@ namespace OpenAI_DotNet
         {
             if (basedOn == null)
             {
-                throw new ArgumentNullException(nameof(basedOn));
+                return;
             }
 
             Prompts = basedOn.Prompts;
