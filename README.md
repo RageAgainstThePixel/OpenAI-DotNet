@@ -10,7 +10,9 @@ This library is based on .NET Standard 2.0, so it should work across .NET Framew
 
 ### Install from NuGet
 
-Install package [`OpenAI` from Nuget](https://www.nuget.org/packages/OpenAI-DotNet/).  Here's how via commandline:
+[![NuGet version (OpenAI-DotNet)](https://img.shields.io/nuget/v/OpenAI-DotNet.svg?style=flat-square)](https://www.nuget.org/packages/OpenAI-DotNet/)
+
+Install package [`OpenAI` from Nuget](https://www.nuget.org/packages/OpenAI-DotNet/).  Here's how via command line:
 
 ```powershell
 Install-Package OpenAI-DotNet
