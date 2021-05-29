@@ -5,11 +5,11 @@ using System.Text.Json.Serialization;
 namespace OpenAI_DotNet
 {
     /// <summary>
-    /// Represents a request to the Completions API.  Mostly matches the parameters in
-    /// <see href="https://beta.openai.com/api-ref#create-completion-post">the OpenAI docs</see>,
+    /// Represents a request to the <see cref="CompletionEndpoint"/>.  Mostly matches the parameters in
+    /// <see href="https://beta.openai.com/docs/api-reference/completions">the OpenAI docs</see>,
     /// although some have been renames or expanded into single/multiple properties for ease of use.
     /// </summary>
-    public class CompletionRequest
+    public sealed class CompletionRequest
     {
         /// <summary>
         /// If you are requesting more than one prompt, specify them as an array of strings.

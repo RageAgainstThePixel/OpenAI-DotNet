@@ -24,7 +24,7 @@ namespace OpenAI_Tests
 
             foreach (var engine in engines)
             {
-                var result = api.EnginesEndpoint.RetrieveEngineDetailsAsync(engine.EngineName).Result;
+                var result = api.EnginesEndpoint.GetEngineDetailsAsync(engine.EngineName).Result;
 
                 Assert.IsNotNull(result);
             }

@@ -34,8 +34,9 @@ namespace OpenAI_DotNet
         /// Represents an Engine with the given id/<see cref="EngineName"/>
         /// </summary>
         /// <param name="name">The id/<see cref="EngineName"/> to use.
-        /// If the <paramref name="name"/> contains a colon (as is the case in the API's <see cref="CompletionResult.Model"/> response),
-        /// the part before the colon is treated as the id/<see cref="EngineName"/> and the following portion is considered the <see cref="ModelRevision"/>
+        /// If the <paramref name="name"/> contains a colon,
+        /// the part before the colon is treated as the id/<see cref="EngineName"/>
+        /// and the following portion is considered the <see cref="ModelRevision"/>
         ///	</param>
         public Engine(string name)
         {
@@ -63,7 +64,7 @@ namespace OpenAI_DotNet
         public bool? Ready { get; set; }
 
         /// <summary>
-        /// The revision of the model as indicated in responses from the API which specify a <see cref="CompletionResult.Model"/>.
+        /// The revision of the model as indicated in responses from the API which specify a model.
         /// </summary>
         [JsonIgnore]
         public string ModelRevision { get; set; }

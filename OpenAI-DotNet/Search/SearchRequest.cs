@@ -4,7 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI_DotNet
 {
-    internal class SearchRequest
+    ///<summary>
+    /// Represents a request to the <see cref="SearchEndpoint"/>.
+    /// </summary>
+    internal sealed class SearchRequest
     {
         [JsonPropertyName("query")]
         public string Query { get; }

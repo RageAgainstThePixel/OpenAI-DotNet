@@ -3,9 +3,9 @@
 namespace OpenAI_DotNet
 {
     /// <summary>
-    /// Represents a completion choice returned by the Completion API.
+    /// Represents a completion choice returned by the <see cref="CompletionEndpoint"/>.
     /// </summary>
-    public class Choice
+    public sealed class Choice
     {
         /// <summary>
         /// The main text of the completion

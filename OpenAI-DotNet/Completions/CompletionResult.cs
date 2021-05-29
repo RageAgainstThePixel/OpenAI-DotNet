@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 namespace OpenAI_DotNet
 {
     /// <summary>
-    /// Represents a result from calling the Completion API
+    /// Represents a result from calling the <see cref="CompletionEndpoint"/>.
     /// </summary>
-    public class CompletionResult
+    public sealed class CompletionResult : BaseResponse
     {
         /// <summary>
         /// The identifier of the result, which may be used during troubleshooting
@@ -28,7 +28,7 @@ namespace OpenAI_DotNet
         private Engine engine;
 
         /// <summary>
-        /// Which model was used to generate this result.  Be sure to check <see cref="OpenAI_DotNet.Engine.ModelRevision"/> for the specific revision.
+        /// Which model was used to generate this result. Be sure to check <see cref="OpenAI_DotNet.Engine.ModelRevision"/> for the specific revision.
         /// </summary>
         [JsonIgnore]
         public Engine Engine
@@ -45,24 +45,6 @@ namespace OpenAI_DotNet
         /// </summary>
         [JsonPropertyName("choices")]
         public List<Choice> Completions { get; set; }
-
-        /// <summary>
-        /// The server-side processing time as reported by the API.  This can be useful for debugging where a delay occurs.
-        /// </summary>
-        [JsonIgnore]
-        public TimeSpan ProcessingTime { get; set; }
-
-        /// <summary>
-        /// The organization associated with the API request, as reported by the API.
-        /// </summary>
-        [JsonIgnore]
-        public string Organization { get; set; }
-
-        /// <summary>
-        /// The request id of this API call, as reported in the response headers.  This may be useful for troubleshooting or when contacting OpenAI support in reference to a specific request.
-        /// </summary>
-        [JsonIgnore]
-        public string RequestId { get; set; }
 
         /// <summary>
         /// Gets the text of the first completion, representing the main result
