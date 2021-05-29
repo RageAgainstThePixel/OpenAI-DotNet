@@ -23,7 +23,7 @@ namespace OpenAI_Tests
 
             Assert.IsNotNull(api.ClassificationEndpoint);
 
-            var result = await api.ClassificationEndpoint.CreateClassificationAsync(new ClassificationRequest(query, examples, labels));
+            var result = await api.ClassificationEndpoint.GetClassificationAsync(new ClassificationRequest(query, examples, labels));
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Label == "Negative");
         }
