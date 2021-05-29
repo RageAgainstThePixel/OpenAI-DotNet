@@ -3,9 +3,9 @@
 namespace OpenAI_DotNet
 {
     /// <summary>
-    /// Used internally to deserialize a result from the Document Search API
+    /// Represents a single search result in <see cref="SearchResponse"/>.
     /// </summary>
-    public class SearchResult
+    internal sealed class SearchResult
     {
         /// <summary>
         /// The index of the document as originally supplied

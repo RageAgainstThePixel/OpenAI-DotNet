@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -15,17 +13,18 @@ namespace OpenAI_DotNet
     /// a few written examples. This simple approach works for a wide range of use cases, including summarization,
     /// translation, grammar correction, question answering, chatbots, composing emails, and much more
     /// (see the prompt library for inspiration).
+    /// <see href="https://beta.openai.com/docs/api-reference/completions"/>
     /// </summary>
-    public class CompletionEndpoint
+    public class CompletionEndpoint : BaseEndPoint
     {
-        private readonly OpenAI api;
+        /// <inheritdoc />
+        internal CompletionEndpoint(OpenAI api) : base(api) { }
 
-        /// <summary>
-        /// Constructor of the api endpoint.
-        /// Rather than instantiating this yourself, access it through an instance of
-        /// <see cref="OpenAI"/> as <see cref="OpenAI.CompletionEndpoint"/>.
-        /// </summary>
-        internal CompletionEndpoint(OpenAI api) => this.api = api;
+        /// <inheritdoc />
+        protected override string GetEndpoint(Engine engine = null)
+        {
+            return $"{Api.BaseUrl}engines/{engine?.EngineName ?? Api.DefaultEngine.EngineName}/completions";
+        }
 
         #region Non-streaming
 
@@ -99,12 +98,12 @@ namespace OpenAI_DotNet
         /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
+        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest, Engine engine = null)
         {
             completionRequest.Stream = false;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, new JsonSerializerOptions { IgnoreNullValues = true });
-            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var response = await api.Client.PostAsync($"{api.BaseUrl}engines/{engine?.EngineName ?? api.DefaultEngine.EngineName}/completions", stringContent);
+            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
+            var response = await Api.Client.PostAsync(GetEndpoint(engine), jsonContent.ToJsonStringContent());
 
             if (response.IsSuccessStatusCode)
             {
@@ -195,16 +194,16 @@ namespace OpenAI_DotNet
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
         /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, Engine engine = null)
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, new JsonSerializerOptions { IgnoreNullValues = true });
-            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"{api.BaseUrl}engines/{engine?.EngineName ?? api.DefaultEngine.EngineName}/completions")
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint(engine))
             {
-                Content = stringContent
+                Content = jsonContent.ToJsonStringContent()
             };
-            var response = await api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
             if (response.IsSuccessStatusCode)
             {
@@ -216,7 +215,7 @@ namespace OpenAI_DotNet
                 {
                     if (line.StartsWith("data: "))
                     {
-                        line = line.Substring("data: ".Length);
+                        line = line["data: ".Length..];
                     }
 
                     if (line == "[DONE]")
@@ -311,16 +310,16 @@ namespace OpenAI_DotNet
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <seealso href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams"/>
         /// for more details on how to consume an async enumerable.</returns>
+        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, Engine engine = null)
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, new JsonSerializerOptions { IgnoreNullValues = true });
-            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"{api.BaseUrl}engines/{engine?.EngineName ?? api.DefaultEngine.EngineName}/completions")
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint(engine))
             {
-                Content = stringContent
+                Content = jsonContent.ToJsonStringContent()
             };
-            var response = await api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
             if (response.IsSuccessStatusCode)
             {
@@ -332,7 +331,7 @@ namespace OpenAI_DotNet
                 {
                     if (line.StartsWith("data: "))
                     {
-                        line = line.Substring("data: ".Length);
+                        line = line["data: ".Length..];
                     }
 
                     if (line == "[DONE]")
@@ -363,11 +362,7 @@ namespace OpenAI_DotNet
                 throw new HttpRequestException($"{nameof(DeserializeResult)} no completions! HTTP status code: {response.StatusCode}. Response body: {result}");
             }
 
-            completionResult.Organization = response.Headers.GetValues("Openai-Organization").FirstOrDefault();
-            completionResult.RequestId = response.Headers.GetValues("X-Request-ID").FirstOrDefault();
-            completionResult.ProcessingTime = TimeSpan.FromMilliseconds(
-                int.Parse(response.Headers.GetValues("Openai-Processing-Ms")
-                    .First()));
+            completionResult.SetResponseData(response.Headers);
 
             return completionResult;
         }

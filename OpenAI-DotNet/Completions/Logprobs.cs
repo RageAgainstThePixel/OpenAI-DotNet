@@ -3,7 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI_DotNet
 {
-    public class Logprobs
+    /// <summary>
+    /// Object belonging to a <see cref="Choice"/>
+    /// </summary>
+    public sealed class Logprobs
     {
         [JsonPropertyName("tokens")]
         public List<string> Tokens { get; set; }

@@ -1,10 +1,10 @@
 # C#/.NET SDK for accessing the OpenAI GPT-3 API
 
-A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
+A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api). (Forked from https://github.com/OkGoDoIt/OpenAI-API-dotnet)
 
 ## Requirements
 
-This library is based on .NET Standard 2.0, so it should work across .NET Framework >=4.7.2 and .NET Core >= 3.0.  It should work across console apps, winforms, wpf, asp.net, etc (although I have not yet tested with asp.net).  It should work across Windows, Linux, and Mac, although I have only tested on Windows and Linux so far.
+This library is based on .NET Standard 2.0, so it should work across .NET Framework >=4.7.2 and .NET Core >= 3.0.  It should work across console apps, winforms, wpf, asp.net, etc.  It should work across Windows, Linux, and Mac.
 
 ## Getting started
 
@@ -70,10 +70,10 @@ OpenAI api = new OpenAI(Authentication.LoadFromDirectory("C:\\MyProject"));;
 
 ### Completions
 
-The Completion API is accessed via `OpenAI.Completions`:
+The Completion API is accessed via `OpenAI.CompletionEndpoint`:
 
 ```csharp
-var result = await api.Completions.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, engine: Engine.Davinci);
+var result = await api.CompletionEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, engine: Engine.Davinci);
 Console.WriteLine(result);
 ```
 
@@ -85,7 +85,7 @@ Streaming allows you to get results are they are generated, which can help your 
 
 ```csharp
 var api = new OpenAI();
-await api.Completions.StreamCompletionAsync(result =>
+await api.CompletionEndpoint.StreamCompletionAsync(result =>
 {
     foreach (var choice in result.Completions)
     {
@@ -100,7 +100,7 @@ Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/
 
 ```csharp
 var api = new OpenAI();
-await foreach (var token in api.Completions.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, engine: Engine.Davinci))
+await foreach (var token in api.CompletionEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, engine: Engine.Davinci))
 {
   Console.Write(token);
 }
@@ -108,7 +108,7 @@ await foreach (var token in api.Completions.StreamCompletionEnumerableAsync("My 
 
 ### Document Search
 
-The Search API is accessed via `OpenAI.Search`:
+The Search API is accessed via `OpenAI.SearchEndpoint`:
 
 #### You can get all results as a dictionary using
 
@@ -117,7 +117,7 @@ var api = new OpenAI();
 string query = "Washington DC";
 string[] documents = { "Canada", "China", "USA", "Spain" };
 
-Dictionary<string, double> results = await api.Search.GetSearchResultsAsync(query, documents, Engine.Curie);
+Dictionary<string, double> results = await api.SearchEndpoint.GetSearchResultsAsync(query, documents, Engine.Curie);
 // result["USA"] == 294.22
 // result["Spain"] == 73.81
 ```
@@ -130,7 +130,7 @@ Dictionary<string, double> results = await api.Search.GetSearchResultsAsync(quer
 var api = new OpenAI();
 string query = "Washington DC";
 string[] documents = { "Canada", "China", "USA", "Spain" };
-string result = await api.Search.GetBestMatchAsync(query, documents, Engine.Curie);
+string result = await api.SearchEndpoint.GetBestMatchAsync(query, documents, Engine.Curie);
 // result == "USA"
 ```
 
@@ -142,8 +142,32 @@ string result = await api.Search.GetBestMatchAsync(query, documents, Engine.Curi
 var api = new OpenAI();
 string query = "Washington DC";
 string[] documents = { "Canada", "China", "USA", "Spain" };
-Tuple<string, double> result = await GetBestMatchWithScoreAsync(query, documents, Engine.Curie);
+Tuple<string, double> result = await await api.SearchEndpoint.GetBestMatchWithScoreAsync(query, documents, Engine.Curie);
 // (result, score) == "USA", 294.22
+```
+
+> returned Tuple result with score
+
+### Classifications
+
+The Classification API is accessed via `OpenAI.ClassificationEndpoint`:
+
+Given a query and a set of labeled examples, the model will predict the most likely label for the query.
+
+```csharp
+var api = new OpenAI();
+
+string query = "It is a raining day :(";
+string[] labels = { "Positive", "Negative", "Neutral" };
+Dictionary<string, string> examples = new Dictionary<string, string>
+{
+    { "A happy moment", "Positive" },
+    { "I am sad.", "Negative" },
+    { "I am feeling awesome", "Positive"}
+};
+
+var result = await api.ClassificationEndpoint.CreateClassificationAsync(new ClassificationRequest(query, examples, labels));
+// result.Label == "Negative"
 ```
 
 ## License
