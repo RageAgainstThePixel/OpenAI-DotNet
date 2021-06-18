@@ -1,6 +1,8 @@
 # C#/.NET SDK for accessing the OpenAI GPT-3 API
 
-A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api). (Forked from https://github.com/OkGoDoIt/OpenAI-API-dotnet)
+A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api). 
+
+Based on [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet)
 
 ## Requirements
 
