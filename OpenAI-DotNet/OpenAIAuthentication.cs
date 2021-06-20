@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Represents authentication to the OpenAPI API endpoint
     /// </summary>
-    public class Authentication
+    public class OpenAIAuthentication
     {
         /// <summary>
         /// The API key, required to access the API endpoint.
@@ -14,23 +14,23 @@ namespace OpenAI_DotNet
         public string ApiKey { get; }
 
         /// <summary>
-        /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="Authentication"/>
+        /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="OpenAIAuthentication"/>
         /// </summary>
-        /// <param name="key">The API key to convert into a <see cref="Authentication"/>.</param>
-        public static implicit operator Authentication(string key) => new Authentication(key);
+        /// <param name="key">The API key to convert into a <see cref="OpenAIAuthentication"/>.</param>
+        public static implicit operator OpenAIAuthentication(string key) => new OpenAIAuthentication(key);
 
         /// <summary>
         /// Instantiates a new Authentication object with the given <paramref name="apiKey"/>, which may be <see langword="null"/>.
         /// </summary>
         /// <param name="apiKey">The API key, required to access the API endpoint.</param>
-        public Authentication(string apiKey) => ApiKey = apiKey;
+        public OpenAIAuthentication(string apiKey) => ApiKey = apiKey;
 
-        private static Authentication cachedDefault = null;
+        private static OpenAIAuthentication cachedDefault = null;
 
         /// <summary>
         /// The default authentication to use when no other auth is specified.  This can be set manually, or automatically loaded via environment variables or a config file.  <seealso cref="LoadFromEnv"/><seealso cref="LoadFromDirectory"/>
         /// </summary>
-        public static Authentication Default
+        public static OpenAIAuthentication Default
         {
             get
             {
@@ -51,8 +51,8 @@ namespace OpenAI_DotNet
         /// <summary>
         /// Attempts to load api keys from environment variables, as "OPENAI_KEY" (or "OPENAI_SECRET_KEY", for backwards compatibility)
         /// </summary>
-        /// <returns>Returns the loaded <see cref="Authentication"/> any api keys were found, or <see langword="null"/> if there were no matching environment vars.</returns>
-        public static Authentication LoadFromEnv()
+        /// <returns>Returns the loaded <see cref="OpenAIAuthentication"/> any api keys were found, or <see langword="null"/> if there were no matching environment vars.</returns>
+        public static OpenAIAuthentication LoadFromEnv()
         {
             var key = Environment.GetEnvironmentVariable("OPENAI_KEY");
 
@@ -66,7 +66,7 @@ namespace OpenAI_DotNet
                 key = Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY");
             }
 
-            return string.IsNullOrEmpty(key) ? null : new Authentication(key);
+            return string.IsNullOrEmpty(key) ? null : new OpenAIAuthentication(key);
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace OpenAI_DotNet
         /// <param name="directory">The directory to look in, or <see langword="null"/> for the current directory</param>
         /// <param name="filename">The filename of the config file</param>
         /// <param name="searchUp">Whether to recursively traverse up the directory tree if the <paramref name="filename"/> is not found in the <paramref name="directory"/></param>
-        /// <returns>Returns the loaded <see cref="Authentication"/> any api keys were found, or <see langword="null"/> if it was not successful in finding a config (or if the config file didn't contain correctly formatted API keys)</returns>
-        public static Authentication LoadFromDirectory(string directory = null, string filename = ".openai", bool searchUp = true)
+        /// <returns>Returns the loaded <see cref="OpenAIAuthentication"/> any api keys were found, or <see langword="null"/> if it was not successful in finding a config (or if the config file didn't contain correctly formatted API keys)</returns>
+        public static OpenAIAuthentication LoadFromDirectory(string directory = null, string filename = ".openai", bool searchUp = true)
         {
             directory ??= Environment.CurrentDirectory;
 
@@ -116,7 +116,7 @@ namespace OpenAI_DotNet
                 }
             }
 
-            return string.IsNullOrEmpty(key) ? null : new Authentication(key);
+            return string.IsNullOrEmpty(key) ? null : new OpenAIAuthentication(key);
         }
     }
 }

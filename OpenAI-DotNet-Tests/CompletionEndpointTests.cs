@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using OpenAI_DotNet;
+using OpenAI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetBasicCompletion()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
             Assert.IsNotNull(api.CompletionEndpoint);
 
             var result = await api.CompletionEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, engine: Engine.Davinci);
@@ -28,7 +28,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetStreamingCompletionAsync()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
             Assert.IsNotNull(api.CompletionEndpoint);
 
             var allCompletions = new List<Choice>();
@@ -52,7 +52,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetStreamingEnumerableCompletion()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
             Assert.IsNotNull(api.CompletionEndpoint);
 
             var allCompletions = new List<Choice>();

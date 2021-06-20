@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using OpenAI_DotNet;
+using OpenAI;
 
 namespace OpenAI_Tests
 {
@@ -19,7 +19,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetClassificationResults()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
 
             Assert.IsNotNull(api.ClassificationEndpoint);
 

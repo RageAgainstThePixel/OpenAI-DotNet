@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using OpenAI_DotNet;
+using OpenAI;
 
 namespace OpenAI_Tests
 {
@@ -8,7 +8,7 @@ namespace OpenAI_Tests
         [Test]
         public void GetEngines()
         {
-            var api = new OpenAI(Engine.Davinci);
+            var api = new OpenAIClient(Engine.Davinci);
 
             var results = api.EnginesEndpoint.GetEnginesAsync().Result;
             Assert.IsNotNull(results);
@@ -18,7 +18,7 @@ namespace OpenAI_Tests
         [Test]
         public void RetrieveEngineDetails()
         {
-            var api = new OpenAI(Engine.Davinci);
+            var api = new OpenAIClient(Engine.Davinci);
 
             var engines = api.EnginesEndpoint.GetEnginesAsync().Result;
 

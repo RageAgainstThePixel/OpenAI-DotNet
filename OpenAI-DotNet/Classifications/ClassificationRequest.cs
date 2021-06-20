@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Represents a request to the Classification API.  Mostly matches the parameters in

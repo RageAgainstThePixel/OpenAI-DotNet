@@ -11,19 +11,21 @@
     Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Copyright></Copyright>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/StephenHodgson/OpenAI-DotNet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/StephenHodgson/OpenAI-DotNet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Added Classifications endpoint
-Misc cleanup, organization, and performance optimizations</PackageReleaseNotes>
+    <PackageReleaseNotes>Migrated to RageAgainstThePixel GitHub account.
+Renamed OpenAI to OpenAIClient
+Renamed Authentication to OpenAIAuthentication</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>2.0.1</Version>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <Version>3.0.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <Company>RageAgainstThePixel</Company>
   </PropertyGroup>
 
 </Project>

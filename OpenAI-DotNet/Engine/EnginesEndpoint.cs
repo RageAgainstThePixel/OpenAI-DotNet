@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// The API endpoint for querying available Engines/models.
@@ -20,7 +20,7 @@ namespace OpenAI_DotNet
         }
 
         /// <inheritdoc />
-        internal EnginesEndpoint(OpenAI api) : base(api) { }
+        internal EnginesEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
         protected override string GetEndpoint(Engine engine = null)

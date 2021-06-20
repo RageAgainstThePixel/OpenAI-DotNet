@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Represents a single search result in <see cref="SearchResponse"/>.

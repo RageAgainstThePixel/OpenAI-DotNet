@@ -1,14 +1,14 @@
-﻿namespace OpenAI_DotNet
+﻿namespace OpenAI
 {
     public abstract class BaseEndPoint
     {
-        protected readonly OpenAI Api;
+        protected readonly OpenAIClient Api;
 
         /// <summary>
         /// Constructor of the api endpoint.
-        /// Rather than instantiating this yourself, access it through an instance of <see cref="OpenAI"/>.
+        /// Rather than instantiating this yourself, access it through an instance of <see cref="OpenAIClient"/>.
         /// </summary>
-        internal BaseEndPoint(OpenAI api) => Api = api;
+        internal BaseEndPoint(OpenAIClient api) => Api = api;
 
         /// <summary>
         /// Gets the basic endpoint url for the API

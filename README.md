@@ -1,24 +1,28 @@
 # C#/.NET SDK for accessing the OpenAI GPT-3 API
 
-A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api). 
-
-Based on [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet)
+A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT-3 API.  More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api) and forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 
 ## Requirements
 
-This library is based on .NET Standard 2.0, so it should work across .NET Framework >=4.7.2 and .NET Core >= 3.0.  It should work across console apps, winforms, wpf, asp.net, etc.  It should work across Windows, Linux, and Mac.
+This library is based on .NET Standard 2.0, so it should work across .NET Framework >=4.7.2 and .NET Core >= 3.0.  It should work across console apps, winforms, wpf, asp.net, etc. It should also work across Windows, Linux, and Mac.
 
 ## Getting started
 
 ### Install from NuGet
 
-[![Nuget Publish](https://github.com/StephenHodgson/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml/badge.svg)](https://github.com/StephenHodgson/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml)[![NuGet version (OpenAI-DotNet)](https://img.shields.io/nuget/v/OpenAI-DotNet.svg?style=flat-square)](https://www.nuget.org/packages/OpenAI-DotNet/)
+[![NuGet version (OpenAI-DotNet)](https://img.shields.io/nuget/v/OpenAI-DotNet.svg)](https://www.nuget.org/packages/OpenAI-DotNet/)
+[![Nuget Publish](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml/badge.svg)](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml)
+[![Discord](https://img.shields.io/discord/855294214065487932.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/xQgMW9ufN4)
 
 Install package [`OpenAI` from Nuget](https://www.nuget.org/packages/OpenAI-DotNet/).  Here's how via command line:
 
 ```powershell
 Install-Package OpenAI-DotNet
 ```
+
+> Looking to use OpenAI in the Unity Game Engine? Check out our unity package on OpenUPM:
+>
+>[![openupm](https://img.shields.io/npm/v/com.openai.unity?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.openai.unity/)
 
 ### Quick Start
 

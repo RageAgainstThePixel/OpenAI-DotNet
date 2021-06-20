@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Represents a completion choice returned by the <see cref="CompletionEndpoint"/>.

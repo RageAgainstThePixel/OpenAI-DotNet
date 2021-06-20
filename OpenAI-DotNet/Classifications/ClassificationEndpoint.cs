@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Classifies the specified query using provided examples.
@@ -13,7 +13,7 @@ namespace OpenAI_DotNet
     public class ClassificationEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal ClassificationEndpoint(OpenAI api) : base(api) { }
+        internal ClassificationEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
         protected override string GetEndpoint(Engine engine = null)

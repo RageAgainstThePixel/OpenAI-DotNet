@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using OpenAI_DotNet;
+using OpenAI;
 using System;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetSearchResults()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
 
             Assert.IsNotNull(api.SearchEndpoint);
 
@@ -25,7 +25,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetBestMatch()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
 
             Assert.IsNotNull(api.SearchEndpoint);
 
@@ -37,7 +37,7 @@ namespace OpenAI_Tests
         [Test]
         public async Task GetBestMatchWithScore()
         {
-            var api = new OpenAI();
+            var api = new OpenAIClient();
 
             Assert.IsNotNull(api.SearchEndpoint);
 

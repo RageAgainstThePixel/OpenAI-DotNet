@@ -1,15 +1,14 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Entry point to the OpenAI API, handling auth and allowing access to the various API endpoints
     /// </summary>
-    public class OpenAI
+    public class OpenAIClient
     {
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
@@ -17,24 +16,24 @@ namespace OpenAI_DotNet
         /// <param name="engine">The <see cref="Engine"/>/model to use for API calls,
         /// defaulting to <see cref="Engine.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAI(Engine engine) : this(null, engine) { }
+        public OpenAIClient(Engine engine) : this(null, engine) { }
 
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        /// <param name="auth">The API authentication information to use for API calls,
-        /// or <see langword="null"/> to attempt to use the <see cref="Authentication.Default"/>,
+        /// <param name="authentication">The API authentication information to use for API calls,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIAuthentication.Default"/>,
         /// potentially loading from environment vars or from a config file.</param>
         /// <param name="engine">The <see cref="Engine"/>/model to use for API calls,
         /// defaulting to <see cref="Engine.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAI(Authentication auth = null, Engine engine = null)
+        public OpenAIClient(OpenAIAuthentication authentication = null, Engine engine = null)
         {
-            Auth = auth ?? Authentication.Default;
+            Auth = authentication ?? OpenAIAuthentication.Default;
 
             if (Auth?.ApiKey is null)
             {
-                throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/StephenHodgson/OpenAI-DotNet#authentication for details.");
+                throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
             Client = new HttpClient();
@@ -53,7 +52,7 @@ namespace OpenAI_DotNet
         /// <summary>
         /// The API authentication information to use for API calls
         /// </summary>
-        public Authentication Auth { get; }
+        public OpenAIAuthentication Auth { get; }
 
         /// <summary>
         /// Specifies which <see cref="Engine"/>/model to use for API calls

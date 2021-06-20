@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Text generation is the core function of the API. You give the API a prompt, and it generates a completion.
@@ -18,7 +18,7 @@ namespace OpenAI_DotNet
     public class CompletionEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal CompletionEndpoint(OpenAI api) : base(api) { }
+        internal CompletionEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
         protected override string GetEndpoint(Engine engine = null)
@@ -55,7 +55,7 @@ namespace OpenAI_DotNet
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
         public async Task<CompletionResult> CreateCompletionAsync(
@@ -95,7 +95,7 @@ namespace OpenAI_DotNet
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
@@ -148,7 +148,7 @@ namespace OpenAI_DotNet
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
         /// for more details on how to consume an async enumerable.</returns>
@@ -193,7 +193,7 @@ namespace OpenAI_DotNet
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, Engine engine = null)
         {
@@ -264,7 +264,7 @@ namespace OpenAI_DotNet
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
         /// for more details on how to consume an async enumerable.</returns>
@@ -306,7 +306,7 @@ namespace OpenAI_DotNet
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <seealso href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams"/>
         /// for more details on how to consume an async enumerable.</returns>

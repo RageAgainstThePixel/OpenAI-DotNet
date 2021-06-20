@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     public abstract class BaseResponse
     {

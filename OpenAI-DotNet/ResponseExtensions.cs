@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net.Http.Headers;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     public static class ResponseExtensions
     {

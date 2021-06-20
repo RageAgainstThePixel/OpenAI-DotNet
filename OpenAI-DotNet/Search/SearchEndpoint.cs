@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// The API lets you do semantic search over documents.
@@ -21,7 +21,7 @@ namespace OpenAI_DotNet
     public class SearchEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal SearchEndpoint(OpenAI api) : base(api) { }
+        internal SearchEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
         protected override string GetEndpoint(Engine engine = null)
@@ -34,7 +34,7 @@ namespace OpenAI_DotNet
         /// </summary>
         /// <param name="searchRequest">The request containing the query and the documents to match against</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns a Dictionary mapping each document to the score for that document.
         /// The similarity score is a positive score that usually ranges from 0 to 300 (but can sometimes go higher),
         /// where a score above 200 usually means the document is semantically similar to the query.</returns>
@@ -68,7 +68,7 @@ namespace OpenAI_DotNet
         /// <param name="query">A query to match against</param>
         /// <param name="documents">Documents to search over, provided as a list of strings</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns a Dictionary mapping each document to the score for that document.
         /// The similarity score is a positive score that usually ranges from 0 to 300 (but can sometimes go higher),
         /// where a score above 200 usually means the document is semantically similar to the query.</returns>
@@ -84,7 +84,7 @@ namespace OpenAI_DotNet
         /// <param name="query">A query to match against</param>
         /// <param name="documents">Documents to search over, provided as a list of strings</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns the best matching document</returns>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<string> GetBestMatchAsync(string query, IEnumerable<string> documents, Engine engine = null)
@@ -99,7 +99,7 @@ namespace OpenAI_DotNet
         /// <param name="query">A query to match against</param>
         /// <param name="documents">Documents to search over, provided as a list of strings</param>
         /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAI.DefaultEngine"/>.</param>
+        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns a tuple of the best matching document and its score.
         /// The similarity score is a positive score that usually ranges from 0 to 300 (but can sometimes go higher),
         /// where a score above 200 usually means the document is semantically similar to the query.</returns>

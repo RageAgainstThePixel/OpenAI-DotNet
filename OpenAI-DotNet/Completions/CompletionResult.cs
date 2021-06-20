@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI_DotNet
+namespace OpenAI
 {
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionEndpoint"/>.
@@ -28,7 +28,7 @@ namespace OpenAI_DotNet
         private Engine engine;
 
         /// <summary>
-        /// Which model was used to generate this result. Be sure to check <see cref="OpenAI_DotNet.Engine.ModelRevision"/> for the specific revision.
+        /// Which model was used to generate this result. Be sure to check <seeOpenAI.Engine.ModelRevision"/> for the specific revision.
         /// </summary>
         [JsonIgnore]
         public Engine Engine
