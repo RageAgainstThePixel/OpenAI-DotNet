@@ -18,14 +18,13 @@ namespace OpenAI_Tests
         [Test]
         public void RetrieveEngineDetails()
         {
-            var api = new OpenAIClient(Engine.Davinci);
-
+            var api = new OpenAIClient();
             var engines = api.EnginesEndpoint.GetEnginesAsync().Result;
 
             foreach (var engine in engines)
             {
+                Console.WriteLine($"Get engine details for {engine.EngineName}");
                 var result = api.EnginesEndpoint.GetEngineDetailsAsync(engine.EngineName).Result;
-
                 Assert.IsNotNull(result);
             }
         }
