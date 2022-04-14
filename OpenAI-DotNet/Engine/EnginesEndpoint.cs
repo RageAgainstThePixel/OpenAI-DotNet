@@ -68,7 +68,7 @@ namespace OpenAI
                 return JsonSerializer.Deserialize<Engine>(await response.Content.ReadAsStringAsync());
             }
 
-            throw new HttpRequestException($"{nameof(GetEngineDetailsAsync)} Failed! HTTP status code: {response.StatusCode}");
+            throw new HttpRequestException($"{nameof(GetEngineDetailsAsync)} for {id} Failed! HTTP status code: {response.StatusCode}");
         }
     }
 }
