@@ -22,11 +22,14 @@ namespace OpenAI_Tests
             var api = new OpenAIClient();
             var engines = api.EnginesEndpoint.GetEnginesAsync().Result;
 
+            Console.WriteLine($"Found {engines.Count} engines");
+
             foreach (var engine in engines)
             {
+                Console.WriteLine($"{engine.EngineName} | Owner: {engine.Owner} | ModelRevision: {engine.ModelRevision} | Ready? {engine.Ready}");
+
                 if (engine.Ready.HasValue && engine.Ready.Value)
                 {
-                    Console.WriteLine($"Get engine details for {engine.EngineName}");
                     var result = api.EnginesEndpoint.GetEngineDetailsAsync(engine.EngineName).Result;
                     Assert.IsNotNull(result);
                 }
