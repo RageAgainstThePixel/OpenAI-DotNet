@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -145,6 +146,21 @@ namespace OpenAI
         }
 
         /// <summary>
+        /// The logit bias dictionary of token bias values for modifying likelihoods. Positive biases increases the likelihood of 
+        /// generating a token, while negative biases decreases the probability of a token. Very large biases (e.g. -100,100) can
+        /// either eliminate or force a token to be generated.
+        /// </summary>
+        [JsonPropertyName("logit_bias")]
+        public Dictionary<string, double> LogitBias { get; set; }
+
+        /// <summary>
+        /// How many different completions to generate.  Interacts with <see cref="NumChoicesPerPrompt"/> to generate top 
+        /// NumChoicesPerPrompt out of BestOf. In cases where both are set, BestOf should be greater than NumChoicesPerPrompt.
+        /// </summary>
+        [JsonPropertyName("best_of")]
+        public int? BestOf { get; set; }
+
+        /// <summary>
         /// This allows you to set default parameters for every request, for example to set a default temperature or max tokens.
         /// For every request, if you do not have a parameter set on the request but do have it set here as a default,
         /// the request will automatically pick up the default value.
@@ -178,6 +194,8 @@ namespace OpenAI
             LogProbabilities = basedOn.LogProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
             Echo = basedOn.Echo ?? DefaultCompletionRequestArgs?.Echo;
             StopSequences = basedOn.StopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
+            LogitBias = basedOn.LogitBias ?? DefaultCompletionRequestArgs?.LogitBias;
+            BestOf = basedOn.BestOf ?? DefaultCompletionRequestArgs?.BestOf;
         }
 
         /// <summary>
@@ -205,6 +223,8 @@ namespace OpenAI
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
+        /// <param name="logitBias">A dictionary of logit bias to influence the probability of generating a token.</param>
+        /// <param name="bestOf">Returns the top bestOf results based on the best probability.</param>
         public CompletionRequest(
             string prompt = null,
             string[] prompts = null,
@@ -216,7 +236,9 @@ namespace OpenAI
             double? frequencyPenalty = null,
             int? logProbabilities = null,
             bool? echo = null,
-            string[] stopSequences = null)
+            string[] stopSequences = null,
+            Dictionary<string, double> logitBias = null,
+            int? bestOf = null)
         {
             if (prompt != null)
             {
@@ -240,6 +262,8 @@ namespace OpenAI
             LogProbabilities = logProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
             Echo = echo ?? DefaultCompletionRequestArgs?.Echo;
             StopSequences = stopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
+            LogitBias = logitBias ?? DefaultCompletionRequestArgs?.LogitBias;
+            BestOf = bestOf ?? DefaultCompletionRequestArgs?.BestOf;
         }
     }
 }
