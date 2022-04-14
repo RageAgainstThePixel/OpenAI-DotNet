@@ -24,9 +24,12 @@ namespace OpenAI_Tests
 
             foreach (var engine in engines)
             {
-                Console.WriteLine($"Get engine details for {engine.EngineName}");
-                var result = api.EnginesEndpoint.GetEngineDetailsAsync(engine.EngineName).Result;
-                Assert.IsNotNull(result);
+                if (engine.Ready.HasValue && engine.Ready.Value)
+                {
+                    Console.WriteLine($"Get engine details for {engine.EngineName}");
+                    var result = api.EnginesEndpoint.GetEngineDetailsAsync(engine.EngineName).Result;
+                    Assert.IsNotNull(result);
+                }
             }
         }
     }
