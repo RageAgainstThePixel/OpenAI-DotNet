@@ -20,13 +20,7 @@ namespace OpenAI
         }
 
         /// <inheritdoc />
-        internal EnginesEndpoint(OpenAIClient api) : base(api) { }
-
-        /// <inheritdoc />
-        protected override string GetEndpoint(Engine engine = null)
-        {
-            return $"{Api.BaseUrl}engines";
-        }
+        internal EnginesEndpoint(BaseOpenAIClient api,UrlGenerator generator) : base(api,generator) { }
 
         /// <summary>
         /// List all engines via the API

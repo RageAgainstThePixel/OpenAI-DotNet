@@ -12,9 +12,22 @@ namespace OpenAI
 
         internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers)
         {
-            response.Organization = headers.GetValues(Organization).FirstOrDefault();
-            response.RequestId = headers.GetValues(RequestId).FirstOrDefault();
-            response.ProcessingTime = TimeSpan.FromMilliseconds(int.Parse(headers.GetValues(ProcessingTime).First()));
+            response.Organization = TryGetCaseInsensitive(headers, Organization);
+            response.RequestId = TryGetCaseInsensitive(headers, RequestId);
+            response.ProcessingTime = TimeSpan.FromMilliseconds(double.Parse(TryGetCaseInsensitive(headers, ProcessingTime)));
         }
+
+        internal static string TryGetCaseInsensitive(HttpResponseHeaders headers,string key)
+        {
+            if(headers.TryGetValues(key,out var values))
+            {
+                return values.FirstOrDefault();
+            } else
+            {
+                return headers.GetValues(key.ToLower()).FirstOrDefault();
+            }
+        }
+
+        
     }
 }

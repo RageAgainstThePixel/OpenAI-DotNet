@@ -21,13 +21,8 @@ namespace OpenAI
     public class SearchEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal SearchEndpoint(OpenAIClient api) : base(api) { }
+        internal SearchEndpoint(BaseOpenAIClient api, UrlGenerator generator) : base(api,generator) { }
 
-        /// <inheritdoc />
-        protected override string GetEndpoint(Engine engine = null)
-        {
-            return $"{Api.BaseUrl}engines/{engine?.EngineName ?? Api.DefaultEngine.EngineName}/search";
-        }
 
         /// <summary>
         /// Perform a semantic search over a list of documents
