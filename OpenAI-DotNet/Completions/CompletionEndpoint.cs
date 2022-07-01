@@ -18,13 +18,8 @@ namespace OpenAI
     public class CompletionEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal CompletionEndpoint(OpenAIClient api) : base(api) { }
-
-        /// <inheritdoc />
-        protected override string GetEndpoint(Engine engine = null)
-        {
-            return $"{Api.BaseUrl}engines/{engine?.EngineName ?? Api.DefaultEngine.EngineName}/completions";
-        }
+        internal CompletionEndpoint(BaseOpenAIClient api,UrlGenerator generator) : base(api,generator) { }
+        
 
         #region Non-streaming
 

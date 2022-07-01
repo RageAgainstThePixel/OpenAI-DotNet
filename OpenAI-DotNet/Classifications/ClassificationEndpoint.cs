@@ -13,13 +13,8 @@ namespace OpenAI
     public class ClassificationEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal ClassificationEndpoint(OpenAIClient api) : base(api) { }
+        internal ClassificationEndpoint(BaseOpenAIClient api,UrlGenerator generator) : base(api,generator) { }
 
-        /// <inheritdoc />
-        protected override string GetEndpoint(Engine engine = null)
-        {
-            return $"{Api.BaseUrl}classifications";
-        }
 
         /// <summary>
         /// Given a query and a set of labeled examples, the model will predict the most likely label for the query.
