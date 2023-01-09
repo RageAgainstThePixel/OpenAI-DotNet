@@ -56,9 +56,8 @@ jobs:
         }
       shell: pwsh
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v3
       if: always()
       with:
         name: Nuget Package
-        path: ${{ env.Project_Path }}/bin
+        path: ${{ github.workspace }}\OpenAI-DotNet\bin
