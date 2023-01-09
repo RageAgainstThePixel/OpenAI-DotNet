@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace OpenAI
 {
     /// <summary>
-    /// Represents a result from calling the <see cref="CompletionEndpoint"/>.
+    /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.
     /// </summary>
     public sealed class CompletionResult : BaseResponse
     {
@@ -14,6 +14,9 @@ namespace OpenAI
         /// </summary>
         [JsonPropertyName("id")]
         public string Id { get; set; }
+
+        [JsonPropertyName("object")]
+        public string Object { get; set; }
 
         /// <summary>
         /// The time when the result was generated in unix epoch format
@@ -24,18 +27,6 @@ namespace OpenAI
         /// The time when the result was generated
         [JsonIgnore]
         public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
-
-        private Engine engine;
-
-        /// <summary>
-        /// Which model was used to generate this result. Be sure to check <seeOpenAI.Engine.ModelRevision"/> for the specific revision.
-        /// </summary>
-        [JsonIgnore]
-        public Engine Engine
-        {
-            get => engine ?? new Engine(Model);
-            set => engine = value;
-        }
 
         [JsonPropertyName("model")]
         public string Model { get; set; }
@@ -51,8 +42,8 @@ namespace OpenAI
         /// </summary>
         public override string ToString()
         {
-            return Completions != null && Completions.Count > 0
-                ? Completions[0].ToString()
+            return Completions is { Count: > 0 }
+                ? Completions[0]
                 : $"CompletionResult {Id} has no valid output";
         }
     }

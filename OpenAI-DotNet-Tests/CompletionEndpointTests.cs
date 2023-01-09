@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
-using OpenAI;
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAI_Tests
+namespace OpenAI.Tests
 {
     public class CompletionEndpointTests
     {
@@ -15,9 +15,9 @@ namespace OpenAI_Tests
         public async Task GetBasicCompletion()
         {
             var api = new OpenAIClient();
-            Assert.IsNotNull(api.CompletionEndpoint);
+            Assert.IsNotNull(api.CompletionsEndpoint);
 
-            var result = await api.CompletionEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, engine: Engine.Davinci);
+            var result = await api.CompletionsEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Completions);
             Assert.NotZero(result.Completions.Count);
@@ -29,11 +29,11 @@ namespace OpenAI_Tests
         public async Task GetStreamingCompletionAsync()
         {
             var api = new OpenAIClient();
-            Assert.IsNotNull(api.CompletionEndpoint);
+            Assert.IsNotNull(api.CompletionsEndpoint);
 
             var allCompletions = new List<Choice>();
 
-            await api.CompletionEndpoint.StreamCompletionAsync(result =>
+            await api.CompletionsEndpoint.StreamCompletionAsync(result =>
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Completions);
@@ -44,7 +44,7 @@ namespace OpenAI_Tests
                 {
                     Console.WriteLine(choice);
                 }
-            }, prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, engine: Engine.Davinci);
+            }, prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci);
             Assert.That(allCompletions.Any(c => c.Text.Trim().ToLower().StartsWith("nine")));
         }
 
@@ -53,11 +53,11 @@ namespace OpenAI_Tests
         public async Task GetStreamingEnumerableCompletion()
         {
             var api = new OpenAIClient();
-            Assert.IsNotNull(api.CompletionEndpoint);
+            Assert.IsNotNull(api.CompletionsEndpoint);
 
             var allCompletions = new List<Choice>();
 
-            await foreach (var result in api.CompletionEndpoint.StreamCompletionEnumerableAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, engine: Engine.Davinci))
+            await foreach (var result in api.CompletionsEndpoint.StreamCompletionEnumerableAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci))
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Completions);

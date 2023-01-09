@@ -1,8 +1,7 @@
 using NUnit.Framework;
-using OpenAI;
 using System.IO;
 
-namespace OpenAI_Tests
+namespace OpenAI.Tests
 {
     public class AuthTests
     {
@@ -10,6 +9,7 @@ namespace OpenAI_Tests
         public void Setup()
         {
             File.WriteAllText(".openai", "OPENAI_KEY=pk-test12");
+            Assert.IsTrue(File.Exists(".openai"));
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace OpenAI_Tests
         }
 
         [Test]
-        public void GetAuthFromNonExistantFile()
+        public void GetAuthFromNonExistentFile()
         {
             var auth = OpenAIAuthentication.LoadFromDirectory(filename: "bad.config");
             Assert.IsNull(auth);
@@ -41,26 +41,24 @@ namespace OpenAI_Tests
         public void GetDefault()
         {
             var auth = OpenAIAuthentication.Default;
-            var envAuth = OpenAIAuthentication.LoadFromEnv();
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
-            Assert.AreEqual(envAuth.ApiKey, auth.ApiKey);
         }
 
         [Test]
-        public void TestHelper()
+        public void Authentication()
         {
             var defaultAuth = OpenAIAuthentication.Default;
             var manualAuth = new OpenAIAuthentication("pk-testAA");
             var api = new OpenAIClient();
-            var shouldBeDefaultAuth = api.Auth;
+            var shouldBeDefaultAuth = api.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeDefaultAuth);
             Assert.IsNotNull(shouldBeDefaultAuth.ApiKey);
             Assert.AreEqual(defaultAuth.ApiKey, shouldBeDefaultAuth.ApiKey);
 
             OpenAIAuthentication.Default = new OpenAIAuthentication("pk-testAA");
             api = new OpenAIClient();
-            var shouldBeManualAuth = api.Auth;
+            var shouldBeManualAuth = api.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeManualAuth);
             Assert.IsNotNull(shouldBeManualAuth.ApiKey);
             Assert.AreEqual(manualAuth.ApiKey, shouldBeManualAuth.ApiKey);
@@ -91,5 +89,15 @@ namespace OpenAI_Tests
             Assert.AreEqual("sk-testBB", auth.ApiKey);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            if (File.Exists(".openai"))
+            {
+                File.Delete(".openai");
+            }
+
+            Assert.IsFalse(File.Exists(".openai"));
+        }
     }
 }
