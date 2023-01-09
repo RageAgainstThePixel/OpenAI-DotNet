@@ -8,6 +8,10 @@ namespace OpenAI
     /// </summary>
     public class OpenAIAuthentication
     {
+        private const string OPENAI_KEY = "OPENAI_KEY";
+        private const string OPENAI_SECRET_KEY = "OPENAI_SECRET_KEY";
+        private const string TEST_OPENAI_SECRET_KEY = "TEST_OPENAI_SECRET_KEY";
+
         /// <summary>
         /// The API key, required to access the API endpoint.
         /// </summary>
@@ -25,7 +29,7 @@ namespace OpenAI
         /// <param name="apiKey">The API key, required to access the API endpoint.</param>
         public OpenAIAuthentication(string apiKey) => ApiKey = apiKey;
 
-        private static OpenAIAuthentication cachedDefault = null;
+        private static OpenAIAuthentication cachedDefault;
 
         /// <summary>
         /// The default authentication to use when no other auth is specified.  This can be set manually, or automatically loaded via environment variables or a config file.  <seealso cref="LoadFromEnv"/><seealso cref="LoadFromDirectory"/>
@@ -39,10 +43,10 @@ namespace OpenAI
                     return cachedDefault;
                 }
 
-                var auth = (LoadFromEnv() ??
-                            LoadFromDirectory()) ??
-                            LoadFromDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-                cachedDefault = auth;
+                var auth = LoadFromDirectory() ??
+                           LoadFromDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) ??
+                           LoadFromEnv();
+                cachedDefault = auth ?? throw new UnauthorizedAccessException("Failed to load a valid API Key!");
                 return auth;
             }
             set => cachedDefault = value;
@@ -54,19 +58,19 @@ namespace OpenAI
         /// <returns>Returns the loaded <see cref="OpenAIAuthentication"/> any api keys were found, or <see langword="null"/> if there were no matching environment vars.</returns>
         public static OpenAIAuthentication LoadFromEnv()
         {
-            var key = Environment.GetEnvironmentVariable("OPENAI_KEY");
+            var apiKey = Environment.GetEnvironmentVariable(OPENAI_KEY);
 
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(apiKey))
             {
-                key = Environment.GetEnvironmentVariable("OPENAI_SECRET_KEY");
+                apiKey = Environment.GetEnvironmentVariable(OPENAI_SECRET_KEY);
             }
 
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(apiKey))
             {
-                key = Environment.GetEnvironmentVariable("TEST_OPENAI_SECRET_KEY");
+                apiKey = Environment.GetEnvironmentVariable(TEST_OPENAI_SECRET_KEY);
             }
 
-            return string.IsNullOrEmpty(key) ? null : new OpenAIAuthentication(key);
+            return string.IsNullOrEmpty(apiKey) ? null : new OpenAIAuthentication(apiKey);
         }
 
         /// <summary>
@@ -95,10 +99,13 @@ namespace OpenAI
                         {
                             switch (parts[0].ToUpper())
                             {
-                                case "OPENAI_KEY":
+                                case OPENAI_KEY:
                                     key = parts[1].Trim();
                                     break;
-                                case "OPENAI_SECRET_KEY":
+                                case OPENAI_SECRET_KEY:
+                                    key = parts[1].Trim();
+                                    break;
+                                case TEST_OPENAI_SECRET_KEY:
                                     key = parts[1].Trim();
                                     break;
                             }

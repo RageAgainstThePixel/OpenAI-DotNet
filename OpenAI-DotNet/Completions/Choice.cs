@@ -3,7 +3,7 @@
 namespace OpenAI
 {
     /// <summary>
-    /// Represents a completion choice returned by the <see cref="CompletionEndpoint"/>.
+    /// Represents a completion choice returned by the <see cref="CompletionsEndpoint"/>.
     /// </summary>
     public sealed class Choice
     {

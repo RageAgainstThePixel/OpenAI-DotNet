@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenAI.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -15,16 +16,14 @@ namespace OpenAI
     /// (see the prompt library for inspiration).
     /// <see href="https://beta.openai.com/docs/api-reference/completions"/>
     /// </summary>
-    public class CompletionEndpoint : BaseEndPoint
+    public class CompletionsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal CompletionEndpoint(OpenAIClient api) : base(api) { }
+        internal CompletionsEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
-        protected override string GetEndpoint(Engine engine = null)
-        {
-            return $"{Api.BaseUrl}engines/{engine?.EngineName ?? Api.DefaultEngine.EngineName}/completions";
-        }
+        protected override string GetEndpoint()
+            => $"{Api.BaseUrl}completions";
 
         #region Non-streaming
 
@@ -34,6 +33,7 @@ namespace OpenAI
         /// </summary>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
+        /// <param name="suffix">The suffix that comes after a completion of inserted text.</param>
         /// <param name="max_tokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
         /// <param name="temperature">What sampling temperature to use. Higher values means the model will take more risks.
         /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
@@ -54,13 +54,14 @@ namespace OpenAI
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
+        /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
+        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
         public async Task<CompletionResult> CreateCompletionAsync(
             string prompt = null,
             string[] prompts = null,
+            string suffix = null,
             int? max_tokens = null,
             double? temperature = null,
             double? top_p = null,
@@ -70,12 +71,14 @@ namespace OpenAI
             int? logProbabilities = null,
             bool? echo = null,
             string[] stopSequences = null,
-            Engine engine = null
-            )
+            Model model = null
+        )
         {
             var request = new CompletionRequest(
+                model ?? Api.DefaultModel,
                 prompt,
                 prompts,
+                suffix,
                 max_tokens,
                 temperature,
                 top_p,
@@ -86,7 +89,7 @@ namespace OpenAI
                 echo,
                 stopSequences);
 
-            return await CreateCompletionAsync(request, engine);
+            return await CreateCompletionAsync(request);
         }
 
         /// <summary>
@@ -94,16 +97,14 @@ namespace OpenAI
         /// This is non-streaming, so it will wait until the API returns the full result.
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest, Engine engine = null)
+        public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest)
         {
             completionRequest.Stream = false;
             var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
-            var response = await Api.Client.PostAsync(GetEndpoint(engine), jsonContent.ToJsonStringContent());
+            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent());
 
             if (response.IsSuccessStatusCode)
             {
@@ -120,12 +121,11 @@ namespace OpenAI
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified request,
         /// and stream the results to the <paramref name="resultHandler"/> as they come in.
-        /// If you are on the latest C# supporting <see cref="IAsyncEnumerable{T}"/>,
-        /// you may prefer the cleaner syntax of <see cref="StreamCompletionEnumerableAsync(CompletionRequest,Engine)"/> instead.
         /// </summary>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
+        /// <param name="suffix"></param>
         /// <param name="max_tokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
         /// <param name="temperature">What sampling temperature to use. Higher values means the model will take more risks.
         /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
@@ -147,8 +147,8 @@ namespace OpenAI
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
+        /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
+        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
         /// for more details on how to consume an async enumerable.</returns>
@@ -156,6 +156,7 @@ namespace OpenAI
             Action<CompletionResult> resultHandler,
             string prompt = null,
             string[] prompts = null,
+            string suffix = null,
             int? max_tokens = null,
             double? temperature = null,
             double? top_p = null,
@@ -165,12 +166,14 @@ namespace OpenAI
             int? logProbabilities = null,
             bool? echo = null,
             string[] stopSequences = null,
-            Engine engine = null
+            Model model = null
             )
         {
             var request = new CompletionRequest(
+                model ?? Api.DefaultModel,
                 prompt,
                 prompts,
+                suffix,
                 max_tokens,
                 temperature,
                 top_p,
@@ -181,25 +184,21 @@ namespace OpenAI
                 echo,
                 stopSequences);
 
-            await StreamCompletionAsync(request, resultHandler, engine);
+            await StreamCompletionAsync(request, resultHandler);
         }
 
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified request,
         /// and stream the results to the <paramref name="resultHandler"/> as they come in.
-        /// If you are on the latest C# supporting <see cref="IAsyncEnumerable{T}"/>,
-        /// you may prefer the cleaner syntax of <see cref="StreamCompletionEnumerableAsync(CompletionRequest,Engine)"/> instead.
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, Engine engine = null)
+        public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler)
         {
             completionRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, new JsonSerializerOptions { IgnoreNullValues = true });
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint(engine))
+            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint())
             {
                 Content = jsonContent.ToJsonStringContent()
             };
@@ -209,9 +208,8 @@ namespace OpenAI
             {
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 using var reader = new StreamReader(stream);
-                string line;
 
-                while ((line = await reader.ReadLineAsync()) != null)
+                while (await reader.ReadLineAsync() is { } line)
                 {
                     if (line.StartsWith("data: "))
                     {
@@ -237,11 +235,12 @@ namespace OpenAI
 
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified parameters.
-        /// If you are not using C# 8 supporting <see cref="IAsyncEnumerable{T}"/> or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, Engine)"/> instead.
+        /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
+        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult})"/> instead.
         /// </summary>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
+        /// <param name="suffix">The suffix that comes after a completion of inserted text.</param>
         /// <param name="max_tokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
         /// <param name="temperature">What sampling temperature to use. Higher values means the model will take more risks.
         /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
@@ -263,14 +262,15 @@ namespace OpenAI
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
+        /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
+        /// Defaults to <see cref="OpenAI.DefaultModel"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
         /// for more details on how to consume an async enumerable.</returns>
         public IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(
             string prompt = null,
             string[] prompts = null,
+            string suffix = null,
             int? max_tokens = null,
             double? temperature = null,
             double? top_p = null,
@@ -280,12 +280,14 @@ namespace OpenAI
             int? logProbabilities = null,
             bool? echo = null,
             string[] stopSequences = null,
-            Engine engine = null
+            Model model = null
             )
         {
             var request = new CompletionRequest(
+                model ?? Api.DefaultModel,
                 prompt,
                 prompts,
+                suffix,
                 max_tokens,
                 temperature,
                 top_p,
@@ -296,26 +298,24 @@ namespace OpenAI
                 echo,
                 stopSequences);
 
-            return StreamCompletionEnumerableAsync(request, engine);
+            return StreamCompletionEnumerableAsync(request);
         }
 
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.
-        /// If you are not using C# 8 supporting <see cref="IAsyncEnumerable{T}"/> or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, Engine)"/> instead.
+        /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
+        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult})"/> instead.
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
-        /// <param name="engine">Optional, <see cref="Engine"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultEngine"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <seealso href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams"/>
         /// for more details on how to consume an async enumerable.</returns>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, Engine engine = null)
+        public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest)
         {
             completionRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, new JsonSerializerOptions { IgnoreNullValues = true });
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint(engine))
+            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetEndpoint())
             {
                 Content = jsonContent.ToJsonStringContent()
             };
@@ -325,9 +325,8 @@ namespace OpenAI
             {
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 using var reader = new StreamReader(stream);
-                string line;
 
-                while ((line = await reader.ReadLineAsync()) != null)
+                while (await reader.ReadLineAsync() is { } line)
                 {
                     if (line.StartsWith("data: "))
                     {

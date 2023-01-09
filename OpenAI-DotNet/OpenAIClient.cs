@@ -1,7 +1,13 @@
-﻿using System.Net.Http;
+﻿using OpenAI.Edits;
+using OpenAI.Embeddings;
+using OpenAI.Images;
+using OpenAI.Models;
+using OpenAI.Moderations;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
@@ -13,51 +19,67 @@ namespace OpenAI
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        /// <param name="engine">The <see cref="Engine"/>/model to use for API calls,
-        /// defaulting to <see cref="Engine.Davinci"/> if not specified.</param>
+        /// <param name="model">The <see cref="Model"/>/model to use for API calls,
+        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAIClient(Engine engine) : this(null, engine) { }
+        public OpenAIClient(Model model) : this(null, model) { }
 
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        /// <param name="authentication">The API authentication information to use for API calls,
-        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIAuthentication.Default"/>,
+        /// <param name="openAIAuthentication">The API authentication information to use for API calls,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
         /// potentially loading from environment vars or from a config file.</param>
-        /// <param name="engine">The <see cref="Engine"/>/model to use for API calls,
-        /// defaulting to <see cref="Engine.Davinci"/> if not specified.</param>
+        /// <param name="model">The <see cref="Model"/> to use for API calls,
+        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAIClient(OpenAIAuthentication authentication = null, Engine engine = null)
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, Model model = null)
         {
-            Auth = authentication ?? OpenAIAuthentication.Default;
+            OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
 
-            if (Auth?.ApiKey is null)
+            if (OpenAIAuthentication?.ApiKey is null)
             {
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
             Client = new HttpClient();
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Auth.ApiKey);
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             Client.DefaultRequestHeaders.Add("User-Agent", "dotnet_openai_api");
             Version = 1;
-            JsonSerializationOptions = new JsonSerializerOptions { IgnoreNullValues = true };
-
-            DefaultEngine = engine ?? Engine.Default;
-            EnginesEndpoint = new EnginesEndpoint(this);
-            CompletionEndpoint = new CompletionEndpoint(this);
-            SearchEndpoint = new SearchEndpoint(this);
-            ClassificationEndpoint = new ClassificationEndpoint(this);
+            JsonSerializationOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+            DefaultModel = model ?? Model.Default;
+            ModelsEndpoint = new ModelsEndpoint(this);
+            CompletionsEndpoint = new CompletionsEndpoint(this);
+            EditsEndpoint = new EditsEndpoint(this);
+            ImagesEndPoint = new ImagesEndpoint(this);
+            EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
+            //TODO FilesEndpoint
+            //TODO File-tunes
+            ModerationsEndpoint = new ModerationsEndpoint(this);
         }
+
+        /// <summary>
+        /// <see cref="HttpClient"/> to use when making calls to the API.
+        /// </summary>
+        internal HttpClient Client { get; }
+
+        /// <summary>
+        /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
+        /// </summary>
+        internal JsonSerializerOptions JsonSerializationOptions { get; }
 
         /// <summary>
         /// The API authentication information to use for API calls
         /// </summary>
-        public OpenAIAuthentication Auth { get; }
+        public OpenAIAuthentication OpenAIAuthentication { get; }
 
         /// <summary>
-        /// Specifies which <see cref="Engine"/>/model to use for API calls
+        /// Specifies which <see cref="Model"/> to use for API calls
         /// </summary>
-        public Engine DefaultEngine { get; set; }
+        public Model DefaultModel { get; set; }
 
         private int version;
 
@@ -75,9 +97,14 @@ namespace OpenAI
         }
 
         /// <summary>
-        /// The API endpoint for querying available Engines/models
+        /// The base url to use when making calls to the API.
         /// </summary>
-        public EnginesEndpoint EnginesEndpoint { get; }
+        internal string BaseUrl { get; private set; }
+
+        /// <summary>
+        /// List and describe the various models available in the API.
+        /// </summary>
+        public ModelsEndpoint ModelsEndpoint { get; }
 
         /// <summary>
         /// Text generation is the core function of the API.
@@ -87,42 +114,26 @@ namespace OpenAI
         /// including summarization, translation, grammar correction, question answering, chatbots, composing emails,
         /// and much more (see the prompt library for inspiration).
         /// </summary>
-        public CompletionEndpoint CompletionEndpoint { get; }
+        public CompletionsEndpoint CompletionsEndpoint { get; }
 
         /// <summary>
-        /// This endpoint lets you do semantic search over documents. This means that you can provide a query,
-        /// such as a natural language question or a statement, and find documents that answer the question
-        /// or are semantically related to the statement. The “documents” can be words, sentences, paragraphs
-        /// or even longer documents. For example, if you provide documents "White House", "hospital", "school"
-        /// and query "the president", you’ll get a different similarity score for each document.
-        /// The higher the similarity score, the more semantically similar the document is to the query
-        /// (in this example, “White House” will be most similar to “the president”).
+        /// Given a prompt and an instruction, the model will return an edited version of the prompt.
         /// </summary>
-        public SearchEndpoint SearchEndpoint { get; }
+        public EditsEndpoint EditsEndpoint { get; }
 
         /// <summary>
-        /// This endpoint provides the ability to leverage a labeled set of examples without fine-tuning and can be
-        /// used for any text-to-label task. By avoiding fine-tuning, it eliminates the need for hyper-parameter tuning.
-        /// The endpoint serves as an "autoML" solution that is easy to configure, and adapt to changing label schema.
-        /// Up to 200 labeled examples can be provided at query time. Given a query and a set of labeled examples,
-        /// the model will predict the most likely label for the query. Useful as a drop-in replacement for any ML
-        /// classification or text-to-label task.
+        /// Given a prompt and/or an input image, the model will generate a new image.
         /// </summary>
-        public ClassificationEndpoint ClassificationEndpoint { get; }
+        public ImagesEndpoint ImagesEndPoint { get; }
 
         /// <summary>
-        /// <see cref="HttpClient"/> to use when making calls to the API.
+        /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
         /// </summary>
-        internal HttpClient Client { get; }
+        public EmbeddingsEndpoint EmbeddingsEndpoint { get; }
 
         /// <summary>
-        /// The base url to use when making calls to the API.
+        /// The moderation endpoint is a tool you can use to check whether content complies with OpenAI's content policy. Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.
         /// </summary>
-        internal string BaseUrl { get; private set; }
-
-        /// <summary>
-        /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
-        /// </summary>
-        internal JsonSerializerOptions JsonSerializationOptions { get; }
+        public ModerationsEndpoint ModerationsEndpoint { get; }
     }
 }

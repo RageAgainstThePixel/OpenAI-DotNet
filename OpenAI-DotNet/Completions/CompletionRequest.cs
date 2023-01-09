@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenAI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -6,12 +7,15 @@ using System.Text.Json.Serialization;
 namespace OpenAI
 {
     /// <summary>
-    /// Represents a request to the <see cref="CompletionEndpoint"/>.  Mostly matches the parameters in
+    /// Represents a request to the <see cref="CompletionsEndpoint"/>.  Mostly matches the parameters in
     /// <see href="https://beta.openai.com/docs/api-reference/completions">the OpenAI docs</see>,
     /// although some have been renames or expanded into single/multiple properties for ease of use.
     /// </summary>
     public sealed class CompletionRequest
     {
+        [JsonPropertyName("model")]
+        public string Model { get; set; }
+
         /// <summary>
         /// If you are requesting more than one prompt, specify them as an array of strings.
         /// </summary>
@@ -44,6 +48,12 @@ namespace OpenAI
                 }
             }
         }
+
+        /// <summary>
+        /// The suffix that comes after a completion of inserted text.
+        /// </summary>
+        [JsonPropertyName("suffix")]
+        public string Suffix { get; set; }
 
         /// <summary>
         /// How many tokens to complete to. Can return fewer if a stop sequence is hit.
@@ -90,7 +100,7 @@ namespace OpenAI
 
         /// <summary>
         /// Specifies where the results should stream and be returned at one time.
-        /// Do not set this yourself, use the appropriate methods on <see cref="CompletionEndpoint"/> instead.
+        /// Do not set this yourself, use the appropriate methods on <see cref="CompletionsEndpoint"/> instead.
         /// </summary>
         [JsonPropertyName("stream")]
         public bool Stream { get; internal set; } = false;
@@ -161,6 +171,12 @@ namespace OpenAI
         public int? BestOf { get; set; }
 
         /// <summary>
+        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
+        /// </summary>
+        [JsonPropertyName("user")]
+        public string User { get; set; }
+
+        /// <summary>
         /// This allows you to set default parameters for every request, for example to set a default temperature or max tokens.
         /// For every request, if you do not have a parameter set on the request but do have it set here as a default,
         /// the request will automatically pick up the default value.
@@ -184,7 +200,9 @@ namespace OpenAI
                 return;
             }
 
+            Model = basedOn.Model;
             Prompts = basedOn.Prompts;
+            Suffix = basedOn.Suffix ?? DefaultCompletionRequestArgs?.Suffix;
             MaxTokens = basedOn.MaxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
             Temperature = basedOn.Temperature ?? DefaultCompletionRequestArgs?.Temperature;
             TopP = basedOn.TopP ?? DefaultCompletionRequestArgs?.TopP;
@@ -196,11 +214,13 @@ namespace OpenAI
             StopSequences = basedOn.StopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
             LogitBias = basedOn.LogitBias ?? DefaultCompletionRequestArgs?.LogitBias;
             BestOf = basedOn.BestOf ?? DefaultCompletionRequestArgs?.BestOf;
+            User = basedOn.User ?? DefaultCompletionRequestArgs?.User;
         }
 
         /// <summary>
         /// Creates a new <see cref="CompletionRequest"/> with the specified parameters
         /// </summary>
+        /// <param name="model">ID of the model to use. You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.</param>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
         /// <param name="max_tokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
@@ -225,9 +245,12 @@ namespace OpenAI
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="logitBias">A dictionary of logit bias to influence the probability of generating a token.</param>
         /// <param name="bestOf">Returns the top bestOf results based on the best probability.</param>
+        /// <param name="user">A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.</param>
         public CompletionRequest(
+            Model model,
             string prompt = null,
             string[] prompts = null,
+            string suffix = null,
             int? max_tokens = null,
             double? temperature = null,
             double? top_p = null,
@@ -238,7 +261,8 @@ namespace OpenAI
             bool? echo = null,
             string[] stopSequences = null,
             Dictionary<string, double> logitBias = null,
-            int? bestOf = null)
+            int? bestOf = null,
+            string user = null)
         {
             if (prompt != null)
             {
@@ -253,6 +277,8 @@ namespace OpenAI
                 throw new ArgumentNullException($"Missing required {prompt}(s)");
             }
 
+            Model = model ?? DefaultCompletionRequestArgs?.Model;
+            Suffix = suffix ?? DefaultCompletionRequestArgs?.Suffix;
             MaxTokens = max_tokens ?? DefaultCompletionRequestArgs?.MaxTokens;
             Temperature = temperature ?? DefaultCompletionRequestArgs?.Temperature;
             TopP = top_p ?? DefaultCompletionRequestArgs?.TopP;
@@ -264,6 +290,7 @@ namespace OpenAI
             StopSequences = stopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
             LogitBias = logitBias ?? DefaultCompletionRequestArgs?.LogitBias;
             BestOf = bestOf ?? DefaultCompletionRequestArgs?.BestOf;
+            User = user ?? DefaultCompletionRequestArgs?.User;
         }
     }
 }

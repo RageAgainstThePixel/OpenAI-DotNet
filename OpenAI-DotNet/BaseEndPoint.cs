@@ -13,8 +13,7 @@
         /// <summary>
         /// Gets the basic endpoint url for the API
         /// </summary>
-        /// <param name="engine">Optional, Engine to use for endpoint.</param>
         /// <returns>The completed basic url for the endpoint.</returns>
-        protected abstract string GetEndpoint(Engine engine = null);
+        protected abstract string GetEndpoint();
     }
 }
