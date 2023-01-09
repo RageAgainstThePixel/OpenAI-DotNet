@@ -34,9 +34,13 @@ jobs:
       env:
         TEST_OPENAI_SECRET_KEY: ${{ secrets.TEST_OPENAI_SECRET_KEY }}
 
-    - name: Test package exists
+    - name: Publish Nuget Package
       run: |
-        $packagePath = ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg
+        $out = ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}
+
+        if (Test-Path -Path $out) {
+          $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse
+        }
 
         Write-Host Package path: $packagePath
 
@@ -44,11 +48,12 @@ jobs:
           Write-Error Failed to find package at $packagePath
           exit 1
         }
-      shell: pwsh
 
-    - name: Publish Nuget
-      if: github.ref == 'refs/heads/main' && matrix.configuration == 'Release'
-      run: dotnet nuget push ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        $isRelease = ${{ github.ref == 'refs/heads/main' && matrix.configuration == 'Release' }}
+
+        if ($isRelease -eq 'true') {
+          dotnet nuget push $packagePath --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        }
       shell: pwsh
 
     - name: Upload build artifacts
