@@ -36,7 +36,7 @@ jobs:
 
     - name: Publish Nuget Package
       run: |
-        $out = ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}
+        $out = "${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}"
 
         if (Test-Path -Path $out) {
           $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse
