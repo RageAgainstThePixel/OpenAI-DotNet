@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -15,9 +14,11 @@
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Migrated to RageAgainstThePixel GitHub account.
-Renamed OpenAI to OpenAIClient
-Renamed Authentication to OpenAIAuthentication</PackageReleaseNotes>
+    <PackageReleaseNotes>
+Bump version to 4.0.0
+Removed Engine, Search and Classification Endpoints
+Added Models, Edits, Image, Embeddings and Moderation endpoints
+    </PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
@@ -27,5 +28,4 @@ Renamed Authentication to OpenAIAuthentication</PackageReleaseNotes>
     <FileVersion>4.0.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
   </PropertyGroup>
-
 </Project>
