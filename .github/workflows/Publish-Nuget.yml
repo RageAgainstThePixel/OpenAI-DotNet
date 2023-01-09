@@ -34,19 +34,16 @@ jobs:
       env:
         TEST_OPENAI_SECRET_KEY: ${{ secrets.TEST_OPENAI_SECRET_KEY }}
 
-    - name: Build Package (${{ matrix.configuration }})
-      run: dotnet build --configuration ${{ matrix.configuration }}
-
-    - name: Test package path
+    - name: Test package exists
       run: |
         $packagePath = ${{ github.workspace }}/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg
+
+        Write-Host Package path: $packagePath
 
         if (-not (Test-Path -Path $packagePath)) {
           Write-Error Failed to find package at $packagePath
           exit 1
         }
-
-        Write-Host Package path: $packagePath
       shell: pwsh
 
     - name: Publish Nuget
