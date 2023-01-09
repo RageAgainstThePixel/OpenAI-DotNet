@@ -212,8 +212,7 @@ The Create Image API is accessed via `OpenAIClient.ImagesEndpoint.GenerateImageA
 ```csharp
 var api = new OpenAIClient();
 var results = await api.ImageGenerationEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
-var image = results[0];
-// result == Texture2D generated image
+// results == array of image urls to download
 ```
 
 #### [Edit Image](https://beta.openai.com/docs/api-reference/images/create-edit)
@@ -225,7 +224,7 @@ The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageEditA
 ```csharp
 var api = new OpenAIClient();
 var results = await api.ImagesEndPoint.CreateImageEditAsync(Path.GetFullPath(imageAssetPath), Path.GetFullPath(maskAssetPath), "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
-// results == file://path/to/image.png | Texture2D
+// results == array of image urls to download
 ```
 
 #### [Create Image Variation](https://beta.openai.com/docs/api-reference/images/create-variation)
@@ -237,7 +236,7 @@ The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageVaria
 ```csharp
 var api = new OpenAIClient();
 var results = await api.ImagesEndPoint.CreateImageVariationAsync(Path.GetFullPath(imageAssetPath), 1, ImageSize.Small);
-// results == file://path/to/image.png | Texture2D
+// results == array of image urls to download
 ```
 
 ### [Moderations](https://beta.openai.com/docs/api-reference/moderations)
