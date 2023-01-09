@@ -42,14 +42,14 @@ jobs:
           $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse
         }
 
-        Write-Host Package path: $packagePath
-
-        if (-not (Test-Path -Path $packagePath)) {
-          Write-Error Failed to find package at $packagePath
+        if (Test-Path -Path $packagePath) {
+          Write-Host Package path: $packagePath
+        } else {
+          Write-Host Failed to find package at $packagePath
           exit 1
         }
 
-        $isRelease = ${{ github.ref == 'refs/heads/main' && matrix.configuration == 'Release' }}
+        $isRelease = "${{ github.ref == 'refs/heads/main' && matrix.configuration == 'Release' }}"
 
         if ($isRelease -eq 'true') {
           dotnet nuget push $packagePath --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
