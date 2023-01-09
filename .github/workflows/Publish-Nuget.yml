@@ -36,7 +36,7 @@ jobs:
 
     - name: Test package exists
       run: |
-        $packagePath = ${{ github.workspace }}/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg
+        $packagePath = ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg
 
         Write-Host Package path: $packagePath
 
@@ -48,7 +48,7 @@ jobs:
 
     - name: Publish Nuget
       if: github.ref == 'refs/heads/main' && matrix.configuration == 'Release'
-      run: dotnet nuget push ${{ github.workspace }}/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ${{ github.workspace }}/OpenAI-DotNet/OpenAI-DotNet/bin/${{ matrix.configuration }}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       shell: pwsh
 
     - name: Upload build artifacts
