@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using OpenAI.Models;
 using System;
 
 namespace OpenAI.Tests
@@ -7,10 +6,9 @@ namespace OpenAI.Tests
     public class ModelsEndpointTests
     {
         [Test]
-        public void GetEngines()
+        public void GetModels()
         {
-            var api = new OpenAIClient(Model.Davinci);
-
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             var results = api.ModelsEndpoint.GetModelsAsync().Result;
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -19,10 +17,10 @@ namespace OpenAI.Tests
         [Test]
         public void RetrieveModelDetails()
         {
-            var api = new OpenAIClient();
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             var models = api.ModelsEndpoint.GetModelsAsync().Result;
 
-            Console.WriteLine($"Found {models.Count} engines!");
+            Console.WriteLine($"Found {models.Count} models!");
 
             foreach (var model in models)
             {
@@ -35,7 +33,7 @@ namespace OpenAI.Tests
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"No Engine details found for {model.Id}\n{e}");
+                    Console.WriteLine($"No Model details found for {model.Id}\n{e}");
                 }
             }
         }

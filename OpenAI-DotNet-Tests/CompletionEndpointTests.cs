@@ -14,7 +14,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task GetBasicCompletion()
         {
-            var api = new OpenAIClient();
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
 
             var result = await api.CompletionsEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci);
@@ -28,7 +28,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task GetStreamingCompletionAsync()
         {
-            var api = new OpenAIClient();
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
 
             var allCompletions = new List<Choice>();
@@ -52,7 +52,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task GetStreamingEnumerableCompletion()
         {
-            var api = new OpenAIClient();
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
 
             var allCompletions = new List<Choice>();

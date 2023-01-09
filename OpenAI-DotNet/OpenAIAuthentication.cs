@@ -46,7 +46,7 @@ namespace OpenAI
                 var auth = LoadFromDirectory() ??
                            LoadFromDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) ??
                            LoadFromEnv();
-                cachedDefault = auth;
+                cachedDefault = auth ?? throw new UnauthorizedAccessException("Failed to load a valid API Key!");
                 return auth;
             }
             set => cachedDefault = value;
