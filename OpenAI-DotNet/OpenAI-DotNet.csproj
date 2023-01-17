@@ -15,17 +15,17 @@
     <PackageTags>OpenAI, AI, ML, API</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>
-Bump version to 4.0.0
-Removed Engine, Search and Classification Endpoints
-Added Models, Edits, Image, Embeddings and Moderation endpoints
+Bump version to 4.0.1
+Fixed Moderation default model
+Added Moderation Tests
     </PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.0.0</Version>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
-    <FileVersion>4.0.0.0</FileVersion>
+    <Version>4.0.1</Version>
+    <AssemblyVersion>4.0.1.0</AssemblyVersion>
+    <FileVersion>4.0.1.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
   </PropertyGroup>
 </Project>
