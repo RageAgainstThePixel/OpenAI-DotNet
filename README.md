@@ -211,7 +211,7 @@ The Create Image API is accessed via `OpenAIClient.ImagesEndpoint.GenerateImageA
 
 ```csharp
 var api = new OpenAIClient();
-var results = await api.ImageGenerationEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
+var results = await api.ImagesEndpoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
 // results == array of image urls to download
 ```
 
