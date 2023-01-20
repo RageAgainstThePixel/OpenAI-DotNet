@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    public class CompletionEndpointTests
+    internal class TestFixture_02_Completions
     {
         private readonly string prompts = "One Two Three Four Five Six Seven Eight Nine One Two Three Four Five Six Seven Eight";
 
