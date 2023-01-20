@@ -3,11 +3,10 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class ModerationEndpointTests
+    internal class TestFixture_08_Moderations
     {
-
         [Test]
-        public async Task GetModerationViolationTest()
+        public async Task Test_1_Moderate()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.ModerationsEndpoint);

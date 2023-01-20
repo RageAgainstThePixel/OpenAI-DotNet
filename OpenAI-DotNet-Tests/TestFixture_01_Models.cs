@@ -3,10 +3,10 @@ using System;
 
 namespace OpenAI.Tests
 {
-    public class ModelsEndpointTests
+    internal class TestFixture_01_Models
     {
         [Test]
-        public void GetModels()
+        public void Test_1_GetModels()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             var results = api.ModelsEndpoint.GetModelsAsync().Result;
@@ -15,7 +15,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public void RetrieveModelDetails()
+        public void Test_2_RetrieveModelDetails()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             var models = api.ModelsEndpoint.GetModelsAsync().Result;
