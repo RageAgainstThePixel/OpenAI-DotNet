@@ -78,8 +78,22 @@ Attempts to load api keys from a configuration file, by default `.openai` in the
 
 To create a configuration file, create a new text file named `.openai` and containing the line:
 
+> Organization entry is optional.
+
+##### Json format
+
+```json
+{
+  "openai_key":"sk-aaaabbbbbccccddddd",
+  "organization":"org-yourOrganizationId"
+}
+```
+
+##### Deprecated format
+
 ```shell
 OPENAI_KEY=sk-aaaabbbbbccccddddd
+ORGANIZATION=org-yourOrganizationId
 ```
 
 You can also load the file directly with known path by calling a static method in Authentication:
@@ -127,7 +141,7 @@ The Completion API is accessed via `OpenAIClient.CompletionEndpoint`:
 ```csharp
 var api = new OpenAIClient();
 var result = await api.CompletionEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
-Debug.Log(result);
+Console.WriteLine(result);
 ```
 
  Get the `CompletionResult` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
@@ -143,12 +157,10 @@ await api.CompletionEndpoint.StreamCompletionAsync(result =>
 {
     foreach (var choice in result.Completions)
     {
-        Debug.Log(choice);
+        Console.WriteLine(choice);
     }
 }, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
 ```
-
-The result.Completions
 
 Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
 
@@ -156,7 +168,7 @@ Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/
 var api = new OpenAIClient();
 await foreach (var token in api.CompletionEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
 {
-  Debug.Log(token);
+  Console.WriteLine(token);
 }
 ```
 
