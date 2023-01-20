@@ -47,7 +47,7 @@ namespace OpenAI.Tests
         [Test]
         public void Test_3_GenerateImageVariations()
         {
-            var api = new OpenAIClient();
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.ImagesEndPoint);
 
             var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
