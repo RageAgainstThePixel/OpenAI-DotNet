@@ -41,8 +41,7 @@ namespace OpenAI.Models
                 return JsonSerializer.Deserialize<ModelsList>(resultAsString)?.Data;
             }
 
-            throw new HttpRequestException(
-                $"{nameof(GetModelsAsync)} Failed! HTTP status code: {response.StatusCode}.");
+            throw new HttpRequestException($"{nameof(GetModelsAsync)} Failed! HTTP status code: {response.StatusCode}.");
         }
 
         /// <summary>
@@ -60,8 +59,7 @@ namespace OpenAI.Models
                 return JsonSerializer.Deserialize<Model>(await response.Content.ReadAsStringAsync());
             }
 
-            throw new HttpRequestException(
-                $"{nameof(GetModelDetailsAsync)} Failed! HTTP status code: {response.StatusCode}");
+            throw new HttpRequestException($"{nameof(GetModelDetailsAsync)} Failed! HTTP status code: {response.StatusCode}");
         }
     }
 }
