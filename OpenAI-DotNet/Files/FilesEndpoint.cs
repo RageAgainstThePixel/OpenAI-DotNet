@@ -103,29 +103,31 @@ namespace OpenAI.Files
         /// <summary>
         /// Delete a file.
         /// </summary>
-        /// <param name="fileData">The file data to delete.</param>
-        /// <returns>True, if file was successfully deleted.</returns>
-        /// <exception cref="HttpRequestException"></exception>
-        public async Task<bool> DeleteFileAsync(FileData fileData)
-            => await DeleteFileAsync(fileData.Id);
-
-        /// <summary>
-        /// Delete a file.
-        /// </summary>
         /// <param name="fileId">The ID of the file to use for this request</param>
         /// <returns>True, if file was successfully deleted.</returns>
         /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFileAsync(string fileId)
         {
-            var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}");
-            var responseAsString = await response.Content.ReadAsStringAsync();
+            return await InternalDeleteFileAsync(1);
 
-            if (!response.IsSuccessStatusCode)
+            async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                throw new HttpRequestException($"{nameof(UploadFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
-            }
+                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}");
+                var responseAsString = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<FileDeleteResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (responseAsString.Contains("File is still processing. Check back later."))
+                    {
+                        await Task.Delay(1000 * attempt);
+                        return await InternalDeleteFileAsync(attempt + 1);
+                    }
+
+                    throw new HttpRequestException($"{nameof(DeleteFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
+                }
+
+                return JsonSerializer.Deserialize<FileDeleteResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+            }
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace OpenAI.Files
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException($"{nameof(UploadFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
+                throw new HttpRequestException($"{nameof(GetFileInfoAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
             }
 
             return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);

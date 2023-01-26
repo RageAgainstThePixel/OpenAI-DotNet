@@ -41,7 +41,7 @@ namespace OpenAI.Tests
 
             foreach (var file in result)
             {
-                Console.WriteLine($"{file.Id} -> {file.Object} {file.FileName}");
+                Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
             }
         }
 
