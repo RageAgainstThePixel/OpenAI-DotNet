@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
 {
-    public sealed class ImageEditRequest
+    public sealed class ImageEditRequest : IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -131,10 +130,7 @@ namespace OpenAI.Images
 
         ~ImageEditRequest()
         {
-            Image?.Close();
-            Image?.Dispose();
-            Mask?.Close();
-            Mask?.Dispose();
+            Dispose(false);
         }
 
         /// <summary>
@@ -172,5 +168,22 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         public string User { get; }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Image?.Close();
+                Image?.Dispose();
+                Mask?.Dispose();
+                Mask?.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

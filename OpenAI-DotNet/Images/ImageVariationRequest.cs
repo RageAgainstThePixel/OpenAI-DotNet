@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
 {
-    public sealed class ImageVariationRequest
+    public sealed class ImageVariationRequest : IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -52,35 +51,44 @@ namespace OpenAI.Images
 
         ~ImageVariationRequest()
         {
-            Image?.Close();
-            Image?.Dispose();
+            Dispose(false);
         }
 
         /// <summary>
         /// The image to use as the basis for the variation(s). Must be a valid PNG file, less than 4MB, and square.
         /// </summary>
-        [JsonIgnore]
         public Stream Image { get; }
 
-        [JsonIgnore]
         public string ImageName { get; }
 
         /// <summary>
         /// The number of images to generate. Must be between 1 and 10.
         /// </summary>
-        [JsonPropertyName("n")]
         public int Number { get; }
 
         /// <summary>
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
         /// </summary>
-        [JsonPropertyName("size")]
         public string Size { get; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
-        [JsonPropertyName("user")]
         public string User { get; }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Image?.Close();
+                Image?.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

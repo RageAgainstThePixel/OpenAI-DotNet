@@ -87,6 +87,7 @@ namespace OpenAI.Files
             await request.File.CopyToAsync(fileData, cancellationToken);
             content.Add(new StringContent(request.Purpose), "purpose");
             content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
+            request.Dispose();
 
             var response = await Api.Client.PostAsync(GetEndpoint(), content, cancellationToken);
             var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken);

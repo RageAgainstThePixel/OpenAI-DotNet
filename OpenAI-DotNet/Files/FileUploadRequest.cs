@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace OpenAI.Files
 {
-    public sealed class FileUploadRequest
+    public sealed class FileUploadRequest : IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -31,8 +32,7 @@ namespace OpenAI.Files
 
         ~FileUploadRequest()
         {
-            File?.Close();
-            File?.Dispose();
+            Dispose(false);
         }
 
         public Stream File { get; }
@@ -40,5 +40,20 @@ namespace OpenAI.Files
         public string FileName { get; }
 
         public string Purpose { get; }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                File?.Close();
+                File?.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
