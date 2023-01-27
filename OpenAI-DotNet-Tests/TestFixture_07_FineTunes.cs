@@ -155,6 +155,7 @@ namespace OpenAI.Tests
 
             var jobInfo = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
             Assert.IsNotNull(jobInfo);
+            Console.WriteLine($"{jobInfo.Id} -> {jobInfo.Status}");
             Assert.IsTrue(jobInfo.Status == "cancelled");
             var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
             Assert.IsTrue(result);
