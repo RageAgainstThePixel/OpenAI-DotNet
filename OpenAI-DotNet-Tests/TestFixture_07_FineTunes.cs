@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using OpenAI.Files;
-using OpenAI.FileTunes;
+using OpenAI.FineTuning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,46 +9,47 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_07_FineTunes
+    internal class TestFixture_07_FineTuning
     {
         private async Task<FileData> CreateTestTrainingDataAsync(OpenAIClient api)
         {
-
             var lines = new List<string>
             {
-                new FineTunesTrainingData("Company: BHFF insurance\\nProduct: allround insurance\\nAd:One stop shop for all your insurance needs!\\nSupported:", "yes"),
-                new FineTunesTrainingData("Company: Loft conversion specialists\\nProduct: -\\nAd:Straight teeth in weeks!\\nSupported:", "no")
+                new FineTuningTrainingData("Company: BHFF insurance\\nProduct: allround insurance\\nAd:One stop shop for all your insurance needs!\\nSupported:", "yes"),
+                new FineTuningTrainingData("Company: Loft conversion specialists\\nProduct: -\\nAd:Straight teeth in weeks!\\nSupported:", "no")
             };
 
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
             await File.WriteAllLinesAsync(localTrainingDataPath, lines);
 
-            var fileData = api.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune").Result;
+            var fileData = await api.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);
             Assert.IsFalse(File.Exists(localTrainingDataPath));
             return fileData;
         }
 
         [Test]
-        public void Test_01_CreateFineTune()
+        public async Task Test_01_CreateFineTuneJob()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
-            var fileData = CreateTestTrainingDataAsync(api).Result;
-            var request = new CreateFineTuneRequest(fileData);
-            var fineTuneResponse = api.FineTunesEndpoint.CreateFineTuneAsync(request).Result;
+            var fileData = await CreateTestTrainingDataAsync(api);
+            var request = new CreateFineTuneJobRequest(fileData);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
 
             Assert.IsNotNull(fineTuneResponse);
+            var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
+            Assert.IsTrue(result);
         }
 
         [Test]
-        public void Test_02_ListFineTunes()
+        public async Task Test_02_ListFineTuneJobs()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
-            var fineTuneJobs = api.FineTunesEndpoint.ListFineTuneJobsAsync().Result;
+            var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
             Assert.IsNotNull(fineTuneJobs);
             Assert.IsNotEmpty(fineTuneJobs);
 
@@ -59,30 +60,30 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public void Test_03_RetrieveFineTuneInfo()
+        public async Task Test_03_RetrieveFineTuneJobInfo()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
-            var fineTuneJobs = api.FineTunesEndpoint.ListFineTuneJobsAsync().Result;
+            var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
             Assert.IsNotNull(fineTuneJobs);
             Assert.IsNotEmpty(fineTuneJobs);
 
             foreach (var job in fineTuneJobs)
             {
-                var request = api.FineTunesEndpoint.RetrieveFineTuneJobInfoAsync(job).Result;
+                var request = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(job);
                 Assert.IsNotNull(request);
                 Console.WriteLine($"{request.Id} -> {request.Status}");
             }
         }
 
         [Test]
-        public void Test_04_ListFineTuneEvents()
+        public async Task Test_04_ListFineTuneEvents()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
-            var fineTuneJobs = api.FineTunesEndpoint.ListFineTuneJobsAsync().Result;
+            var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
             Assert.IsNotNull(fineTuneJobs);
             Assert.IsNotEmpty(fineTuneJobs);
 
@@ -93,7 +94,7 @@ namespace OpenAI.Tests
                     continue;
                 }
 
-                var fineTuneEvents = api.FineTunesEndpoint.ListFineTuneEventsAsync(job).Result;
+                var fineTuneEvents = await api.FineTuningEndpoint.ListFineTuneEventsAsync(job);
                 Assert.IsNotNull(fineTuneEvents);
                 Assert.IsNotEmpty(fineTuneEvents);
 
@@ -109,12 +110,12 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public void Test_05_CancelFineTunes()
+        public async Task Test_05_CancelFineTuneJob()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
-            var fineTuneJobs = api.FineTunesEndpoint.ListFineTuneJobsAsync().Result;
+            var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
             Assert.IsNotNull(fineTuneJobs);
             Assert.IsNotEmpty(fineTuneJobs);
 
@@ -122,7 +123,7 @@ namespace OpenAI.Tests
             {
                 if (job.Status == "pending")
                 {
-                    var result = api.FineTunesEndpoint.CancelFineTuneJob(job).Result;
+                    var result = await api.FineTuningEndpoint.CancelFineTuneJob(job);
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result);
                     Console.WriteLine($"{job.Id} -> cancelled");
@@ -134,55 +135,59 @@ namespace OpenAI.Tests
         public async Task Test_06_StreamFineTuneEvents()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
             var fileData = await CreateTestTrainingDataAsync(api);
-            var request = new CreateFineTuneRequest(fileData);
-            var fineTuneResponse = await api.FineTunesEndpoint.CreateFineTuneAsync(request);
+            var request = new CreateFineTuneJobRequest(fileData);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
             Assert.IsNotNull(fineTuneResponse);
 
-            var fineTuneJob = await api.FineTunesEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
+            var fineTuneJob = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
             Assert.IsNotNull(fineTuneJob);
             Console.WriteLine($"{fineTuneJob.Id} ->");
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await api.FineTunesEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
+            await api.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
             {
                 Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
                 cancellationTokenSource.Cancel();
             }, cancellationTokenSource.Token);
 
-            var jobInfo = await api.FineTunesEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
+            var jobInfo = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
             Assert.IsNotNull(jobInfo);
             Assert.IsTrue(jobInfo.Status == "cancelled");
+            var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
+            Assert.IsTrue(result);
         }
 
         [Test]
         public async Task Test_07_StreamFineTuneEventsEnumerable()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.FineTunesEndpoint);
+            Assert.IsNotNull(api.FineTuningEndpoint);
 
             var fileData = await CreateTestTrainingDataAsync(api);
-            var request = new CreateFineTuneRequest(fileData);
-            var fineTuneResponse = await api.FineTunesEndpoint.CreateFineTuneAsync(request);
+            var request = new CreateFineTuneJobRequest(fileData);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
             Assert.IsNotNull(fineTuneResponse);
 
-            var fineTuneJob = await api.FineTunesEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
+            var fineTuneJob = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
             Assert.IsNotNull(fineTuneJob);
             Console.WriteLine($"{fineTuneJob.Id} ->");
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await foreach (var fineTuneEvent in api.FineTunesEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancellationTokenSource.Token))
+            await foreach (var fineTuneEvent in api.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancellationTokenSource.Token))
             {
                 Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
                 cancellationTokenSource.Cancel();
             }
 
-            var jobInfo = await api.FineTunesEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
+            var jobInfo = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
             Assert.IsNotNull(jobInfo);
             Console.WriteLine($"{jobInfo.Id} -> {jobInfo.Status}");
             Assert.IsTrue(jobInfo.Status == "cancelled");
+            var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
+            Assert.IsTrue(result);
         }
 
         [Test]

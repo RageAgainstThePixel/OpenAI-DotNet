@@ -87,11 +87,18 @@ namespace OpenAI.Models
         /// <summary>
         /// Delete a fine-tuned model. You must have the Owner role in your organization.
         /// </summary>
-        /// <param name="model">The <see cref="Model"/> to delete.</param>
+        /// <param name="modelId">The <see cref="Model"/> to delete.</param>
         /// <returns>True, if fine-tuned model was successfully deleted.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<bool> DeleteFineTuneModelAsync(Model model)
+        public async Task<bool> DeleteFineTuneModelAsync(string modelId)
         {
+            var model = await GetModelDetailsAsync(modelId);
+
+            if (model == null)
+            {
+                throw new Exception($"Failed to get {modelId} info!");
+            }
+
             if (model.OwnedBy != Api.OpenAIAuthentication.Organization)
             {
                 throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");

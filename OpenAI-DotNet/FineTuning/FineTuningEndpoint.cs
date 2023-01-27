@@ -3,21 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAI.Files;
 
-namespace OpenAI.FileTunes
+namespace OpenAI.FineTuning
 {
     /// <summary>
     /// Manage fine-tuning jobs to tailor a model to your specific training data.
     /// <see href="https://beta.openai.com/docs/guides/fine-tuning"/>
     /// </summary>
-    public class FineTunesEndpoint : BaseEndPoint
+    public class FineTuningEndpoint : BaseEndPoint
     {
         private class FineTuneList
         {
@@ -35,7 +33,7 @@ namespace OpenAI.FileTunes
         }
 
         /// <inheritdoc />
-        public FineTunesEndpoint(OpenAIClient api) : base(api) { }
+        public FineTuningEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
         protected override string GetEndpoint()
@@ -46,12 +44,12 @@ namespace OpenAI.FileTunes
         /// Response includes details of the enqueued job including job status and
         /// the name of the fine-tuned models once complete.
         /// </summary>
-        /// <param name="request"><see cref="CreateFineTuneRequest"/>.</param>
+        /// <param name="jobRequest"><see cref="CreateFineTuneJobRequest"/>.</param>
         /// <returns><see cref="FineTuneJob"/>.</returns>
         /// <exception cref="HttpRequestException">.</exception>
-        public async Task<FineTuneResponse> CreateFineTuneAsync(CreateFineTuneRequest request)
+        public async Task<FineTuneJobResponse> CreateFineTuneAsync(CreateFineTuneJobRequest jobRequest)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
+            var jsonContent = JsonSerializer.Serialize(jobRequest, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent());
             var responseAsString = await response.Content.ReadAsStringAsync();
 
@@ -60,7 +58,7 @@ namespace OpenAI.FileTunes
                 throw new HttpRequestException($"{nameof(CreateFineTuneAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {responseAsString}");
             }
 
-            var result = JsonSerializer.Deserialize<FineTuneResponse>(responseAsString, Api.JsonSerializationOptions);
+            var result = JsonSerializer.Deserialize<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
             result.SetResponseData(response.Headers);
             return result;
         }
@@ -87,9 +85,9 @@ namespace OpenAI.FileTunes
         /// Gets info about the fine-tune job.
         /// </summary>
         /// <param name="fineTuneJob"><see cref="FineTuneJob"/>.</param>
-        /// <returns><see cref="FineTuneResponse"/>.</returns>
+        /// <returns><see cref="FineTuneJobResponse"/>.</returns>
         /// <exception cref="HttpRequestException">.</exception>
-        public async Task<FineTuneResponse> RetrieveFineTuneJobInfoAsync(FineTuneJob fineTuneJob)
+        public async Task<FineTuneJobResponse> RetrieveFineTuneJobInfoAsync(FineTuneJob fineTuneJob)
         {
             var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fineTuneJob.Id}");
             var responseAsString = await response.Content.ReadAsStringAsync();
@@ -99,7 +97,7 @@ namespace OpenAI.FileTunes
                 throw new HttpRequestException($"{nameof(RetrieveFineTuneJobInfoAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {responseAsString}");
             }
 
-            var result = JsonSerializer.Deserialize<FineTuneResponse>(responseAsString, Api.JsonSerializationOptions);
+            var result = JsonSerializer.Deserialize<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
             result.SetResponseData(response.Headers);
             return result;
         }
@@ -108,7 +106,7 @@ namespace OpenAI.FileTunes
         /// Immediately cancel a fine-tune job.
         /// </summary>
         /// <param name="fineTuneJob"><see cref="FineTuneJob"/> to cancel.</param>
-        /// <returns><see cref="FineTuneResponse"/>.</returns>
+        /// <returns><see cref="FineTuneJobResponse"/>.</returns>
         /// <exception cref="HttpRequestException">.</exception>
         public async Task<bool> CancelFineTuneJob(FineTuneJob fineTuneJob)
         {
@@ -120,7 +118,7 @@ namespace OpenAI.FileTunes
                 throw new HttpRequestException($"{nameof(CancelFineTuneJob)} Failed! HTTP status code: {response.StatusCode}. Request body: {responseAsString}");
             }
 
-            var result = JsonSerializer.Deserialize<FineTuneResponse>(responseAsString, Api.JsonSerializationOptions);
+            var result = JsonSerializer.Deserialize<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
             result.SetResponseData(response.Headers);
             return result.Status == "cancelled";
         }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAI.FileTunes
+namespace OpenAI.FineTuning
 {
     public sealed class HyperParams
     {

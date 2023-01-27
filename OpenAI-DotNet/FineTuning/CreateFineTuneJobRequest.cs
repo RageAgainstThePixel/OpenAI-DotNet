@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.FileTunes
+namespace OpenAI.FineTuning
 {
-    public sealed class CreateFineTuneRequest
+    public sealed class CreateFineTuneJobRequest
     {
-        public CreateFineTuneRequest(
+        public CreateFineTuneJobRequest(
             string trainingFileId,
             string validationFileId = null,
             string model = null,

@@ -1,31 +1,12 @@
 ﻿using OpenAI.Files;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.FileTunes
+namespace OpenAI.FineTuning
 {
-    public sealed class FineTuneResponse : BaseResponse
+    public sealed class FineTuneJob
     {
-        public static implicit operator FineTuneJob(FineTuneResponse response)
-            => new FineTuneJob
-            {
-                Id = response.Id,
-                Object = response.Object,
-                Model = response.Model,
-                CreatedAtUnixTime = response.CreatedUnixTime,
-                Events = response.Events.ToList(),
-                FineTunedModel = response.FineTunedModel,
-                HyperParams = response.HyperParams,
-                OrganizationId = response.OrganizationId,
-                ResultFiles = response.ResultFiles.ToList(),
-                Status = response.Status,
-                ValidationFiles = response.ValidationFiles.ToList(),
-                TrainingFiles = response.TrainingFiles.ToList(),
-                UpdatedAtUnixTime = response.UpdatedAtUnixTime
-            };
-
         [JsonPropertyName("id")]
         public string Id { get; set; }
 
@@ -36,10 +17,10 @@ namespace OpenAI.FileTunes
         public string Model { get; set; }
 
         [JsonPropertyName("created_at")]
-        public int CreatedUnixTime { get; set; }
+        public int CreatedAtUnixTime { get; set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
 
         [JsonPropertyName("events")]
         public IReadOnlyList<Event> Events { get; set; }
