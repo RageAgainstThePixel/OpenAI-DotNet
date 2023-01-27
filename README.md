@@ -37,6 +37,7 @@ var api = new OpenAIClient();
 - [Models](#models)
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
+  - [Delete Fine Tuned Model](#delete-fine-tuned-model)
 - [Completions](#completions)
   - [Streaming](#streaming)
 - [Edits](#edits)
@@ -47,6 +48,19 @@ var api = new OpenAIClient();
   - [Create Image](#create-image)
   - [Edit Image](#edit-image)
   - [Create Image Variation](#create-image-variation)
+- [Files](#files)
+  - [List Files](#list-files)
+  - [Upload File](#upload-file)
+  - [Delete File](#delete-file)
+  - [Retrieve File Info](#retrieve-file-info)
+  - [Download File Content](#download-file-content)
+- [Fine Tuning](#fine-tuning)
+  - [Create Fine Tune Job](#create-fine-tune-job)
+  - [List Fine Tune Jobs](#list-fine-tune-jobs)
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
+  - [Cancel Fine Tune Job](#cancel-fine-tune-job)
+  - [List Fine Tune Events](#list-fine-tune-events)
+  - [Stream Fine Tune Events](#stream-fine-tune-events)
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
 
@@ -132,6 +146,16 @@ Retrieves a model instance, providing basic information about the model such as 
 ```csharp
 var api = new OpenAIClient();
 var model = await api.ModelsEndpoint.GetModelDetailsAsync("text-davinci-003");
+```
+
+#### [Delete Fine Tuned Model](https://beta.openai.com/docs/api-reference/fine-tunes/delete-model)
+
+Delete a fine-tuned model. You must have the Owner role in your organization.
+
+```csharp
+var api = new OpenAIClient();
+var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
+// result == true
 ```
 
 ### [Completions](https://beta.openai.com/docs/api-reference/completions)
@@ -249,6 +273,141 @@ The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageVaria
 var api = new OpenAIClient();
 var results = await api.ImagesEndPoint.CreateImageVariationAsync(Path.GetFullPath(imageAssetPath), 1, ImageSize.Small);
 // results == array of image urls to download
+```
+
+### [Files](https://beta.openai.com/docs/api-reference/files)
+
+Files are used to upload documents that can be used with features like [Fine-tuning](#fine-tuning).
+
+The Files API is accessed via `OpenAIClient.FilesEndpoint`.
+
+#### [List Files](https://beta.openai.com/docs/api-reference/files/list)
+
+Returns a list of files that belong to the user's organization.
+
+```csharp
+var api = new OpenAIClient();
+var files = await api.FilesEndpoint.ListFilesAsync();
+
+foreach (var file in result)
+{
+    Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
+}
+```
+
+#### [Upload File](https://beta.openai.com/docs/api-reference/files/upload)
+
+Upload a file that contains document(s) to be used across various endpoints/features. Currently, the size of all the files uploaded by one organization can be up to 1 GB. Please contact us if you need to increase the storage limit.
+
+```csharp
+var api = new OpenAIClient();
+var fileData = await api.FilesEndpoint.UploadFileAsync("path/to/your/file.jsonl", "fine-tune");
+```
+
+#### [Delete File](https://beta.openai.com/docs/api-reference/files/delete)
+
+Delete a file.
+
+```csharp
+var api = new OpenAIClient();
+var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
+// result == true
+```
+
+#### [Retrieve File Info](https://beta.openai.com/docs/api-reference/files/retrieve)
+
+Returns information about a specific file.
+
+```csharp
+var api = new OpenAIClient();
+var fileData = await GetFileInfoAsync(fileId);
+```
+
+#### [Download File Content](https://beta.openai.com/docs/api-reference/files/retrieve-content)
+
+Downloads the specified file.
+
+```csharp
+var api = new OpenAIClient();
+var downloadedFilePath = await api.FilesEndpoint.DownloadFileAsync(fileId, "path/to/your/save/directory");
+```
+
+### [Fine Tuning](https://beta.openai.com/docs/api-reference/fine-tunes)
+
+Manage fine-tuning jobs to tailor a model to your specific training data.
+
+Related guide: [Fine-tune models](https://beta.openai.com/docs/guides/fine-tuning)
+
+The Files API is accessed via `OpenAIClient.FineTuningEndpoint`.
+
+#### [Create Fine Tune Job](https://beta.openai.com/docs/api-reference/fine-tunes/create)
+
+Creates a job that fine-tunes a specified model from a given dataset.
+
+Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
+
+```csharp
+var api = new OpenAIClient();
+var request = new CreateFineTuneRequest(fileData);
+var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
+```
+
+#### [List Fine Tune Jobs](https://beta.openai.com/docs/api-reference/fine-tunes/list)
+
+List your organization's fine-tuning jobs.
+
+```csharp
+var api = new OpenAIClient();
+var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
+```
+
+#### [Retrieve Fine Tune Job Info](https://beta.openai.com/docs/api-reference/fine-tunes/retrieve)
+
+Gets info about the fine-tune job.
+
+```csharp
+var api = new OpenAIClient();
+var request = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
+```
+
+#### [Cancel Fine Tune Job](https://beta.openai.com/docs/api-reference/fine-tunes/cancel)
+
+Immediately cancel a fine-tune job.
+
+```csharp
+var api = new OpenAIClient();
+var result = await api.FineTuningEndpoint.CancelFineTuneJob(job);
+// result = true
+```
+
+#### [List Fine Tune Events](https://beta.openai.com/docs/api-reference/fine-tunes/events)
+
+Get fine-grained status updates for a fine-tune job.
+
+```csharp
+var api = new OpenAIClient();
+var fineTuneEvents = await api.FineTuningEndpoint.ListFineTuneEventsAsync(fineTuneJob);
+```
+
+#### [Stream Fine Tune Events](https://beta.openai.com/docs/api-reference/fine-tunes/events#fine-tunes/events-stream)
+
+```csharp
+var api = new OpenAIClient();
+await api.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
+{
+    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
+});
+```
+
+Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
+
+```csharp
+var api = new OpenAIClient();
+await foreach (var fineTuneEvent in api.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob))
+{
+    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
+    cancellationTokenSource.Cancel();
+}
 ```
 
 ### [Moderations](https://beta.openai.com/docs/api-reference/moderations)

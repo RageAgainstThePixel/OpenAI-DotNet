@@ -96,6 +96,7 @@ namespace OpenAI.Images
             {
                 content.Add(new StringContent(request.User), "user");
             }
+            request.Dispose();
 
             var response = await Api.Client.PostAsync($"{GetEndpoint()}edits", content);
             var responseAsString = await response.Content.ReadAsStringAsync();

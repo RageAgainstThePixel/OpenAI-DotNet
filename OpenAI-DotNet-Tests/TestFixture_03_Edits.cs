@@ -16,8 +16,8 @@ namespace OpenAI.Tests
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
-            Assert.IsTrue(result.ToString().Contains("week"));
             Console.WriteLine(result);
+            Assert.IsTrue(result.ToString().Contains("week"));
         }
     }
 }

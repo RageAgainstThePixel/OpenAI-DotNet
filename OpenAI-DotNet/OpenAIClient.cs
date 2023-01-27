@@ -1,5 +1,7 @@
 ﻿using OpenAI.Edits;
 using OpenAI.Embeddings;
+using OpenAI.Files;
+using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
@@ -62,8 +64,8 @@ namespace OpenAI
             EditsEndpoint = new EditsEndpoint(this);
             ImagesEndPoint = new ImagesEndpoint(this);
             EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
-            //TODO FilesEndpoint
-            //TODO File-tunes
+            FilesEndpoint = new FilesEndpoint(this);
+            FineTuningEndpoint = new FineTuningEndpoint(this);
             ModerationsEndpoint = new ModerationsEndpoint(this);
         }
 
@@ -136,6 +138,16 @@ namespace OpenAI
         /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
         /// </summary>
         public EmbeddingsEndpoint EmbeddingsEndpoint { get; }
+
+        /// <summary>
+        /// Files are used to upload documents that can be used with features like Fine-tuning.
+        /// </summary>
+        public FilesEndpoint FilesEndpoint { get; }
+
+        /// <summary>
+        /// Manage fine-tuning jobs to tailor a model to your specific training data.
+        /// </summary>
+        public FineTuningEndpoint FineTuningEndpoint { get; }
 
         /// <summary>
         /// The moderation endpoint is a tool you can use to check whether content complies with OpenAI's content policy. Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.

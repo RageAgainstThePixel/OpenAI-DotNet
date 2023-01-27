@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
 {
-    public sealed class ImageEditRequest
+    public sealed class ImageEditRequest : IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -131,54 +130,60 @@ namespace OpenAI.Images
 
         ~ImageEditRequest()
         {
-            Image?.Close();
-            Image?.Dispose();
-            Mask?.Close();
-            Mask?.Dispose();
+            Dispose(false);
         }
 
         /// <summary>
         /// The image to edit. Must be a valid PNG file, less than 4MB, and square.
         /// If mask is not provided, image must have transparency, which will be used as the mask.
         /// </summary>
-        [JsonIgnore]
         public Stream Image { get; }
 
-        [JsonIgnore]
         public string ImageName { get; }
 
         /// <summary>
         /// An additional image whose fully transparent areas (e.g. where alpha is zero) indicate where image should be edited.
         /// Must be a valid PNG file, less than 4MB, and have the same dimensions as image.
         /// </summary>
-        [JsonIgnore]
         public Stream Mask { get; }
 
-        [JsonIgnore]
         public string MaskName { get; }
 
         /// <summary>
         /// A text description of the desired image(s). The maximum length is 1000 characters.
         /// </summary>
-        [JsonPropertyName("prompt")]
         public string Prompt { get; }
 
         /// <summary>
         /// The number of images to generate. Must be between 1 and 10.
         /// </summary>
-        [JsonPropertyName("n")]
         public int Number { get; }
 
         /// <summary>
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
         /// </summary>
-        [JsonPropertyName("size")]
         public string Size { get; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
-        [JsonPropertyName("user")]
         public string User { get; }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Image?.Close();
+                Image?.Dispose();
+                Mask?.Dispose();
+                Mask?.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
