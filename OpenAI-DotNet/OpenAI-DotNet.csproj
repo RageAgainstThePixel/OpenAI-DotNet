@@ -15,17 +15,17 @@
     <PackageTags>OpenAI, AI, ML, API</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>
-Bump version to 4.0.2
-Added ability to specify organization in authentication setup
-Added additional unit tests
+Bump version to 4.1.0
+Added Files and Fine Tunes Endpoints.
+Refactored some responses to be immutable.
     </PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.0.2</Version>
-    <AssemblyVersion>4.0.2.0</AssemblyVersion>
-    <FileVersion>4.0.2.0</FileVersion>
+    <Version>4.1.0</Version>
+    <AssemblyVersion>4.1.0.0</AssemblyVersion>
+    <FileVersion>4.1.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
   </PropertyGroup>
 </Project>

@@ -12,7 +12,7 @@ namespace OpenAI.Tests
         private readonly string prompts = "One Two Three Four Five Six Seven Eight Nine One Two Three Four Five Six Seven Eight";
 
         [Test]
-        public async Task GetBasicCompletion()
+        public async Task Test_01_GetBasicCompletion()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
@@ -26,7 +26,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task GetStreamingCompletionAsync()
+        public async Task Test_02_GetStreamingCompletion()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
@@ -50,7 +50,7 @@ namespace OpenAI.Tests
 
 
         [Test]
-        public async Task GetStreamingEnumerableCompletion()
+        public async Task Test_03_GetStreamingEnumerableCompletion()
         {
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);

@@ -164,7 +164,7 @@ namespace OpenAI.Files
         }
 
         /// <summary>
-        /// 
+        /// Downloads the specified file.
         /// </summary>
         /// <param name="fileData"><see cref="FileData"/> to download.</param>
         /// <param name="directory">The directory to download the file into.</param>

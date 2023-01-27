@@ -35,12 +35,12 @@ namespace OpenAI.Embeddings
         }
 
         [JsonPropertyName("input")]
-        public string Input { get; set; }
+        public string Input { get; }
 
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string Model { get; }
 
         [JsonPropertyName("user")]
-        public string User { get; set; }
+        public string User { get; }
     }
 }

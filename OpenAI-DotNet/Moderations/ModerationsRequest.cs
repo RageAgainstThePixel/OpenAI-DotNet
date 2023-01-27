@@ -19,6 +19,7 @@ namespace OpenAI.Moderations
         /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
         /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
         /// </param>
+        [JsonConstructor]
         public ModerationsRequest(string input, Model model = null)
         {
             Input = input;
@@ -26,9 +27,9 @@ namespace OpenAI.Moderations
         }
 
         [JsonPropertyName("input")]
-        public string Input { get; set; }
+        public string Input { get; }
 
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string Model { get; }
     }
 }

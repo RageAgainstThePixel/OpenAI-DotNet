@@ -2,7 +2,6 @@
 using OpenAI.FileTunes;
 using System;
 using System.IO;
-using System.Text.Json;
 
 namespace OpenAI.Tests
 {
@@ -14,9 +13,7 @@ namespace OpenAI.Tests
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.FilesEndpoint);
 
-            var trainingData = new FineTunesTrainingData("I'm a", "learning language model");
-            var authText = JsonSerializer.Serialize(trainingData);
-            File.WriteAllText("test.jsonl", authText);
+            File.WriteAllText("test.jsonl", new FineTunesTrainingData("I'm a", "learning language model"));
             Assert.IsTrue(File.Exists("test.jsonl"));
             var result = api.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune").Result;
 
@@ -81,6 +78,7 @@ namespace OpenAI.Tests
             {
                 var result = api.FilesEndpoint.DeleteFileAsync(file).Result;
                 Assert.IsTrue(result);
+                Console.WriteLine($"{file.Id} -> deleted");
             }
 
             files = api.FilesEndpoint.ListFilesAsync().Result;

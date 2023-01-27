@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -19,6 +20,26 @@ namespace OpenAI.Models
             public List<Model> Data { get; set; }
         }
 
+        private class DeleteModelResponse
+        {
+            [JsonConstructor]
+            public DeleteModelResponse(string id, string @object, bool deleted)
+            {
+                Id = id;
+                Object = @object;
+                Deleted = deleted;
+            }
+
+            [JsonPropertyName("id")]
+            public string Id { get; }
+
+            [JsonPropertyName("object")]
+            public string Object { get; }
+
+            [JsonPropertyName("deleted")]
+            public bool Deleted { get; }
+        }
+
         /// <inheritdoc />
         public ModelsEndpoint(OpenAIClient api) : base(api) { }
 
@@ -34,14 +55,14 @@ namespace OpenAI.Models
         public async Task<IReadOnlyList<Model>> GetModelsAsync()
         {
             var response = await Api.Client.GetAsync(GetEndpoint());
-            var resultAsString = await response.Content.ReadAsStringAsync();
+            var responseAsString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ModelsList>(resultAsString)?.Data;
+                return JsonSerializer.Deserialize<ModelsList>(responseAsString)?.Data;
             }
 
-            throw new HttpRequestException($"{nameof(GetModelsAsync)} Failed! HTTP status code: {response.StatusCode}.");
+            throw new HttpRequestException($"{nameof(GetModelsAsync)} Failed! HTTP status code: {response.StatusCode}| response body: {responseAsString}.");
         }
 
         /// <summary>
@@ -53,13 +74,38 @@ namespace OpenAI.Models
         public async Task<Model> GetModelDetailsAsync(string id)
         {
             var response = await Api.Client.GetAsync($"{GetEndpoint()}/{id}");
+            var responseAsString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<Model>(await response.Content.ReadAsStringAsync());
+                return JsonSerializer.Deserialize<Model>(responseAsString);
             }
 
-            throw new HttpRequestException($"{nameof(GetModelDetailsAsync)} Failed! HTTP status code: {response.StatusCode}");
+            throw new HttpRequestException($"{nameof(GetModelDetailsAsync)} Failed! HTTP status code: {response.StatusCode} | response body: {responseAsString}.");
+        }
+
+        /// <summary>
+        /// Delete a fine-tuned model. You must have the Owner role in your organization.
+        /// </summary>
+        /// <param name="model">The <see cref="Model"/> to delete.</param>
+        /// <returns>True, if fine-tuned model was successfully deleted.</returns>
+        /// <exception cref="HttpRequestException"></exception>
+        public async Task<bool> DeleteFineTuneModelAsync(Model model)
+        {
+            if (model.OwnedBy != Api.OpenAIAuthentication.Organization)
+            {
+                throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
+            }
+
+            var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}");
+            var responseAsString = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString)?.Deleted ?? false;
+            }
+
+            throw new HttpRequestException($"{nameof(DeleteFineTuneModelAsync)} Failed! HTTP status code: {response.StatusCode} | response body: {responseAsString}.");
         }
     }
 }

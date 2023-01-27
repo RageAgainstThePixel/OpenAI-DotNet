@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.FileTunes
 {
@@ -10,6 +11,8 @@ namespace OpenAI.FileTunes
     /// </summary>
     public class FineTunesTrainingData
     {
+        public static implicit operator string(FineTunesTrainingData data) => JsonSerializer.Serialize(data);
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -25,12 +28,12 @@ namespace OpenAI.FileTunes
         /// Prompt text.
         /// </summary>
         [JsonPropertyName("prompt")]
-        public string Prompt { get; set; }
+        public string Prompt { get; }
 
         /// <summary>
         /// The ideal completion text.
         /// </summary>
         [JsonPropertyName("completion")]
-        public string Completion { get; set; }
+        public string Completion { get; }
     }
 }

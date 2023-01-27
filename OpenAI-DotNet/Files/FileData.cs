@@ -26,6 +26,9 @@ namespace OpenAI.Files
         [JsonPropertyName("purpose")]
         public string Purpose { get; set; }
 
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
+
         public static implicit operator string(FileData fileData) => fileData.Id;
     }
 }
