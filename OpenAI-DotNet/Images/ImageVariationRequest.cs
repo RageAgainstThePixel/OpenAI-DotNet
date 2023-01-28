@@ -49,10 +49,7 @@ namespace OpenAI.Images
             User = user;
         }
 
-        ~ImageVariationRequest()
-        {
-            Dispose(false);
-        }
+        ~ImageVariationRequest() => Dispose(false);
 
         /// <summary>
         /// The image to use as the basis for the variation(s). Must be a valid PNG file, less than 4MB, and square.

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Completions
 {
     /// <summary>
     /// Represents a completion choice returned by the <see cref="CompletionsEndpoint"/>.
@@ -34,7 +34,7 @@ namespace OpenAI
         /// <summary>
         /// Gets the main text of this completion
         /// </summary>
-        public override string ToString() => $"{Index}|{FinishReason}|{Text}";
+        public override string ToString() => Text;
 
         public static implicit operator string(Choice choice) => choice.Text;
     }

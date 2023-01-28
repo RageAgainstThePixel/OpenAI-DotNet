@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 
 namespace OpenAI
 {
-    public static class ResponseExtensions
+    internal static class ResponseExtensions
     {
         private const string Organization = "Openai-Organization";
         private const string RequestId = "X-Request-ID";

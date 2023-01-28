@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using OpenAI.Completions;
 using OpenAI.Models;
 using System;
 using System.Collections.Generic;

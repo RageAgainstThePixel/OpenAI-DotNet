@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Completions
 {
     /// <summary>
     /// Object belonging to a <see cref="Choice"/>

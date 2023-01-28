@@ -173,7 +173,7 @@ namespace OpenAI.FineTuning
 
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        fineTuneEventCallback(JsonSerializer.Deserialize<Event>(line.Trim()));
+                        fineTuneEventCallback(JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions));
                     }
                 }
 
@@ -225,7 +225,7 @@ namespace OpenAI.FineTuning
 
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        yield return JsonSerializer.Deserialize<Event>(line.Trim());
+                        yield return JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions);
                     }
                 }
 

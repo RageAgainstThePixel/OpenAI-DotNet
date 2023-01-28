@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using OpenAI.Models;
 
 namespace OpenAI.Edits
 {
