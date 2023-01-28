@@ -406,7 +406,6 @@ var api = new OpenAIClient();
 await foreach (var fineTuneEvent in api.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob))
 {
     Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-    cancellationTokenSource.Cancel();
 }
 ```
 
