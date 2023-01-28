@@ -7,7 +7,7 @@ namespace OpenAI
     /// <summary>
     /// Represents authentication to the OpenAPI API endpoint
     /// </summary>
-    public class OpenAIAuthentication
+    public sealed class OpenAIAuthentication
     {
         private const string OPENAI_KEY = "OPENAI_KEY";
         private const string OPENAI_API_KEY = "OPENAI_API_KEY";
@@ -29,7 +29,7 @@ namespace OpenAI
         public string Organization => authInfo.Organization;
 
         /// <summary>
-        /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="OpenAIAuthentication"/>
+        /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="OpenAIAuthentication"/>.
         /// </summary>
         /// <param name="key">The API key to convert into a <see cref="OpenAIAuthentication"/>.</param>
         public static implicit operator OpenAIAuthentication(string key) => new OpenAIAuthentication(key);

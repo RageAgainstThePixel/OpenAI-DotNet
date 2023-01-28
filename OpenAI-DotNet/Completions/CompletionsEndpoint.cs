@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OpenAI
+namespace OpenAI.Completions
 {
     /// <summary>
     /// Text generation is the core function of the API. You give the API a prompt, and it generates a completion.
@@ -16,7 +16,7 @@ namespace OpenAI
     /// (see the prompt library for inspiration).
     /// <see href="https://beta.openai.com/docs/api-reference/completions"/>
     /// </summary>
-    public class CompletionsEndpoint : BaseEndPoint
+    public sealed class CompletionsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
         internal CompletionsEndpoint(OpenAIClient api) : base(api) { }
@@ -71,8 +71,7 @@ namespace OpenAI
             int? logProbabilities = null,
             bool? echo = null,
             string[] stopSequences = null,
-            Model model = null
-        )
+            Model model = null)
         {
             var request = new CompletionRequest(
                 model ?? Api.DefaultModel,
@@ -354,7 +353,7 @@ namespace OpenAI
 
         private CompletionResult DeserializeResult(HttpResponseMessage response, string result)
         {
-            var completionResult = JsonSerializer.Deserialize<CompletionResult>(result);
+            var completionResult = JsonSerializer.Deserialize<CompletionResult>(result, Api.JsonSerializationOptions);
 
             if (completionResult?.Completions == null || completionResult.Completions.Count == 0)
             {

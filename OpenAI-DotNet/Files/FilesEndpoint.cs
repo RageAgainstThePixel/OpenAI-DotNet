@@ -46,7 +46,7 @@ namespace OpenAI.Files
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<FilesList>(resultAsString)?.Data;
+                return JsonSerializer.Deserialize<FilesList>(resultAsString, Api.JsonSerializationOptions)?.Data;
             }
 
             throw new HttpRequestException($"{nameof(ListFilesAsync)} Failed! HTTP status code: {response.StatusCode}.");

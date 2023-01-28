@@ -59,7 +59,7 @@ namespace OpenAI.Models
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ModelsList>(responseAsString)?.Data;
+                return JsonSerializer.Deserialize<ModelsList>(responseAsString, Api.JsonSerializationOptions)?.Data;
             }
 
             throw new HttpRequestException($"{nameof(GetModelsAsync)} Failed! HTTP status code: {response.StatusCode}| response body: {responseAsString}.");
@@ -78,7 +78,7 @@ namespace OpenAI.Models
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<Model>(responseAsString);
+                return JsonSerializer.Deserialize<Model>(responseAsString, Api.JsonSerializationOptions);
             }
 
             throw new HttpRequestException($"{nameof(GetModelDetailsAsync)} Failed! HTTP status code: {response.StatusCode} | response body: {responseAsString}.");
@@ -109,7 +109,7 @@ namespace OpenAI.Models
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
             }
 
             throw new HttpRequestException($"{nameof(DeleteFineTuneModelAsync)} Failed! HTTP status code: {response.StatusCode} | response body: {responseAsString}.");

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Completions
 {
     /// <summary>
     /// Represents a request to the <see cref="CompletionsEndpoint"/>.  Mostly matches the parameters in
@@ -20,7 +20,7 @@ namespace OpenAI
         /// If you are requesting more than one prompt, specify them as an array of strings.
         /// </summary>
         [JsonPropertyName("prompt")]
-        public string[] Prompts { get; set; } = new string[0];
+        public string[] Prompts { get; set; } = Array.Empty<string>();
 
         /// <summary>
         /// For convenience, if you are only requesting a single prompt, set it here

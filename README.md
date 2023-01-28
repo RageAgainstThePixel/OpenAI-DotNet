@@ -131,7 +131,7 @@ var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 
 ### [Models](https://beta.openai.com/docs/api-reference/models)
 
-List and describe the various models available in the API. You can refer to the Models documentation to understand what models are available and the differences between them.
+List and describe the various models available in the API. You can refer to the [Models documentation](https://beta.openai.com/docs/models) to understand what models are available and the differences between them.
 
 The Models API is accessed via `OpenAIClient.ModelsEndpoint`.
 
@@ -165,11 +165,11 @@ var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-
 
 ### [Completions](https://beta.openai.com/docs/api-reference/completions)
 
-The Completion API is accessed via `OpenAIClient.CompletionEndpoint`:
+The Completion API is accessed via `OpenAIClient.CompletionsEndpoint`:
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.CompletionEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
+var result = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
 Console.WriteLine(result);
 ```
 
@@ -182,7 +182,7 @@ Streaming allows you to get results are they are generated, which can help your 
 ```csharp
 var api = new OpenAIClient();
 
-await api.CompletionEndpoint.StreamCompletionAsync(result =>
+await api.CompletionsEndpoint.StreamCompletionAsync(result =>
 {
     foreach (var choice in result.Completions)
     {
@@ -195,7 +195,7 @@ Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/
 
 ```csharp
 var api = new OpenAIClient();
-await foreach (var token in api.CompletionEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
+await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
 {
   Console.WriteLine(token);
 }

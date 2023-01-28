@@ -1,4 +1,5 @@
-﻿using OpenAI.Edits;
+﻿using OpenAI.Completions;
+using OpenAI.Edits;
 using OpenAI.Embeddings;
 using OpenAI.Files;
 using OpenAI.FineTuning;

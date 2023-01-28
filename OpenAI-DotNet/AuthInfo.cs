@@ -1,12 +1,11 @@
-﻿using System;
-using System.Security.Authentication;
+﻿using System.Security.Authentication;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    [Serializable]
     internal class AuthInfo
     {
+        [JsonConstructor]
         public AuthInfo(string apiKey, string organization = null)
         {
             if (!apiKey.Contains("sk-"))
@@ -28,9 +27,9 @@ namespace OpenAI
         }
 
         [JsonPropertyName("apiKey")]
-        public string ApiKey { get; set; }
+        public string ApiKey { get; }
 
         [JsonPropertyName("organization")]
-        public string Organization { get; set; }
+        public string Organization { get; }
     }
 }

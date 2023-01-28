@@ -128,10 +128,7 @@ namespace OpenAI.Images
             User = user;
         }
 
-        ~ImageEditRequest()
-        {
-            Dispose(false);
-        }
+        ~ImageEditRequest() => Dispose(false);
 
         /// <summary>
         /// The image to edit. Must be a valid PNG file, less than 4MB, and square.

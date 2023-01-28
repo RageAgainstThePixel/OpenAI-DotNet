@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Completions
 {
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.

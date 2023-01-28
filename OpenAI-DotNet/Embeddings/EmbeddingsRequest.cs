@@ -1,6 +1,6 @@
-﻿using System;
+﻿using OpenAI.Models;
+using System;
 using System.Text.Json.Serialization;
-using OpenAI.Models;
 
 namespace OpenAI.Embeddings
 {
