@@ -103,7 +103,7 @@ To create a configuration file, create a new text file named `.openai` and conta
 
 ```json
 {
-  "openai_key":"sk-aaaabbbbbccccddddd",
+  "apiKey":"sk-aaaabbbbbccccddddd",
   "organization":"org-yourOrganizationId"
 }
 ```
