@@ -16,10 +16,15 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 4.3.0
-Fixed an issue when searching for .openai config file
-Renamed CreateFineTuneAsync -&gt; CreateFineTuneJobAsync
-Renamed CancelFineTuneJob -&gt; CancelFineTuneJobAsync
-Immutable response objects</PackageReleaseNotes>
+- Fixed an issue when searching for .openai config file
+- Immutable response objects
+- Renamed `CreateFineTuneAsync` -&gt; `CreateFineTuneJobAsync`
+- Renamed `CancelFineTuneJob` -&gt; `CancelFineTuneJobAsync`
+- removed `OpenAI.Models.Permission.Created`
+- added `OpenAI.Models.Permission.CreatedAt`
+- added `OpenAI.Models.Permission.CreatedAtUnixTime`
+- `FineTuneJobResponse` is now internal but implicitly casted to `FineTuneJob`
+- Changed User-Agent of library to OpenAI-DotNet</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
