@@ -6,7 +6,7 @@ A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT
 
 ## Requirements
 
-This library targets .NET 5.0 and above.
+This library targets .NET 6.0 and above.
 
 It should work across console apps, winforms, wpf, asp.net, etc.
 
