@@ -6,7 +6,7 @@ namespace OpenAI.Moderations
     public sealed class ModerationsResponse : BaseResponse
     {
         [JsonConstructor]
-        public ModerationsResponse(string id, string model, List<ModerationResult> results)
+        public ModerationsResponse(string id, string model, IReadOnlyList<ModerationResult> results)
         {
             Id = id;
             Model = model;
@@ -20,6 +20,6 @@ namespace OpenAI.Moderations
         public string Model { get; }
 
         [JsonPropertyName("results")]
-        public List<ModerationResult> Results { get; }
+        public IReadOnlyList<ModerationResult> Results { get; }
     }
 }

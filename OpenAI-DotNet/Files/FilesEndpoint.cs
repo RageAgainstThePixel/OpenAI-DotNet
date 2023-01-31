@@ -41,8 +41,8 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<FileData>> ListFilesAsync()
         {
-            var response = await Api.Client.GetAsync(GetEndpoint());
-            var resultAsString = await response.Content.ReadAsStringAsync();
+            var response = await Api.Client.GetAsync(GetEndpoint()).ConfigureAwait(false);
+            var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
@@ -69,7 +69,7 @@ namespace OpenAI.Files
         /// <returns><see cref="FileData"/>.</returns>
         /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
-            => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken);
+            => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Upload a file that contains document(s) to be used across various endpoints/features.
@@ -84,13 +84,13 @@ namespace OpenAI.Files
         {
             using var fileData = new MemoryStream();
             using var content = new MultipartFormDataContent();
-            await request.File.CopyToAsync(fileData, cancellationToken);
+            await request.File.CopyToAsync(fileData, cancellationToken).ConfigureAwait(false);
             content.Add(new StringContent(request.Purpose), "purpose");
             content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetEndpoint(), content, cancellationToken);
-            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken);
+            var response = await Api.Client.PostAsync(GetEndpoint(), content, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -108,19 +108,19 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFileAsync(string fileId)
         {
-            return await InternalDeleteFileAsync(1);
+            return await InternalDeleteFileAsync(1).ConfigureAwait(false);
 
             async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}");
-                var responseAsString = await response.Content.ReadAsStringAsync();
+                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}").ConfigureAwait(false);
+                var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     if (responseAsString.Contains("File is still processing. Check back later."))
                     {
-                        await Task.Delay(1000 * attempt);
-                        return await InternalDeleteFileAsync(attempt + 1);
+                        await Task.Delay(1000 * attempt).ConfigureAwait(false);
+                        return await InternalDeleteFileAsync(attempt + 1).ConfigureAwait(false);
                     }
 
                     throw new HttpRequestException($"{nameof(DeleteFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
@@ -138,8 +138,8 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> GetFileInfoAsync(string fileId)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fileId}");
-            var responseAsString = await response.Content.ReadAsStringAsync();
+            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fileId}").ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -159,8 +159,8 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<string> DownloadFileAsync(string fileId, string directory, CancellationToken cancellationToken = default)
         {
-            var fileData = await GetFileInfoAsync(fileId);
-            return await DownloadFileAsync(fileData, directory, cancellationToken);
+            var fileData = await GetFileInfoAsync(fileId).ConfigureAwait(false);
+            return await DownloadFileAsync(fileData, directory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace OpenAI.Files
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<string> DownloadFileAsync(FileData fileData, string directory, CancellationToken cancellationToken = default)
         {
-            await using var response = await Api.Client.GetStreamAsync($"{GetEndpoint()}/{fileData.Id}/content", cancellationToken);
+            await using var response = await Api.Client.GetStreamAsync($"{GetEndpoint()}/{fileData.Id}/content", cancellationToken).ConfigureAwait(false);
 
             if (!Directory.Exists(directory))
             {
@@ -182,7 +182,7 @@ namespace OpenAI.Files
 
             var filePath = Path.Combine(directory, fileData.FileName);
             await using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate);
-            await response.CopyToAsync(fileStream, cancellationToken);
+            await response.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
             return filePath;
         }
     }
