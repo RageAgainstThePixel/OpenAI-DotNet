@@ -46,7 +46,7 @@ namespace OpenAI
             }
 
             Client = new HttpClient();
-            Client.DefaultRequestHeaders.Add("User-Agent", "dotnet_openai_api");
+            Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
 
             if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.Organization))
