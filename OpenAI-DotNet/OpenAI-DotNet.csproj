@@ -5,28 +5,40 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Stephen Hodgson</Authors>
     <Product>OpenAI-DotNet</Product>
-    <Description>A simple C# / .NET wrapper library to use with OpenAI's GPT-3 API (currently in beta).  Independently developed, this is not an official library and I am not affiliated with OpenAI.  An OpenAI API account is required.
-
-    Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
+    <Description>A simple C# / .NET wrapper library to use with OpenAI's GPT-3 API (currently in beta).|
+Independently developed, this is not an official library and I am not affiliated with OpenAI.|
+An OpenAI API account is required.
+Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Copyright></Copyright>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-    <PackageTags>OpenAI, AI, ML, API</PackageTags>
+    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>
-Bump version to 4.2.0
-Added missing Completions namespace.
-Alignment with com.openai.unity library.
-Misc formatting and bug fixes.
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>Bump version to 4.3.0
+- Fixed an issue when searching for .openai config file
+- Immutable response objects
+- Renamed `CreateFineTuneAsync` -&gt; `CreateFineTuneJobAsync`
+- Renamed `CancelFineTuneJob` -&gt; `CancelFineTuneJobAsync`
+- removed `OpenAI.Models.Permission.Created`
+- added `OpenAI.Models.Permission.CreatedAt`
+- added `OpenAI.Models.Permission.CreatedAtUnixTime`
+- `FineTuneJobResponse` is now internal but implicitly casted to `FineTuneJob`
+- Changed User-Agent of library to OpenAI-DotNet</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.2.0</Version>
-    <AssemblyVersion>4.2.0.0</AssemblyVersion>
-    <FileVersion>4.2.0.0</FileVersion>
+    <Version>4.3.0</Version>
+    <AssemblyVersion>4.3.0.0</AssemblyVersion>
+    <FileVersion>4.3.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

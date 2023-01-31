@@ -1,15 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Models
 {
     public sealed class Permission
     {
         [JsonConstructor]
-        public Permission(string id, string @object, int created, bool allowCreateEngine, bool allowSampling, bool allowLogprobs, bool allowSearchIndices, bool allowView, bool allowFineTuning, string organization, object group, bool isBlocking)
+        public Permission(string id, string @object, int createdAtUnixTime, bool allowCreateEngine, bool allowSampling, bool allowLogprobs, bool allowSearchIndices, bool allowView, bool allowFineTuning, string organization, object group, bool isBlocking)
         {
             Id = id;
             Object = @object;
-            Created = created;
+            CreatedAtUnixTime = createdAtUnixTime;
             AllowCreateEngine = allowCreateEngine;
             AllowSampling = allowSampling;
             AllowLogprobs = allowLogprobs;
@@ -28,7 +29,10 @@ namespace OpenAI.Models
         public string Object { get; }
 
         [JsonPropertyName("created")]
-        public int Created { get; }
+        public int CreatedAtUnixTime { get; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
 
         [JsonPropertyName("allow_create_engine")]
         public bool AllowCreateEngine { get; }

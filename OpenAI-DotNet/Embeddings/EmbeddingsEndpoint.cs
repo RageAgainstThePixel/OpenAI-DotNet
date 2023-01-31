@@ -35,7 +35,7 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(string input, Model model = null, string user = null)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user));
+            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
@@ -44,11 +44,11 @@ namespace OpenAI.Embeddings
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request)
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
-            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent());
+            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                var resultAsString = await response.Content.ReadAsStringAsync();
+                var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var embeddingsResponse = JsonSerializer.Deserialize<EmbeddingsResponse>(resultAsString, Api.JsonSerializationOptions);
 
                 if (embeddingsResponse == null)

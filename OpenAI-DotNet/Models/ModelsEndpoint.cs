@@ -54,8 +54,8 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<IReadOnlyList<Model>> GetModelsAsync()
         {
-            var response = await Api.Client.GetAsync(GetEndpoint());
-            var responseAsString = await response.Content.ReadAsStringAsync();
+            var response = await Api.Client.GetAsync(GetEndpoint()).ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
@@ -73,8 +73,8 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<Model> GetModelDetailsAsync(string id)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{id}");
-            var responseAsString = await response.Content.ReadAsStringAsync();
+            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{id}").ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
@@ -92,7 +92,7 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFineTuneModelAsync(string modelId)
         {
-            var model = await GetModelDetailsAsync(modelId);
+            var model = await GetModelDetailsAsync(modelId).ConfigureAwait(false);
 
             if (model == null)
             {
@@ -104,8 +104,8 @@ namespace OpenAI.Models
                 throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
             }
 
-            var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}");
-            var responseAsString = await response.Content.ReadAsStringAsync();
+            var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}").ConfigureAwait(false);
+            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {

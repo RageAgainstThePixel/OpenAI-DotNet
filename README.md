@@ -6,7 +6,7 @@ A simple C# .NET wrapper library to use with [OpenAI](https://openai.com/)'s GPT
 
 ## Requirements
 
-This library is based on .NET 6.0.
+This library targets .NET 6.0 and above.
 
 It should work across console apps, winforms, wpf, asp.net, etc.
 
@@ -354,7 +354,7 @@ Response includes details of the enqueued job including job status and the name 
 ```csharp
 var api = new OpenAIClient();
 var request = new CreateFineTuneRequest(fileData);
-var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
+var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneJobAsync(request);
 ```
 
 #### [List Fine Tune Jobs](https://beta.openai.com/docs/api-reference/fine-tunes/list)
@@ -381,7 +381,7 @@ Immediately cancel a fine-tune job.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.FineTuningEndpoint.CancelFineTuneJob(job);
+var result = await api.FineTuningEndpoint.CancelFineTuneJobAsync(job);
 // result = true
 ```
 

@@ -6,69 +6,85 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    public sealed class FineTuneJobResponse : BaseResponse
+    internal sealed class FineTuneJobResponse : BaseResponse
     {
-        public static implicit operator FineTuneJob(FineTuneJobResponse jobResponse)
-            => new FineTuneJob
-            {
-                Id = jobResponse.Id,
-                Object = jobResponse.Object,
-                Model = jobResponse.Model,
-                CreatedAtUnixTime = jobResponse.CreatedUnixTime,
-                Events = jobResponse.Events.ToList(),
-                FineTunedModel = jobResponse.FineTunedModel,
-                HyperParams = jobResponse.HyperParams,
-                OrganizationId = jobResponse.OrganizationId,
-                ResultFiles = jobResponse.ResultFiles.ToList(),
-                Status = jobResponse.Status,
-                ValidationFiles = jobResponse.ValidationFiles.ToList(),
-                TrainingFiles = jobResponse.TrainingFiles.ToList(),
-                UpdatedAtUnixTime = jobResponse.UpdatedAtUnixTime
-            };
+        [JsonConstructor]
+        public FineTuneJobResponse(string id, string @object, string model, int createdUnixTime, IReadOnlyList<Event> events, string fineTunedModel, HyperParams hyperParams, string organizationId, IReadOnlyList<FileData> resultFiles, string status, IReadOnlyList<FileData> validationFiles, IReadOnlyList<FileData> trainingFiles, int updatedAtUnixTime)
+        {
+            Id = id;
+            Object = @object;
+            Model = model;
+            CreatedUnixTime = createdUnixTime;
+            Events = events;
+            FineTunedModel = fineTunedModel;
+            HyperParams = hyperParams;
+            OrganizationId = organizationId;
+            ResultFiles = resultFiles;
+            Status = status;
+            ValidationFiles = validationFiles;
+            TrainingFiles = trainingFiles;
+            UpdatedAtUnixTime = updatedAtUnixTime;
+        }
 
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string Id { get; }
 
         [JsonPropertyName("object")]
-        public string Object { get; set; }
+        public string Object { get; }
 
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string Model { get; }
 
         [JsonPropertyName("created_at")]
-        public int CreatedUnixTime { get; set; }
+        public int CreatedUnixTime { get; }
 
         [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
 
         [JsonPropertyName("events")]
-        public IReadOnlyList<Event> Events { get; set; }
+        public IReadOnlyList<Event> Events { get; }
 
         [JsonPropertyName("fine_tuned_model")]
-        public string FineTunedModel { get; set; }
+        public string FineTunedModel { get; }
 
         [JsonPropertyName("hyperparams")]
-        public HyperParams HyperParams { get; set; }
+        public HyperParams HyperParams { get; }
 
         [JsonPropertyName("organization_id")]
-        public string OrganizationId { get; set; }
+        public string OrganizationId { get; }
 
         [JsonPropertyName("result_files")]
-        public IReadOnlyList<FileData> ResultFiles { get; set; }
+        public IReadOnlyList<FileData> ResultFiles { get; }
 
         [JsonPropertyName("status")]
-        public string Status { get; set; }
+        public string Status { get; }
 
         [JsonPropertyName("validation_files")]
-        public IReadOnlyList<FileData> ValidationFiles { get; set; }
+        public IReadOnlyList<FileData> ValidationFiles { get; }
 
         [JsonPropertyName("training_files")]
-        public IReadOnlyList<FileData> TrainingFiles { get; set; }
+        public IReadOnlyList<FileData> TrainingFiles { get; }
 
         [JsonPropertyName("updated_at")]
-        public int UpdatedAtUnixTime { get; set; }
+        public int UpdatedAtUnixTime { get; }
 
         [JsonIgnore]
         public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(UpdatedAtUnixTime).DateTime;
+
+        public static implicit operator FineTuneJob(FineTuneJobResponse jobResponse)
+            => new FineTuneJob(
+                jobResponse.Id,
+                jobResponse.Object,
+                jobResponse.Model,
+                jobResponse.CreatedUnixTime,
+                jobResponse.Events.ToList(),
+                jobResponse.FineTunedModel,
+                jobResponse.HyperParams,
+                jobResponse.OrganizationId,
+                jobResponse.ResultFiles.ToList(),
+                jobResponse.Status,
+                jobResponse.ValidationFiles.ToList(),
+                jobResponse.TrainingFiles.ToList(),
+                jobResponse.UpdatedAtUnixTime);
     }
 }

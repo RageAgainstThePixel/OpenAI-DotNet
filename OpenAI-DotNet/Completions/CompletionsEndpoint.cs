@@ -88,7 +88,7 @@ namespace OpenAI.Completions
                 echo,
                 stopSequences);
 
-            return await CreateCompletionAsync(request);
+            return await CreateCompletionAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -103,11 +103,11 @@ namespace OpenAI.Completions
         {
             completionRequest.Stream = false;
             var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
-            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent());
+            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                return DeserializeResult(response, await response.Content.ReadAsStringAsync());
+                return DeserializeResult(response, await response.Content.ReadAsStringAsync().ConfigureAwait(false));
             }
 
             throw new HttpRequestException($"{nameof(CreateCompletionAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
@@ -183,7 +183,7 @@ namespace OpenAI.Completions
                 echo,
                 stopSequences);
 
-            await StreamCompletionAsync(request, resultHandler);
+            await StreamCompletionAsync(request, resultHandler).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -201,14 +201,14 @@ namespace OpenAI.Completions
             {
                 Content = jsonContent.ToJsonStringContent()
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                await using var stream = await response.Content.ReadAsStreamAsync();
+                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using var reader = new StreamReader(stream);
 
-                while (await reader.ReadLineAsync() is { } line)
+                while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
                 {
                     if (line.StartsWith("data: "))
                     {
@@ -318,14 +318,14 @@ namespace OpenAI.Completions
             {
                 Content = jsonContent.ToJsonStringContent()
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                await using var stream = await response.Content.ReadAsStreamAsync();
+                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using var reader = new StreamReader(stream);
 
-                while (await reader.ReadLineAsync() is { } line)
+                while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
                 {
                     if (line.StartsWith("data: "))
                     {

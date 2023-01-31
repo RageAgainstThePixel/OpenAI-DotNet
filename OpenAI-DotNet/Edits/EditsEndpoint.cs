@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using OpenAI.Models;
 
 namespace OpenAI.Edits
 {
@@ -47,7 +46,7 @@ namespace OpenAI.Edits
             Model model = null)
         {
             var request = new EditRequest(input, instruction, editCount, temperature, topP, model);
-            var result = await CreateEditAsync(request);
+            var result = await CreateEditAsync(request).ConfigureAwait(false);
             return result.ToString();
         }
 
@@ -59,11 +58,11 @@ namespace OpenAI.Edits
         public async Task<EditResponse> CreateEditAsync(EditRequest request)
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
-            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent());
+            var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                var resultAsString = await response.Content.ReadAsStringAsync();
+                var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var editResponse = JsonSerializer.Deserialize<EditResponse>(resultAsString, Api.JsonSerializationOptions);
 
                 if (editResponse == null)

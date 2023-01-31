@@ -17,7 +17,7 @@ namespace OpenAI
     /// <summary>
     /// Entry point to the OpenAI API, handling auth and allowing access to the various API endpoints
     /// </summary>
-    public class OpenAIClient
+    public sealed class OpenAIClient
     {
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
@@ -46,7 +46,7 @@ namespace OpenAI
             }
 
             Client = new HttpClient();
-            Client.DefaultRequestHeaders.Add("User-Agent", "dotnet_openai_api");
+            Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
 
             if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.Organization))

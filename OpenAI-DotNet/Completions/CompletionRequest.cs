@@ -103,7 +103,7 @@ namespace OpenAI.Completions
         /// Do not set this yourself, use the appropriate methods on <see cref="CompletionsEndpoint"/> instead.
         /// </summary>
         [JsonPropertyName("stream")]
-        public bool Stream { get; internal set; } = false;
+        public bool Stream { get; internal set; }
 
         /// <summary>
         /// Include the log probabilities on the most likely tokens, which can be found in

@@ -36,7 +36,7 @@ namespace OpenAI.Tests
 
             var fileData = await CreateTestTrainingDataAsync(api);
             var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneJobAsync(request);
 
             Assert.IsNotNull(fineTuneResponse);
             var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
@@ -123,7 +123,7 @@ namespace OpenAI.Tests
             {
                 if (job.Status == "pending")
                 {
-                    var result = await api.FineTuningEndpoint.CancelFineTuneJob(job);
+                    var result = await api.FineTuningEndpoint.CancelFineTuneJobAsync(job);
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result);
                     Console.WriteLine($"{job.Id} -> cancelled");
@@ -139,7 +139,7 @@ namespace OpenAI.Tests
 
             var fileData = await CreateTestTrainingDataAsync(api);
             var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneJobAsync(request);
             Assert.IsNotNull(fineTuneResponse);
 
             var fineTuneJob = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
@@ -169,7 +169,7 @@ namespace OpenAI.Tests
 
             var fileData = await CreateTestTrainingDataAsync(api);
             var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneAsync(request);
+            var fineTuneResponse = await api.FineTuningEndpoint.CreateFineTuneJobAsync(request);
             Assert.IsNotNull(fineTuneResponse);
 
             var fineTuneJob = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
