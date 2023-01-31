@@ -17,7 +17,7 @@ namespace OpenAI
     /// <summary>
     /// Entry point to the OpenAI API, handling auth and allowing access to the various API endpoints
     /// </summary>
-    public class OpenAIClient
+    public sealed class OpenAIClient
     {
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints

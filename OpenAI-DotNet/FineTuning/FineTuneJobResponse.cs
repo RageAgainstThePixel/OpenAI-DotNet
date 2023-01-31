@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    public sealed class FineTuneJobResponse : BaseResponse
+    internal sealed class FineTuneJobResponse : BaseResponse
     {
         [JsonConstructor]
         public FineTuneJobResponse(string id, string @object, string model, int createdUnixTime, IReadOnlyList<Event> events, string fineTunedModel, HyperParams hyperParams, string organizationId, IReadOnlyList<FileData> resultFiles, string status, IReadOnlyList<FileData> validationFiles, IReadOnlyList<FileData> trainingFiles, int updatedAtUnixTime)

@@ -47,7 +47,7 @@ namespace OpenAI.FineTuning
         /// <param name="jobRequest"><see cref="CreateFineTuneJobRequest"/>.</param>
         /// <returns><see cref="FineTuneJob"/>.</returns>
         /// <exception cref="HttpRequestException">.</exception>
-        public async Task<FineTuneJobResponse> CreateFineTuneJobAsync(CreateFineTuneJobRequest jobRequest)
+        public async Task<FineTuneJob> CreateFineTuneJobAsync(CreateFineTuneJobRequest jobRequest)
         {
             var jsonContent = JsonSerializer.Serialize(jobRequest, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
@@ -84,12 +84,12 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Gets info about the fine-tune job.
         /// </summary>
-        /// <param name="fineTuneJob"><see cref="FineTuneJob"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
         /// <returns><see cref="FineTuneJobResponse"/>.</returns>
-        /// <exception cref="HttpRequestException">.</exception>
-        public async Task<FineTuneJobResponse> RetrieveFineTuneJobInfoAsync(FineTuneJob fineTuneJob)
+        /// <exception cref="HttpRequestException"></exception>
+        public async Task<FineTuneJob> RetrieveFineTuneJobInfoAsync(string jobId)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fineTuneJob.Id}").ConfigureAwait(false);
+            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{jobId}").ConfigureAwait(false);
             var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -105,12 +105,12 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Immediately cancel a fine-tune job.
         /// </summary>
-        /// <param name="fineTuneJob"><see cref="FineTuneJob"/> to cancel.</param>
+        /// <param name="jobId"><see cref="FineTuneJob.Id"/> to cancel.</param>
         /// <returns><see cref="FineTuneJobResponse"/>.</returns>
-        /// <exception cref="HttpRequestException">.</exception>
-        public async Task<bool> CancelFineTuneJobAsync(FineTuneJob fineTuneJob)
+        /// <exception cref="HttpRequestException"></exception>
+        public async Task<bool> CancelFineTuneJobAsync(string jobId)
         {
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}/{fineTuneJob.Id}/cancel", null).ConfigureAwait(false);
+            var response = await Api.Client.PostAsync($"{GetEndpoint()}/{jobId}/cancel", null!).ConfigureAwait(false);
             var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -126,11 +126,12 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Get fine-grained status updates for a fine-tune job.
         /// </summary>
-        /// <param name="fineTuneJob"><see cref="FineTuneJob"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
         /// <returns>List of events for <see cref="FineTuneJob"/>.</returns>
-        public async Task<IReadOnlyList<Event>> ListFineTuneEventsAsync(FineTuneJob fineTuneJob)
+        /// <exception cref="HttpRequestException"></exception>
+        public async Task<IReadOnlyList<Event>> ListFineTuneEventsAsync(string jobId)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fineTuneJob.Id}/events").ConfigureAwait(false);
+            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{jobId}/events").ConfigureAwait(false);
             var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -144,13 +145,13 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Stream the fine-grained status updates for a fine-tune job.
         /// </summary>
-        /// <param name="fineTuneJob"><see cref="FineTuneJob"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
         /// <param name="fineTuneEventCallback">The event callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task StreamFineTuneEventsAsync(FineTuneJob fineTuneJob, Action<Event> fineTuneEventCallback, CancellationToken cancellationToken = default)
+        public async Task StreamFineTuneEventsAsync(string jobId, Action<Event> fineTuneEventCallback, CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{GetEndpoint()}/{fineTuneJob.Id}/events?stream=true");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{GetEndpoint()}/{jobId}/events?stream=true");
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -179,11 +180,11 @@ namespace OpenAI.FineTuning
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    var result = await CancelFineTuneJobAsync(fineTuneJob).ConfigureAwait(false);
+                    var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
                     if (!result)
                     {
-                        throw new Exception($"Failed to cancel {fineTuneJob}");
+                        throw new Exception($"Failed to cancel {jobId}");
                     }
                 }
             }
@@ -197,12 +198,12 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Stream the fine-grained status updates for a fine-tune job.
         /// </summary>
-        /// <param name="fineTuneJob"><see cref="FineTuneJob"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException"></exception>
-        public async IAsyncEnumerable<Event> StreamFineTuneEventsEnumerableAsync(FineTuneJob fineTuneJob, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<Event> StreamFineTuneEventsEnumerableAsync(string jobId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{GetEndpoint()}/{fineTuneJob.Id}/events?stream=true");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{GetEndpoint()}/{jobId}/events?stream=true");
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -231,11 +232,11 @@ namespace OpenAI.FineTuning
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    var result = await CancelFineTuneJobAsync(fineTuneJob).ConfigureAwait(false);
+                    var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
                     if (!result)
                     {
-                        throw new Exception($"Failed to cancel {fineTuneJob}");
+                        throw new Exception($"Failed to cancel {jobId}");
                     }
                 }
             }

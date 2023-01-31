@@ -50,7 +50,7 @@ namespace OpenAI.FineTuning
         public HyperParams HyperParams { get; }
 
         [JsonPropertyName("organization_id")]
-        public string OrganizationId { get; set; }
+        public string OrganizationId { get; }
 
         [JsonPropertyName("result_files")]
         public IReadOnlyList<FileData> ResultFiles { get; }
@@ -69,5 +69,7 @@ namespace OpenAI.FineTuning
 
         [JsonIgnore]
         public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(UpdatedAtUnixTime).DateTime;
+
+        public static implicit operator string(FineTuneJob job) => job.Id;
     }
 }
