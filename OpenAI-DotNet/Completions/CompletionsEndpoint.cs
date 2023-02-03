@@ -110,7 +110,7 @@ namespace OpenAI.Completions
                 return DeserializeResult(response, await response.Content.ReadAsStringAsync().ConfigureAwait(false));
             }
 
-            throw new HttpRequestException($"{nameof(CreateCompletionAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+            throw new HttpRequestException($"{nameof(CreateCompletionAsync)} Failed! HTTP status code: {response.StatusCode} Content: {await response.Content.ReadAsStringAsync()} Request body: {jsonContent}");
         }
 
         #endregion Non-Streaming
@@ -228,7 +228,7 @@ namespace OpenAI.Completions
             }
             else
             {
-                throw new HttpRequestException($"{nameof(StreamCompletionAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+                throw new HttpRequestException($"{nameof(StreamCompletionAsync)} Failed! HTTP status code: {response.StatusCode} Content: {await response.Content.ReadAsStringAsync()}. Request body: {jsonContent}");
             }
         }
 
@@ -345,7 +345,7 @@ namespace OpenAI.Completions
             }
             else
             {
-                throw new HttpRequestException($"{nameof(StreamCompletionEnumerableAsync)} Failed! HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+                throw new HttpRequestException($"{nameof(StreamCompletionEnumerableAsync)} Failed! HTTP status code: {response.StatusCode} Content: {await response.Content.ReadAsStringAsync()}. Request body: {jsonContent}");
             }
         }
 
