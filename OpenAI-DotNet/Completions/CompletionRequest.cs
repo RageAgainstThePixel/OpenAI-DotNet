@@ -107,7 +107,7 @@ namespace OpenAI.Completions
 
         /// <summary>
         /// Include the log probabilities on the most likely tokens, which can be found in
-        /// <see cref="CompletionResult.Completions"/> -> <see cref="Choice.Logprobs"/>.
+        /// <see cref="CompletionResult.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
         /// So for example, if logprobs is 10, the API will return a list of the 10 most likely tokens.
         /// If logprobs is supplied, the API will always return the logprob of the sampled token,
         /// so there may be up to logprobs+1 elements in the response.
@@ -223,11 +223,12 @@ namespace OpenAI.Completions
         /// <param name="model">ID of the model to use. You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.</param>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
-        /// <param name="max_tokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
+        /// <param name="suffix">The suffix that comes after a completion of inserted text.</param>
+        /// <param name="maxTokens">How many tokens to complete to. Can return fewer if a stop sequence is hit.</param>
         /// <param name="temperature">What sampling temperature to use. Higher values means the model will take more risks.
         /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
-        /// It is generally recommend to use this or <paramref name="top_p"/> but not both.</param>
-        /// <param name="top_p">An alternative to sampling with temperature, called nucleus sampling,
+        /// It is generally recommend to use this or <paramref name="topP"/> but not both.</param>
+        /// <param name="topP">An alternative to sampling with temperature, called nucleus sampling,
         /// where the model considers the results of the tokens with top_p probability mass.
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// It is generally recommend to use this or <paramref name="temperature"/> but not both.</param>
@@ -237,7 +238,7 @@ namespace OpenAI.Completions
         /// <param name="frequencyPenalty">The scale of the penalty for how often a token is used.
         /// Should generally be between 0 and 1, although negative numbers are allowed to encourage token reuse.</param>
         /// <param name="logProbabilities">Include the log probabilities on the logProbabilities most likely tokens,
-        /// which can be found in <see cref="CompletionResult.Completions"/> -> <see cref="Choice.Logprobs"/>.
+        /// which can be found in <see cref="CompletionResult.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
         /// So for example, if logprobs is 10, the API will return a list of the 10 most likely tokens. If logprobs is supplied,
         /// the API will always return the logprob of the sampled token, so there may be up to logprobs+1 elements in the response.</param>
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
@@ -249,17 +250,17 @@ namespace OpenAI.Completions
         public CompletionRequest(
             Model model,
             string prompt = null,
-            string[] prompts = null,
+            IEnumerable<string> prompts = null,
             string suffix = null,
-            int? max_tokens = null,
+            int? maxTokens = null,
             double? temperature = null,
-            double? top_p = null,
+            double? topP = null,
             int? numOutputs = null,
             double? presencePenalty = null,
             double? frequencyPenalty = null,
             int? logProbabilities = null,
             bool? echo = null,
-            string[] stopSequences = null,
+            IEnumerable<string> stopSequences = null,
             Dictionary<string, double> logitBias = null,
             int? bestOf = null,
             string user = null)
@@ -270,24 +271,24 @@ namespace OpenAI.Completions
             }
             else if (prompts != null)
             {
-                Prompts = prompts;
+                Prompts = prompts.ToArray();
             }
             else
             {
-                throw new ArgumentNullException($"Missing required {prompt}(s)");
+                throw new ArgumentNullException($"Missing required {nameof(prompt)}(s)");
             }
 
             Model = model ?? DefaultCompletionRequestArgs?.Model;
             Suffix = suffix ?? DefaultCompletionRequestArgs?.Suffix;
-            MaxTokens = max_tokens ?? DefaultCompletionRequestArgs?.MaxTokens;
+            MaxTokens = maxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
             Temperature = temperature ?? DefaultCompletionRequestArgs?.Temperature;
-            TopP = top_p ?? DefaultCompletionRequestArgs?.TopP;
+            TopP = topP ?? DefaultCompletionRequestArgs?.TopP;
             NumChoicesPerPrompt = numOutputs ?? DefaultCompletionRequestArgs?.NumChoicesPerPrompt;
             PresencePenalty = presencePenalty ?? DefaultCompletionRequestArgs?.PresencePenalty;
             FrequencyPenalty = frequencyPenalty ?? DefaultCompletionRequestArgs?.FrequencyPenalty;
             LogProbabilities = logProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
             Echo = echo ?? DefaultCompletionRequestArgs?.Echo;
-            StopSequences = stopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
+            StopSequences = stopSequences?.ToArray() ?? DefaultCompletionRequestArgs?.StopSequences;
             LogitBias = logitBias ?? DefaultCompletionRequestArgs?.LogitBias;
             BestOf = bestOf ?? DefaultCompletionRequestArgs?.BestOf;
             User = user ?? DefaultCompletionRequestArgs?.User;

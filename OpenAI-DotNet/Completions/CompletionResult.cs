@@ -10,7 +10,12 @@ namespace OpenAI.Completions
     public sealed class CompletionResult : BaseResponse
     {
         [JsonConstructor]
-        public CompletionResult(string id, string @object, int createdUnixTime, string model, List<Choice> completions)
+        public CompletionResult(
+            string id,
+            string @object,
+            int createdUnixTime,
+            string model,
+            IReadOnlyList<Choice> completions)
         {
             Id = id;
             Object = @object;
@@ -47,7 +52,7 @@ namespace OpenAI.Completions
         /// The completions returned by the API.  Depending on your request, there may be 1 or many choices.
         /// </summary>
         [JsonPropertyName("choices")]
-        public List<Choice> Completions { get; }
+        public IReadOnlyList<Choice> Completions { get; }
 
         /// <summary>
         /// Gets the text of the first completion, representing the main result

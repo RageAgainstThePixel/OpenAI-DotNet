@@ -42,14 +42,8 @@ namespace OpenAI.Files
         public async Task<IReadOnlyList<FileData>> ListFilesAsync()
         {
             var response = await Api.Client.GetAsync(GetEndpoint()).ConfigureAwait(false);
-            var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return JsonSerializer.Deserialize<FilesList>(resultAsString, Api.JsonSerializationOptions)?.Data;
-            }
-
-            throw new HttpRequestException($"{nameof(ListFilesAsync)} Failed! HTTP status code: {response.StatusCode}.");
+            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            return JsonSerializer.Deserialize<FilesList>(resultAsString, Api.JsonSerializationOptions)?.Data;
         }
 
         /// <summary>
@@ -90,13 +84,7 @@ namespace OpenAI.Files
             request.Dispose();
 
             var response = await Api.Client.PostAsync(GetEndpoint(), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException($"{nameof(UploadFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
-            }
-
+            var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
         }
 
@@ -104,22 +92,25 @@ namespace OpenAI.Files
         /// Delete a file.
         /// </summary>
         /// <param name="fileId">The ID of the file to use for this request</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was successfully deleted.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<bool> DeleteFileAsync(string fileId)
+        public async Task<bool> DeleteFileAsync(string fileId, CancellationToken cancellationToken = default)
         {
             return await InternalDeleteFileAsync(1).ConfigureAwait(false);
 
             async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}").ConfigureAwait(false);
-                var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}", cancellationToken).ConfigureAwait(false);
+                // We specifically don't use the extension method here bc we need to check if it's still processing the file.
+                var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     if (responseAsString.Contains("File is still processing. Check back later."))
                     {
-                        await Task.Delay(1000 * attempt).ConfigureAwait(false);
+                        // back off requests on each attempt
+                        await Task.Delay(1000 * attempt, cancellationToken).ConfigureAwait(false);
                         return await InternalDeleteFileAsync(attempt + 1).ConfigureAwait(false);
                     }
 
@@ -139,13 +130,7 @@ namespace OpenAI.Files
         public async Task<FileData> GetFileInfoAsync(string fileId)
         {
             var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fileId}").ConfigureAwait(false);
-            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException($"{nameof(GetFileInfoAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
-            }
-
+            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
         }
 

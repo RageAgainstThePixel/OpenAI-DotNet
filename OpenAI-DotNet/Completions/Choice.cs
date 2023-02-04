@@ -8,11 +8,15 @@ namespace OpenAI.Completions
     public sealed class Choice
     {
         [JsonConstructor]
-        public Choice(string text, int index, Logprobs logprobs, string finishReason)
+        public Choice(
+            string text,
+            int index,
+            LogProbabilities logProbabilities,
+            string finishReason)
         {
             Text = text;
             Index = index;
-            Logprobs = logprobs;
+            LogProbabilities = logProbabilities;
             FinishReason = finishReason;
         }
 
@@ -32,7 +36,7 @@ namespace OpenAI.Completions
         /// If the request specified <see cref="CompletionRequest.LogProbabilities"/>, this contains the list of the most likely tokens.
         /// </summary>
         [JsonPropertyName("logprobs")]
-        public Logprobs Logprobs { get; }
+        public LogProbabilities LogProbabilities { get; }
 
         /// <summary>
         /// If this is the last segment of the completion result, this specifies why the completion has ended.

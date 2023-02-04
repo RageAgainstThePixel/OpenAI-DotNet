@@ -16,7 +16,7 @@ namespace OpenAI.FineTuning
             bool computeClassificationMetrics = false,
             int? classificationNClasses = null,
             string classificationPositiveClasses = null,
-            List<double> classificationBetas = null,
+            IReadOnlyList<double> classificationBetas = null,
             string suffix = null)
         {
             TrainingFileId = trainingFileId;
@@ -64,7 +64,7 @@ namespace OpenAI.FineTuning
         public string ClassificationPositiveClasses { get; set; }
 
         [JsonPropertyName("classification_betas")]
-        public List<double> ClassificationBetas { get; set; }
+        public IReadOnlyList<double> ClassificationBetas { get; set; }
 
         [JsonPropertyName("suffix")]
         public string Suffix { get; set; }
