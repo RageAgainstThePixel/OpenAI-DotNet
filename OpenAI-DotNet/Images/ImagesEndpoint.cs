@@ -40,11 +40,7 @@ namespace OpenAI.Images
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync($"{GetEndpoint()}generations", jsonContent.ToJsonStringContent()).ConfigureAwait(false);
-
-            return response.IsSuccessStatusCode
-                ? await DeserializeResponseAsync(response).ConfigureAwait(false)
-                : throw new HttpRequestException(
-                    $"{nameof(GenerateImageAsync)} Failed!  HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+            return await DeserializeResponseAsync(response).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -100,12 +96,7 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync($"{GetEndpoint()}edits", content).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-
-            return response.IsSuccessStatusCode
-                ? await DeserializeResponseAsync(response).ConfigureAwait(false)
-                : throw new HttpRequestException(
-                    $"{nameof(CreateImageEditAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
+            return await DeserializeResponseAsync(response).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -151,12 +142,7 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-
-            return response.IsSuccessStatusCode
-                ? await DeserializeResponseAsync(response).ConfigureAwait(false)
-                : throw new HttpRequestException(
-                    $"{nameof(CreateImageVariationAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
+            return await DeserializeResponseAsync(response).ConfigureAwait(false);
         }
 
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response)

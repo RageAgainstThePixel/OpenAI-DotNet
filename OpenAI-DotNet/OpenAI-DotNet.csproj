@@ -15,7 +15,7 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 4.4.0
+    <PackageReleaseNotes>Bump version to 4.4.1
 - Renamed `Choice.Logprobs -&gt; Choice.LogProbabilities`
 - Renamed `OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions`
 - Renamed `CompletionRequest` parameter names:
@@ -28,7 +28,7 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.4.0</Version>
+    <Version>4.4.1</Version>
     <AssemblyVersion>4.3.0.0</AssemblyVersion>
     <FileVersion>4.3.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
