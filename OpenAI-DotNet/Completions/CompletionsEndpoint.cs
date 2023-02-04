@@ -265,7 +265,7 @@ namespace OpenAI.Completions
         /// for more details on how to consume an async enumerable.</returns>
         public IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(
             string prompt = null,
-            string[] prompts = null,
+            IEnumerable<string> prompts = null,
             string suffix = null,
             int? maxTokens = null,
             double? temperature = null,
@@ -275,7 +275,7 @@ namespace OpenAI.Completions
             double? frequencyPenalty = null,
             int? logProbabilities = null,
             bool? echo = null,
-            string[] stopSequences = null,
+            IEnumerable<string> stopSequences = null,
             Model model = null,
             CancellationToken cancellationToken = default)
         {

@@ -23,12 +23,15 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
   - `top_p` -&gt; `topP`
 - Updated `CompletionRequest` to accept `IEnumerable&lt;string&gt;` values for `prompts` and `stopSequences`
 - Refactored all endpoints to use new response validation extension
-- Added `CancellationToken` to most endpoints that had long running operations</PackageReleaseNotes>
+- Added `CancellationToken` to most endpoints that had long running operations
+Bump version to 4.4.1
+- hotfix to CompletionsEndpoint to use `IEnumerable&lt;string&gt;`
+- hotfix to cleanup Images endpoints</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.4.0</Version>
+    <Version>4.4.1</Version>
     <AssemblyVersion>4.3.0.0</AssemblyVersion>
     <FileVersion>4.3.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>

@@ -56,23 +56,16 @@ namespace OpenAI.Moderations
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            var moderationResponse = JsonSerializer.Deserialize<ModerationsResponse>(resultAsString, Api.JsonSerializationOptions);
 
-            if (response.IsSuccessStatusCode)
+            if (moderationResponse == null)
             {
-                var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-                var moderationResponse = JsonSerializer.Deserialize<ModerationsResponse>(resultAsString, Api.JsonSerializationOptions);
-
-                if (moderationResponse == null)
-                {
-                    throw new HttpRequestException($"{nameof(CreateModerationAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
-                }
-
-                moderationResponse.SetResponseData(response.Headers);
-
-                return moderationResponse;
+                throw new HttpRequestException($"{nameof(CreateModerationAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
             }
 
-            throw new HttpRequestException($"{nameof(CreateModerationAsync)} Failed!  HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+            moderationResponse.SetResponseData(response.Headers);
+            return moderationResponse;
         }
     }
 }
