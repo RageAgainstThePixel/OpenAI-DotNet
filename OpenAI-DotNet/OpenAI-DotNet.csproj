@@ -15,7 +15,7 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 4.4.1
+    <PackageReleaseNotes>Bump version to 4.4.0
 - Renamed `Choice.Logprobs -&gt; Choice.LogProbabilities`
 - Renamed `OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions`
 - Renamed `CompletionRequest` parameter names:
@@ -23,7 +23,10 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
   - `top_p` -&gt; `topP`
 - Updated `CompletionRequest` to accept `IEnumerable&lt;string&gt;` values for `prompts` and `stopSequences`
 - Refactored all endpoints to use new response validation extension
-- Added `CancellationToken` to most endpoints that had long running operations</PackageReleaseNotes>
+- Added `CancellationToken` to most endpoints that had long running operations
+Bump version to 4.4.1
+- hotfix to CompletionsEndpoint to use `IEnumerable&lt;string&gt;`
+- hotfix to cleanup Images endpoints</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
