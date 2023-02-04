@@ -188,14 +188,14 @@ await api.CompletionsEndpoint.StreamCompletionAsync(result =>
     {
         Console.WriteLine(choice);
     }
-}, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
+}, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
 ```
 
 Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
 
 ```csharp
 var api = new OpenAIClient();
-await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", max_tokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
+await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
 {
   Console.WriteLine(token);
 }
@@ -211,7 +211,7 @@ The Edits API is accessed via `OpenAIClient.EditsEndpoint`.
 
 Creates a new edit for the provided input, instruction, and parameters using the provided input and instruction.
 
-The Create Edit API is accessed via `OpenAIClient.ImagesEndpoint.CreateEditAsync()`.
+The Create Edit API is accessed via `OpenAIClient.ImagesEndpoint.CreateEditAsync`.
 
 ```csharp
 var api = new OpenAIClient();
@@ -231,7 +231,7 @@ The Edits API is accessed via `OpenAIClient.EmbeddingsEndpoint`.
 
 Creates an embedding vector representing the input text.
 
-The Create Embedding API is accessed via `OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync()`.
+The Create Embedding API is accessed via `OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync`.
 
 ```csharp
 var api = new OpenAIClient();
@@ -248,7 +248,7 @@ The Images API is accessed via `OpenAIClient.ImagesEndpoint`.
 
 Creates an image given a prompt.
 
-The Create Image API is accessed via `OpenAIClient.ImagesEndpoint.GenerateImageAsync()`.
+The Create Image API is accessed via `OpenAIClient.ImagesEndpoint.GenerateImageAsync`.
 
 ```csharp
 var api = new OpenAIClient();
@@ -260,7 +260,7 @@ var results = await api.ImagesEndpoint.GenerateImageAsync("A house riding a velo
 
 Creates an edited or extended image given an original image and a prompt.
 
-The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageEditAsync()`:
+The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageEditAsync`:
 
 ```csharp
 var api = new OpenAIClient();
@@ -272,7 +272,7 @@ var results = await api.ImagesEndPoint.CreateImageEditAsync(Path.GetFullPath(ima
 
 Creates a variation of a given image.
 
-The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageVariationAsync()`:
+The Edit Image API is accessed via `OpenAIClient.ImagesEndPoint.CreateImageVariationAsync`:
 
 ```csharp
 var api = new OpenAIClient();
@@ -424,7 +424,7 @@ Related guide: [Moderations](https://beta.openai.com/docs/guides/moderation)
 
 Classifies if text violates OpenAI's Content Policy.
 
-The Moderations endpoint can be accessed via `OpenAIClient.ModerationsEndpoint.GetModerationAsync()`:
+The Moderations endpoint can be accessed via `OpenAIClient.ModerationsEndpoint.GetModerationAsync`:
 
 ```csharp
 var api = new OpenAIClient();

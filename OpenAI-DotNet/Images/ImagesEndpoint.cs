@@ -100,7 +100,7 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync($"{GetEndpoint()}edits", content).ConfigureAwait(false);
-            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
 
             return response.IsSuccessStatusCode
                 ? await DeserializeResponseAsync(response).ConfigureAwait(false)
@@ -151,7 +151,7 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content).ConfigureAwait(false);
-            var responseAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
 
             return response.IsSuccessStatusCode
                 ? await DeserializeResponseAsync(response).ConfigureAwait(false)
@@ -162,7 +162,7 @@ namespace OpenAI.Images
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response)
         {
             Debug.Assert(response.IsSuccessStatusCode);
-            var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
 
             if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)

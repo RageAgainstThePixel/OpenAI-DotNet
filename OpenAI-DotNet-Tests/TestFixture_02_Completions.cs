@@ -18,12 +18,16 @@ namespace OpenAI.Tests
             var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
             Assert.IsNotNull(api.CompletionsEndpoint);
 
-            var result = await api.CompletionsEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci);
+            var result = await api.CompletionsEndpoint.CreateCompletionAsync(prompts, temperature: 0.1, maxTokens: 5, numOutputs: 5, model: Model.Davinci);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Completions);
             Assert.NotZero(result.Completions.Count);
             Assert.That(result.Completions.Any(c => c.Text.Trim().ToLower().StartsWith("nine")));
-            Console.WriteLine(result);
+
+            foreach (var choice in result.Completions)
+            {
+                Console.WriteLine(choice);
+            }
         }
 
         [Test]
@@ -45,10 +49,9 @@ namespace OpenAI.Tests
                 {
                     Console.WriteLine(choice);
                 }
-            }, prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci);
+            }, prompts, temperature: 0.1, maxTokens: 5, numOutputs: 5, model: Model.Davinci);
             Assert.That(allCompletions.Any(c => c.Text.Trim().ToLower().StartsWith("nine")));
         }
-
 
         [Test]
         public async Task Test_03_GetStreamingEnumerableCompletion()
@@ -58,11 +61,12 @@ namespace OpenAI.Tests
 
             var allCompletions = new List<Choice>();
 
-            await foreach (var result in api.CompletionsEndpoint.StreamCompletionEnumerableAsync(prompts, temperature: 0.1, max_tokens: 5, numOutputs: 5, model: Model.Davinci))
+            await foreach (var result in api.CompletionsEndpoint.StreamCompletionEnumerableAsync(prompts, temperature: 0.1, maxTokens: 5, numOutputs: 5, model: Model.Davinci))
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Completions);
                 Assert.NotZero(result.Completions.Count);
+                Console.WriteLine(result);
                 allCompletions.AddRange(result.Completions);
             }
 

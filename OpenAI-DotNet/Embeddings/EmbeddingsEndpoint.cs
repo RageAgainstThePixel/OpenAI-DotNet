@@ -45,23 +45,16 @@ namespace OpenAI.Embeddings
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            var embeddingsResponse = JsonSerializer.Deserialize<EmbeddingsResponse>(resultAsString, Api.JsonSerializationOptions);
+            embeddingsResponse.SetResponseData(response.Headers);
 
-            if (response.IsSuccessStatusCode)
+            if (embeddingsResponse == null)
             {
-                var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var embeddingsResponse = JsonSerializer.Deserialize<EmbeddingsResponse>(resultAsString, Api.JsonSerializationOptions);
-
-                if (embeddingsResponse == null)
-                {
-                    throw new HttpRequestException($"{nameof(CreateEmbeddingAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
-                }
-
-                embeddingsResponse.SetResponseData(response.Headers);
-
-                return embeddingsResponse;
+                throw new HttpRequestException($"{nameof(CreateEmbeddingAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
             }
 
-            throw new HttpRequestException($"{nameof(CreateEmbeddingAsync)} Failed!  HTTP status code: {response.StatusCode}. Request body: {jsonContent}");
+            return embeddingsResponse;
         }
     }
 }

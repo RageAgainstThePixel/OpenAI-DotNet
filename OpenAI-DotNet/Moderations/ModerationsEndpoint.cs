@@ -59,7 +59,7 @@ namespace OpenAI.Moderations
 
             if (response.IsSuccessStatusCode)
             {
-                var resultAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
                 var moderationResponse = JsonSerializer.Deserialize<ModerationsResponse>(resultAsString, Api.JsonSerializationOptions);
 
                 if (moderationResponse == null)

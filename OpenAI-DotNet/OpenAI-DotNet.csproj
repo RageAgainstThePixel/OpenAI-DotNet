@@ -13,23 +13,22 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3</PackageTags>
+    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 4.3.0
-- Fixed an issue when searching for .openai config file
-- Immutable response objects
-- Renamed `CreateFineTuneAsync` -&gt; `CreateFineTuneJobAsync`
-- Renamed `CancelFineTuneJob` -&gt; `CancelFineTuneJobAsync`
-- removed `OpenAI.Models.Permission.Created`
-- added `OpenAI.Models.Permission.CreatedAt`
-- added `OpenAI.Models.Permission.CreatedAtUnixTime`
-- `FineTuneJobResponse` is now internal but implicitly casted to `FineTuneJob`
-- Changed User-Agent of library to OpenAI-DotNet</PackageReleaseNotes>
+    <PackageReleaseNotes>Bump version to 4.4.0
+- Renamed `Choice.Logprobs -&gt; Choice.LogProbabilities`
+- Renamed `OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions`
+- Renamed `CompletionRequest` parameter names:
+  - `max_tokens` -&gt; `maxTokens`
+  - `top_p` -&gt; `topP`
+- Updated `CompletionRequest` to accept `IEnumerable&lt;string&gt;` values for `prompts` and `stopSequences`
+- Refactored all endpoints to use new response validation extension
+- Added `CancellationToken` to most endpoints that had long running operations</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.3.0</Version>
+    <Version>4.4.0</Version>
     <AssemblyVersion>4.3.0.0</AssemblyVersion>
     <FileVersion>4.3.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
