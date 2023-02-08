@@ -26,7 +26,7 @@ Install package [`OpenAI` from Nuget](https://www.nuget.org/packages/OpenAI-DotN
 Install-Package OpenAI-DotNet
 ```
 
-> Looking to use OpenAI in the Unity Game Engine? Check out our unity package on OpenUPM:
+> Looking to [use OpenAI in the Unity Game Engine](https://github.com/RageAgainstThePixel/com.openai.unity)? Check out our unity package on OpenUPM:
 >
 >[![openupm](https://img.shields.io/npm/v/com.openai.unity?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.openai.unity/)
 
