@@ -119,10 +119,19 @@ var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("your/path/to/
 
 #### Use System Environment Variables
 
-> Use `OPENAI_KEY` or `OPENAI_SECRET_KEY` specify a key defined in the system's local environment:
+Use your system's environment variables specify an api key and organization to use.
+
+- Use `OPENAI_API_KEY` for your api key.
+- Use `OPEN_AI_ORGANIZATION_ID` to specify an organization.
 
 ```csharp
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+```
+
+or
+
+```csharp
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv("org-yourOrganizationId"));
 ```
 
 ### [Models](https://beta.openai.com/docs/api-reference/models)
