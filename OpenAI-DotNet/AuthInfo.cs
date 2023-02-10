@@ -6,7 +6,7 @@ namespace OpenAI
     internal class AuthInfo
     {
         [JsonConstructor]
-        public AuthInfo(string apiKey, string organization = null)
+        public AuthInfo(string apiKey, string organizationId = null)
         {
             if (!apiKey.Contains("sk-"))
             {
@@ -15,14 +15,14 @@ namespace OpenAI
 
             ApiKey = apiKey;
 
-            if (organization != null)
+            if (organizationId != null)
             {
-                if (!organization.Contains("org-"))
+                if (!organizationId.Contains("org-"))
                 {
-                    throw new InvalidCredentialException($"{nameof(organization)} parameter must start with 'org-'");
+                    throw new InvalidCredentialException($"{nameof(organizationId)} parameter must start with 'org-'");
                 }
 
-                Organization = organization;
+                OrganizationId = organizationId;
             }
         }
 
@@ -30,6 +30,6 @@ namespace OpenAI
         public string ApiKey { get; }
 
         [JsonPropertyName("organization")]
-        public string Organization { get; }
+        public string OrganizationId { get; }
     }
 }

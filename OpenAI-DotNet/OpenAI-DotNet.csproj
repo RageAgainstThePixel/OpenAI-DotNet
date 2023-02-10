@@ -34,11 +34,17 @@ Bump version to 4.4.2
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.4.2</Version>
-    <AssemblyVersion>4.4.2.0</AssemblyVersion>
-    <FileVersion>4.4.2.0</FileVersion>
+    <Version>4.4.3</Version>
+    <AssemblyVersion>4.4.3.0</AssemblyVersion>
+    <FileVersion>4.4.3.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md">

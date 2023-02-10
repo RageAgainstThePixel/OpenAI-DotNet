@@ -87,7 +87,7 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
-            if (model.OwnedBy != Api.OpenAIAuthentication.Organization)
+            if (model.OwnedBy != Api.OpenAIAuthentication.OrganizationId)
             {
                 throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
             }
