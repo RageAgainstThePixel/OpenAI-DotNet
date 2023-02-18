@@ -8,18 +8,19 @@ namespace OpenAI
         [JsonConstructor]
         public AuthInfo(string apiKey, string organizationId = null)
         {
-            if (!apiKey.Contains("sk-"))
+            if (string.IsNullOrWhiteSpace(apiKey) ||
+                !apiKey.Contains("sk-"))
             {
-                throw new InvalidCredentialException($"{apiKey} parameter must start with 'sk-'");
+                throw new InvalidCredentialException($"{apiKey} must start with 'sk-'");
             }
 
             ApiKey = apiKey;
 
-            if (organizationId != null)
+            if (!string.IsNullOrWhiteSpace(organizationId))
             {
                 if (!organizationId.Contains("org-"))
                 {
-                    throw new InvalidCredentialException($"{nameof(organizationId)} parameter must start with 'org-'");
+                    throw new InvalidCredentialException($"{nameof(organizationId)} must start with 'org-'");
                 }
 
                 OrganizationId = organizationId;

@@ -13,6 +13,7 @@ namespace OpenAI
         private const string OPENAI_API_KEY = "OPENAI_API_KEY";
         private const string OPENAI_SECRET_KEY = "OPENAI_SECRET_KEY";
         private const string TEST_OPENAI_SECRET_KEY = "TEST_OPENAI_SECRET_KEY";
+        private const string OPENAI_ORGANIZATION_ID = "OPENAI_ORGANIZATION_ID";
         private const string OPEN_AI_ORGANIZATION_ID = "OPEN_AI_ORGANIZATION_ID";
         private const string ORGANIZATION = "ORGANIZATION";
 
@@ -114,6 +115,11 @@ namespace OpenAI
             if (string.IsNullOrWhiteSpace(organizationId))
             {
                 organizationId = Environment.GetEnvironmentVariable(OPEN_AI_ORGANIZATION_ID);
+            }
+
+            if (string.IsNullOrWhiteSpace(organizationId))
+            {
+                organizationId = Environment.GetEnvironmentVariable(OPENAI_ORGANIZATION_ID);
             }
 
             return string.IsNullOrEmpty(apiKey) ? null : new OpenAIAuthentication(apiKey, organizationId);
