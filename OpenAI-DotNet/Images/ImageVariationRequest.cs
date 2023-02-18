@@ -10,7 +10,6 @@ namespace OpenAI.Images
         /// </summary>
         /// <param name="imagePath">
         /// The image to edit. Must be a valid PNG file, less than 4MB, and square.
-        /// If mask is not provided, image must have transparency, which will be used as the mask.
         /// </param>
         /// <param name="numberOfResults">
         /// The number of images to generate. Must be between 1 and 10.
@@ -22,14 +21,38 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
+            : this(File.OpenRead(imagePath), Path.GetFileName(imagePath), numberOfResults, size, user)
         {
-            if (!File.Exists(imagePath))
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="image">
+        /// The image to edit. Must be a valid PNG file, less than 4MB, and square.
+        /// </param>
+        /// <param name="imageName">
+        /// The name of the image.
+        /// </param>
+        /// <param name="numberOfResults">
+        /// The number of images to generate. Must be between 1 and 10.
+        /// </param>
+        /// <param name="size">
+        /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
+        /// </param>
+        /// <param name="user">
+        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
+        /// </param>
+        public ImageVariationRequest(Stream image, string imageName, int numberOfResults, ImageSize size, string user)
+        {
+            Image = image;
+
+            if (string.IsNullOrWhiteSpace(imageName))
             {
-                throw new FileNotFoundException($"Could not find the {nameof(imagePath)} file located at {imagePath}");
+                imageName = "image.png";
             }
 
-            Image = File.OpenRead(imagePath);
-            ImageName = Path.GetFileName(imagePath);
+            ImageName = imageName;
 
             if (numberOfResults is > 10 or < 1)
             {

@@ -29,46 +29,16 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         public ImageEditRequest(string imagePath, string maskPath, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
+            : this(
+                File.OpenRead(imagePath),
+                Path.GetFileName(imagePath),
+                string.IsNullOrWhiteSpace(maskPath) ? null : File.OpenRead(maskPath),
+                string.IsNullOrWhiteSpace(maskPath) ? null : Path.GetFileName(maskPath),
+                prompt,
+                numberOfResults,
+                size,
+                user)
         {
-            if (!File.Exists(imagePath))
-            {
-                throw new FileNotFoundException($"Could not find the {nameof(imagePath)} file located at {imagePath}");
-            }
-
-            Image = File.OpenRead(imagePath);
-            ImageName = Path.GetFileName(imagePath);
-
-            if (!File.Exists(maskPath))
-            {
-                throw new FileNotFoundException($"Could not find the {nameof(maskPath)} file located at {maskPath}");
-            }
-
-            Mask = File.OpenRead(maskPath);
-            MaskName = Path.GetFileName(maskPath);
-
-            if (prompt.Length > 1000)
-            {
-                throw new ArgumentOutOfRangeException(nameof(prompt), "The maximum character length for the prompt is 1000 characters.");
-            }
-
-            Prompt = prompt;
-
-            if (numberOfResults is > 10 or < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(numberOfResults), "The number of results must be between 1 and 10");
-            }
-
-            Number = numberOfResults;
-
-            Size = size switch
-            {
-                ImageSize.Small => "256x256",
-                ImageSize.Medium => "512x512",
-                ImageSize.Large => "1024x1024",
-                _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
-            };
-
-            User = user;
         }
 
         /// <summary>
@@ -99,9 +69,25 @@ namespace OpenAI.Images
         public ImageEditRequest(Stream image, string imageName, Stream mask, string maskName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
         {
             Image = image;
+
+            if (string.IsNullOrWhiteSpace(imageName))
+            {
+                imageName = "image.png";
+            }
+
             ImageName = imageName;
-            Mask = mask;
-            MaskName = maskName;
+
+            if (mask != null)
+            {
+                Mask = mask;
+
+                if (string.IsNullOrWhiteSpace(maskName))
+                {
+                    maskName = "mask.png";
+                }
+
+                MaskName = maskName;
+            }
 
             if (prompt.Length > 1000)
             {

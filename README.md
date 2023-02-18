@@ -78,13 +78,13 @@ You use the `OpenAIAuthentication` when you initialize the API as shown:
 #### Pass keys directly with constructor
 
 ```csharp
-var api = new OpenAIClient("sk-mykeyhere");
+var api = new OpenAIClient("sk-apiKey");
 ```
 
 Or create a `OpenAIAuthentication` object manually
 
 ```csharp
-var api = new OpenAIClient(new OpenAIAuthentication("sk-secretkey"));
+var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId"));
 ```
 
 #### Load key from configuration file
@@ -122,16 +122,10 @@ var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("your/path/to/
 Use your system's environment variables specify an api key and organization to use.
 
 - Use `OPENAI_API_KEY` for your api key.
-- Use `OPEN_AI_ORGANIZATION_ID` to specify an organization.
+- Use `OPENAI_ORGANIZATION_ID` to specify an organization.
 
 ```csharp
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-```
-
-or
-
-```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv("org-yourOrganizationId"));
 ```
 
 ### [Models](https://beta.openai.com/docs/api-reference/models)

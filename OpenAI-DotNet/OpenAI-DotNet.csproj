@@ -15,7 +15,21 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 4.4.0
+    <PackageReleaseNotes>Bump version to 4.4.4
+- ImageEditRequest mask is now optional so long as texture has alpha transparency
+- ImageVariationRequest added constructor overload for memory stream image 
+- Updated AuthInfo parameter validation
+- Renamed OPEN_AI_ORGANIZATION_ID -&gt; OPENAI_ORGANIZATION_ID
+Bump version to 4.4.3
+- added `OPEN_AI_ORGANIZATION_ID` environment variable
+- deprecated `Organization` use `OrganizationId` instead
+Bump version to 4.4.2
+- Removed a useless assert
+- Updated docs
+Bump version to 4.4.1
+- hotfix to CompletionsEndpoint to use `IEnumerable&lt;string&gt;`
+- hotfix to cleanup Images endpoints
+Bump version to 4.4.0
 - Renamed `Choice.Logprobs -&gt; Choice.LogProbabilities`
 - Renamed `OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions`
 - Renamed `CompletionRequest` parameter names:
@@ -23,20 +37,14 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
   - `top_p` -&gt; `topP`
 - Updated `CompletionRequest` to accept `IEnumerable&lt;string&gt;` values for `prompts` and `stopSequences`
 - Refactored all endpoints to use new response validation extension
-- Added `CancellationToken` to most endpoints that had long running operations
-Bump version to 4.4.1
-- hotfix to CompletionsEndpoint to use `IEnumerable&lt;string&gt;`
-- hotfix to cleanup Images endpoints
-Bump version to 4.4.2
-- Removed a useless assert
-- Updated docs</PackageReleaseNotes>
+- Added `CancellationToken` to most endpoints that had long running operations</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.4.3</Version>
-    <AssemblyVersion>4.4.3.0</AssemblyVersion>
-    <FileVersion>4.4.3.0</FileVersion>
+    <Version>4.4.4</Version>
+    <AssemblyVersion>4.4.4.0</AssemblyVersion>
+    <FileVersion>4.4.4.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
