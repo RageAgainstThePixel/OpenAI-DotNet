@@ -17,6 +17,7 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 4.4.4
 - ImageEditRequest mask is now optional so long as texture has alpha transparency
+- ImageVariationRequest added constructor overload for memory stream image 
 - Updated AuthInfo parameter validation
 - Renamed OPEN_AI_ORGANIZATION_ID -&gt; OPENAI_ORGANIZATION_ID
 Bump version to 4.4.3
