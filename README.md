@@ -237,7 +237,8 @@ Creates an embedding vector representing the input text.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...");
+var model = await api.ModelsEndpoint.GetModelDetailsAsync("text-embedding-ada-002");
+var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", model);
 Console.WriteLine(result);
 ```
 
