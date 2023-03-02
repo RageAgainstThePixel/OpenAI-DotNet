@@ -221,10 +221,10 @@ Creates a completion for the chat message
 IClient(OpenAIAuthentication.LoadFromEnv());
 var chatPrompts = new List<ChatPrompt>
 {
-new ChatPrompt("system", "You are a helpful assistant."),
-new ChatPrompt("user", "Who won the world series in 2020?"),
-new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-new ChatPrompt("user", "Where was it played?"),
+    new ChatPrompt("system", "You are a helpful assistant."),
+    new ChatPrompt("user", "Who won the world series in 2020?"),
+    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
+    new ChatPrompt("user", "Where was it played?"),
 };
 var chatRequest = new ChatRequest(chatPrompts);
 var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
