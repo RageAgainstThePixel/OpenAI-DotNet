@@ -9,13 +9,15 @@
 Independently developed, this is not an official library and I am not affiliated with OpenAI.|
 An OpenAI API account is required.
 Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
-    <Copyright></Copyright>
+    <Copyright>2023</Copyright>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 5.0.0
+    <PackageReleaseNotes>Bump version to 5.0.1
+- Fixed chat parameters
+Bump version to 5.0.0
 - Added Chat endpoint
 Bump version to 4.4.4
 - ImageEditRequest mask is now optional so long as texture has alpha transparency
@@ -29,24 +31,24 @@ Bump version to 4.4.2
 - Removed a useless assert
 - Updated docs
 Bump version to 4.4.1
-- hotfix to CompletionsEndpoint to use `IEnumerable&lt;string&gt;`
+- hotfix to CompletionsEndpoint to use IEnumerable&lt;string&gt;
 - hotfix to cleanup Images endpoints
 Bump version to 4.4.0
-- Renamed `Choice.Logprobs -&gt; Choice.LogProbabilities`
-- Renamed `OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions`
-- Renamed `CompletionRequest` parameter names:
-  - `max_tokens` -&gt; `maxTokens`
-  - `top_p` -&gt; `topP`
-- Updated `CompletionRequest` to accept `IEnumerable&lt;string&gt;` values for `prompts` and `stopSequences`
+- Renamed Choice.Logprobs -&gt; Choice.LogProbabilities
+- Renamed OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions
+- Renamed CompletionRequest parameter names:
+  - max_tokens -&gt; maxTokens
+  - top_p -&gt; topP
+- Updated CompletionRequest to accept IEnumerable&lt;string&gt; values for prompts and stopSequences
 - Refactored all endpoints to use new response validation extension
 - Added `CancellationToken` to most endpoints that had long running operations</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>5.0.0</Version>
-    <AssemblyVersion>4.4.4.0</AssemblyVersion>
-    <FileVersion>4.4.4.0</FileVersion>
+    <Version>5.0.1</Version>
+    <AssemblyVersion>5.0.1.0</AssemblyVersion>
+    <FileVersion>5.0.1.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
