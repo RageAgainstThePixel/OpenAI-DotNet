@@ -218,7 +218,7 @@ Given a chat conversation, the model will return a chat completion response.
 Creates a completion for the chat message
 
 ```csharp
-IClient(OpenAIAuthentication.LoadFromEnv());
+var api = new OpenAIClient();
 var chatPrompts = new List<ChatPrompt>
 {
     new ChatPrompt("system", "You are a helpful assistant."),
