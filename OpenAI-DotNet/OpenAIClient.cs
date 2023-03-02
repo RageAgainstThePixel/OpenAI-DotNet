@@ -1,4 +1,5 @@
-﻿using OpenAI.Completions;
+﻿using OpenAI.Chat;
+using OpenAI.Completions;
 using OpenAI.Edits;
 using OpenAI.Embeddings;
 using OpenAI.Files;
@@ -68,6 +69,7 @@ namespace OpenAI
             FilesEndpoint = new FilesEndpoint(this);
             FineTuningEndpoint = new FineTuningEndpoint(this);
             ModerationsEndpoint = new ModerationsEndpoint(this);
+            ChatEndpoint = new ChatEndpoint(this);
         }
 
         /// <summary>
@@ -124,6 +126,11 @@ namespace OpenAI
         /// and much more (see the prompt library for inspiration).
         /// </summary>
         public CompletionsEndpoint CompletionsEndpoint { get; }
+
+        /// <summary>
+        /// Given a chat conversation, the model will return a chat completion response.
+        /// </summary>
+        public ChatEndpoint ChatEndpoint { get; }
 
         /// <summary>
         /// Given a prompt and an instruction, the model will return an edited version of the prompt.

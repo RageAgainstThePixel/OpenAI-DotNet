@@ -70,27 +70,33 @@ namespace OpenAI.Models
         public static Model Default => Davinci;
 
         /// <summary>
+        /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
+        /// the price per token, we recommend gpt-3.5-turbo for most use cases.
+        /// </summary>
+        public static Model GPT3_5_Turbo { get; } = new Model("gpt-3.5-turbo") { OwnedBy = "openai" };
+
+        /// <summary>
         /// The most powerful, largest engine available, although the speed is quite slow.<para/>
         /// Good at: Complex intent, cause and effect, summarization for audience
         /// </summary>
-        public static Model Davinci => new Model("text-davinci-003") { OwnedBy = "openai" };
+        public static Model Davinci { get; } = new Model("text-davinci-003") { OwnedBy = "openai" };
 
         /// <summary>
         /// The 2nd most powerful engine, a bit faster than <see cref="Davinci"/>, and a bit faster.<para/>
         /// Good at: Language translation, complex classification, text sentiment, summarization.
         /// </summary>
-        public static Model Curie => new Model("text-curie-001") { OwnedBy = "openai" };
+        public static Model Curie { get; } = new Model("text-curie-001") { OwnedBy = "openai" };
 
         /// <summary>
         /// The 2nd fastest engine, a bit more powerful than <see cref="Ada"/>, and a bit slower.<para/>
         /// Good at: Moderate classification, semantic search classification
         /// </summary>
-        public static Model Babbage => new Model("text-babbage-001") { OwnedBy = "openai" };
+        public static Model Babbage { get; } = new Model("text-babbage-001") { OwnedBy = "openai" };
 
         /// <summary>
         /// The smallest, fastest engine available, although the quality of results may be poor.<para/>
         /// Good at: Parsing text, simple classification, address correction, keywords
         /// </summary>
-        public static Model Ada => new Model("text-ada-001") { OwnedBy = "openai" };
+        public static Model Ada { get; } = new Model("text-ada-001") { OwnedBy = "openai" };
     }
 }
