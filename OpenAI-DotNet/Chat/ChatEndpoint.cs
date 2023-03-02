@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,8 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            var payload = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
+            var json = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions);
+            var payload = json.ToJsonStringContent();
             var result = await Api.Client.PostAsync($"{GetEndpoint()}/completions", payload, cancellationToken);
             var resultAsString = await result.ReadAsStringAsync(cancellationToken);
             return JsonSerializer.Deserialize<ChatResponse>(resultAsString, Api.JsonSerializationOptions);

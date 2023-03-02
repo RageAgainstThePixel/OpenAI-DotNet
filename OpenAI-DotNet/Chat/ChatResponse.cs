@@ -7,41 +7,23 @@ namespace OpenAI.Chat
 {
     public sealed class ChatResponse
     {
-        [JsonConstructor]
-        public ChatResponse(
-            string id,
-            string @object,
-            int created,
-            string model,
-            Usage usage,
-            List<Choice> choices
-        )
-        {
-            Id = id;
-            Object = @object;
-            Created = created;
-            Model = model;
-            Usage = usage;
-            Choices = choices;
-        }
-
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; set; }
 
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; set; }
 
         [JsonPropertyName("created")]
-        public int Created { get; }
+        public int Created { get; set; }
 
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; set; }
 
         [JsonPropertyName("usage")]
-        public Usage Usage { get; }
+        public Usage Usage { get; set; }
 
         [JsonPropertyName("choices")]
-        public IReadOnlyList<Choice> Choices { get; }
+        public IReadOnlyList<Choice> Choices { get; set; }
 
         [JsonIgnore]
         public Choice FirstChoice => Choices.FirstOrDefault();
