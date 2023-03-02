@@ -15,7 +15,9 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 4.4.4
+    <PackageReleaseNotes>Bump version to 5.0.0
+- Added Chat endpoint
+Bump version to 4.4.4
 - ImageEditRequest mask is now optional so long as texture has alpha transparency
 - ImageVariationRequest added constructor overload for memory stream image 
 - Updated AuthInfo parameter validation
@@ -42,7 +44,7 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>4.4.4</Version>
+    <Version>5.0.0</Version>
     <AssemblyVersion>4.4.4.0</AssemblyVersion>
     <FileVersion>4.4.4.0</FileVersion>
     <Company>RageAgainstThePixel</Company>

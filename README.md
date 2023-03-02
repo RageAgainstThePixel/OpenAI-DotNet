@@ -40,7 +40,10 @@ Install-Package OpenAI-DotNet
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
 - [Completions](#completions)
-  - [Streaming](#streaming)
+  - [Streaming](#completion-streaming)
+- [Chat](#chat)
+  - [Chat Completions](#chat-completions)
+  - [Streaming](#chat-streaming)
 - [Edits](#edits)
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
@@ -180,7 +183,7 @@ Console.WriteLine(result);
 
 > To get the `CompletionResult` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
 
-#### Streaming
+#### Completion Streaming
 
 Streaming allows you to get results are they are generated, which can help your application feel more responsive, especially on slow models like Davinci.
 
@@ -204,6 +207,34 @@ await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAs
 {
   Console.WriteLine(token);
 }
+```
+
+### [Chat](https://platform.openai.com/docs/api-reference/chat)
+
+Given a chat conversation, the model will return a chat completion response.
+
+#### [Chat Completions](https://platform.openai.com/docs/api-reference/chat/create)
+
+Creates a completion for the chat message
+
+```csharp
+IClient(OpenAIAuthentication.LoadFromEnv());
+var chatPrompts = new List<ChatPrompt>
+{
+new ChatPrompt("system", "You are a helpful assistant."),
+new ChatPrompt("user", "Who won the world series in 2020?"),
+new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
+new ChatPrompt("user", "Where was it played?"),
+};
+var chatRequest = new ChatRequest(chatPrompts);
+var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+Console.WriteLine(result.FirstChoice);
+```
+
+##### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
+
+```csharp
+TODO
 ```
 
 ### [Edits](https://beta.openai.com/docs/api-reference/edits)
