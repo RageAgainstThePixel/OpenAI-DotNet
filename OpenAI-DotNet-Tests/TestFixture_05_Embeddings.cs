@@ -14,5 +14,16 @@ namespace OpenAI.Tests
             Assert.IsNotNull(result);
             Assert.IsNotEmpty(result.Data);
         }
+
+        [Test]
+        public async Task Test_2_CreateEmbeddingsWithMultipleInputs()
+        {
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+            Assert.IsNotNull(api.EmbeddingsEndpoint);
+            var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync(
+                new[] { "The food was delicious and the waiter...", "The food was terrible and the waiter..." });
+            Assert.IsNotNull(result);
+            Assert.AreEqual(result.Data.Count, 2);
+        }
     }
 }
