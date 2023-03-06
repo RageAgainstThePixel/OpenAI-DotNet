@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
@@ -13,6 +13,21 @@ namespace OpenAI.Tests
             var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...");
             Assert.IsNotNull(result);
             Assert.IsNotEmpty(result.Data);
+        }
+
+        [Test]
+        public async Task Test_2_CreateEmbeddingsWithMultipleInputs()
+        {
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+            Assert.IsNotNull(api.EmbeddingsEndpoint);
+            var embeddings = new[]
+            {
+                "The food was delicious and the waiter...",
+                "The food was terrible and the waiter..."
+            };
+            var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync(embeddings);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(result.Data.Count, 2);
         }
     }
 }

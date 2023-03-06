@@ -19,17 +19,24 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             double? presencePenalty = null,
             double? frequencyPenalty = null,
+            Dictionary<string, double> logitBias = null,
             string user = null)
         {
             const string defaultModel = "gpt-3.5-turbo";
-            Model = model ?? new Model(defaultModel);
+            Model = model ?? Models.Model.GPT3_5_Turbo;
 
             if (!Model.Contains(defaultModel))
             {
                 throw new ArgumentException(nameof(model), $"{Model} not supported");
             }
 
-            Messages = messages.ToList();
+            Messages = messages?.ToList();
+
+            if (Messages?.Count == 0)
+            {
+                throw new ArgumentNullException(nameof(messages), $"Missing required {nameof(messages)} parameter");
+            }
+
             Temperature = temperature;
             TopP = topP;
             Number = number;
@@ -37,6 +44,7 @@ namespace OpenAI.Chat
             MaxTokens = maxTokens;
             PresencePenalty = presencePenalty;
             FrequencyPenalty = frequencyPenalty;
+            LogitBias = logitBias;
             User = user;
         }
 
@@ -127,7 +135,7 @@ namespace OpenAI.Chat
         /// Defaults to null
         /// </summary>
         [JsonPropertyName("logit_bias")]
-        public Dictionary<string, double> LogitBias { get; set; }
+        public IReadOnlyDictionary<string, double> LogitBias { get; set; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
