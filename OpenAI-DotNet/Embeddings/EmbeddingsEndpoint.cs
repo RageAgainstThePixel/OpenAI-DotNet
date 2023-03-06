@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using OpenAI.Models;
+﻿using OpenAI.Models;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -54,12 +54,9 @@ namespace OpenAI.Embeddings
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
-        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(
-            IList<string> input,
-            Model model = null,
-            string user = null)
+        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, Model model = null, string user = null)
             => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
-        
+
         /// <summary>
         /// Creates an embedding vector representing the input text.
         /// </summary>
