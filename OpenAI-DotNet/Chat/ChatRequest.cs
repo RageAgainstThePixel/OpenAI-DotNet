@@ -19,6 +19,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             double? presencePenalty = null,
             double? frequencyPenalty = null,
+            Dictionary<string, double> logitBias = null,
             string user = null)
         {
             const string defaultModel = "gpt-3.5-turbo";
@@ -37,6 +38,7 @@ namespace OpenAI.Chat
             MaxTokens = maxTokens;
             PresencePenalty = presencePenalty;
             FrequencyPenalty = frequencyPenalty;
+            LogitBias = logitBias;
             User = user;
         }
 
