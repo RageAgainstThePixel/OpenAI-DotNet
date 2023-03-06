@@ -22,7 +22,7 @@ namespace OpenAI.Chat
             string user = null)
         {
             const string defaultModel = "gpt-3.5-turbo";
-            Model = model ?? new Model(defaultModel);
+            Model = model ?? Models.Model.GPT3_5_Turbo;
 
             if (!Model.Contains(defaultModel))
             {

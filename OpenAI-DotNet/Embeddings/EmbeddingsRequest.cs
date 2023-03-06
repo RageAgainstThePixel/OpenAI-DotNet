@@ -1,6 +1,7 @@
 ﻿using OpenAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Embeddings
@@ -24,17 +25,13 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(string input, Model model = null, string user = null)
+            : this(new List<string> { input }, model, user)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
+                throw new ArgumentNullException(nameof(input));
             }
-
-            Input = new List<string> { input };
-            Model = model ?? new Model("text-embedding-ada-002");
-            User = user;
         }
-
 
         /// <summary>
         /// Constructor.
@@ -52,20 +49,27 @@ namespace OpenAI.Embeddings
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
-        public EmbeddingsRequest(IList<string> input, Model model = null, string user = null)
+        public EmbeddingsRequest(IEnumerable<string> input, Model model = null, string user = null)
         {
-            if (input.Count == 0)
+            Input = input?.ToList();
+
+            if (Input?.Count == 0)
             {
                 throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
             }
 
-            Input = new List<string>(input);
             Model = model ?? new Model("text-embedding-ada-002");
+
+            if (!Model.Contains("text-embedding"))
+            {
+                throw new ArgumentException(nameof(model), $"{Model} is not supported for embedding.");
+            }
+
             User = user;
         }
 
         [JsonPropertyName("input")]
-        public IList<string> Input { get; }
+        public IReadOnlyList<string> Input { get; }
 
         [JsonPropertyName("model")]
         public string Model { get; }

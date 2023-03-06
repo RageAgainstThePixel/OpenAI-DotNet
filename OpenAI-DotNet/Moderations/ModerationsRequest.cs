@@ -1,4 +1,5 @@
-﻿using OpenAI.Models;
+﻿using System;
+using OpenAI.Models;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Moderations
@@ -24,6 +25,11 @@ namespace OpenAI.Moderations
         {
             Input = input;
             Model = model ?? new Model("text-moderation-latest");
+
+            if (!Model.Contains("text-moderation"))
+            {
+                throw new ArgumentException(nameof(model), $"{Model} is not supported.");
+            }
         }
 
         [JsonPropertyName("input")]
