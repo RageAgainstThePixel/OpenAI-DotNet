@@ -30,7 +30,13 @@ namespace OpenAI.Chat
                 throw new ArgumentException(nameof(model), $"{Model} not supported");
             }
 
-            Messages = messages.ToList();
+            Messages = messages?.ToList();
+
+            if (Messages?.Count == 0)
+            {
+                throw new ArgumentNullException(nameof(messages), $"Missing required {nameof(messages)} parameter");
+            }
+
             Temperature = temperature;
             TopP = topP;
             Number = number;
