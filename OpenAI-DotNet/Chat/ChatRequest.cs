@@ -129,7 +129,7 @@ namespace OpenAI.Chat
         /// Defaults to null
         /// </summary>
         [JsonPropertyName("logit_bias")]
-        public Dictionary<string, double> LogitBias { get; set; }
+        public IReadOnlyDictionary<string, double> LogitBias { get; set; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
