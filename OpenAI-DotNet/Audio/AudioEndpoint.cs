@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +12,17 @@ namespace OpenAI.Audio
     /// </summary>
     public sealed class AudioEndpoint : BaseEndPoint
     {
+        private class AudioResponse
+        {
+            public AudioResponse(string text)
+            {
+                Text = text;
+            }
+
+            [JsonPropertyName("text")]
+            public string Text { get; }
+        }
+
         /// <inheritdoc />
         public AudioEndpoint(OpenAIClient api) : base(api) { }
 
@@ -23,7 +36,7 @@ namespace OpenAI.Audio
         /// <param name="request"><see cref="AudioTranscriptionRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The transcribed text.</returns>
-        public async Task<string> CreateTranscription(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
+        public async Task<string> CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
             using var audioData = new MemoryStream();
@@ -36,7 +49,8 @@ namespace OpenAI.Audio
                 content.Add(new StringContent(request.Prompt), "prompt");
             }
 
-            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+            var responseFormat = request.ResponseFormat;
+            content.Add(new StringContent(responseFormat.ToString().ToLower()), "response_format");
 
             if (request.Temperature.HasValue)
             {
@@ -50,9 +64,12 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content, cancellationToken);
+            var response = await Api.Client.PostAsync($"{GetEndpoint()}/transcriptions", content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
-            return responseAsString;
+
+            return responseFormat == AudioResponseFormat.Json
+                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
+                : responseAsString;
         }
 
         /// <summary>
@@ -61,7 +78,7 @@ namespace OpenAI.Audio
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>The translated text.</returns>
-        public async Task<string> CreateTranslation(AudioTranslationRequest request, CancellationToken cancellationToken = default)
+        public async Task<string> CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
             using var audioData = new MemoryStream();
@@ -74,7 +91,8 @@ namespace OpenAI.Audio
                 content.Add(new StringContent(request.Prompt), "prompt");
             }
 
-            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+            var responseFormat = request.ResponseFormat;
+            content.Add(new StringContent(responseFormat.ToString().ToLower()), "response_format");
 
             if (request.Temperature.HasValue)
             {
@@ -83,9 +101,12 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content, cancellationToken);
+            var response = await Api.Client.PostAsync($"{GetEndpoint()}/translations", content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
-            return responseAsString;
+
+            return responseFormat == AudioResponseFormat.Json
+                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
+                : responseAsString;
         }
     }
 }

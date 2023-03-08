@@ -30,23 +30,4 @@ namespace OpenAI.Tests
             Assert.AreEqual(result.Data.Count, 2);
         }
     }
-
-    internal class TestFixture_07_Audio
-    {
-        [Test]
-        public async Task Test_1_Transcription()
-        {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.AudioEndpoint);
-            await Task.CompletedTask;
-        }
-
-        [Test]
-        public async Task Test_2_Translation()
-        {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.AudioEndpoint);
-            await Task.CompletedTask;
-        }
-    }
 }
