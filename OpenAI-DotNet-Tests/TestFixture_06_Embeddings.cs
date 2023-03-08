@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_05_Embeddings
+    internal class TestFixture_06_Embeddings
     {
         [Test]
         public async Task Test_1_CreateEmbedding()
@@ -28,6 +28,25 @@ namespace OpenAI.Tests
             var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync(embeddings);
             Assert.IsNotNull(result);
             Assert.AreEqual(result.Data.Count, 2);
+        }
+    }
+
+    internal class TestFixture_07_Audio
+    {
+        [Test]
+        public async Task Test_1_Transcription()
+        {
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+            Assert.IsNotNull(api.AudioEndpoint);
+            await Task.CompletedTask;
+        }
+
+        [Test]
+        public async Task Test_2_Translation()
+        {
+            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+            Assert.IsNotNull(api.AudioEndpoint);
+            await Task.CompletedTask;
         }
     }
 }
