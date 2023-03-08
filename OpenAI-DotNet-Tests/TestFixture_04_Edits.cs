@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_03_Edits
+    internal class TestFixture_04_Edits
     {
         [Test]
         public async Task Test_1_GetBasicEdit()

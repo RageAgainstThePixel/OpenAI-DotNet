@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_08_Moderations
+    internal class TestFixture_10_Moderations
     {
         [Test]
         public async Task Test_1_Moderate()

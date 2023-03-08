@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_06_Files
+    internal class TestFixture_08_Files
     {
         [Test]
         public async Task Test_01_UploadFile()

@@ -48,6 +48,9 @@ Install-Package OpenAI-DotNet
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
+- [Audio](#audio)
+  - [Create Transcription](#create-transcription)
+  - [Create Translation](#create-translation)
 - [Images](#images)
   - [Create Image](#create-image)
   - [Edit Image](#edit-image)
@@ -270,6 +273,32 @@ Creates an embedding vector representing the input text.
 var api = new OpenAIClient();
 var model = await api.ModelsEndpoint.GetModelDetailsAsync("text-embedding-ada-002");
 var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", model);
+Console.WriteLine(result);
+```
+
+### [Audio](https://beta.openai.com/docs/api-reference/audio)
+
+Converts audio into text.
+
+#### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/create)
+
+Transcribes audio into the input language.
+
+```csharp
+var api = new OpenAIClient();
+var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
+var result = await api.AudioEndpoint.CreateTranscriptionAsync(request);
+Console.WriteLine(result);
+```
+
+#### [Create Translation](https://platform.openai.com/docs/api-reference/audio/create)
+
+Translates audio into into English.
+
+```csharp
+var api = new OpenAIClient();
+var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
+var result = await api.AudioEndpoint.CreateTranslationAsync(request);
 Console.WriteLine(result);
 ```
 
