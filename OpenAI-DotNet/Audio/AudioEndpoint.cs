@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Audio
@@ -18,25 +20,72 @@ namespace OpenAI.Audio
         /// <summary>
         /// Transcribes audio into the input language.
         /// </summary>
-        /// <param name="transcriptionRequest"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="request"><see cref="AudioTranscriptionRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The transcribed text.</returns>
-        public async Task<string> CreateTranscription(AudioTranscriptionRequest transcriptionRequest, CancellationToken cancellationToken = default)
+        public async Task<string> CreateTranscription(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
-            await Task.CompletedTask;
-            return null;
+            using var content = new MultipartFormDataContent();
+            using var audioData = new MemoryStream();
+            await request.Audio.CopyToAsync(audioData, cancellationToken);
+            content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
+            content.Add(new StringContent(request.Model), "model");
+
+            if (!string.IsNullOrWhiteSpace(request.Prompt))
+            {
+                content.Add(new StringContent(request.Prompt), "prompt");
+            }
+
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+
+            if (request.Temperature.HasValue)
+            {
+                content.Add(new StringContent(request.Temperature.ToString()), "temperature");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Language))
+            {
+                content.Add(new StringContent(request.Language), "language");
+            }
+
+            request.Dispose();
+
+            var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content, cancellationToken);
+            var responseAsString = await response.ReadAsStringAsync(cancellationToken);
+            return responseAsString;
         }
 
         /// <summary>
         /// Translates audio into into English.
         /// </summary>
-        /// <param name="translationRequest"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>The translated text.</returns>
-        public async Task<string> CreateTranslation(AudioTranslationRequest translationRequest, CancellationToken cancellationToken = default)
+        public async Task<string> CreateTranslation(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
-            await Task.CompletedTask;
-            return null;
+            using var content = new MultipartFormDataContent();
+            using var audioData = new MemoryStream();
+            await request.Audio.CopyToAsync(audioData, cancellationToken);
+            content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
+            content.Add(new StringContent(request.Model), "model");
+
+            if (!string.IsNullOrWhiteSpace(request.Prompt))
+            {
+                content.Add(new StringContent(request.Prompt), "prompt");
+            }
+
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+
+            if (request.Temperature.HasValue)
+            {
+                content.Add(new StringContent(request.Temperature.ToString()), "temperature");
+            }
+
+            request.Dispose();
+
+            var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content, cancellationToken);
+            var responseAsString = await response.ReadAsStringAsync(cancellationToken);
+            return responseAsString;
         }
     }
 }
