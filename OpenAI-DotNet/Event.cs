@@ -5,33 +5,23 @@ namespace OpenAI
 {
     public sealed class Event
     {
-        [JsonConstructor]
-        public Event(
-            string @object,
-            int createdAtUnixTime,
-            string level,
-            string message
-        )
-        {
-            Object = @object;
-            CreatedAtUnixTime = createdAtUnixTime;
-            Level = level;
-            Message = message;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedAtUnixTime { get; }
+        public int CreatedAtUnixTime { get; private set; }
 
         [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
 
+        [JsonInclude]
         [JsonPropertyName("level")]
-        public string Level { get; }
+        public string Level { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("message")]
-        public string Message { get; }
+        public string Message { get; private set; }
     }
 }

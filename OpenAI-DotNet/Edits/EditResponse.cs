@@ -6,37 +6,28 @@ namespace OpenAI.Edits
 {
     public sealed class EditResponse : BaseResponse
     {
-        [JsonConstructor]
-        public EditResponse(
-            string @object,
-            int createdUnixTime,
-            IReadOnlyList<Choice> choices,
-            Usage usage)
-        {
-            Object = @object;
-            CreatedUnixTime = createdUnixTime;
-            Choices = choices;
-            Usage = usage;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
         /// <summary>
         /// The time when the result was generated in unix epoch format
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("created")]
-        public int CreatedUnixTime { get; }
+        public int CreatedUnixTime { get; private set; }
 
         /// The time when the result was generated
         [JsonIgnore]
         public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
 
+        [JsonInclude]
         [JsonPropertyName("choices")]
-        public IReadOnlyList<Choice> Choices { get; }
+        public IReadOnlyList<Choice> Choices { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("usage")]
-        public Usage Usage { get; }
+        public Usage Usage { get; private set; }
 
         /// <summary>
         /// Gets the text of the first edit, representing the main result

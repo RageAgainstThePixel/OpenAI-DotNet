@@ -4,18 +4,13 @@ namespace OpenAI.Edits
 {
     public sealed class Choice
     {
-        [JsonConstructor]
-        public Choice(string text, int index)
-        {
-            Text = text;
-            Index = index;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("text")]
-        public string Text { get; }
+        public string Text { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("index")]
-        public int Index { get; }
+        public int Index { get; private set; }
 
         /// <summary>
         /// Gets the main text of this completion

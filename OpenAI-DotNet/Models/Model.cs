@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Models
 {
     /// <summary>
-    /// Represents a language model.
+    /// Represents a language model.<br/>
+    /// <see href="https://platform.openai.com/docs/models/model-endpoint-compatability"/>
     /// </summary>
     public sealed class Model
     {
@@ -15,21 +17,6 @@ namespace OpenAI.Models
         public Model(string id)
         {
             Id = id;
-        }
-
-        [JsonConstructor]
-        public Model(
-            string id,
-            string @object,
-            string ownedBy,
-            IReadOnlyList<Permission> permissions,
-            string root, string parent) : this(id)
-        {
-            Object = @object;
-            OwnedBy = ownedBy;
-            Permissions = permissions;
-            Root = root;
-            Parent = parent;
         }
 
         /// <summary>
@@ -46,27 +33,34 @@ namespace OpenAI.Models
         /// <inheritdoc />
         public override string ToString() => Id;
 
+        [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("owned_by")]
         public string OwnedBy { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("permissions")]
-        public IReadOnlyList<Permission> Permissions { get; }
+        public IReadOnlyList<Permission> Permissions { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("root")]
-        public string Root { get; }
+        public string Root { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("parent")]
-        public string Parent { get; }
+        public string Parent { get; private set; }
 
         /// <summary>
         /// The default Model to use in the case no other is specified.  Defaults to <see cref="Davinci"/>
         /// </summary>
+        [Obsolete("Will be removed in next major release.")]
         public static Model Default => Davinci;
 
         /// <summary>
@@ -98,5 +92,20 @@ namespace OpenAI.Models
         /// Good at: Parsing text, simple classification, address correction, keywords
         /// </summary>
         public static Model Ada { get; } = new Model("text-ada-001") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Embeddings.EmbeddingsEndpoint"/>.
+        /// </summary>
+        public static Model Embedding_Ada_002 { get; } = new Model("text-embedding-ada-002") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Audio.AudioEndpoint"/>.
+        /// </summary>
+        public static Model Whisper1 { get; } = new Model("whisper-1") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Moderations.ModerationsEndpoint"/>.
+        /// </summary>
+        public static Model Moderation_Latest { get; } = new Model("text-moderation-latest") { OwnedBy = "openai" };
     }
 }

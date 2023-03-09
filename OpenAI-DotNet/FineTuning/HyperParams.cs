@@ -13,16 +13,20 @@ namespace OpenAI.FineTuning
             PromptLossWeight = promptLossWeight;
         }
 
+        [JsonInclude]
         [JsonPropertyName("batch_size")]
-        public int? BatchSize { get; }
+        public int? BatchSize { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("learning_rate_multiplier")]
-        public double? LearningRateMultiplier { get; }
+        public double? LearningRateMultiplier { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("n_epochs")]
-        public int Epochs { get; }
+        public int Epochs { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("prompt_loss_weight")]
-        public double PromptLossWeight { get; }
+        public double PromptLossWeight { get; private set; }
     }
 }

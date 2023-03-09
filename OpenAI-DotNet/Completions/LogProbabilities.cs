@@ -8,29 +8,20 @@ namespace OpenAI.Completions
     /// </summary>
     public sealed class LogProbabilities
     {
-        [JsonConstructor]
-        public LogProbabilities(
-            IReadOnlyList<string> tokens,
-            IReadOnlyList<double> tokenLogProbabilities,
-            IList<IDictionary<string, double>> topLogProbabilities,
-            IReadOnlyList<int> textOffsets)
-        {
-            Tokens = tokens;
-            TokenLogProbabilities = tokenLogProbabilities;
-            TopLogProbabilities = topLogProbabilities;
-            TextOffsets = textOffsets;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("tokens")]
-        public IReadOnlyList<string> Tokens { get; }
+        public IReadOnlyList<string> Tokens { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("token_logprobs")]
-        public IReadOnlyList<double> TokenLogProbabilities { get; }
+        public IReadOnlyList<double> TokenLogProbabilities { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("top_logprobs")]
-        public IList<IDictionary<string, double>> TopLogProbabilities { get; }
+        public IList<IDictionary<string, double>> TopLogProbabilities { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("text_offset")]
-        public IReadOnlyList<int> TextOffsets { get; }
+        public IReadOnlyList<int> TextOffsets { get; private set; }
     }
 }

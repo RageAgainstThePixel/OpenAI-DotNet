@@ -8,65 +8,60 @@ namespace OpenAI.FineTuning
 {
     internal sealed class FineTuneJobResponse : BaseResponse
     {
-        [JsonConstructor]
-        public FineTuneJobResponse(string id, string @object, string model, int createdUnixTime, IReadOnlyList<Event> events, string fineTunedModel, HyperParams hyperParams, string organizationId, IReadOnlyList<FileData> resultFiles, string status, IReadOnlyList<FileData> validationFiles, IReadOnlyList<FileData> trainingFiles, int updatedAtUnixTime)
-        {
-            Id = id;
-            Object = @object;
-            Model = model;
-            CreatedUnixTime = createdUnixTime;
-            Events = events;
-            FineTunedModel = fineTunedModel;
-            HyperParams = hyperParams;
-            OrganizationId = organizationId;
-            ResultFiles = resultFiles;
-            Status = status;
-            ValidationFiles = validationFiles;
-            TrainingFiles = trainingFiles;
-            UpdatedAtUnixTime = updatedAtUnixTime;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedUnixTime { get; }
+        public int CreatedUnixTime { get; private set; }
 
         [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
 
+        [JsonInclude]
         [JsonPropertyName("events")]
-        public IReadOnlyList<Event> Events { get; }
+        public IReadOnlyList<Event> Events { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("fine_tuned_model")]
-        public string FineTunedModel { get; }
+        public string FineTunedModel { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("hyperparams")]
-        public HyperParams HyperParams { get; }
+        public HyperParams HyperParams { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("organization_id")]
-        public string OrganizationId { get; }
+        public string OrganizationId { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("result_files")]
-        public IReadOnlyList<FileData> ResultFiles { get; }
+        public IReadOnlyList<FileData> ResultFiles { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("status")]
-        public string Status { get; }
+        public string Status { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("validation_files")]
-        public IReadOnlyList<FileData> ValidationFiles { get; }
+        public IReadOnlyList<FileData> ValidationFiles { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("training_files")]
-        public IReadOnlyList<FileData> TrainingFiles { get; }
+        public IReadOnlyList<FileData> TrainingFiles { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("updated_at")]
-        public int UpdatedAtUnixTime { get; }
+        public int UpdatedAtUnixTime { get; private set; }
 
         [JsonIgnore]
         public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(UpdatedAtUnixTime).DateTime;

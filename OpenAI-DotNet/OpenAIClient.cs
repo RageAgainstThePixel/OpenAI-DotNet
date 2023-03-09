@@ -8,6 +8,7 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -27,7 +28,18 @@ namespace OpenAI
         /// <param name="model">The <see cref="Model"/>/model to use for API calls,
         /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
+        [Obsolete("Will be removed in next major release.")]
         public OpenAIClient(Model model) : this(null, model) { }
+
+        /// <summary>
+        /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
+        /// </summary>
+        /// <param name="openAIAuthentication"></param>
+        /// <param name="model">The <see cref="Model"/>/model to use for API calls,
+        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
+        /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
+        [Obsolete("Will be removed in next major release.")]
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication, Model model) : this(openAIAuthentication) { }
 
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
@@ -35,10 +47,8 @@ namespace OpenAI
         /// <param name="openAIAuthentication">The API authentication information to use for API calls,
         /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
         /// potentially loading from environment vars or from a config file.</param>
-        /// <param name="model">The <see cref="Model"/> to use for API calls,
-        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, Model model = null)
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null)
         {
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
 
@@ -61,7 +71,6 @@ namespace OpenAI
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-            DefaultModel = model ?? Model.Default;
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
             ChatEndpoint = new ChatEndpoint(this);
@@ -92,6 +101,7 @@ namespace OpenAI
         /// <summary>
         /// Specifies which <see cref="Model"/> to use for API calls
         /// </summary>
+        [Obsolete("Will be removed in next major release.")]
         public Model DefaultModel { get; set; }
 
         private int version;

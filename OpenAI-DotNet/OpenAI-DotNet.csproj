@@ -15,7 +15,13 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 5.1.0
+    <PackageReleaseNotes>Bump version to 5.1.1
+- Refactored Model validation
+- Added additional default models
+- Deprecate OpenAIClient.DefaultModel
+- Implemented chat completion streaming
+- Refactored immutable types
+Bump version to 5.1.0
 - Add support for Audio endpoint and Whisper models
   - Audio Speech to text
   - Audio translation
@@ -28,7 +34,7 @@ Bump version to 5.0.0
 - Added Chat endpoint
 Bump version to 4.4.4
 - ImageEditRequest mask is now optional so long as texture has alpha transparency
-- ImageVariationRequest added constructor overload for memory stream image 
+- ImageVariationRequest added constructor overload for memory stream image
 - Updated AuthInfo parameter validation
 - Renamed OPEN_AI_ORGANIZATION_ID -&gt; OPENAI_ORGANIZATION_ID
 Bump version to 4.4.3
@@ -53,9 +59,9 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>5.1.0</Version>
-    <AssemblyVersion>5.1.0.0</AssemblyVersion>
-    <FileVersion>5.1.0.0</FileVersion>
+    <Version>5.1.1</Version>
+    <AssemblyVersion>5.1.1.0</AssemblyVersion>
+    <FileVersion>5.1.1.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

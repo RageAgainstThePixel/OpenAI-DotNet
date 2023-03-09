@@ -1,6 +1,5 @@
 ﻿using OpenAI.Models;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -65,16 +64,8 @@ namespace OpenAI.Embeddings
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            var embeddingsResponse = JsonSerializer.Deserialize<EmbeddingsResponse>(resultAsString, Api.JsonSerializationOptions);
-            embeddingsResponse.SetResponseData(response.Headers);
-
-            if (embeddingsResponse == null)
-            {
-                throw new HttpRequestException($"{nameof(CreateEmbeddingAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
-            }
-
-            return embeddingsResponse;
+            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, Api.JsonSerializationOptions);
         }
     }
 }

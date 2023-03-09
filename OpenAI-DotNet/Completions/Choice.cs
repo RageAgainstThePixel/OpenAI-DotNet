@@ -7,42 +7,33 @@ namespace OpenAI.Completions
     /// </summary>
     public sealed class Choice
     {
-        [JsonConstructor]
-        public Choice(
-            string text,
-            int index,
-            LogProbabilities logProbabilities,
-            string finishReason)
-        {
-            Text = text;
-            Index = index;
-            LogProbabilities = logProbabilities;
-            FinishReason = finishReason;
-        }
-
         /// <summary>
         /// The main text of the completion
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("text")]
-        public string Text { get; }
+        public string Text { get; private set; }
 
         /// <summary>
         /// If multiple completion choices we returned, this is the index withing the various choices
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("index")]
-        public int Index { get; }
+        public int Index { get; private set; }
 
         /// <summary>
         /// If the request specified <see cref="CompletionRequest.LogProbabilities"/>, this contains the list of the most likely tokens.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("logprobs")]
-        public LogProbabilities LogProbabilities { get; }
+        public LogProbabilities LogProbabilities { get; private set; }
 
         /// <summary>
         /// If this is the last segment of the completion result, this specifies why the completion has ended.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("finish_reason")]
-        public string FinishReason { get; }
+        public string FinishReason { get; private set; }
 
         /// <summary>
         /// Gets the main text of this completion

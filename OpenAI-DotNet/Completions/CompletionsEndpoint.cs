@@ -57,7 +57,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
@@ -78,7 +78,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,
@@ -110,7 +110,7 @@ namespace OpenAI.Completions
             var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent(), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return DeserializeResult(response, responseAsString);
+            return response.DeserializeResponse<CompletionResult>(responseAsString, Api.JsonSerializationOptions);
         }
 
         #endregion Non-Streaming
@@ -147,7 +147,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
@@ -170,7 +170,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,
@@ -222,13 +222,13 @@ namespace OpenAI.Completions
 
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    resultHandler(DeserializeResult(response, line.Trim()));
+                    resultHandler(response.DeserializeResponse<CompletionResult>(line.Trim(), Api.JsonSerializationOptions));
                 }
             }
         }
 
         /// <summary>
-        /// Ask the API to complete the prompt(s) using the specified parameters.
+        /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
         /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, CancellationToken)"/> instead.
         /// </summary>
@@ -257,7 +257,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="Model.Default"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
@@ -279,7 +279,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,
@@ -297,7 +297,7 @@ namespace OpenAI.Completions
         }
 
         /// <summary>
-        /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.
+        /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
         /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, CancellationToken)"/> instead.
         /// </summary>
@@ -335,25 +335,11 @@ namespace OpenAI.Completions
 
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    yield return DeserializeResult(response, line.Trim());
+                    yield return response.DeserializeResponse<CompletionResult>(line.Trim(), Api.JsonSerializationOptions);
                 }
             }
         }
 
         #endregion Streaming
-
-        private CompletionResult DeserializeResult(HttpResponseMessage response, string json)
-        {
-            var result = JsonSerializer.Deserialize<CompletionResult>(json, Api.JsonSerializationOptions);
-
-            if (result?.Completions == null || result.Completions.Count == 0)
-            {
-                throw new HttpRequestException($"{nameof(DeserializeResult)} no completions! HTTP status code: {response.StatusCode}. Response body: {json}");
-            }
-
-            result.SetResponseData(response.Headers);
-
-            return result;
-        }
     }
 }

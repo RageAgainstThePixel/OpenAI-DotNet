@@ -5,21 +5,16 @@ namespace OpenAI.Embeddings
 {
     public sealed class Datum
     {
-        [JsonConstructor]
-        public Datum(string @object, IReadOnlyList<double> embedding, int index)
-        {
-            Object = @object;
-            Embedding = embedding;
-            Index = index;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("embedding")]
-        public IReadOnlyList<double> Embedding { get; }
+        public IReadOnlyList<double> Embedding { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("index")]
-        public int Index { get; }
+        public int Index { get; private set; }
     }
 }

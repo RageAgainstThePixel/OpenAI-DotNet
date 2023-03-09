@@ -24,11 +24,11 @@ namespace OpenAI.Moderations
         public ModerationsRequest(string input, Model model = null)
         {
             Input = input;
-            Model = model ?? new Model("text-moderation-latest");
+            Model = model ?? Models.Model.Moderation_Latest;
 
             if (!Model.Contains("text-moderation"))
             {
-                throw new ArgumentException(nameof(model), $"{Model} is not supported.");
+                throw new ArgumentException($"{Model} is not supported", nameof(model));
             }
         }
 

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class Message
+    public sealed class Delta
     {
         [JsonInclude]
         [JsonPropertyName("role")]
@@ -11,9 +11,5 @@ namespace OpenAI.Chat
         [JsonInclude]
         [JsonPropertyName("content")]
         public string Content { get; private set; }
-
-        public override string ToString() => Content;
-
-        public static implicit operator string(Message message) => message.Content;
     }
 }
