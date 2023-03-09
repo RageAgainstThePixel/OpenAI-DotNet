@@ -200,7 +200,7 @@ namespace OpenAI.Completions
                 return;
             }
 
-            Model = basedOn.Model;
+            Model = basedOn.Model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
             Prompts = basedOn.Prompts;
             Suffix = basedOn.Suffix ?? DefaultCompletionRequestArgs?.Suffix;
             MaxTokens = basedOn.MaxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
@@ -278,7 +278,7 @@ namespace OpenAI.Completions
                 throw new ArgumentNullException($"Missing required {nameof(prompt)}(s)");
             }
 
-            Model = model ?? DefaultCompletionRequestArgs?.Model;
+            Model = model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
 
             if (!Model.Contains("davinci") ||
                 !Model.Contains("curie") ||

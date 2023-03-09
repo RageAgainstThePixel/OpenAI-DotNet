@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Models
 {
     /// <summary>
-    /// Represents a language model.
+    /// Represents a language model.<br/>
+    /// <see href="https://platform.openai.com/docs/models/model-endpoint-compatability"/>
     /// </summary>
     public sealed class Model
     {
@@ -67,6 +69,7 @@ namespace OpenAI.Models
         /// <summary>
         /// The default Model to use in the case no other is specified.  Defaults to <see cref="Davinci"/>
         /// </summary>
+        [Obsolete("Will be removed in next major release.")]
         public static Model Default => Davinci;
 
         /// <summary>
@@ -98,5 +101,20 @@ namespace OpenAI.Models
         /// Good at: Parsing text, simple classification, address correction, keywords
         /// </summary>
         public static Model Ada { get; } = new Model("text-ada-001") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Embeddings.EmbeddingsEndpoint"/>.
+        /// </summary>
+        public static Model Embedding_Ada_002 { get; } = new Model("text-embedding-ada-002") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Audio.AudioEndpoint"/>.
+        /// </summary>
+        public static Model Whisper1 { get; } = new Model("whisper-1") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// The default model for <see cref="Moderations.ModerationsEndpoint"/>.
+        /// </summary>
+        public static Model Moderation_Latest { get; } = new Model("text-moderation-latest") { OwnedBy = "openai" };
     }
 }

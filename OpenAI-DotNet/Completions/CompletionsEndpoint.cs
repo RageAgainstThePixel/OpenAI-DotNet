@@ -57,7 +57,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>Asynchronously returns the completion result.
         /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
@@ -78,7 +78,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,
@@ -147,7 +147,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="OpenAIClient.DefaultModel"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
@@ -170,7 +170,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,
@@ -257,7 +257,7 @@ namespace OpenAI.Completions
         /// <param name="stopSequences">One or more sequences where the API will stop generating further tokens.
         /// The returned text will not contain the stop sequence.</param>
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
-        /// Defaults to <see cref="Model.Default"/>.</param>
+        /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
@@ -279,7 +279,7 @@ namespace OpenAI.Completions
             CancellationToken cancellationToken = default)
         {
             var request = new CompletionRequest(
-                model ?? Api.DefaultModel,
+                model ?? Model.Davinci,
                 prompt,
                 prompts,
                 suffix,

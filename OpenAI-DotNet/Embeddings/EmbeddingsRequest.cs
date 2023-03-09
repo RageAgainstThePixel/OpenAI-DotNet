@@ -58,7 +58,7 @@ namespace OpenAI.Embeddings
                 throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
             }
 
-            Model = model ?? new Model("text-embedding-ada-002");
+            Model = model ?? Models.Model.Embedding_Ada_002;
 
             if (!Model.Contains("embedding") ||
                 !Model.Contains("search") ||

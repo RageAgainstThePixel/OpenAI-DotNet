@@ -24,7 +24,7 @@ namespace OpenAI.Moderations
         public ModerationsRequest(string input, Model model = null)
         {
             Input = input;
-            Model = model ?? new Model("text-moderation-latest");
+            Model = model ?? Models.Model.Moderation_Latest;
 
             if (!Model.Contains("text-moderation"))
             {
