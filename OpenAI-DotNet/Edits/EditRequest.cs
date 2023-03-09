@@ -36,7 +36,7 @@ namespace OpenAI.Edits
 
             if (!Model.Contains("-edit-"))
             {
-                throw new ArgumentException(nameof(model), $"{Model} does not support editing");
+                throw new ArgumentException($"{Model} is not supported", nameof(model));
             }
 
             Input = input;

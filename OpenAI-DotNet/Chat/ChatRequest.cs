@@ -22,12 +22,11 @@ namespace OpenAI.Chat
             Dictionary<string, double> logitBias = null,
             string user = null)
         {
-            const string defaultModel = "gpt-3.5-turbo";
             Model = model ?? Models.Model.GPT3_5_Turbo;
 
-            if (!Model.Contains(defaultModel))
+            if (!Model.Contains("turbo"))
             {
-                throw new ArgumentException(nameof(model), $"{Model} not supported");
+                throw new ArgumentException($"{Model} is not supported", nameof(model));
             }
 
             Messages = messages?.ToList();

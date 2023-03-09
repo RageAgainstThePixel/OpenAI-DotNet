@@ -28,7 +28,7 @@ namespace OpenAI.Moderations
 
             if (!Model.Contains("text-moderation"))
             {
-                throw new ArgumentException(nameof(model), $"{Model} is not supported.");
+                throw new ArgumentException($"{Model} is not supported", nameof(model));
             }
         }
 

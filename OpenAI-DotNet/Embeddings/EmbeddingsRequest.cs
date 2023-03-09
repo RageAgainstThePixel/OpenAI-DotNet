@@ -62,7 +62,7 @@ namespace OpenAI.Embeddings
 
             if (!Model.Contains("text-embedding"))
             {
-                throw new ArgumentException(nameof(model), $"{Model} is not supported for embedding.");
+                throw new ArgumentException($"{Model} is not supported", nameof(model));
             }
 
             User = user;
