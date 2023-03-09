@@ -1,5 +1,4 @@
 ﻿using OpenAI.Models;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -59,16 +58,8 @@ namespace OpenAI.Edits
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
             var response = await Api.Client.PostAsync(GetEndpoint(), jsonContent.ToJsonStringContent()).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            var editResponse = JsonSerializer.Deserialize<EditResponse>(resultAsString, Api.JsonSerializationOptions);
-            editResponse.SetResponseData(response.Headers);
-
-            if (editResponse == null)
-            {
-                throw new HttpRequestException($"{nameof(CreateEditAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
-            }
-
-            return editResponse;
+            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            return response.DeserializeResponse<EditResponse>(responseAsString, Api.JsonSerializationOptions);
         }
     }
 }

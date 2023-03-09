@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,6 +41,13 @@ namespace OpenAI
                 var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 throw new HttpRequestException($"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}");
             }
+        }
+
+        internal static T DeserializeResponse<T>(this HttpResponseMessage response, string json, JsonSerializerOptions settings) where T : BaseResponse
+        {
+            var result = JsonSerializer.Deserialize<T>(json, settings);
+            result.SetResponseData(response.Headers);
+            return result;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class ChatResponse
+    public sealed class ChatResponse : BaseResponse
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
