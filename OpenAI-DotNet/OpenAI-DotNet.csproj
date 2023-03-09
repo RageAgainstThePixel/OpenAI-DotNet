@@ -17,6 +17,7 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 5.1.1
 - Refactored Model validation
+- Added additional default models
 - Deprecate OpenAIClient.DefaultModel
 - Implemented chat completion streaming
 - Refactored immutable types
@@ -33,7 +34,7 @@ Bump version to 5.0.0
 - Added Chat endpoint
 Bump version to 4.4.4
 - ImageEditRequest mask is now optional so long as texture has alpha transparency
-- ImageVariationRequest added constructor overload for memory stream image 
+- ImageVariationRequest added constructor overload for memory stream image
 - Updated AuthInfo parameter validation
 - Renamed OPEN_AI_ORGANIZATION_ID -&gt; OPENAI_ORGANIZATION_ID
 Bump version to 4.4.3
