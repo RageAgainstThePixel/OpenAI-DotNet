@@ -280,10 +280,10 @@ namespace OpenAI.Completions
 
             Model = model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
 
-            if (!Model.Contains("davinci") ||
-                !Model.Contains("curie") ||
-                !Model.Contains("cushman") ||
-                !Model.Contains("babbage") ||
+            if (!Model.Contains("davinci") &&
+                !Model.Contains("curie") &&
+                !Model.Contains("cushman") &&
+                !Model.Contains("babbage") &&
                 !Model.Contains("ada"))
             {
                 throw new ArgumentException($"{Model} is not supported", nameof(model));
