@@ -9,35 +9,23 @@ namespace OpenAI.Completions
     /// </summary>
     public sealed class CompletionResult : BaseResponse
     {
-        [JsonConstructor]
-        public CompletionResult(
-            string id,
-            string @object,
-            int createdUnixTime,
-            string model,
-            IReadOnlyList<Choice> completions)
-        {
-            Id = id;
-            Object = @object;
-            CreatedUnixTime = createdUnixTime;
-            Model = model;
-            Completions = completions;
-        }
-
         /// <summary>
         /// The identifier of the result, which may be used during troubleshooting
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; }
+        public string Object { get; private set; }
 
         /// <summary>
         /// The time when the result was generated in unix epoch format
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("created")]
-        public int CreatedUnixTime { get; }
+        public int CreatedUnixTime { get; private set; }
 
         /// <summary>
         /// The time when the result was generated.
@@ -45,14 +33,16 @@ namespace OpenAI.Completions
         [JsonIgnore]
         public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
 
+        [JsonInclude]
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; private set; }
 
         /// <summary>
         /// The completions returned by the API.  Depending on your request, there may be 1 or many choices.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("choices")]
-        public IReadOnlyList<Choice> Completions { get; }
+        public IReadOnlyList<Choice> Completions { get; private set; }
 
         /// <summary>
         /// Gets the text of the first completion, representing the main result

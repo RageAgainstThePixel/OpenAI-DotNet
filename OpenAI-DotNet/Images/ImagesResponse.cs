@@ -5,17 +5,12 @@ namespace OpenAI.Images
 {
     internal class ImagesResponse : BaseResponse
     {
-        [JsonConstructor]
-        public ImagesResponse(int created, IReadOnlyList<ImageResult> data)
-        {
-            Created = created;
-            Data = data;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("created")]
-        public int Created { get; }
+        public int Created { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("data")]
-        public IReadOnlyList<ImageResult> Data { get; }
+        public IReadOnlyList<ImageResult> Data { get; private set; }
     }
 }

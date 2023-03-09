@@ -4,37 +4,32 @@ namespace OpenAI.Moderations
 {
     public sealed class Categories
     {
-        [JsonConstructor]
-        public Categories(bool hate, bool hateThreatening, bool selfHarm, bool sexual, bool sexualMinors, bool violence, bool violenceGraphic)
-        {
-            Hate = hate;
-            HateThreatening = hateThreatening;
-            SelfHarm = selfHarm;
-            Sexual = sexual;
-            SexualMinors = sexualMinors;
-            Violence = violence;
-            ViolenceGraphic = violenceGraphic;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("hate")]
-        public bool Hate { get; }
+        public bool Hate { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("hate/threatening")]
-        public bool HateThreatening { get; }
+        public bool HateThreatening { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("self-harm")]
-        public bool SelfHarm { get; }
+        public bool SelfHarm { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("sexual")]
-        public bool Sexual { get; }
+        public bool Sexual { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("sexual/minors")]
-        public bool SexualMinors { get; }
+        public bool SexualMinors { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("violence")]
-        public bool Violence { get; }
+        public bool Violence { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("violence/graphic")]
-        public bool ViolenceGraphic { get; }
+        public bool ViolenceGraphic { get; private set; }
     }
 }

@@ -5,21 +5,16 @@ namespace OpenAI.Moderations
 {
     public sealed class ModerationsResponse : BaseResponse
     {
-        [JsonConstructor]
-        public ModerationsResponse(string id, string model, IReadOnlyList<ModerationResult> results)
-        {
-            Id = id;
-            Model = model;
-            Results = results;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("results")]
-        public IReadOnlyList<ModerationResult> Results { get; }
+        public IReadOnlyList<ModerationResult> Results { get; private set; }
     }
 }

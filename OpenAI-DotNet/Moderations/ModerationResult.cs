@@ -4,21 +4,16 @@ namespace OpenAI.Moderations
 {
     public sealed class ModerationResult
     {
-        [JsonConstructor]
-        public ModerationResult(Categories categories, Scores scores, bool flagged)
-        {
-            Categories = categories;
-            Scores = scores;
-            Flagged = flagged;
-        }
-
+        [JsonInclude]
         [JsonPropertyName("categories")]
-        public Categories Categories { get; }
+        public Categories Categories { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("category_scores")]
-        public Scores Scores { get; }
+        public Scores Scores { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("flagged")]
-        public bool Flagged { get; }
+        public bool Flagged { get; private set; }
     }
 }
