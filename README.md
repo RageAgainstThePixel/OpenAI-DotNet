@@ -237,7 +237,39 @@ Console.WriteLine(result.FirstChoice);
 ##### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
 
 ```csharp
-TODO
+var api = new OpenAIClient();
+var chatPrompts = new List<ChatPrompt>
+{
+    new ChatPrompt("system", "You are a helpful assistant."),
+    new ChatPrompt("user", "Who won the world series in 2020?"),
+    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
+    new ChatPrompt("user", "Where was it played?"),
+};
+var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+
+await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
+{
+    Console.WriteLine(result.FirstChoice);
+});
+```
+
+Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
+
+```csharp
+var api = new OpenAIClient();
+var chatPrompts = new List<ChatPrompt>
+{
+    new ChatPrompt("system", "You are a helpful assistant."),
+    new ChatPrompt("user", "Who won the world series in 2020?"),
+    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
+    new ChatPrompt("user", "Where was it played?"),
+};
+var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+
+await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
+{
+    Console.WriteLine(result.FirstChoice);
+}
 ```
 
 ### [Edits](https://beta.openai.com/docs/api-reference/edits)

@@ -17,6 +17,9 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 5.1.1
 - Refactored Model validation
+- Deprecate OpenAIClient.DefaultModel
+- Implemented chat completion streaming
+- Refactored immutable types
 Bump version to 5.1.0
 - Add support for Audio endpoint and Whisper models
   - Audio Speech to text
