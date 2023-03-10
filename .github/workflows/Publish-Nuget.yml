@@ -36,7 +36,8 @@ jobs:
     - name: Test Package ${{ matrix.configuration }}
       run: dotnet test --configuration ${{ matrix.configuration }}
       env:
-        TEST_OPENAI_SECRET_KEY: ${{ secrets.TEST_OPENAI_SECRET_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
 
     - name: Publish Nuget Package
       run: |
