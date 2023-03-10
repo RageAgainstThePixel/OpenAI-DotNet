@@ -4,6 +4,7 @@ using OpenAI.FineTuning;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -201,16 +202,13 @@ namespace OpenAI.Tests
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);
 
-            foreach (var model in models)
+            foreach (var model in models.Where(x => x.OwnedBy.StartsWith("user-")))
             {
-                if (model.OwnedBy == api.OpenAIAuthentication.OrganizationId)
-                {
-                    Console.WriteLine(model);
-                    var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result);
-                    Console.WriteLine($"{model.Id} -> deleted");
-                }
+                Console.WriteLine(model);
+                var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
+                Assert.IsNotNull(result);
+                Assert.IsTrue(result);
+                Console.WriteLine($"{model.Id} -> deleted");
             }
         }
     }
