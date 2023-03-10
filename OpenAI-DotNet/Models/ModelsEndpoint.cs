@@ -87,14 +87,21 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
-            if (model.OwnedBy != Api.OpenAIAuthentication.OrganizationId)
+            try
             {
-                throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
+                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}").ConfigureAwait(false);
+                var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
             }
+            catch (Exception e)
+            {
+                if (e.Message.Contains("api.delete"))
+                {
+                    throw new UnauthorizedAccessException($"You do not have permissions to delete models for this organization.\n{e}");
+                }
 
-            var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}").ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+                throw;
+            }
         }
     }
 }

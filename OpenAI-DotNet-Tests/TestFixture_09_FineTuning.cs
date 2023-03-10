@@ -4,6 +4,7 @@ using OpenAI.FineTuning;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -201,16 +202,27 @@ namespace OpenAI.Tests
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);
 
-            foreach (var model in models)
+            try
             {
-                if (model.OwnedBy == api.OpenAIAuthentication.OrganizationId)
+                foreach (var model in models)
                 {
+                    if (model.OwnedBy.Contains("openai") ||
+                        model.OwnedBy.Contains("system"))
+                    {
+                        continue;
+                    }
+
                     Console.WriteLine(model);
                     var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result);
                     Console.WriteLine($"{model.Id} -> deleted");
+                    break;
                 }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Your account does not have permissions to delete models.");
             }
         }
     }
