@@ -17,6 +17,8 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 6.0.0
 - Added support for Azure OpenAI
+Bump version to 5.1.2
+- Fixed an issue when deleting personal account fine tuned models
 Bump version to 5.1.1
 - Refactored Model validation
 - Added additional default models
