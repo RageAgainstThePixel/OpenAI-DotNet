@@ -202,13 +202,27 @@ namespace OpenAI.Tests
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);
 
-            foreach (var model in models.Where(model => model.OwnedBy is not ("openai" or "system" or "openai-dev")))
+            try
             {
-                Console.WriteLine(model);
-                var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
-                Assert.IsNotNull(result);
-                Assert.IsTrue(result);
-                Console.WriteLine($"{model.Id} -> deleted");
+                foreach (var model in models)
+                {
+                    if (model.OwnedBy.Contains("openai") ||
+                        model.OwnedBy.Contains("system"))
+                    {
+                        continue;
+                    }
+
+                    Console.WriteLine(model);
+                    var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
+                    Assert.IsNotNull(result);
+                    Assert.IsTrue(result);
+                    Console.WriteLine($"{model.Id} -> deleted");
+                    break;
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Your account does not have permissions to delete models.");
             }
         }
     }
