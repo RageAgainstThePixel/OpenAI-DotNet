@@ -203,7 +203,7 @@ namespace OpenAI.Tests
 
             foreach (var model in models)
             {
-                if (model.OwnedBy == api.OpenAIAuthentication.OrganizationId)
+                if (model.OwnedBy != "openai")
                 {
                     Console.WriteLine(model);
                     var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
