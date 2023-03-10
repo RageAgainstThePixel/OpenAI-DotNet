@@ -202,7 +202,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);
 
-            foreach (var model in models.Where(model => model.OwnedBy != "openai"))
+            foreach (var model in models.Where(model => model.OwnedBy is not ("openai" or "system" or "openai-dev")))
             {
                 Console.WriteLine(model);
                 var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync(model);
