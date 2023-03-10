@@ -24,9 +24,6 @@ namespace OpenAI
         /// </summary>
         public string ApiKey => authInfo.ApiKey;
 
-        [Obsolete("Use OrganizationId instead")]
-        public string Organization => authInfo.OrganizationId;
-
         /// <summary>
         /// For users who belong to multiple organizations, you can pass a header to specify which organization is used for an API request.
         /// Usage from these API requests will count against the specified organization's subscription quota.

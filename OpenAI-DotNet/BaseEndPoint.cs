@@ -2,18 +2,20 @@
 {
     public abstract class BaseEndPoint
     {
+        protected BaseEndPoint(OpenAIClient api) => Api = api;
+
         protected readonly OpenAIClient Api;
 
         /// <summary>
-        /// Constructor of the api endpoint.
-        /// Rather than instantiating this yourself, access it through an instance of <see cref="OpenAIClient"/>.
+        /// The root endpoint address.
         /// </summary>
-        internal BaseEndPoint(OpenAIClient api) => Api = api;
+        protected abstract string Root { get; }
 
         /// <summary>
-        /// Gets the basic endpoint url for the API
+        /// Gets the full formatted url for the API endpoint.
         /// </summary>
-        /// <returns>The completed basic url for the endpoint.</returns>
-        protected abstract string GetEndpoint();
+        /// <param name="endpoint">The endpoint url.</param>
+        protected string GetUrl(string endpoint = "")
+            => string.Format(Api.BaseRequestUrl, $"{Root}{endpoint}");
     }
 }

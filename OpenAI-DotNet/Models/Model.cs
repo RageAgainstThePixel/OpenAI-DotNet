@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Models
@@ -56,12 +55,6 @@ namespace OpenAI.Models
         [JsonInclude]
         [JsonPropertyName("parent")]
         public string Parent { get; private set; }
-
-        /// <summary>
-        /// The default Model to use in the case no other is specified.  Defaults to <see cref="Davinci"/>
-        /// </summary>
-        [Obsolete("Will be removed in next major release.")]
-        public static Model Default => Davinci;
 
         /// <summary>
         /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
