@@ -1,7 +1,9 @@
 # OpenAI-DotNet
 
 A simple C# .NET client library to use with [OpenAI](https://openai.com/)'s API.
+
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
+
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
 
 > This repository is available to transfer to the OpenAI organization if they so choose to accept it.
