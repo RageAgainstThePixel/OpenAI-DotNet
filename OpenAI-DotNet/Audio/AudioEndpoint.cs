@@ -27,8 +27,7 @@ namespace OpenAI.Audio
         public AudioEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
-        protected override string GetEndpoint()
-            => $"{Api.BaseUrl}audio";
+        protected override string Root => "audio";
 
         /// <summary>
         /// Transcribes audio into the input language.
@@ -64,7 +63,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}/transcriptions", content, cancellationToken);
+            var response = await Api.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
 
             return responseFormat == AudioResponseFormat.Json
@@ -101,7 +100,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}/translations", content, cancellationToken);
+            var response = await Api.Client.PostAsync(GetUrl("/translations"), content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
 
             return responseFormat == AudioResponseFormat.Json

@@ -15,7 +15,9 @@ Based on OpenAI-API by OKGoDoIt (Roger Pincombe)</Description>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 5.1.2
+    <PackageReleaseNotes>Bump version to 6.0.0
+- Added support for Azure OpenAI
+Bump version to 5.1.2
 - Fixed an issue when deleting personal account fine tuned models
 Bump version to 5.1.1
 - Refactored Model validation
@@ -61,9 +63,9 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>5.1.2</Version>
-    <AssemblyVersion>5.1.2.0</AssemblyVersion>
-    <FileVersion>5.1.2.0</FileVersion>
+    <Version>6.0.0</Version>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <FileVersion>6.0.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

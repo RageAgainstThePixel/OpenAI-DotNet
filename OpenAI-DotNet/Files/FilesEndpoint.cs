@@ -31,8 +31,7 @@ namespace OpenAI.Files
         public FilesEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
-        protected override string GetEndpoint()
-            => $"{Api.BaseUrl}files";
+        protected override string Root => "files";
 
         /// <summary>
         /// Returns a list of files that belong to the user's organization.
@@ -41,7 +40,7 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<FileData>> ListFilesAsync()
         {
-            var response = await Api.Client.GetAsync(GetEndpoint()).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<FilesList>(resultAsString, Api.JsonSerializationOptions)?.Data;
         }
@@ -83,7 +82,7 @@ namespace OpenAI.Files
             content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetEndpoint(), content, cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
         }
@@ -101,7 +100,7 @@ namespace OpenAI.Files
 
             async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{fileId}", cancellationToken).ConfigureAwait(false);
+                var response = await Api.Client.DeleteAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
                 // We specifically don't use the extension method here bc we need to check if it's still processing the file.
                 var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
@@ -129,7 +128,7 @@ namespace OpenAI.Files
         /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> GetFileInfoAsync(string fileId)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{fileId}").ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{fileId}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
         }
@@ -158,7 +157,7 @@ namespace OpenAI.Files
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<string> DownloadFileAsync(FileData fileData, string directory, CancellationToken cancellationToken = default)
         {
-            await using var response = await Api.Client.GetStreamAsync($"{GetEndpoint()}/{fileData.Id}/content", cancellationToken).ConfigureAwait(false);
+            await using var response = await Api.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
 
             if (!Directory.Exists(directory))
             {

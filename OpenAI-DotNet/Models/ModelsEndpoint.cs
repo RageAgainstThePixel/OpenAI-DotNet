@@ -43,9 +43,7 @@ namespace OpenAI.Models
         /// <inheritdoc />
         public ModelsEndpoint(OpenAIClient api) : base(api) { }
 
-        /// <inheritdoc />
-        protected override string GetEndpoint()
-            => $"{Api.BaseUrl}models";
+        protected override string Root => "models";
 
         /// <summary>
         /// List all models via the API
@@ -54,7 +52,7 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<IReadOnlyList<Model>> GetModelsAsync()
         {
-            var response = await Api.Client.GetAsync(GetEndpoint()).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<ModelsList>(responseAsString, Api.JsonSerializationOptions)?.Data;
         }
@@ -67,7 +65,7 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<Model> GetModelDetailsAsync(string id)
         {
-            var response = await Api.Client.GetAsync($"{GetEndpoint()}/{id}").ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{id}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<Model>(responseAsString, Api.JsonSerializationOptions);
         }
@@ -89,7 +87,7 @@ namespace OpenAI.Models
 
             try
             {
-                var response = await Api.Client.DeleteAsync($"{GetEndpoint()}/{model.Id}").ConfigureAwait(false);
+                var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
                 return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
             }

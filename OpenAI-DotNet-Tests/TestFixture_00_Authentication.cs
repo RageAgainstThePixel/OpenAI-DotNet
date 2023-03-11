@@ -156,6 +156,15 @@ namespace OpenAI.Tests
             }
         }
 
+        [Test]
+        public void Test_11_AzureConfigurationSettings()
+        {
+            var auth = new OpenAIAuthentication("sk-testAA", "org-testAA");
+            var settings = new OpenAIClientSettings("test-resource", "deployment-id-test");
+            var api = new OpenAIClient(auth, settings);
+            Console.WriteLine(api.BaseRequestUrl);
+        }
+
         [TearDown]
         public void TearDown()
         {

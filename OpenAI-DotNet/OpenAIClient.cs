@@ -8,7 +8,6 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
-using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -25,32 +24,15 @@ namespace OpenAI
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        /// <param name="model">The <see cref="Model"/>/model to use for API calls,
-        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
-        /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        [Obsolete("Will be removed in next major release.")]
-        public OpenAIClient(Model model) : this(null, model) { }
-
-        /// <summary>
-        /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
-        /// </summary>
-        /// <param name="openAIAuthentication"></param>
-        /// <param name="model">The <see cref="Model"/>/model to use for API calls,
-        /// defaulting to <see cref="Model.Davinci"/> if not specified.</param>
-        /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        [Obsolete("Will be removed in next major release.")]
-        public OpenAIClient(OpenAIAuthentication openAIAuthentication, Model model) : this(openAIAuthentication) { }
-
-        /// <summary>
-        /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
-        /// </summary>
         /// <param name="openAIAuthentication">The API authentication information to use for API calls,
         /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
         /// potentially loading from environment vars or from a config file.</param>
+        /// <param name="clientSettings">Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
-        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null)
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null)
         {
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
+            OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
 
             if (OpenAIAuthentication?.ApiKey is null)
             {
@@ -59,14 +41,21 @@ namespace OpenAI
 
             Client = new HttpClient();
             Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
+
+            if (OpenAIClientSettings.ResourceName == OpenAIClientSettings.OpenAIDomain)
+            {
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
+            }
+            else
+            {
+                Client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
+            }
 
             if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
             {
                 Client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
             }
 
-            Version = 1;
             JsonSerializationOptions = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -98,31 +87,12 @@ namespace OpenAI
         /// </summary>
         public OpenAIAuthentication OpenAIAuthentication { get; }
 
-        /// <summary>
-        /// Specifies which <see cref="Model"/> to use for API calls
-        /// </summary>
-        [Obsolete("Will be removed in next major release.")]
-        public Model DefaultModel { get; set; }
-
-        private int version;
-
-        /// <summary>
-        /// Specifies which version of the API to use.
-        /// </summary>
-        public int Version
-        {
-            get => version;
-            set
-            {
-                version = value;
-                BaseUrl = $"https://api.openai.com/v{version}/";
-            }
-        }
+        private OpenAIClientSettings OpenAIClientSettings { get; }
 
         /// <summary>
         /// The base url to use when making calls to the API.
         /// </summary>
-        internal string BaseUrl { get; private set; }
+        internal string BaseRequestUrl => OpenAIClientSettings.BaseRequestUrl;
 
         /// <summary>
         /// List and describe the various models available in the API.

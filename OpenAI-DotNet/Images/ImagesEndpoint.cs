@@ -17,7 +17,7 @@ namespace OpenAI.Images
         internal ImagesEndpoint(OpenAIClient api) : base(api) { }
 
         /// <inheritdoc />
-        protected override string GetEndpoint() => $"{Api.BaseUrl}images/";
+        protected override string Root => "images";
 
         /// <summary>
         /// Creates an image given a prompt.
@@ -40,8 +40,8 @@ namespace OpenAI.Images
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions);
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}generations", jsonContent.ToJsonStringContent(), cancellationToken).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
@@ -104,7 +104,7 @@ namespace OpenAI.Images
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}edits", content, cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
@@ -153,7 +153,7 @@ namespace OpenAI.Images
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync($"{GetEndpoint()}variations", content, cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
