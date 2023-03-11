@@ -68,6 +68,7 @@ Bump version to 4.4.0
     <FileVersion>6.0.0.0</FileVersion>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>OpenAI-DotNet-Icon.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
@@ -77,6 +78,12 @@ Bump version to 4.4.0
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\OpenAI-DotNet-Icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

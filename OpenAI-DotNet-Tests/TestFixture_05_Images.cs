@@ -34,7 +34,7 @@ namespace OpenAI.Tests
             var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
             var maskAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_mask.png");
 
-            var results = await api.ImagesEndPoint.CreateImageEditAsync(Path.GetFullPath(imageAssetPath), Path.GetFullPath(maskAssetPath), "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
+            var results = await api.ImagesEndPoint.CreateImageEditAsync(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
