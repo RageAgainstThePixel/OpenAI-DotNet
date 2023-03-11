@@ -1,6 +1,6 @@
 # OpenAI-DotNet
 
-A simple C# .NET client library to use with [OpenAI](https://openai.com/)'s API.
+A simple C# .NET client library for [OpenAI](https://openai.com/) to use GPT-3 and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
 
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 
