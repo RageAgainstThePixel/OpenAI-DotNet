@@ -17,7 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 6.0.0
+    <PackageReleaseNotes>Bump version to 6.0.1
+- Updated package info
+- Updated docs
+Bump version to 6.0.0
 - Added support for Azure OpenAI
 Bump version to 5.1.2
 - Fixed an issue when deleting personal account fine tuned models
@@ -65,9 +68,7 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.0.0</Version>
-    <AssemblyVersion>6.0.0.0</AssemblyVersion>
-    <FileVersion>6.0.0.0</FileVersion>
+    <Version>6.0.1</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
