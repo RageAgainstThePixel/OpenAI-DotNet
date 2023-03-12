@@ -43,6 +43,7 @@ namespace OpenAI.Models
         /// <inheritdoc />
         public ModelsEndpoint(OpenAIClient api) : base(api) { }
 
+        /// <inheritdoc />
         protected override string Root => "models";
 
         /// <summary>
