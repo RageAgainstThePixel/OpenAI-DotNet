@@ -57,6 +57,16 @@ namespace OpenAI.Models
         public string Parent { get; private set; }
 
         /// <summary>
+        /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat. Will be updated with our latest model iteration.
+        /// </summary>
+        public static Model GPT4 { get; } = new Model("gpt-4") { OwnedBy = "openai" };
+
+        /// <summary>
+        /// Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with our latest model iteration.
+        /// </summary>
+        public static Model GPT4_32K { get; } = new Model("gpt-4-32k") { OwnedBy = "openai" };
+
+        /// <summary>
         /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
         /// the price per token, we recommend gpt-3.5-turbo for most use cases.
         /// </summary>
