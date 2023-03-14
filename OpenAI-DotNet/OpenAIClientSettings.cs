@@ -12,25 +12,20 @@
             ResourceName = OpenAIDomain;
             ApiVersion = "1";
             DeploymentId = string.Empty;
-            BaseRequestUrl = $"https://{OpenAIDomain}/v{ApiVersion}/{{0}}";
+            BaseRequestUrl = $"https://{ResourceName}/v{ApiVersion}/{{0}}";
         }
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
         /// </summary>
+        /// <param name="domain">Base api domain.</param>
         /// <param name="apiVersion">The version of the OpenAI api you want to use.</param>
-        public OpenAIClientSettings(string apiVersion)
+        public OpenAIClientSettings(string domain = OpenAIDomain, string apiVersion = "1")
         {
-            ResourceName = OpenAIDomain;
-
-            if (string.IsNullOrWhiteSpace(apiVersion))
-            {
-                apiVersion = "1";
-            }
-
+            ResourceName = domain;
             ApiVersion = apiVersion;
             DeploymentId = string.Empty;
-            BaseRequestUrl = $"https://{OpenAIDomain}/v{ApiVersion}/{{0}}";
+            BaseRequestUrl = $"https://{ResourceName}/v{ApiVersion}/{{0}}";
         }
 
         /// <summary>
