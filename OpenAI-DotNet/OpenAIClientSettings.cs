@@ -43,11 +43,6 @@
         /// </param>
         public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = "2022-12-01")
         {
-            if (string.IsNullOrWhiteSpace(resourceName))
-            {
-                resourceName = OpenAIDomain;
-            }
-
             ResourceName = resourceName;
             DeploymentId = deploymentId;
             ApiVersion = apiVersion;

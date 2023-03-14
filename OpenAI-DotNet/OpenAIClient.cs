@@ -42,7 +42,7 @@ namespace OpenAI
             Client = new HttpClient();
             Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
-            if (OpenAIClientSettings.ResourceName == OpenAIClientSettings.OpenAIDomain)
+            if (!OpenAIClientSettings.BaseRequestUrl.Contains(OpenAIClientSettings.OpenAIDomain))
             {
                 Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             }
