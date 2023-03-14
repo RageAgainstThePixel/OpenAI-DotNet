@@ -4,7 +4,7 @@
 [![NuGet version (OpenAI-DotNet)](https://img.shields.io/nuget/v/OpenAI-DotNet.svg)](https://www.nuget.org/packages/OpenAI-DotNet/)
 [![Nuget Publish](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml/badge.svg)](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml)
 
-A simple C# .NET client library for [OpenAI](https://openai.com/) to use GPT-4, GPT-3 and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
+A simple C# .NET client library for [OpenAI](https://openai.com/) to use use chat-gpt, GPT-4, GPT-3.5-Turbo and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
 
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 
