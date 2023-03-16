@@ -17,8 +17,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 6.1.1
-- Added support for custom domains and proxy api.
+    <PackageReleaseNotes>Bump version to 6.2.0
+- Added OpenAI-DotNet-Proxy project and package.
+- Added support for custom domains
+- Updated unit tests
+- Updated docs
 Bump version to 6.1.0
 - Added support for gpt-4 models
 Bump version to 6.0.1
