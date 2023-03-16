@@ -2,7 +2,6 @@
 
 [![Discord](https://img.shields.io/discord/855294214065487932.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/xQgMW9ufN4)
 [![NuGet version (OpenAI-DotNet)](https://img.shields.io/nuget/v/OpenAI-DotNet.svg?label=OpenAI-DotNet&logo=nuget)](https://www.nuget.org/packages/OpenAI-DotNet/)
-[![NuGet version (OpenAI-DotNet-Proxy)](https://img.shields.io/nuget/v/OpenAI-DotNet-Proxy.svg?label=OpenAI-DotNet-Proxy&logo=nuget)](https://www.nuget.org/packages/OpenAI-DotNet-Proxy/)
 [![Nuget Publish](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml/badge.svg)](https://github.com/RageAgainstThePixel/OpenAI-DotNet/actions/workflows/Publish-Nuget.yml)
 
 A simple C# .NET client library for [OpenAI](https://openai.com/) to use use chat-gpt, GPT-4, GPT-3.5-Turbo and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
@@ -150,13 +149,11 @@ var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymen
 var api = new OpenAIClient(auth, settings);
 ```
 
-### :new: [OpenAI API Proxy](OpenAI-DotNet-Proxy/Readme.md)
-
-[![NuGet version (OpenAI-DotNet-Proxy)](https://img.shields.io/nuget/v/OpenAI-DotNet-Proxy.svg?label=OpenAI-DotNet-Proxy&logo=nuget)](https://www.nuget.org/packages/OpenAI-DotNet-Proxy/)
+### :new: OpenAI API Proxy
 
 Using either the [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) or [com.openai.unity](https://github.com/RageAgainstThePixel/com.openai.unity) packages directly in your front-end app may expose your API keys and other sensitive information. To mitigate this risk, it is recommended to set up an intermediate API that makes requests to OpenAI on behalf of your front-end app. This library can be utilized for both front-end and intermediary host configurations, ensuring secure communication with the OpenAI API.
 
-#### Font End Example
+#### Front End Example
 
 In the front end example, you will need to securely authenticate your users using your preferred OAuth provider. Once the user is authenticated, exchange your custom auth token with your API key on the backend.
 
@@ -177,16 +174,16 @@ var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
 var api = new OpenAIClient(auth, settings);
 ```
 
-This setup allows your front end application to securely communicate with your backend that will be using the OpenAI-DotNet-Proxy, which then forwards requests to the OpenAI API. This ensures that your OpenAI API keys and other sensitive information remain secure throughout the process.
+This setup allows your front end application to securely communicate with your backend that will be using the proxy service, which then forwards requests to the OpenAI API. This ensures that your OpenAI API keys and other sensitive information remain secure throughout the process.
 
 #### Back End Example
 
 In this example, we demonstrate how to set up and use `OpenAIProxyStartup` in a new ASP.NET Core web app. The proxy server will handle authentication and forward requests to the OpenAI API, ensuring that your API keys and other sensitive information remain secure.
 
 1. Create a new [ASP.NET Core minimal web API](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-6.0) project.
-2. Add the OpenAI-DotNet-Proxy nuget package to your project.
-  a. Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
-  b. Powershell install: `Install-Package OpenAI-DotNet-Proxy`
+2. Add the OpenAI-DotNet nuget package to your project.
+    - Powershell install: `Install-Package OpenAI-DotNet`
+    - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
 4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxyStartup.CreateDefaultHost` method, passing your custom `AuthenticationFilter` as a type argument.
 5. Create `OpenAIAuthentication` and `OpenAIClientSettings` as you would normally with your API keys, org id, or Azure settings.

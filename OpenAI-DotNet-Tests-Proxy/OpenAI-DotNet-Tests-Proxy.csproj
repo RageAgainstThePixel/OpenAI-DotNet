@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenAI-DotNet-Proxy\OpenAI-DotNet-Proxy.csproj" />
     <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
   </ItemGroup>
 
