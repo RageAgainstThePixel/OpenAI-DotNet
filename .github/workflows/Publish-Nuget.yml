@@ -89,6 +89,7 @@ jobs:
         uses: ./.github/actions/build-and-publish
         with:
           project_name: OpenAI-DotNet
+          nuget_api_key: ${{ secrets.NUGET_API_KEY }}
 
   build-openai-dotnet-proxy:
     needs: test
@@ -109,3 +110,4 @@ jobs:
         uses: ./.github/actions/build-and-publish
         with:
           project_name: OpenAI-DotNet-Proxy
+          nuget_api_key: ${{ secrets.NUGET_API_KEY }}

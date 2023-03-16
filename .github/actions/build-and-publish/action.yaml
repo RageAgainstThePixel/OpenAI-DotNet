@@ -5,6 +5,9 @@ inputs:
   project_name:
     description: "The name of the project"
     required: true
+  nuget_api_key:
+    description: "NuGet API Key"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -26,7 +29,7 @@ runs:
         $isRelease = "${{ github.ref == 'refs/heads/main' }}"
 
         if ($isRelease -eq 'true') {
-          dotnet nuget push $packagePath --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push $packagePath --api-key ${{ inputs.nuget_api_key }} --source https://api.nuget.org/v3/index.json
         }
 
         $version = ([xml](Get-Content -Path (Get-Item -Path $packagePath).FullName)).package.metadata.version
