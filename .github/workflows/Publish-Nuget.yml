@@ -23,7 +23,7 @@ env:
   DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
 
 jobs:
-  test:
+  build:
     runs-on: windows-latest
 
     steps:
@@ -70,4 +70,4 @@ jobs:
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
         path: ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
-
+        if-no-files-found: ignore
