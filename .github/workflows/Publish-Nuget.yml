@@ -33,10 +33,10 @@ jobs:
           modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
           if [[ -n "$modified" ]]; then
             echo "Modified files found"
-            echo "paths_modified=true" >> $GITHUB_ENV
+            echo "PATHS_MODIFIED=true" >> $GITHUB_ENV
           else
             echo "No modified files found"
-            echo "paths_modified=false" >> $GITHUB_ENV
+            echo "PATHS_MODIFIED=false" >> $GITHUB_ENV
           fi
 
   test:
@@ -45,24 +45,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      if: env.paths_modified == 'true'
+      if: env.PATHS_MODIFIED == 'true'
       with:
         fetch-depth: 0
 
     - uses: actions/setup-dotnet@v3
-      if: env.paths_modified == 'true'
+      if: env.PATHS_MODIFIED == 'true'
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Test Packages
-      if: env.paths_modified == 'true'
+      if: env.PATHS_MODIFIED == 'true'
       run: dotnet test --configuration Release
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
 
     - name: No tests needed
-      if: env.paths_modified == 'false'
+      if: env.PATHS_MODIFIED == 'false'
       run: echo "No tests needed as no files in the specified paths were modified."
 
   build-openai-dotnet:
