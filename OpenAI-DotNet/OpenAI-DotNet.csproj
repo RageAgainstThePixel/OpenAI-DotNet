@@ -15,7 +15,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt</PackageTags>
+    <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Bump version to 6.2.0
 - Added OpenAI-DotNet-Proxy project and package.
