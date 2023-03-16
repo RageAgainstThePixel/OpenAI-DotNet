@@ -14,7 +14,7 @@ runs:
     - name: Build and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\${{ inputs.project_name }}"
-        dotnet pack $projectPath
+        dotnet build $projectPath
         $out = "$projectPath\bin\Release"
         $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse -ErrorAction SilentlyContinue
 
