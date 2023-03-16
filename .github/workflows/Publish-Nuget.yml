@@ -37,13 +37,12 @@ jobs:
           $modified = git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | Where-Object { ($_ -notmatch 'Readme.md' -and $_ -notmatch 'README.md') -and ($_ -match '^OpenAI-DotNet\/.*' -or $_ -match '^OpenAI-DotNet-Proxy\/.*') }
 
           if ($modified) {
-            if ($modified) {
-              Write-Host "Modified files found"
-              "PATHS_MODIFIED=true" >> $env:GITHUB_OUTPUT
-            } else {
-              Write-Host "No modified files found"
-              "PATHS_MODIFIED=false" >> $env:GITHUB_OUTPUT
-            }
+            Write-Host "Modified files found"
+            "PATHS_MODIFIED=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No modified files found"
+            "PATHS_MODIFIED=false" >> $env:GITHUB_OUTPUT
+          }
 
   test:
     needs: check_paths
