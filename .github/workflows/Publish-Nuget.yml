@@ -41,10 +41,10 @@ jobs:
           modified=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- OpenAI-DotNet/ OpenAI-DotNet-Proxy/)
           if [[ -n "$modified" ]]; then
             echo "Modified files found"
-            echo "::set-output name=modified::true"
+            echo "modified=true" >> $GITHUB_ENV
           else
             echo "No modified files found"
-            echo "::set-output name=modified::false"
+            echo "modified=false" >> $GITHUB_ENV
           fi
 
   test:
