@@ -25,7 +25,26 @@ env:
   DOTNET_VERSION: ${{ github.event.inputs.dotnet_version || '6.0.x' }}
 
 jobs:
+  check_paths:
+    runs-on: ubuntu-latest
+    outputs:
+      paths_modified: ${{ steps.check.outputs.modified }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check for modified files
+        id: check
+        run: |
+          modified=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- OpenAI-DotNet/ OpenAI-DotNet-Proxy/)
+          if [[ -n "$modified" ]]; then
+            echo "Modified files found"
+            echo "::set-output name=modified::true"
+          else
+            echo "No modified files found"
+            echo "::set-output name=modified::false"
+          fi
+
   test:
+    needs: check_paths
     runs-on: windows-latest
 
     steps:
@@ -45,7 +64,6 @@ jobs:
 
   build-openai-dotnet:
     needs: test
-    if: contains(github.event.head_commit.modified, 'OpenAI-DotNet/')
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
