@@ -1,6 +1,5 @@
 <Project>
   <PropertyGroup>
     <OpenAIDotNetVersion>6.1.1</OpenAIDotNetVersion>
-    <OpenAIDotNetProxyVersion>1.0.0</OpenAIDotNetProxyVersion>
   </PropertyGroup>
 </Project>
