@@ -95,7 +95,6 @@ jobs:
 
   build-openai-dotnet-proxy:
     needs: test
-    if: contains(github.event.head_commit.modified, 'OpenAI-DotNet-Proxy/')
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
