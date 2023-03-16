@@ -28,7 +28,7 @@ runs:
         $isRelease = "${{ github.ref == 'refs/heads/main' }}"
 
         if ($isRelease -eq 'true') {
-          dotnet nuget push $packagePath --api-key ${{ inputs.nuget_api_key }} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push $packagePath --api-key ${{ inputs.nuget_api_key }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
 
         $version = $packagePath.Name -replace "^${{ inputs.project_name }}.(.*).nupkg$",'$1'
@@ -36,6 +36,7 @@ runs:
       shell: pwsh
 
     - uses: actions/upload-artifact@v3
+      if: always()
       with:
         name: ${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}
         path: ${{ github.workspace }}/${{ inputs.project_name }}/bin/Release/${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}.nupkg
