@@ -28,7 +28,7 @@ jobs:
   check_paths:
     runs-on: ubuntu-latest
     outputs:
-      paths_modified: ${{ steps.check.outputs.modified }}
+      paths_modified: ${{ steps.check.outputs.paths_modified }}
 
     steps:
       - uses: actions/checkout@v3
@@ -38,13 +38,13 @@ jobs:
       - name: Check for modified files
         id: check
         run: |
-          modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
-          if [[ -n "$modified" ]]; then
+          paths_modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
+          if [[ -n "$paths_modified" ]]; then
             echo "Modified files found"
-            echo "modified=true" >> $GITHUB_ENV
+            echo "paths_modified=true" >> $GITHUB_ENV
           else
             echo "No modified files found"
-            echo "modified=false" >> $GITHUB_ENV
+            echo "paths_modified=false" >> $GITHUB_ENV
           fi
 
   test:

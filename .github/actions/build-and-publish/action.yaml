@@ -31,11 +31,11 @@ runs:
           dotnet nuget push $packagePath --api-key ${{ inputs.nuget_api_key }} --source https://api.nuget.org/v3/index.json
         }
 
-        $version = ([xml](Get-Content -Path (Get-Item -Path $packagePath).FullName)).package.metadata.version
+        $version = $packagePath.Name -replace "^${{ inputs.project_name }}.(.*).nupkg$",'$1'
         echo "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       shell: pwsh
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ inputs.project_name }}@${{ env.PACKAGE_VERSION }}
-        path: ${{ github.workspace }}/${{ inputs.project_name }}/bin/
+        name: ${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}
+        path: ${{ github.workspace }}/${{ inputs.project_name }}/bin/Release/${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}.nupkg
