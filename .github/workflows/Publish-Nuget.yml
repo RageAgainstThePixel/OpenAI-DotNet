@@ -61,10 +61,15 @@ jobs:
         dotnet_version: ${{ env.DOTNET_VERSION }}
 
     - name: Test Packages
+      if: needs.check_paths.outputs.paths_modified == 'true'
       run: dotnet test --configuration Release
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
+
+    - name: No tests needed
+      if: needs.check_paths.outputs.paths_modified == 'false'
+      run: echo "No tests needed as no files in the specified paths were modified."
 
   build-openai-dotnet:
     needs: test
