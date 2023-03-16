@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_03_Chat
+    internal class TestFixture_03_Chat : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_GetChatCompletion()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.ChatEndpoint);
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var chatPrompts = new List<ChatPrompt>
             {
                 new ChatPrompt("system", "You are a helpful assistant."),
@@ -22,7 +21,7 @@ namespace OpenAI.Tests
                 new ChatPrompt("user", "Where was it played?"),
             };
             var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
-            var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+            var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
@@ -32,8 +31,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_2_GetChatStreamingCompletion()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.ChatEndpoint);
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var chatPrompts = new List<ChatPrompt>
             {
                 new ChatPrompt("system", "You are a helpful assistant."),
@@ -44,7 +42,7 @@ namespace OpenAI.Tests
             var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
             var allContent = new List<string>();
 
-            await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
+            await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Choices);
@@ -58,8 +56,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_3_GetChatStreamingCompletionEnumerableAsync()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.ChatEndpoint);
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var chatPrompts = new List<ChatPrompt>
             {
                 new ChatPrompt("system", "You are a helpful assistant."),
@@ -70,7 +67,7 @@ namespace OpenAI.Tests
             var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
             var allContent = new List<string>();
 
-            await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
+            await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Choices);

@@ -1,8 +1,14 @@
-﻿namespace OpenAI
+﻿using System;
+
+namespace OpenAI
 {
+    /// <summary>
+    /// The client settings for configuring Azure OpenAI or custom domain.
+    /// </summary>
     public sealed class OpenAIClientSettings
     {
         internal const string OpenAIDomain = "api.openai.com";
+        internal const string AzureOpenAIDomain = "openai.azure.com";
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
@@ -10,27 +16,30 @@
         public OpenAIClientSettings()
         {
             ResourceName = OpenAIDomain;
-            ApiVersion = "1";
+            ApiVersion = "v1";
             DeploymentId = string.Empty;
-            BaseRequestUrl = $"https://{OpenAIDomain}/v{ApiVersion}/{{0}}";
+            BaseRequest = $"/{ApiVersion}/";
+            BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
         }
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
         /// </summary>
+        /// <param name="domain">Base api domain.</param>
         /// <param name="apiVersion">The version of the OpenAI api you want to use.</param>
-        public OpenAIClientSettings(string apiVersion)
+        public OpenAIClientSettings(string domain, string apiVersion = "v1")
         {
-            ResourceName = OpenAIDomain;
-
-            if (string.IsNullOrWhiteSpace(apiVersion))
+            if (!domain.Contains(".") &&
+                !domain.Contains(":"))
             {
-                apiVersion = "1";
+                throw new ArgumentException($"You're attempting to pass a \"resourceName\" parameter to \"{nameof(domain)}\". Please specify \"resourceName:\" for this parameter in constructor.");
             }
 
+            ResourceName = domain;
             ApiVersion = apiVersion;
             DeploymentId = string.Empty;
-            BaseRequestUrl = $"https://{OpenAIDomain}/v{ApiVersion}/{{0}}";
+            BaseRequest = $"/{ApiVersion}/";
+            BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
         }
 
         /// <summary>
@@ -48,15 +57,17 @@
         /// </param>
         public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = "2022-12-01")
         {
-            if (string.IsNullOrWhiteSpace(resourceName))
+            if (resourceName.Contains(".") ||
+                resourceName.Contains(":"))
             {
-                resourceName = OpenAIDomain;
+                throw new ArgumentException($"You're attempting to pass a \"domain\" parameter to \"{nameof(resourceName)}\". Please specify \"domain:\" for this parameter in constructor.");
             }
 
             ResourceName = resourceName;
             DeploymentId = deploymentId;
             ApiVersion = apiVersion;
-            BaseRequestUrl = $"https://{ResourceName}.openai.azure.com/openai/deployments/{DeploymentId}/{{0}}?api-version={ApiVersion}";
+            BaseRequest = $"/openai/deployments/{DeploymentId}/";
+            BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}?api-version={ApiVersion}";
         }
 
         public string ResourceName { get; }
@@ -65,7 +76,9 @@
 
         public string DeploymentId { get; }
 
-        internal string BaseRequestUrl { get; }
+        internal string BaseRequest { get; }
+
+        internal string BaseRequestUrlFormat { get; }
 
         public static OpenAIClientSettings Default { get; } = new OpenAIClientSettings();
     }

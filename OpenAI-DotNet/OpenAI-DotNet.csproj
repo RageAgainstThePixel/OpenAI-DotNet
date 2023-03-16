@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Stephen Hodgson</Authors>
     <Product>OpenAI-DotNet</Product>
-    <Description>A simple C# .NET client library for OpenAI  to use GPT-4 and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
+    <Description>A simple C# .NET client library for OpenAI  to use chat-gpt, gpt-4, gpt-3.5-turbo and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
 
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 
@@ -15,9 +15,14 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT</PackageTags>
+    <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 6.1.0
+    <PackageReleaseNotes>Bump version to 6.2.0
+- Added OpenAI-DotNet-Proxy project and package.
+- Added support for custom domains
+- Updated unit tests
+- Updated docs
+Bump version to 6.1.0
 - Added support for gpt-4 models
 Bump version to 6.0.1
 - Updated package info
@@ -70,7 +75,7 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.1.0</Version>
+    <Version>$(OpenAIDotNetVersion)</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>

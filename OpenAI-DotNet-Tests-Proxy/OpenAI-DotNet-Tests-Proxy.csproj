@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <SignAssembly>false</SignAssembly>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>OpenAI.Tests.Proxy</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenAI-DotNet-Proxy\OpenAI-DotNet-Proxy.csproj" />
+    <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -22,12 +22,25 @@ namespace OpenAI
     public sealed class OpenAIClient
     {
         /// <summary>
+        /// For internal testing only.
+        /// </summary>
+        internal OpenAIClient(OpenAIAuthentication openAIAuthentication, OpenAIClientSettings clientSettings, HttpClient client)
+            : this(openAIAuthentication, clientSettings)
+        {
+            Client = SetupClient(client);
+        }
+
+        /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        /// <param name="openAIAuthentication">The API authentication information to use for API calls,
+        /// <param name="openAIAuthentication">
+        /// The API authentication information to use for API calls,
         /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
-        /// potentially loading from environment vars or from a config file.</param>
-        /// <param name="clientSettings">Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure.</param>
+        /// potentially loading from environment vars or from a config file.
+        /// </param>
+        /// <param name="clientSettings">
+        /// Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure.
+        /// </param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
         public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null)
         {
@@ -39,23 +52,7 @@ namespace OpenAI
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
-            Client = new HttpClient();
-            Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-
-            if (OpenAIClientSettings.ResourceName == OpenAIClientSettings.OpenAIDomain)
-            {
-                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
-            }
-            else
-            {
-                Client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
-            }
-
-            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
-            {
-                Client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
-            }
-
+            Client = SetupClient();
             JsonSerializationOptions = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -72,10 +69,32 @@ namespace OpenAI
             ModerationsEndpoint = new ModerationsEndpoint(this);
         }
 
+        private HttpClient SetupClient(HttpClient client = null)
+        {
+            client ??= new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
+
+            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
+            }
+            else
+            {
+                client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
+            }
+
+            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
+            {
+                client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
+            }
+
+            return client;
+        }
+
         /// <summary>
         /// <see cref="HttpClient"/> to use when making calls to the API.
         /// </summary>
-        internal HttpClient Client { get; }
+        internal HttpClient Client { get; private set; }
 
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
@@ -87,12 +106,10 @@ namespace OpenAI
         /// </summary>
         public OpenAIAuthentication OpenAIAuthentication { get; }
 
-        private OpenAIClientSettings OpenAIClientSettings { get; }
-
         /// <summary>
-        /// The base url to use when making calls to the API.
+        /// The client settings for configuring Azure OpenAI or custom domain.
         /// </summary>
-        internal string BaseRequestUrl => OpenAIClientSettings.BaseRequestUrl;
+        internal OpenAIClientSettings OpenAIClientSettings { get; }
 
         /// <summary>
         /// List and describe the various models available in the API.

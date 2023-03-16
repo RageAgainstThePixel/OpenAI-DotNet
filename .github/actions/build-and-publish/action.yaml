@@ -1,0 +1,41 @@
+# .github/actions/build-and-publish/action.yml
+name: "Build and Publish NuGet Package"
+description: "Build and publish the specified NuGet package"
+inputs:
+  project_name:
+    description: "The name of the project"
+    required: true
+  nuget_api_key:
+    description: "NuGet API Key"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Build Pack and Publish NuGet Package
+      run: |
+        $projectPath = "${{ github.workspace }}\${{ inputs.project_name }}"
+        dotnet build $projectPath --configuration Release
+        $out = "$projectPath\bin\Release"
+        $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse -ErrorAction SilentlyContinue
+
+        if ($packagePath) {
+          Write-Host Package path: $packagePath
+        } else {
+          Write-Host Failed to find package at $out
+          exit 1
+        }
+
+        $isRelease = "${{ github.ref == 'refs/heads/main' }}"
+
+        if ($isRelease -eq 'true') {
+          dotnet nuget push $packagePath --api-key ${{ inputs.nuget_api_key }} --source https://api.nuget.org/v3/index.json
+        }
+
+        $version = $packagePath.Name -replace "^${{ inputs.project_name }}.(.*).nupkg$",'$1'
+        echo "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      shell: pwsh
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}
+        path: ${{ github.workspace }}/${{ inputs.project_name }}/bin/Release/${{ inputs.project_name }}.${{ env.PACKAGE_VERSION }}.nupkg
