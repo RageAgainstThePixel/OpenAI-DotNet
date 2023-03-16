@@ -22,6 +22,9 @@ jobs:
   check_paths:
     runs-on: windows-latest
 
+    outputs:
+      paths_modified: ${{ steps.check.outputs.paths_modified }}
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,10 +39,10 @@ jobs:
           if ($modified) {
             if ($modified) {
               Write-Host "Modified files found"
-              "PATHS_MODIFIED=true" >> $env:GITHUB_ENV
+              "PATHS_MODIFIED=true" >> $env:GITHUB_OUTPUT
             } else {
               Write-Host "No modified files found"
-              "PATHS_MODIFIED=false" >> $env:GITHUB_ENV
+              "PATHS_MODIFIED=false" >> $env:GITHUB_OUTPUT
             }
 
   test:
@@ -48,24 +51,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      if: ${{ env.PATHS_MODIFIED == 'true' }}
+      if: ${{ needs.check_paths.outputs.paths_modified == 'true' }}
       with:
         fetch-depth: 0
 
     - uses: actions/setup-dotnet@v3
-      if: ${{ env.PATHS_MODIFIED == 'true' }}
+      if: ${{ needs.check_paths.outputs.paths_modified == 'true' }}
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Test Packages
-      if: ${{ env.PATHS_MODIFIED == 'true' }}
+      if: ${{ needs.check_paths.outputs.paths_modified == 'true' }}
       run: dotnet test --configuration Release
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
 
     - name: No tests needed
-      if: ${{ env.PATHS_MODIFIED == 'false' }}
+      if: ${{ needs.check_paths.outputs.paths_modified == 'false' }}
       run: echo "No tests needed as no files in the specified paths were modified."
 
   build-openai-dotnet:
