@@ -20,7 +20,7 @@ env:
 
 jobs:
   check_paths:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -29,15 +29,16 @@ jobs:
 
       - name: Check for modified files
         id: check
+        shell: pwsh
         run: |
-          modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
-          if [[ -n "$modified" ]]; then
-            echo "Modified files found"
-            echo "PATHS_MODIFIED=true" >> $GITHUB_ENV
-          else
-            echo "No modified files found"
-            echo "PATHS_MODIFIED=false" >> $GITHUB_ENV
-          fi
+          $modified = git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | Where-Object { ($_ -notmatch 'Readme.md' -and $_ -notmatch 'README.md') -and ($_ -match '^OpenAI-DotNet\/' -or $_ -match '^OpenAI-DotNet-Proxy\/') }
+          if ($modified) {
+            Write-Host "Modified files found"
+            echo "PATHS_MODIFIED=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+          } else {
+            Write-Host "No modified files found"
+            echo "PATHS_MODIFIED=false" | Out-File -FilePath $env:GITHUB_ENV -Append
+          }
 
   test:
     needs: check_paths
