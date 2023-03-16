@@ -16,13 +16,13 @@ on:
 
   workflow_dispatch:
     inputs:
-      dotnet_version:
+      dotnet-version:
         description: ".NET version to use"
         required: false
         default: "6.0.x"
 
 env:
-  DOTNET_VERSION: ${{ github.event.inputs.dotnet_version || '6.0.x' }}
+  DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
 
 jobs:
   check_paths:
@@ -58,7 +58,7 @@ jobs:
 
     - uses: actions/setup-dotnet@v3
       with:
-        dotnet_version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Test Packages
       if: needs.check_paths.outputs.paths_modified == 'true'
@@ -81,7 +81,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet_version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - uses: microsoft/setup-msbuild@v1
 
@@ -101,7 +101,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet_version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - uses: microsoft/setup-msbuild@v1
 
