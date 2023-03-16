@@ -5,16 +5,9 @@ inputs:
   project_name:
     description: "The name of the project"
     required: true
-  dotnet_version:
-    description: ".NET version to use"
-    required: true
 runs:
   using: "composite"
   steps:
-    - uses: ./.github/actions/setup
-      with:
-        dotnet_version: ${{ inputs.dotnet_version }}
-
     - name: Build and Publish NuGet Package
       run: |
         $out = "${{ github.workspace }}\${{ inputs.project_name }}\bin\Release"

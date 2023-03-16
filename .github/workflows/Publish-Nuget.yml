@@ -29,7 +29,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: ./.github/actions/setup
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-dotnet@v3
       with:
         dotnet_version: ${{ env.DOTNET_VERSION }}
 
@@ -44,6 +48,16 @@ jobs:
     if: contains(github.event.head_commit.modified, 'OpenAI-DotNet/')
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet_version: ${{ env.DOTNET_VERSION }}
+
+      - uses: microsoft/setup-msbuild@v1
+
       - name: Build and Publish OpenAI-DotNet NuGet Package
         uses: ./.github/actions/build-and-publish
         with:
@@ -55,6 +69,16 @@ jobs:
     if: contains(github.event.head_commit.modified, 'OpenAI-DotNet-Proxy/')
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet_version: ${{ env.DOTNET_VERSION }}
+
+      - uses: microsoft/setup-msbuild@v1
+
       - name: Build and Publish OpenAI-DotNet-Proxy NuGet Package
         uses: ./.github/actions/build-and-publish
         with:
