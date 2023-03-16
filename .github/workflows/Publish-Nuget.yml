@@ -34,7 +34,7 @@ jobs:
         id: check
         shell: pwsh
         run: |
-          $modified = git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | Where-Object { ($_ -notmatch 'Readme.md' -and $_ -notmatch 'README.md') -and ($_ -match '^OpenAI-DotNet\/.*' -or $_ -match '^OpenAI-DotNet-Proxy\/.*') }
+          $modified = git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | Where-Object { ($_ -notlike '*Readme.md' -and $_ -notlike '*README.md') -and ($_ -match '^OpenAI-DotNet\/.*' -or $_ -match '^OpenAI-DotNet-Proxy\/.*') }
 
           if ($modified) {
             Write-Host "Modified files found"
