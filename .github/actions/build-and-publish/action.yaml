@@ -11,10 +11,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build and Publish NuGet Package
+    - name: Build Pack and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\${{ inputs.project_name }}"
-        dotnet build $projectPath
+        dotnet build $projectPath --configuration Release
         $out = "$projectPath\bin\Release"
         $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse -ErrorAction SilentlyContinue
 
