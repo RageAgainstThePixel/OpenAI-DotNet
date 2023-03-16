@@ -162,7 +162,18 @@ namespace OpenAI.Tests
             var auth = new OpenAIAuthentication("sk-testAA", "org-testAA");
             var settings = new OpenAIClientSettings(resourceName: "test-resource", deploymentId: "deployment-id-test");
             var api = new OpenAIClient(auth, settings);
-            Console.WriteLine(api.BaseRequestUrl);
+            Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
+            Console.WriteLine(api.OpenAIClientSettings.BaseRequestUrlFormat);
+        }
+
+        [Test]
+        public void Test_12_CustomDomainConfigurationSettings()
+        {
+            var auth = new OpenAIAuthentication("sess-customToken");
+            var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
+            var api = new OpenAIClient(auth, settings);
+            Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
+            Console.WriteLine(api.OpenAIClientSettings.BaseRequestUrlFormat);
         }
 
         [TearDown]

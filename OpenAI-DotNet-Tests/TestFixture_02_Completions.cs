@@ -8,16 +8,15 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_02_Completions
+    internal class TestFixture_02_Completions : AbstractTestFixture
     {
         private const string CompletionPrompts = "One Two Three Four Five Six Seven Eight Nine One Two Three Four Five Six Seven Eight";
 
         [Test]
         public async Task Test_01_GetBasicCompletion()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.CompletionsEndpoint);
-            var result = await api.CompletionsEndpoint.CreateCompletionAsync(
+            Assert.IsNotNull(OpenAIClient.CompletionsEndpoint);
+            var result = await OpenAIClient.CompletionsEndpoint.CreateCompletionAsync(
                 CompletionPrompts,
                 temperature: 0.1,
                 maxTokens: 5,
@@ -33,11 +32,10 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_02_GetStreamingCompletion()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.CompletionsEndpoint);
+            Assert.IsNotNull(OpenAIClient.CompletionsEndpoint);
             var allCompletions = new List<Choice>();
 
-            await api.CompletionsEndpoint.StreamCompletionAsync(result =>
+            await OpenAIClient.CompletionsEndpoint.StreamCompletionAsync(result =>
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Completions);
@@ -52,11 +50,10 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_03_GetStreamingEnumerableCompletion()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            Assert.IsNotNull(api.CompletionsEndpoint);
+            Assert.IsNotNull(OpenAIClient.CompletionsEndpoint);
             var allCompletions = new List<Choice>();
 
-            await foreach (var result in api.CompletionsEndpoint.StreamCompletionEnumerableAsync(
+            await foreach (var result in OpenAIClient.CompletionsEndpoint.StreamCompletionEnumerableAsync(
                                CompletionPrompts,
                                temperature: 0.1,
                                maxTokens: 5,

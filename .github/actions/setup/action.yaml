@@ -1,0 +1,19 @@
+# .github/actions/setup/action.yml
+name: "Setup"
+description: "Checkout repository and set up .NET and MSBuild"
+inputs:
+  dotnet_version:
+    description: ".NET version to use"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet_version }}
+
+    - uses: microsoft/setup-msbuild@v1

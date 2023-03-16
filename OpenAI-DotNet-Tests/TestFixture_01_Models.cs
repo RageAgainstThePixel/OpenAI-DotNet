@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_01_Models
+    internal class TestFixture_01_Models : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_GetModels()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            var results = await api.ModelsEndpoint.GetModelsAsync();
+            var results = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
         }
@@ -18,9 +17,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_2_RetrieveModelDetails()
         {
-            var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-            var models = await api.ModelsEndpoint.GetModelsAsync();
-
+            var models = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Console.WriteLine($"Found {models.Count} models!");
 
             foreach (var model in models)
@@ -29,7 +26,7 @@ namespace OpenAI.Tests
 
                 try
                 {
-                    var result = await api.ModelsEndpoint.GetModelDetailsAsync(model.Id);
+                    var result = await OpenAIClient.ModelsEndpoint.GetModelDetailsAsync(model.Id);
                     Assert.IsNotNull(result);
                 }
                 catch (Exception e)

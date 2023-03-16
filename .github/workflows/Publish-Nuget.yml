@@ -6,63 +6,57 @@ on:
       - main
     paths:
       - OpenAI-DotNet/**
+      - OpenAI-DotNet-Proxy/**
   pull_request:
     branches:
       - '*'
     paths:
       - OpenAI-DotNet/**
+      - OpenAI-DotNet-Proxy/**
 
   workflow_dispatch:
+    inputs:
+      dotnet_version:
+        description: ".NET version to use"
+        required: false
+        default: "6.0.x"
+
+env:
+  DOTNET_VERSION: ${{ github.event.inputs.dotnet_version || '6.0.x' }}
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        configuration: [Release]
-
+  test:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: ./.github/actions/setup
       with:
-        fetch-depth: 0
+        dotnet_version: ${{ env.DOTNET_VERSION }}
 
-    - uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0.x'
-
-    - uses: microsoft/setup-msbuild@v1
-
-    - name: Test Package ${{ matrix.configuration }}
-      run: dotnet test --configuration ${{ matrix.configuration }}
+    - name: Test Packages
+      run: dotnet test --configuration Release
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
 
-    - name: Publish Nuget Package
-      run: |
-        $out = "${{ github.workspace }}\OpenAI-DotNet\bin\${{ matrix.configuration }}"
+  build-openai-dotnet:
+    needs: test
+    if: contains(github.event.head_commit.modified, 'OpenAI-DotNet/')
+    runs-on: windows-latest
+    steps:
+      - name: Build and Publish OpenAI-DotNet NuGet Package
+        uses: ./.github/actions/build-and-publish
+        with:
+          project_name: OpenAI-DotNet
+          dotnet_version: ${{ env.DOTNET_VERSION }}
 
-        if (Test-Path -Path $out) {
-          $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse
-        }
-
-        if (Test-Path -Path $packagePath) {
-          Write-Host Package path: $packagePath
-        } else {
-          Write-Host Failed to find package at $packagePath
-          exit 1
-        }
-
-        $isRelease = "${{ github.ref == 'refs/heads/main' && matrix.configuration == 'Release' }}"
-
-        if ($isRelease -eq 'true') {
-          dotnet nuget push $packagePath --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-        }
-      shell: pwsh
-
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: Nuget Package ${{ matrix.configuration }}
-        path: ${{ github.workspace }}\OpenAI-DotNet\bin
+  build-openai-dotnet-proxy:
+    needs: test
+    if: contains(github.event.head_commit.modified, 'OpenAI-DotNet-Proxy/')
+    runs-on: windows-latest
+    steps:
+      - name: Build and Publish OpenAI-DotNet-Proxy NuGet Package
+        uses: ./.github/actions/build-and-publish
+        with:
+          project_name: OpenAI-DotNet-Proxy
+          dotnet_version: ${{ env.DOTNET_VERSION }}
