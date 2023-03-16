@@ -53,10 +53,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      if: needs.check_paths.outputs.paths_modified == 'true'
       with:
         fetch-depth: 0
 
     - uses: actions/setup-dotnet@v3
+      if: needs.check_paths.outputs.paths_modified == 'true'
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
