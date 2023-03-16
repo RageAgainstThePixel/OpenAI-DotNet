@@ -21,8 +21,6 @@ env:
 jobs:
   check_paths:
     runs-on: ubuntu-latest
-    outputs:
-      paths_modified: ${{ steps.check.outputs.paths_modified }}
 
     steps:
       - uses: actions/checkout@v3
@@ -32,13 +30,13 @@ jobs:
       - name: Check for modified files
         id: check
         run: |
-          paths_modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
-          if [[ -n "$paths_modified" ]]; then
+          modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
+          if [[ -n "$modified" ]]; then
             echo "Modified files found"
-            echo "::set-output name=paths_modified::true"
+            echo "paths_modified=true" >> $GITHUB_ENV
           else
             echo "No modified files found"
-            echo "::set-output name=paths_modified::false"
+            echo "paths_modified=false" >> $GITHUB_ENV
           fi
 
   test:
@@ -47,24 +45,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      if: needs.check_paths.outputs.paths_modified == 'true'
+      if: env.paths_modified == 'true'
       with:
         fetch-depth: 0
 
     - uses: actions/setup-dotnet@v3
-      if: needs.check_paths.outputs.paths_modified == 'true'
+      if: env.paths_modified == 'true'
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Test Packages
-      if: needs.check_paths.outputs.paths_modified == 'true'
+      if: env.paths_modified == 'true'
       run: dotnet test --configuration Release
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
 
     - name: No tests needed
-      if: needs.check_paths.outputs.paths_modified == 'false'
+      if: env.paths_modified == 'false'
       run: echo "No tests needed as no files in the specified paths were modified."
 
   build-openai-dotnet:
