@@ -1,7 +1,7 @@
 
 # OpenAI-DotNet-Proxy
 
-[![NuGet version (OpenAI-DotNet-Proxy)](https://img.shields.io/nuget/v/OpenAI-DotNet-Proxy.svg)](https://www.nuget.org/packages/OpenAI-DotNet-Proxy/)
+[![NuGet version (OpenAI-DotNet-Proxy)](https://img.shields.io/nuget/v/OpenAI-DotNet-Proxy.svg?label=OpenAI-DotNet-Proxy&logo=nuget)](https://www.nuget.org/packages/OpenAI-DotNet-Proxy/)
 
 A simple Proxy API gateway for [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) to make authenticated requests from a front end application without exposing your API keys.
 

@@ -38,7 +38,7 @@ jobs:
       - name: Check for modified files
         id: check
         run: |
-          modified=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- OpenAI-DotNet/ OpenAI-DotNet-Proxy/)
+          modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
           if [[ -n "$modified" ]]; then
             echo "Modified files found"
             echo "modified=true" >> $GITHUB_ENV
