@@ -5,8 +5,6 @@ VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet", "OpenAI-DotNet\OpenAI-DotNet.csproj", "{76B6480E-154A-4341-B530-AFE04B254360}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI-DotNet-Proxy", "OpenAI-DotNet-Proxy\OpenAI-DotNet-Proxy.csproj", "{DEF7D9FF-A356-48C7-937F-C13FF59DF68A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests", "OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj", "{066EC5A5-47CE-4B91-B924-F236644037C1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests-Proxy", "OpenAI-DotNet-Tests-Proxy\OpenAI-DotNet-Tests-Proxy.csproj", "{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}"
@@ -21,10 +19,6 @@ Global
 		{76B6480E-154A-4341-B530-AFE04B254360}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76B6480E-154A-4341-B530-AFE04B254360}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76B6480E-154A-4341-B530-AFE04B254360}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEF7D9FF-A356-48C7-937F-C13FF59DF68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEF7D9FF-A356-48C7-937F-C13FF59DF68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEF7D9FF-A356-48C7-937F-C13FF59DF68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEF7D9FF-A356-48C7-937F-C13FF59DF68A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{066EC5A5-47CE-4B91-B924-F236644037C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{066EC5A5-47CE-4B91-B924-F236644037C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{066EC5A5-47CE-4B91-B924-F236644037C1}.Release|Any CPU.ActiveCfg = Release|Any CPU

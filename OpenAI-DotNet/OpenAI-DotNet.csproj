@@ -17,7 +17,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 6.2.0
+    <PackageReleaseNotes>Bump version to 6.3.0
+- Removed OpenAI-DotNet-Proxy and put it directly in packge on its own
+Bump version to 6.2.0
 - Added OpenAI-DotNet-Proxy project and package.
 - Added support for custom domains
 - Updated unit tests
@@ -75,7 +77,7 @@ Bump version to 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>$(OpenAIDotNetVersion)</Version>
+    <Version>6.3.0</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
@@ -95,5 +97,6 @@ Bump version to 4.4.0
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 </Project>
