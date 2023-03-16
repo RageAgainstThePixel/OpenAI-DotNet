@@ -35,10 +35,10 @@ jobs:
           paths_modified=$(git diff --name-only --diff-filter=AMDR origin/${{ github.base_ref }}...${{ github.sha }} | grep -v -e 'Readme.md' -e 'README.md' | grep -e '^OpenAI-DotNet\/' -e '^OpenAI-DotNet-Proxy\/')
           if [[ -n "$paths_modified" ]]; then
             echo "Modified files found"
-            echo "paths_modified=true" >> $GITHUB_ENV
+            echo "::set-output name=paths_modified::true"
           else
             echo "No modified files found"
-            echo "paths_modified=false" >> $GITHUB_ENV
+            echo "::set-output name=paths_modified::false"
           fi
 
   test:
