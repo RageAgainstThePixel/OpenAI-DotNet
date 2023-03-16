@@ -2,6 +2,9 @@
 
 namespace OpenAI
 {
+    /// <summary>
+    /// The client settings for configuring Azure OpenAI or custom domain.
+    /// </summary>
     public sealed class OpenAIClientSettings
     {
         internal const string OpenAIDomain = "api.openai.com";

@@ -106,6 +106,9 @@ namespace OpenAI
         /// </summary>
         public OpenAIAuthentication OpenAIAuthentication { get; }
 
+        /// <summary>
+        /// The client settings for configuring Azure OpenAI or custom domain.
+        /// </summary>
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
         /// <summary>

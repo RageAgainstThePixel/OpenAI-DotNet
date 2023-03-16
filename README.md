@@ -39,7 +39,7 @@ Install-Package OpenAI-DotNet
 
 - [Authentication](#authentication)
 - [Azure OpenAI](#azure-openai)
-- [OpenAI API Proxy](#openai-api-proxy)
+- [OpenAI API Proxy](#new-openai-api-proxy) :new:
 - [Models](#models)
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
@@ -150,7 +150,7 @@ var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymen
 var api = new OpenAIClient(auth, settings);
 ```
 
-### [OpenAI API Proxy](OpenAI-DotNet-Proxy/Readme.md)
+### :new: [OpenAI API Proxy](OpenAI-DotNet-Proxy/Readme.md)
 
 Using either the [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) or [com.openai.unity](https://github.com/RageAgainstThePixel/com.openai.unity) packages directly in your front-end app may expose your API keys and other sensitive information. To mitigate this risk, it is recommended to set up an intermediate API that makes requests to OpenAI on behalf of your front-end app. This library can be utilized for both front-end and intermediary host configurations, ensuring secure communication with the OpenAI API.
 
