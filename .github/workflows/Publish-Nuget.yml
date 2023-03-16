@@ -62,7 +62,6 @@ jobs:
         uses: ./.github/actions/build-and-publish
         with:
           project_name: OpenAI-DotNet
-          dotnet_version: ${{ env.DOTNET_VERSION }}
 
   build-openai-dotnet-proxy:
     needs: test
@@ -83,4 +82,3 @@ jobs:
         uses: ./.github/actions/build-and-publish
         with:
           project_name: OpenAI-DotNet-Proxy
-          dotnet_version: ${{ env.DOTNET_VERSION }}
