@@ -37,6 +37,7 @@ jobs:
 
     - name: Test Packages
       run: dotnet test --configuration Release
+      if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}

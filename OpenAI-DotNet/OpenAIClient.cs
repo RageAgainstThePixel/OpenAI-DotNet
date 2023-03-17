@@ -76,6 +76,13 @@ namespace OpenAI
 
             if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain))
             {
+                if (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
+                    (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
+                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix)))
+                {
+                    throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
+                }
+
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             }
             else
