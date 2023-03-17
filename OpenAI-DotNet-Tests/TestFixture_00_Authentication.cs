@@ -159,7 +159,7 @@ namespace OpenAI.Tests
         [Test]
         public void Test_11_AzureConfigurationSettings()
         {
-            var auth = new OpenAIAuthentication("sk-testAA", "org-testAA");
+            var auth = new OpenAIAuthentication("testKeyAaBbCcDd");
             var settings = new OpenAIClientSettings(resourceName: "test-resource", deploymentId: "deployment-id-test");
             var api = new OpenAIClient(auth, settings);
             Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
@@ -169,7 +169,7 @@ namespace OpenAI.Tests
         [Test]
         public void Test_12_CustomDomainConfigurationSettings()
         {
-            var auth = new OpenAIAuthentication("sess-customToken");
+            var auth = new OpenAIAuthentication("sess-customIssuedToken");
             var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
             var api = new OpenAIClient(auth, settings);
             Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
