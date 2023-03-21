@@ -8,7 +8,7 @@ namespace OpenAI.Moderations
 {
     /// <summary>
     /// The moderation endpoint is a tool you can use to check whether content complies with OpenAI's content policy.
-    /// Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.
+    /// Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.<br/>
     /// <see href="https://beta.openai.com/docs/api-reference/moderations"/>
     /// </summary>
     public sealed class ModerationsEndpoint : BaseEndPoint
