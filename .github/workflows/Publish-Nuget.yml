@@ -45,7 +45,8 @@ jobs:
     - name: Build Pack and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
-        dotnet build $projectPath --configuration Release
+        dotnet build --configuration Release
+        dotnet pack $projectPath --configuration Release --include-symbols
         $out = "$projectPath\bin\Release"
         $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse -ErrorAction SilentlyContinue
 

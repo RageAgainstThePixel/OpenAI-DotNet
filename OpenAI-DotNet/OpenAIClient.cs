@@ -22,9 +22,19 @@ namespace OpenAI
     public sealed class OpenAIClient
     {
         /// <summary>
-        /// For internal testing only.
+        /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
-        internal OpenAIClient(OpenAIAuthentication openAIAuthentication, OpenAIClientSettings clientSettings, HttpClient client)
+        /// <param name="openAIAuthentication">
+        /// The API authentication information to use for API calls,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
+        /// potentially loading from environment vars or from a config file.
+        /// </param>
+        /// <param name="clientSettings">
+        /// Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure.
+        /// </param>
+        /// <param name="client">A <see cref="HttpClient"/>.</param>
+        /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication, OpenAIClientSettings clientSettings, HttpClient client)
             : this(openAIAuthentication, clientSettings)
         {
             Client = SetupClient(client);

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -20,7 +21,7 @@ namespace OpenAI.Tests
             var models = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Console.WriteLine($"Found {models.Count} models!");
 
-            foreach (var model in models)
+            foreach (var model in models.OrderBy(model => model.Id))
             {
                 Console.WriteLine($"{model.Id} | Owner: {model.OwnedBy}");
 
