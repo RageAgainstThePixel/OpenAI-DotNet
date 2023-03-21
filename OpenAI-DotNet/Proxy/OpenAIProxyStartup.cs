@@ -103,11 +103,16 @@ namespace OpenAI.Proxy
 
                 foreach (var header in proxyResponse.Headers)
                 {
+                    // transfer encoding (and specifically 'chunked') occurs when different character sets are used - for example, latin and greek
+                    // the client doesn't know how to handle it, and crashes
+                    // when removed, it works just fine ..
+                    if (header.Key == "Transfer-Encoding") continue;
                     httpContext.Response.Headers[header.Key] = header.Value.ToArray();
                 }
 
                 foreach (var header in proxyResponse.Content.Headers)
                 {
+                    if (header.Key == "Transfer-Encoding") continue;
                     httpContext.Response.Headers[header.Key] = header.Value.ToArray();
                 }
 
