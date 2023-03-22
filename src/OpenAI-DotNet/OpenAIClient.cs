@@ -37,7 +37,7 @@ namespace OpenAI
         public OpenAIClient(OpenAIAuthentication openAIAuthentication, OpenAIClientSettings clientSettings, HttpClient client)
             : this(openAIAuthentication, clientSettings)
         {
-            Client = SetupClient(client);
+            this.Client = this.SetupClient(client);
         }
 
         /// <summary>
@@ -54,29 +54,29 @@ namespace OpenAI
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
         public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null)
         {
-            OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
-            OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
+            this.OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
+            this.OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
 
-            if (OpenAIAuthentication?.ApiKey is null)
+            if (this.OpenAIAuthentication?.ApiKey is null)
             {
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
-            Client = SetupClient();
-            JsonSerializationOptions = new JsonSerializerOptions
+            this.Client = this.SetupClient();
+            this.JsonSerializationOptions = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-            ModelsEndpoint = new ModelsEndpoint(this);
-            CompletionsEndpoint = new CompletionsEndpoint(this);
-            ChatEndpoint = new ChatEndpoint(this);
-            EditsEndpoint = new EditsEndpoint(this);
-            ImagesEndPoint = new ImagesEndpoint(this);
-            EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
-            AudioEndpoint = new AudioEndpoint(this);
-            FilesEndpoint = new FilesEndpoint(this);
-            FineTuningEndpoint = new FineTuningEndpoint(this);
-            ModerationsEndpoint = new ModerationsEndpoint(this);
+            this.ModelsEndpoint = new ModelsEndpoint(this);
+            this.CompletionsEndpoint = new CompletionsEndpoint(this);
+            this.ChatEndpoint = new ChatEndpoint(this);
+            this.EditsEndpoint = new EditsEndpoint(this);
+            this.ImagesEndPoint = new ImagesEndpoint(this);
+            this.EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
+            this.AudioEndpoint = new AudioEndpoint(this);
+            this.FilesEndpoint = new FilesEndpoint(this);
+            this.FineTuningEndpoint = new FineTuningEndpoint(this);
+            this.ModerationsEndpoint = new ModerationsEndpoint(this);
         }
 
         private HttpClient SetupClient(HttpClient client = null)
@@ -84,25 +84,25 @@ namespace OpenAI
             client ??= new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain))
+            if (!this.OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain))
             {
-                if (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
-                    (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
-                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix)))
+                if (System.String.IsNullOrWhiteSpace(this.OpenAIAuthentication.ApiKey) ||
+                    (!this.OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
+                     !this.OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix)))
                 {
-                    throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
+                    throw new InvalidCredentialException($"{this.OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
                 }
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.OpenAIAuthentication.ApiKey);
             }
             else
             {
-                client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
+                client.DefaultRequestHeaders.Add("api-key", this.OpenAIAuthentication.ApiKey);
             }
 
-            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
+            if (!System.String.IsNullOrWhiteSpace(this.OpenAIAuthentication.OrganizationId))
             {
-                client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
+                client.DefaultRequestHeaders.Add("OpenAI-Organization", this.OpenAIAuthentication.OrganizationId);
             }
 
             return client;

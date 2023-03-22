@@ -45,23 +45,23 @@ namespace OpenAI.Images
         /// </param>
         public ImageVariationRequest(Stream image, string imageName, int numberOfResults, ImageSize size, string user)
         {
-            Image = image;
+            this.Image = image;
 
-            if (string.IsNullOrWhiteSpace(imageName))
+            if (String.IsNullOrWhiteSpace(imageName))
             {
                 imageName = "image.png";
             }
 
-            ImageName = imageName;
+            this.ImageName = imageName;
 
             if (numberOfResults is > 10 or < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(numberOfResults), "The number of results must be between 1 and 10");
             }
 
-            Number = numberOfResults;
+            this.Number = numberOfResults;
 
-            Size = size switch
+            this.Size = size switch
             {
                 ImageSize.Small => "256x256",
                 ImageSize.Medium => "512x512",
@@ -69,10 +69,10 @@ namespace OpenAI.Images
                 _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
             };
 
-            User = user;
+            this.User = user;
         }
 
-        ~ImageVariationRequest() => Dispose(false);
+        ~ImageVariationRequest() => this.Dispose(false);
 
         /// <summary>
         /// The image to use as the basis for the variation(s). Must be a valid PNG file, less than 4MB, and square.
@@ -100,14 +100,14 @@ namespace OpenAI.Images
         {
             if (disposing)
             {
-                Image?.Close();
-                Image?.Dispose();
+                this.Image?.Close();
+                this.Image?.Dispose();
             }
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

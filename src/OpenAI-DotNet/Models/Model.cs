@@ -15,22 +15,31 @@ namespace OpenAI.Models
         /// <param name="id"></param>
         public Model(string id)
         {
-            Id = id;
+            this.Id = id;
         }
 
         /// <summary>
         /// Allows a model to be implicitly cast to the string of its id.
         /// </summary>
         /// <param name="model">The <see cref="Model"/> to cast to a string.</param>
-        public static implicit operator string(Model model) => model.Id;
+        public static implicit operator string(Model model)
+        {
+            return model.Id;
+        }
 
         /// <summary>
         /// Allows a string to be implicitly cast as a <see cref="Model"/>
         /// </summary>
-        public static implicit operator Model(string name) => new Model(name);
+        public static implicit operator Model(string name)
+        {
+            return new Model(name);
+        }
 
         /// <inheritdoc />
-        public override string ToString() => Id;
+        public override string ToString()
+        {
+            return this.Id;
+        }
 
         [JsonInclude]
         [JsonPropertyName("id")]

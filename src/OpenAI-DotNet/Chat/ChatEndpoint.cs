@@ -29,10 +29,10 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(chatRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<ChatResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<ChatResponse>(responseAsString, this.Api.JsonSerializationOptions);
         }
 
 
@@ -47,19 +47,19 @@ namespace OpenAI.Chat
         public async Task StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"))
+            var jsonContent = JsonSerializer.Serialize(chatRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            using var request = new HttpRequestMessage(HttpMethod.Post, this.GetUrl("/completions"))
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             await response.CheckResponseAsync(cancellationToken);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
             while (await reader.ReadLineAsync() is { } line)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.OrdinalIgnoreCase))
                 {
                     line = line["data: ".Length..];
                 }
@@ -69,9 +69,9 @@ namespace OpenAI.Chat
                     return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    resultHandler(response.DeserializeResponse<ChatResponse>(line.Trim(), Api.JsonSerializationOptions));
+                    resultHandler(response.DeserializeResponse<ChatResponse>(line.Trim(), this.Api.JsonSerializationOptions));
                 }
             }
         }
@@ -88,12 +88,12 @@ namespace OpenAI.Chat
         public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"))
+            var jsonContent = JsonSerializer.Serialize(chatRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            using var request = new HttpRequestMessage(HttpMethod.Post, this.GetUrl("/completions"))
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             await response.CheckResponseAsync(cancellationToken);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -101,7 +101,7 @@ namespace OpenAI.Chat
             while (await reader.ReadLineAsync() is { } line &&
                    !cancellationToken.IsCancellationRequested)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.OrdinalIgnoreCase))
                 {
                     line = line["data: ".Length..];
                 }
@@ -111,9 +111,9 @@ namespace OpenAI.Chat
                     yield break;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    yield return response.DeserializeResponse<ChatResponse>(line.Trim(), Api.JsonSerializationOptions);
+                    yield return response.DeserializeResponse<ChatResponse>(line.Trim(), this.Api.JsonSerializationOptions);
                 }
             }
         }

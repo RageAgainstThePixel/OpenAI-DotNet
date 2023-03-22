@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -30,7 +31,9 @@ namespace OpenAI.Images
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<string>> GenerateImageAsync(string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, CancellationToken cancellationToken = default)
-            => await GenerateImageAsync(new ImageGenerationRequest(prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        {
+            return await this.GenerateImageAsync(new ImageGenerationRequest(prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Creates an image given a prompt.
@@ -41,9 +44,9 @@ namespace OpenAI.Images
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(request, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
+            return await this.DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -71,7 +74,9 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> CreateImageEditAsync(string image, string mask, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, CancellationToken cancellationToken = default)
-            => await CreateImageEditAsync(new ImageEditRequest(image, mask, prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        {
+            return await this.CreateImageEditAsync(new ImageEditRequest(image, mask, prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Creates an edited or extended image given an original image and a prompt.
@@ -95,18 +100,18 @@ namespace OpenAI.Images
             }
 
             content.Add(new StringContent(request.Prompt), "prompt");
-            content.Add(new StringContent(request.Number.ToString()), "n");
+            content.Add(new StringContent(request.Number.ToString(CultureInfo.InvariantCulture)), "n");
             content.Add(new StringContent(request.Size), "size");
 
-            if (!string.IsNullOrWhiteSpace(request.User))
+            if (!System.String.IsNullOrWhiteSpace(request.User))
             {
                 content.Add(new StringContent(request.User), "user");
             }
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
+            return await this.DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -129,7 +134,9 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> CreateImageVariationAsync(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, CancellationToken cancellationToken = default)
-            => await CreateImageVariationAsync(new ImageVariationRequest(imagePath, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        {
+            return await this.CreateImageVariationAsync(new ImageVariationRequest(imagePath, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Creates a variation of a given image.
@@ -144,24 +151,24 @@ namespace OpenAI.Images
             using var imageData = new MemoryStream();
             await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
-            content.Add(new StringContent(request.Number.ToString()), "n");
+            content.Add(new StringContent(request.Number.ToString(CultureInfo.InvariantCulture)), "n");
             content.Add(new StringContent(request.Size), "size");
 
-            if (!string.IsNullOrWhiteSpace(request.User))
+            if (!System.String.IsNullOrWhiteSpace(request.User))
             {
                 content.Add(new StringContent(request.User), "user");
             }
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
+            return await this.DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
+            var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, this.Api.JsonSerializationOptions);
 
             if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)
             {

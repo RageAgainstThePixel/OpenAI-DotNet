@@ -1,4 +1,4 @@
-﻿using OpenAI.Models;
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,24 +26,22 @@ namespace OpenAI.Completions
         /// For convenience, if you are only requesting a single prompt, set it here
         /// </summary>
         [JsonIgnore]
-        public string Prompt
-        {
-            get => Prompts?.FirstOrDefault();
-            set
-            {
+        public string Prompt {
+            get => this.Prompts?.FirstOrDefault();
+            set {
                 if (value == null)
                 {
-                    Prompts = Array.Empty<string>();
+                    this.Prompts = Array.Empty<string>();
                 }
                 else
                 {
-                    if (Prompts.Length == 1)
+                    if (this.Prompts.Length == 1)
                     {
-                        Prompts[0] = value;
+                        this.Prompts[0] = value;
                     }
                     else
                     {
-                        Prompts = new[] { value };
+                        this.Prompts = new[] { value };
                     }
                 }
             }
@@ -132,24 +130,22 @@ namespace OpenAI.Completions
         /// For convenience, if you are only requesting a single stop sequence, set it here
         /// </summary>
         [JsonIgnore]
-        public string StopSequence
-        {
-            get => StopSequences?.FirstOrDefault();
-            set
-            {
+        public string StopSequence {
+            get => this.StopSequences?.FirstOrDefault();
+            set {
                 if (value == null)
                 {
-                    StopSequences = Array.Empty<string>();
+                    this.StopSequences = Array.Empty<string>();
                 }
                 else
                 {
-                    if (StopSequences.Length == 1)
+                    if (this.StopSequences.Length == 1)
                     {
-                        StopSequences[0] = value;
+                        this.StopSequences[0] = value;
                     }
                     else
                     {
-                        StopSequences = new[] { value };
+                        this.StopSequences = new[] { value };
                     }
                 }
             }
@@ -200,21 +196,21 @@ namespace OpenAI.Completions
                 return;
             }
 
-            Model = basedOn.Model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
-            Prompts = basedOn.Prompts;
-            Suffix = basedOn.Suffix ?? DefaultCompletionRequestArgs?.Suffix;
-            MaxTokens = basedOn.MaxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
-            Temperature = basedOn.Temperature ?? DefaultCompletionRequestArgs?.Temperature;
-            TopP = basedOn.TopP ?? DefaultCompletionRequestArgs?.TopP;
-            NumChoicesPerPrompt = basedOn.NumChoicesPerPrompt ?? DefaultCompletionRequestArgs?.NumChoicesPerPrompt;
-            PresencePenalty = basedOn.PresencePenalty ?? DefaultCompletionRequestArgs?.PresencePenalty;
-            FrequencyPenalty = basedOn.FrequencyPenalty ?? DefaultCompletionRequestArgs?.FrequencyPenalty;
-            LogProbabilities = basedOn.LogProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
-            Echo = basedOn.Echo ?? DefaultCompletionRequestArgs?.Echo;
-            StopSequences = basedOn.StopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
-            LogitBias = basedOn.LogitBias ?? DefaultCompletionRequestArgs?.LogitBias;
-            BestOf = basedOn.BestOf ?? DefaultCompletionRequestArgs?.BestOf;
-            User = basedOn.User ?? DefaultCompletionRequestArgs?.User;
+            this.Model = basedOn.Model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
+            this.Prompts = basedOn.Prompts;
+            this.Suffix = basedOn.Suffix ?? DefaultCompletionRequestArgs?.Suffix;
+            this.MaxTokens = basedOn.MaxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
+            this.Temperature = basedOn.Temperature ?? DefaultCompletionRequestArgs?.Temperature;
+            this.TopP = basedOn.TopP ?? DefaultCompletionRequestArgs?.TopP;
+            this.NumChoicesPerPrompt = basedOn.NumChoicesPerPrompt ?? DefaultCompletionRequestArgs?.NumChoicesPerPrompt;
+            this.PresencePenalty = basedOn.PresencePenalty ?? DefaultCompletionRequestArgs?.PresencePenalty;
+            this.FrequencyPenalty = basedOn.FrequencyPenalty ?? DefaultCompletionRequestArgs?.FrequencyPenalty;
+            this.LogProbabilities = basedOn.LogProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
+            this.Echo = basedOn.Echo ?? DefaultCompletionRequestArgs?.Echo;
+            this.StopSequences = basedOn.StopSequences ?? DefaultCompletionRequestArgs?.StopSequences;
+            this.LogitBias = basedOn.LogitBias ?? DefaultCompletionRequestArgs?.LogitBias;
+            this.BestOf = basedOn.BestOf ?? DefaultCompletionRequestArgs?.BestOf;
+            this.User = basedOn.User ?? DefaultCompletionRequestArgs?.User;
         }
 
         /// <summary>
@@ -267,41 +263,41 @@ namespace OpenAI.Completions
         {
             if (prompt != null)
             {
-                Prompt = prompt;
+                this.Prompt = prompt;
             }
             else if (prompts != null)
             {
-                Prompts = prompts.ToArray();
+                this.Prompts = prompts.ToArray();
             }
             else
             {
-                throw new ArgumentNullException($"Missing required {nameof(prompt)}(s)");
+                throw new ArgumentNullException(nameof(prompt), $"Missing required {nameof(prompt)}(s)");
             }
 
-            Model = model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
+            this.Model = model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
 
-            if (!Model.Contains("davinci") &&
-                !Model.Contains("curie") &&
-                !Model.Contains("cushman") &&
-                !Model.Contains("babbage") &&
-                !Model.Contains("ada"))
+            if (!this.Model.Contains("davinci") &&
+                !this.Model.Contains("curie") &&
+                !this.Model.Contains("cushman") &&
+                !this.Model.Contains("babbage") &&
+                !this.Model.Contains("ada"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
 
-            Suffix = suffix ?? DefaultCompletionRequestArgs?.Suffix;
-            MaxTokens = maxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
-            Temperature = temperature ?? DefaultCompletionRequestArgs?.Temperature;
-            TopP = topP ?? DefaultCompletionRequestArgs?.TopP;
-            NumChoicesPerPrompt = numOutputs ?? DefaultCompletionRequestArgs?.NumChoicesPerPrompt;
-            PresencePenalty = presencePenalty ?? DefaultCompletionRequestArgs?.PresencePenalty;
-            FrequencyPenalty = frequencyPenalty ?? DefaultCompletionRequestArgs?.FrequencyPenalty;
-            LogProbabilities = logProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
-            Echo = echo ?? DefaultCompletionRequestArgs?.Echo;
-            StopSequences = stopSequences?.ToArray() ?? DefaultCompletionRequestArgs?.StopSequences;
-            LogitBias = logitBias ?? DefaultCompletionRequestArgs?.LogitBias;
-            BestOf = bestOf ?? DefaultCompletionRequestArgs?.BestOf;
-            User = user ?? DefaultCompletionRequestArgs?.User;
+            this.Suffix = suffix ?? DefaultCompletionRequestArgs?.Suffix;
+            this.MaxTokens = maxTokens ?? DefaultCompletionRequestArgs?.MaxTokens;
+            this.Temperature = temperature ?? DefaultCompletionRequestArgs?.Temperature;
+            this.TopP = topP ?? DefaultCompletionRequestArgs?.TopP;
+            this.NumChoicesPerPrompt = numOutputs ?? DefaultCompletionRequestArgs?.NumChoicesPerPrompt;
+            this.PresencePenalty = presencePenalty ?? DefaultCompletionRequestArgs?.PresencePenalty;
+            this.FrequencyPenalty = frequencyPenalty ?? DefaultCompletionRequestArgs?.FrequencyPenalty;
+            this.LogProbabilities = logProbabilities ?? DefaultCompletionRequestArgs?.LogProbabilities;
+            this.Echo = echo ?? DefaultCompletionRequestArgs?.Echo;
+            this.StopSequences = stopSequences?.ToArray() ?? DefaultCompletionRequestArgs?.StopSequences;
+            this.LogitBias = logitBias ?? DefaultCompletionRequestArgs?.LogitBias;
+            this.BestOf = bestOf ?? DefaultCompletionRequestArgs?.BestOf;
+            this.User = user ?? DefaultCompletionRequestArgs?.User;
         }
     }
 }

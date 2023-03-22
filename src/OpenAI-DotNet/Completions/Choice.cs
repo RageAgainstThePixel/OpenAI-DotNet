@@ -38,8 +38,14 @@ namespace OpenAI.Completions
         /// <summary>
         /// Gets the main text of this completion
         /// </summary>
-        public override string ToString() => Text;
+        public override string ToString()
+        {
+            return this.Text;
+        }
 
-        public static implicit operator string(Choice choice) => choice.Text;
+        public static implicit operator string(Choice choice)
+        {
+            return choice.Text;
+        }
     }
 }

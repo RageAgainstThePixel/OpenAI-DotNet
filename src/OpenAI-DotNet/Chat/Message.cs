@@ -12,8 +12,14 @@ namespace OpenAI.Chat
         [JsonPropertyName("content")]
         public string Content { get; private set; }
 
-        public override string ToString() => Content;
+        public override string ToString()
+        {
+            return this.Content;
+        }
 
-        public static implicit operator string(Message message) => message.Content;
+        public static implicit operator string(Message message)
+        {
+            return message.Content;
+        }
     }
 }

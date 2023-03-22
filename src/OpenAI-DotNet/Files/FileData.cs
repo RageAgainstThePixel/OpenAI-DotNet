@@ -22,7 +22,7 @@ namespace OpenAI.Files
         public int CreatedUnixTime { get; private set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(this.CreatedUnixTime).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("filename")]
@@ -36,6 +36,9 @@ namespace OpenAI.Files
         [JsonPropertyName("status")]
         public string Status { get; private set; }
 
-        public static implicit operator string(FileData fileData) => fileData.Id;
+        public static implicit operator string(FileData fileData)
+        {
+            return fileData.Id;
+        }
     }
 }

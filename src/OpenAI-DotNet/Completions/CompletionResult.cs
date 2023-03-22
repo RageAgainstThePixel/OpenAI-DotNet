@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -31,7 +31,7 @@ namespace OpenAI.Completions
         /// The time when the result was generated.
         /// </summary>
         [JsonIgnore]
-        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(this.CreatedUnixTime).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("model")]
@@ -49,9 +49,9 @@ namespace OpenAI.Completions
         /// </summary>
         public override string ToString()
         {
-            return Completions is { Count: > 0 }
-                ? Completions[0]
-                : $"CompletionResult {Id} has no valid output";
+            return this.Completions is { Count: > 0 }
+                ? this.Completions[0]
+                : $"CompletionResult {this.Id} has no valid output";
         }
     }
 }

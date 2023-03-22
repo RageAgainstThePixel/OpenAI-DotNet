@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -9,18 +9,18 @@ namespace OpenAI.Tests
     internal sealed class TextFixture_11_Proxy : AbstractTestFixture
     {
         [Test]
-        public async Task Test_01_Health()
+        public async Task Test_01_HealthAsync()
         {
-            var response = await HttpClient.GetAsync("/health");
+            var response = await this.HttpClient.GetAsync("/health");
             var responseAsString = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"[{response.StatusCode}] {responseAsString}");
             Assert.IsTrue(HttpStatusCode.OK == response.StatusCode);
         }
 
         [Test]
-        public async Task Test_02_Client_Authenticated()
+        public async Task Test_02_Client_AuthenticatedAsync()
         {
-            var models = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
+            var models = await this.OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);
 
@@ -31,7 +31,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_03_Client_Unauthenticated()
+        public async Task Test_03_Client_UnauthenticatedAsync()
         {
             var webApplicationFactory = new TestProxyFactory();
             var httpClient = webApplicationFactory.CreateClient();
@@ -41,7 +41,7 @@ namespace OpenAI.Tests
 
             try
             {
-                await openAIClient.ModelsEndpoint.GetModelsAsync();
+                _ = await openAIClient.ModelsEndpoint.GetModelsAsync();
             }
             catch (HttpRequestException httpRequestException)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text.Json;
 
@@ -22,27 +22,36 @@ namespace OpenAI
         /// <summary>
         /// The API key, required to access the API endpoint.
         /// </summary>
-        public string ApiKey => authInfo.ApiKey;
+        public string ApiKey => this.authInfo.ApiKey;
 
         /// <summary>
         /// For users who belong to multiple organizations, you can pass a header to specify which organization is used for an API request.
         /// Usage from these API requests will count against the specified organization's subscription quota.
         /// </summary>
-        public string OrganizationId => authInfo.OrganizationId;
+        public string OrganizationId => this.authInfo.OrganizationId;
 
         /// <summary>
         /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="OpenAIAuthentication"/>.
         /// </summary>
         /// <param name="key">The API key to convert into a <see cref="OpenAIAuthentication"/>.</param>
-        public static implicit operator OpenAIAuthentication(string key) => new OpenAIAuthentication(key);
+        public static implicit operator OpenAIAuthentication(string key)
+        {
+            return new OpenAIAuthentication(key);
+        }
 
-        private OpenAIAuthentication(AuthInfo authInfo) => this.authInfo = authInfo;
+        private OpenAIAuthentication(AuthInfo authInfo)
+        {
+            this.authInfo = authInfo;
+        }
 
         /// <summary>
         /// Instantiates a new Authentication object with the given <paramref name="apiKey"/>, which may be <see langword="null"/>.
         /// </summary>
         /// <param name="apiKey">The API key, required to access the API endpoint.</param>
-        public OpenAIAuthentication(string apiKey) => authInfo = new AuthInfo(apiKey);
+        public OpenAIAuthentication(string apiKey)
+        {
+            this.authInfo = new AuthInfo(apiKey);
+        }
 
         /// <summary>
         /// Instantiates a new Authentication object with the given <paramref name="apiKey"/>, which may be <see langword="null"/>.
@@ -52,7 +61,10 @@ namespace OpenAI
         /// For users who belong to multiple organizations, you can pass a header to specify which organization is used for an API request.
         /// Usage from these API requests will count against the specified organization's subscription quota.
         /// </param>
-        public OpenAIAuthentication(string apiKey, string organization) => authInfo = new AuthInfo(apiKey, organization);
+        public OpenAIAuthentication(string apiKey, string organization)
+        {
+            this.authInfo = new AuthInfo(apiKey, organization);
+        }
 
         private static OpenAIAuthentication cachedDefault;
 
@@ -61,10 +73,8 @@ namespace OpenAI
         /// This can be set manually, or automatically loaded via environment variables or a config file.
         /// <seealso cref="LoadFromEnv"/><seealso cref="LoadFromDirectory"/>
         /// </summary>
-        public static OpenAIAuthentication Default
-        {
-            get
-            {
+        public static OpenAIAuthentication Default {
+            get {
                 if (cachedDefault != null)
                 {
                     return cachedDefault;
@@ -94,32 +104,32 @@ namespace OpenAI
         {
             var apiKey = Environment.GetEnvironmentVariable(OPENAI_KEY);
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (String.IsNullOrWhiteSpace(apiKey))
             {
                 apiKey = Environment.GetEnvironmentVariable(OPENAI_API_KEY);
             }
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (String.IsNullOrWhiteSpace(apiKey))
             {
                 apiKey = Environment.GetEnvironmentVariable(OPENAI_SECRET_KEY);
             }
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (String.IsNullOrWhiteSpace(apiKey))
             {
                 apiKey = Environment.GetEnvironmentVariable(TEST_OPENAI_SECRET_KEY);
             }
 
-            if (string.IsNullOrWhiteSpace(organizationId))
+            if (String.IsNullOrWhiteSpace(organizationId))
             {
                 organizationId = Environment.GetEnvironmentVariable(OPEN_AI_ORGANIZATION_ID);
             }
 
-            if (string.IsNullOrWhiteSpace(organizationId))
+            if (String.IsNullOrWhiteSpace(organizationId))
             {
                 organizationId = Environment.GetEnvironmentVariable(OPENAI_ORGANIZATION_ID);
             }
 
-            return string.IsNullOrEmpty(apiKey) ? null : new OpenAIAuthentication(apiKey, organizationId);
+            return String.IsNullOrEmpty(apiKey) ? null : new OpenAIAuthentication(apiKey, organizationId);
         }
 
         /// <summary>
@@ -206,7 +216,7 @@ namespace OpenAI
             }
 
             if (authInfo == null ||
-                string.IsNullOrEmpty(authInfo.ApiKey))
+                String.IsNullOrEmpty(authInfo.ApiKey))
             {
                 return null;
             }

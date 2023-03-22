@@ -34,7 +34,9 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(string input, Model model = null, string user = null)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
+        {
+            return await this.CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
@@ -53,7 +55,9 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, Model model = null, string user = null)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
+        {
+            return await this.CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
@@ -61,10 +65,10 @@ namespace OpenAI.Embeddings
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(request, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.Api.Client.PostAsync(this.GetUrl(), jsonContent).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, this.Api.JsonSerializationOptions);
         }
     }
 }

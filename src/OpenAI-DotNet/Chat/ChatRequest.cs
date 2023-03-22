@@ -78,30 +78,30 @@ namespace OpenAI.Chat
             Dictionary<string, double> logitBias = null,
             string user = null)
         {
-            Model = model ?? Models.Model.GPT3_5_Turbo;
+            this.Model = model ?? Models.Model.GPT3_5_Turbo;
 
-            if (!Model.Contains("turbo") &&
-                !Model.Contains("gpt-4"))
+            if (!this.Model.Contains("turbo") &&
+                !this.Model.Contains("gpt-4"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
 
-            Messages = messages?.ToList();
+            this.Messages = messages?.ToList();
 
-            if (Messages?.Count == 0)
+            if (this.Messages?.Count == 0)
             {
                 throw new ArgumentNullException(nameof(messages), $"Missing required {nameof(messages)} parameter");
             }
 
-            Temperature = temperature;
-            TopP = topP;
-            Number = number;
-            Stops = stops;
-            MaxTokens = maxTokens;
-            PresencePenalty = presencePenalty;
-            FrequencyPenalty = frequencyPenalty;
-            LogitBias = logitBias;
-            User = user;
+            this.Temperature = temperature;
+            this.TopP = topP;
+            this.Number = number;
+            this.Stops = stops;
+            this.MaxTokens = maxTokens;
+            this.PresencePenalty = presencePenalty;
+            this.FrequencyPenalty = frequencyPenalty;
+            this.LogitBias = logitBias;
+            this.User = user;
         }
 
         /// <summary>
@@ -200,6 +200,9 @@ namespace OpenAI.Chat
         [JsonPropertyName("user")]
         public string User { get; }
 
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

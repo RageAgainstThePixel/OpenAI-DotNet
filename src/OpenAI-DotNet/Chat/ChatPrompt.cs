@@ -8,8 +8,8 @@ namespace OpenAI.Chat
         [JsonConstructor]
         public ChatPrompt(string role, string content)
         {
-            Role = role;
-            Content = content;
+            this.Role = role;
+            this.Content = content;
         }
 
         [JsonPropertyName("role")]
@@ -18,6 +18,9 @@ namespace OpenAI.Chat
         [JsonPropertyName("content")]
         public string Content { get; }
 
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

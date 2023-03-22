@@ -23,12 +23,12 @@ namespace OpenAI.Moderations
         [JsonConstructor]
         public ModerationsRequest(string input, Model model = null)
         {
-            Input = input;
-            Model = model ?? Models.Model.Moderation_Latest;
+            this.Input = input;
+            this.Model = model ?? Models.Model.Moderation_Latest;
 
-            if (!Model.Contains("text-moderation"))
+            if (!this.Model.Contains("text-moderation"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
         }
 

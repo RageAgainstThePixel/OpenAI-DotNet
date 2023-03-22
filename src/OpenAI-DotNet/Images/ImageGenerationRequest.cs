@@ -23,16 +23,16 @@ namespace OpenAI.Images
                 throw new ArgumentOutOfRangeException(nameof(prompt), "The maximum character length for the prompt is 1000 characters.");
             }
 
-            Prompt = prompt;
+            this.Prompt = prompt;
 
             if (numberOfResults is > 10 or < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(numberOfResults), "The number of results must be between 1 and 10");
             }
 
-            Number = numberOfResults;
+            this.Number = numberOfResults;
 
-            Size = size switch
+            this.Size = size switch
             {
                 ImageSize.Small => "256x256",
                 ImageSize.Medium => "512x512",
@@ -40,7 +40,7 @@ namespace OpenAI.Images
                 _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
             };
 
-            User = user;
+            this.User = user;
         }
 
         /// <summary>

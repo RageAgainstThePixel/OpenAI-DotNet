@@ -32,8 +32,8 @@ namespace OpenAI.Images
             : this(
                 File.OpenRead(imagePath),
                 Path.GetFileName(imagePath),
-                string.IsNullOrWhiteSpace(maskPath) ? null : File.OpenRead(maskPath),
-                string.IsNullOrWhiteSpace(maskPath) ? null : Path.GetFileName(maskPath),
+                String.IsNullOrWhiteSpace(maskPath) ? null : File.OpenRead(maskPath),
+                String.IsNullOrWhiteSpace(maskPath) ? null : Path.GetFileName(maskPath),
                 prompt,
                 numberOfResults,
                 size,
@@ -68,25 +68,25 @@ namespace OpenAI.Images
         /// </param>
         public ImageEditRequest(Stream image, string imageName, Stream mask, string maskName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
         {
-            Image = image;
+            this.Image = image;
 
-            if (string.IsNullOrWhiteSpace(imageName))
+            if (String.IsNullOrWhiteSpace(imageName))
             {
                 imageName = "image.png";
             }
 
-            ImageName = imageName;
+            this.ImageName = imageName;
 
             if (mask != null)
             {
-                Mask = mask;
+                this.Mask = mask;
 
-                if (string.IsNullOrWhiteSpace(maskName))
+                if (String.IsNullOrWhiteSpace(maskName))
                 {
                     maskName = "mask.png";
                 }
 
-                MaskName = maskName;
+                this.MaskName = maskName;
             }
 
             if (prompt.Length > 1000)
@@ -94,16 +94,16 @@ namespace OpenAI.Images
                 throw new ArgumentOutOfRangeException(nameof(prompt), "The maximum character length for the prompt is 1000 characters.");
             }
 
-            Prompt = prompt;
+            this.Prompt = prompt;
 
             if (numberOfResults is > 10 or < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(numberOfResults), "The number of results must be between 1 and 10");
             }
 
-            Number = numberOfResults;
+            this.Number = numberOfResults;
 
-            Size = size switch
+            this.Size = size switch
             {
                 ImageSize.Small => "256x256",
                 ImageSize.Medium => "512x512",
@@ -111,10 +111,10 @@ namespace OpenAI.Images
                 _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
             };
 
-            User = user;
+            this.User = user;
         }
 
-        ~ImageEditRequest() => Dispose(false);
+        ~ImageEditRequest() => this.Dispose(false);
 
         /// <summary>
         /// The image to edit. Must be a valid PNG file, less than 4MB, and square.
@@ -156,16 +156,16 @@ namespace OpenAI.Images
         {
             if (disposing)
             {
-                Image?.Close();
-                Image?.Dispose();
-                Mask?.Dispose();
-                Mask?.Dispose();
+                this.Image?.Close();
+                this.Image?.Dispose();
+                this.Mask?.Dispose();
+                this.Mask?.Dispose();
             }
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

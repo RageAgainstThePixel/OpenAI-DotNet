@@ -10,19 +10,19 @@ namespace OpenAI.FineTuning
         [JsonConstructor]
         public FineTuneJob(string id, string @object, string model, int createdAtUnixTime, IReadOnlyList<Event> events, string fineTunedModel, HyperParams hyperParams, string organizationId, IReadOnlyList<FileData> resultFiles, string status, IReadOnlyList<FileData> validationFiles, IReadOnlyList<FileData> trainingFiles, int updatedAtUnixTime)
         {
-            Id = id;
-            Object = @object;
-            Model = model;
-            CreatedAtUnixTime = createdAtUnixTime;
-            Events = events;
-            FineTunedModel = fineTunedModel;
-            HyperParams = hyperParams;
-            OrganizationId = organizationId;
-            ResultFiles = resultFiles;
-            Status = status;
-            ValidationFiles = validationFiles;
-            TrainingFiles = trainingFiles;
-            UpdatedAtUnixTime = updatedAtUnixTime;
+            this.Id = id;
+            this.Object = @object;
+            this.Model = model;
+            this.CreatedAtUnixTime = createdAtUnixTime;
+            this.Events = events;
+            this.FineTunedModel = fineTunedModel;
+            this.HyperParams = hyperParams;
+            this.OrganizationId = organizationId;
+            this.ResultFiles = resultFiles;
+            this.Status = status;
+            this.ValidationFiles = validationFiles;
+            this.TrainingFiles = trainingFiles;
+            this.UpdatedAtUnixTime = updatedAtUnixTime;
         }
 
         [JsonPropertyName("id")]
@@ -38,7 +38,7 @@ namespace OpenAI.FineTuning
         public int CreatedAtUnixTime { get; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(this.CreatedAtUnixTime).DateTime;
 
         [JsonPropertyName("events")]
         public IReadOnlyList<Event> Events { get; }
@@ -68,8 +68,11 @@ namespace OpenAI.FineTuning
         public int UpdatedAtUnixTime { get; }
 
         [JsonIgnore]
-        public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(UpdatedAtUnixTime).DateTime;
+        public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(this.UpdatedAtUnixTime).DateTime;
 
-        public static implicit operator string(FineTuneJob job) => job.Id;
+        public static implicit operator string(FineTuneJob job)
+        {
+            return job.Id;
+        }
     }
 }

@@ -12,16 +12,16 @@ namespace OpenAI
         [JsonConstructor]
         public AuthInfo(string apiKey, string organizationId = null)
         {
-            ApiKey = apiKey;
+            this.ApiKey = apiKey;
 
-            if (!string.IsNullOrWhiteSpace(organizationId))
+            if (!System.String.IsNullOrWhiteSpace(organizationId))
             {
                 if (!organizationId.Contains(OrganizationPrefix))
                 {
                     throw new InvalidCredentialException($"{nameof(organizationId)} must start with '{OrganizationPrefix}'");
                 }
 
-                OrganizationId = organizationId;
+                this.OrganizationId = organizationId;
             }
         }
 

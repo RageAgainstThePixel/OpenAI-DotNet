@@ -24,15 +24,15 @@ namespace OpenAI.Files
                 throw new FileNotFoundException($"Could not find the {nameof(filePath)} file located at {filePath}");
             }
 
-            File = System.IO.File.OpenRead(filePath);
-            FileName = Path.GetFileName(filePath);
+            this.File = System.IO.File.OpenRead(filePath);
+            this.FileName = Path.GetFileName(filePath);
 
-            Purpose = purpose;
+            this.Purpose = purpose;
         }
 
         ~FileUploadRequest()
         {
-            Dispose(false);
+            this.Dispose(false);
         }
 
         public Stream File { get; }
@@ -45,14 +45,14 @@ namespace OpenAI.Files
         {
             if (disposing)
             {
-                File?.Close();
-                File?.Dispose();
+                this.File?.Close();
+                this.File?.Dispose();
             }
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

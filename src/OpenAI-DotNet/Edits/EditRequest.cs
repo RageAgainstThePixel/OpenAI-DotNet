@@ -32,18 +32,18 @@ namespace OpenAI.Edits
             double? topP = null,
             Model model = null)
         {
-            Model = model ?? new Model("text-davinci-edit-001");
+            this.Model = model ?? new Model("text-davinci-edit-001");
 
-            if (!Model.Contains("-edit-"))
+            if (!this.Model.Contains("-edit-"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
 
-            Input = input;
-            Instruction = instruction;
-            EditCount = editCount;
-            Temperature = temperature;
-            TopP = topP;
+            this.Input = input;
+            this.Instruction = instruction;
+            this.EditCount = editCount;
+            this.Temperature = temperature;
+            this.TopP = topP;
         }
 
         /// <summary>

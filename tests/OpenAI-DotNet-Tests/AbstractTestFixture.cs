@@ -10,7 +10,7 @@ namespace OpenAI.Tests
         {
             protected override void ConfigureWebHost(IWebHostBuilder builder)
             {
-                builder.UseEnvironment("Development");
+                _ = builder.UseEnvironment("Development");
                 base.ConfigureWebHost(builder);
             }
         }
@@ -24,11 +24,11 @@ namespace OpenAI.Tests
         protected AbstractTestFixture()
         {
             var webApplicationFactory = new TestProxyFactory();
-            HttpClient = webApplicationFactory.CreateClient();
-            var domain = $"{HttpClient.BaseAddress?.Authority}:{HttpClient.BaseAddress?.Port}";
+            this.HttpClient = webApplicationFactory.CreateClient();
+            var domain = $"{this.HttpClient.BaseAddress?.Authority}:{this.HttpClient.BaseAddress?.Port}";
             var settings = new OpenAIClientSettings(domain: domain);
             var auth = new OpenAIAuthentication(TestUserToken);
-            OpenAIClient = new OpenAIClient(auth, settings, HttpClient);
+            this.OpenAIClient = new OpenAIClient(auth, settings, this.HttpClient);
         }
     }
 }

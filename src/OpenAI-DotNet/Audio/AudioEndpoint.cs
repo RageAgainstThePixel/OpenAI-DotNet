@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,7 +18,7 @@ namespace OpenAI.Audio
         {
             public AudioResponse(string text)
             {
-                Text = text;
+                this.Text = text;
             }
 
             [JsonPropertyName("text")]
@@ -44,27 +45,27 @@ namespace OpenAI.Audio
             content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
             content.Add(new StringContent(request.Model), "model");
 
-            if (!string.IsNullOrWhiteSpace(request.Prompt))
+            if (!System.String.IsNullOrWhiteSpace(request.Prompt))
             {
                 content.Add(new StringContent(request.Prompt), "prompt");
             }
 
             var responseFormat = request.ResponseFormat;
-            content.Add(new StringContent(responseFormat.ToString().ToLower()), "response_format");
+            content.Add(new StringContent(responseFormat.ToString().ToLower(CultureInfo.CurrentCulture)), "response_format");
 
             if (request.Temperature.HasValue)
             {
                 content.Add(new StringContent(request.Temperature.ToString()), "temperature");
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Language))
+            if (!System.String.IsNullOrWhiteSpace(request.Language))
             {
                 content.Add(new StringContent(request.Language), "language");
             }
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken);
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/transcriptions"), content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
 
             return responseFormat == AudioResponseFormat.Json
@@ -86,13 +87,13 @@ namespace OpenAI.Audio
             content.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
             content.Add(new StringContent(request.Model), "model");
 
-            if (!string.IsNullOrWhiteSpace(request.Prompt))
+            if (!System.String.IsNullOrWhiteSpace(request.Prompt))
             {
                 content.Add(new StringContent(request.Prompt), "prompt");
             }
 
             var responseFormat = request.ResponseFormat;
-            content.Add(new StringContent(responseFormat.ToString().ToLower()), "response_format");
+            content.Add(new StringContent(responseFormat.ToString().ToLower(CultureInfo.CurrentCulture)), "response_format");
 
             if (request.Temperature.HasValue)
             {
@@ -101,7 +102,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/translations"), content, cancellationToken);
+            var response = await this.Api.Client.PostAsync(this.GetUrl("/translations"), content, cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken);
 
             return responseFormat == AudioResponseFormat.Json

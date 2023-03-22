@@ -43,7 +43,7 @@ namespace OpenAI.FineTuning
         /// Prompt text.
         /// </summary>
         [JsonPropertyName("prompt")]
-        public string Prompt => $"{prompt}{promptSuffix.Replace("\\n", "\n")}";
+        public string Prompt => $"{this.prompt}{this.promptSuffix.Replace("\\n", "\n")}";
 
         private readonly string completion;
 
@@ -53,10 +53,16 @@ namespace OpenAI.FineTuning
         /// The ideal completion text.
         /// </summary>
         [JsonPropertyName("completion")]
-        public string Completion => $" {completion}{completionSuffix.Replace("\\n", "\n")}";
+        public string Completion => $" {this.completion}{this.completionSuffix.Replace("\\n", "\n")}";
 
-        public static implicit operator string(FineTuningTrainingData data) => data.ToString();
+        public static implicit operator string(FineTuningTrainingData data)
+        {
+            return data.ToString();
+        }
 
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

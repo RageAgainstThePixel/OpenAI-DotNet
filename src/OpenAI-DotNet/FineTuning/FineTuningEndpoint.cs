@@ -48,10 +48,10 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException">.</exception>
         public async Task<FineTuneJob> CreateFineTuneJobAsync(CreateFineTuneJobRequest jobRequest)
         {
-            var jsonContent = JsonSerializer.Serialize(jobRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(jobRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.Api.Client.PostAsync(this.GetUrl(), jsonContent).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, this.Api.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -61,9 +61,9 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException">.</exception>
         public async Task<IReadOnlyList<FineTuneJob>> ListFineTuneJobsAsync()
         {
-            var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
+            var response = await this.Api.Client.GetAsync(this.GetUrl()).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FineTuneList>(responseAsString, Api.JsonSerializationOptions)?.Data.OrderBy(job => job.CreatedAtUnixTime).ToArray();
+            return JsonSerializer.Deserialize<FineTuneList>(responseAsString, this.Api.JsonSerializationOptions)?.Data.OrderBy(job => job.CreatedAtUnixTime).ToArray();
         }
 
         /// <summary>
@@ -74,9 +74,9 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException"></exception>
         public async Task<FineTuneJob> RetrieveFineTuneJobInfoAsync(string jobId)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{jobId}")).ConfigureAwait(false);
+            var response = await this.Api.Client.GetAsync(this.GetUrl($"/{jobId}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, this.Api.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -87,9 +87,9 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> CancelFineTuneJobAsync(string jobId)
         {
-            var response = await Api.Client.PostAsync(GetUrl($"/{jobId}/cancel"), null!).ConfigureAwait(false);
+            var response = await this.Api.Client.PostAsync(this.GetUrl($"/{jobId}/cancel"), null!).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            var result = response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            var result = response.DeserializeResponse<FineTuneJobResponse>(responseAsString, this.Api.JsonSerializationOptions);
             return result.Status == "cancelled";
         }
 
@@ -102,9 +102,9 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<Event>> ListFineTuneEventsAsync(string jobId, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{jobId}/events"), cancellationToken).ConfigureAwait(false);
+            var response = await this.Api.Client.GetAsync(this.GetUrl($"/{jobId}/events"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FineTuneEventList>(responseAsString, Api.JsonSerializationOptions)?.Data.OrderBy(@event => @event.CreatedAtUnixTime).ToArray();
+            return JsonSerializer.Deserialize<FineTuneEventList>(responseAsString, this.Api.JsonSerializationOptions)?.Data.OrderBy(@event => @event.CreatedAtUnixTime).ToArray();
         }
 
         /// <summary>
@@ -116,8 +116,8 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException"></exception>
         public async Task StreamFineTuneEventsAsync(string jobId, Action<Event> fineTuneEventCallback, CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, GetUrl($"/{jobId}/events?stream=true"));
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            using var request = new HttpRequestMessage(HttpMethod.Get, this.GetUrl($"/{jobId}/events?stream=true"));
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -125,7 +125,7 @@ namespace OpenAI.FineTuning
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
                    !cancellationToken.IsCancellationRequested)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.CurrentCulture))
                 {
                     line = line["data: ".Length..];
                 }
@@ -135,15 +135,15 @@ namespace OpenAI.FineTuning
                     return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions));
+                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(line.Trim(), this.Api.JsonSerializationOptions));
                 }
             }
 
             if (cancellationToken.IsCancellationRequested)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var result = await this.CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
                 if (!result)
                 {
@@ -160,8 +160,8 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException"></exception>
         public async IAsyncEnumerable<Event> StreamFineTuneEventsEnumerableAsync(string jobId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, GetUrl($"/{jobId}/events?stream=true"));
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            using var request = new HttpRequestMessage(HttpMethod.Get, this.GetUrl($"/{jobId}/events?stream=true"));
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -169,7 +169,7 @@ namespace OpenAI.FineTuning
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
                    !cancellationToken.IsCancellationRequested)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.CurrentCulture))
                 {
                     line = line["data: ".Length..];
                 }
@@ -179,15 +179,15 @@ namespace OpenAI.FineTuning
                     yield break;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    yield return JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions);
+                    yield return JsonSerializer.Deserialize<Event>(line.Trim(), this.Api.JsonSerializationOptions);
                 }
             }
 
             if (cancellationToken.IsCancellationRequested)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var result = await this.CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
                 if (!result)
                 {

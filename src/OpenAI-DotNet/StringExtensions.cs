@@ -6,6 +6,8 @@ namespace OpenAI
     internal static class StringExtensions
     {
         public static StringContent ToJsonStringContent(this string json)
-            => new StringContent(json, Encoding.UTF8, "application/json");
+        {
+            return new StringContent(json, Encoding.UTF8, "application/json");
+        }
     }
 }

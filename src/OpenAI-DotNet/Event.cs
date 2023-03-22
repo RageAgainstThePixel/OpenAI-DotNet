@@ -14,7 +14,7 @@ namespace OpenAI
         public int CreatedAtUnixTime { get; private set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(this.CreatedAtUnixTime).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("level")]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -25,9 +25,9 @@ namespace OpenAI.Models
             [JsonConstructor]
             public DeleteModelResponse(string id, string @object, bool deleted)
             {
-                Id = id;
-                Object = @object;
-                Deleted = deleted;
+                this.Id = id;
+                this.Object = @object;
+                this.Deleted = deleted;
             }
 
             [JsonPropertyName("id")]
@@ -53,9 +53,9 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<IReadOnlyList<Model>> GetModelsAsync()
         {
-            var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
+            var response = await this.Api.Client.GetAsync(this.GetUrl()).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<ModelsList>(responseAsString, Api.JsonSerializationOptions)?.Data;
+            return JsonSerializer.Deserialize<ModelsList>(responseAsString, this.Api.JsonSerializationOptions)?.Data;
         }
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<Model> GetModelDetailsAsync(string id)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{id}")).ConfigureAwait(false);
+            var response = await this.Api.Client.GetAsync(this.GetUrl($"/{id}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<Model>(responseAsString, Api.JsonSerializationOptions);
+            return JsonSerializer.Deserialize<Model>(responseAsString, this.Api.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -79,18 +79,13 @@ namespace OpenAI.Models
         /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFineTuneModelAsync(string modelId)
         {
-            var model = await GetModelDetailsAsync(modelId).ConfigureAwait(false);
-
-            if (model == null)
-            {
-                throw new Exception($"Failed to get {modelId} info!");
-            }
+            var model = await this.GetModelDetailsAsync(modelId).ConfigureAwait(false) ?? throw new Exception($"Failed to get {modelId} info!");
 
             try
             {
-                var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);
+                var response = await this.Api.Client.DeleteAsync(this.GetUrl($"/{model.Id}")).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, this.Api.JsonSerializationOptions)?.Deleted ?? false;
             }
             catch (Exception e)
             {

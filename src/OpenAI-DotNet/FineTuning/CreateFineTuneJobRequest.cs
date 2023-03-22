@@ -19,18 +19,18 @@ namespace OpenAI.FineTuning
             IReadOnlyList<double> classificationBetas = null,
             string suffix = null)
         {
-            TrainingFileId = trainingFileId;
-            ValidationFileId = validationFileId;
-            Model = model ?? "curie";
-            Epochs = (int)epochs;
-            BatchSize = batchSize;
-            LearningRateMultiplier = learningRateMultiplier;
-            PromptLossWeight = promptLossWeight;
-            ComputeClassificationMetrics = computeClassificationMetrics;
-            ClassificationNClasses = classificationNClasses;
-            ClassificationPositiveClasses = classificationPositiveClasses;
-            ClassificationBetas = classificationBetas;
-            Suffix = suffix;
+            this.TrainingFileId = trainingFileId;
+            this.ValidationFileId = validationFileId;
+            this.Model = model ?? "curie";
+            this.Epochs = (int)epochs;
+            this.BatchSize = batchSize;
+            this.LearningRateMultiplier = learningRateMultiplier;
+            this.PromptLossWeight = promptLossWeight;
+            this.ComputeClassificationMetrics = computeClassificationMetrics;
+            this.ClassificationNClasses = classificationNClasses;
+            this.ClassificationPositiveClasses = classificationPositiveClasses;
+            this.ClassificationBetas = classificationBetas;
+            this.Suffix = suffix;
         }
 
         [JsonPropertyName("training_file")]

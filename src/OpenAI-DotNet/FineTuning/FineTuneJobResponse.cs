@@ -25,7 +25,7 @@ namespace OpenAI.FineTuning
         public int CreatedUnixTime { get; private set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(this.CreatedUnixTime).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("events")]
@@ -64,22 +64,24 @@ namespace OpenAI.FineTuning
         public int UpdatedAtUnixTime { get; private set; }
 
         [JsonIgnore]
-        public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(UpdatedAtUnixTime).DateTime;
+        public DateTime UpdatedAt => DateTimeOffset.FromUnixTimeSeconds(this.UpdatedAtUnixTime).DateTime;
 
         public static implicit operator FineTuneJob(FineTuneJobResponse jobResponse)
-            => new FineTuneJob(
-                jobResponse.Id,
-                jobResponse.Object,
-                jobResponse.Model,
-                jobResponse.CreatedUnixTime,
-                jobResponse.Events.ToList(),
-                jobResponse.FineTunedModel,
-                jobResponse.HyperParams,
-                jobResponse.OrganizationId,
-                jobResponse.ResultFiles.ToList(),
-                jobResponse.Status,
-                jobResponse.ValidationFiles.ToList(),
-                jobResponse.TrainingFiles.ToList(),
-                jobResponse.UpdatedAtUnixTime);
+        {
+            return new FineTuneJob(
+                        jobResponse.Id,
+                        jobResponse.Object,
+                        jobResponse.Model,
+                        jobResponse.CreatedUnixTime,
+                        jobResponse.Events.ToList(),
+                        jobResponse.FineTunedModel,
+                        jobResponse.HyperParams,
+                        jobResponse.OrganizationId,
+                        jobResponse.ResultFiles.ToList(),
+                        jobResponse.Status,
+                        jobResponse.ValidationFiles.ToList(),
+                        jobResponse.TrainingFiles.ToList(),
+                        jobResponse.UpdatedAtUnixTime);
+        }
     }
 }

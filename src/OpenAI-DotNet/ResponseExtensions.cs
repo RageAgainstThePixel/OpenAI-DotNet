@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,7 +20,7 @@ namespace OpenAI
         {
             response.Organization = headers.GetValues(Organization).FirstOrDefault();
             response.RequestId = headers.GetValues(RequestId).FirstOrDefault();
-            response.ProcessingTime = TimeSpan.FromMilliseconds(int.Parse(headers.GetValues(ProcessingTime).First()));
+            response.ProcessingTime = TimeSpan.FromMilliseconds(Int32.Parse(headers.GetValues(ProcessingTime).First(), CultureInfo.CurrentCulture));
         }
 
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)

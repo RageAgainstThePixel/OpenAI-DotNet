@@ -15,11 +15,11 @@ namespace OpenAI
         /// </summary>
         public OpenAIClientSettings()
         {
-            ResourceName = OpenAIDomain;
-            ApiVersion = "v1";
-            DeploymentId = string.Empty;
-            BaseRequest = $"/{ApiVersion}/";
-            BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
+            this.ResourceName = OpenAIDomain;
+            this.ApiVersion = "v1";
+            this.DeploymentId = String.Empty;
+            this.BaseRequest = $"/{this.ApiVersion}/";
+            this.BaseRequestUrlFormat = $"https://{this.ResourceName}{this.BaseRequest}{{0}}";
         }
 
         /// <summary>
@@ -29,17 +29,17 @@ namespace OpenAI
         /// <param name="apiVersion">The version of the OpenAI api you want to use.</param>
         public OpenAIClientSettings(string domain, string apiVersion = "v1")
         {
-            if (!domain.Contains(".") &&
-                !domain.Contains(":"))
+            if (!domain.Contains('.') &&
+                !domain.Contains(':'))
             {
                 throw new ArgumentException($"You're attempting to pass a \"resourceName\" parameter to \"{nameof(domain)}\". Please specify \"resourceName:\" for this parameter in constructor.");
             }
 
-            ResourceName = domain;
-            ApiVersion = apiVersion;
-            DeploymentId = string.Empty;
-            BaseRequest = $"/{ApiVersion}/";
-            BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
+            this.ResourceName = domain;
+            this.ApiVersion = apiVersion;
+            this.DeploymentId = String.Empty;
+            this.BaseRequest = $"/{this.ApiVersion}/";
+            this.BaseRequestUrlFormat = $"https://{this.ResourceName}{this.BaseRequest}{{0}}";
         }
 
         /// <summary>
@@ -57,17 +57,17 @@ namespace OpenAI
         /// </param>
         public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = "2022-12-01")
         {
-            if (resourceName.Contains(".") ||
-                resourceName.Contains(":"))
+            if (resourceName.Contains('.') ||
+                resourceName.Contains(':'))
             {
                 throw new ArgumentException($"You're attempting to pass a \"domain\" parameter to \"{nameof(resourceName)}\". Please specify \"domain:\" for this parameter in constructor.");
             }
 
-            ResourceName = resourceName;
-            DeploymentId = deploymentId;
-            ApiVersion = apiVersion;
-            BaseRequest = $"/openai/deployments/{DeploymentId}/";
-            BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}?api-version={ApiVersion}";
+            this.ResourceName = resourceName;
+            this.DeploymentId = deploymentId;
+            this.ApiVersion = apiVersion;
+            this.BaseRequest = $"/openai/deployments/{this.DeploymentId}/";
+            this.BaseRequestUrlFormat = $"https://{this.ResourceName}.{AzureOpenAIDomain}{this.BaseRequest}{{0}}?api-version={this.ApiVersion}";
         }
 
         public string ResourceName { get; }

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using OpenAI.FineTuning;
 using System;
 using System.IO;
@@ -9,12 +9,12 @@ namespace OpenAI.Tests
     internal sealed class TestFixture_08_Files : AbstractTestFixture
     {
         [Test]
-        public async Task Test_01_UploadFile()
+        public async Task Test_01_UploadFileAsync()
         {
-            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
+            Assert.IsNotNull(this.OpenAIClient.FilesEndpoint);
             await File.WriteAllTextAsync("test.jsonl", new FineTuningTrainingData("I'm a", "learning language model"));
             Assert.IsTrue(File.Exists("test.jsonl"));
-            var result = await OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune");
+            var result = await this.OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune");
 
             Assert.IsNotNull(result);
             Assert.IsTrue(result.FileName == "test.jsonl");
@@ -25,33 +25,33 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_02_ListFiles()
+        public async Task Test_02_ListFilesAsync()
         {
-            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
-            var result = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+            Assert.IsNotNull(this.OpenAIClient.FilesEndpoint);
+            var result = await this.OpenAIClient.FilesEndpoint.ListFilesAsync();
 
             Assert.IsNotNull(result);
             Assert.IsNotEmpty(result);
 
             foreach (var file in result)
             {
-                var fileInfo = await OpenAIClient.FilesEndpoint.GetFileInfoAsync(file);
+                var fileInfo = await this.OpenAIClient.FilesEndpoint.GetFileInfoAsync(file);
                 Assert.IsNotNull(fileInfo);
                 Console.WriteLine($"{fileInfo.Id} -> {fileInfo.Object}: {fileInfo.FileName} | {fileInfo.Size} bytes");
             }
         }
 
         [Test]
-        public async Task Test_03_DownloadFile()
+        public async Task Test_03_DownloadFileAsync()
         {
-            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
-            var files = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+            Assert.IsNotNull(this.OpenAIClient.FilesEndpoint);
+            var files = await this.OpenAIClient.FilesEndpoint.ListFilesAsync();
 
             Assert.IsNotNull(files);
             Assert.IsNotEmpty(files);
 
             var testFileData = files[0];
-            var result = await OpenAIClient.FilesEndpoint.DownloadFileAsync(testFileData, Directory.GetCurrentDirectory());
+            var result = await this.OpenAIClient.FilesEndpoint.DownloadFileAsync(testFileData, Directory.GetCurrentDirectory());
 
             Assert.IsNotNull(result);
             Console.WriteLine(result);
@@ -62,21 +62,21 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_DeleteFiles()
+        public async Task Test_04_DeleteFilesAsync()
         {
-            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
-            var files = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+            Assert.IsNotNull(this.OpenAIClient.FilesEndpoint);
+            var files = await this.OpenAIClient.FilesEndpoint.ListFilesAsync();
             Assert.IsNotNull(files);
             Assert.IsNotEmpty(files);
 
             foreach (var file in files)
             {
-                var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
+                var result = await this.OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
                 Assert.IsTrue(result);
                 Console.WriteLine($"{file.Id} -> deleted");
             }
 
-            files = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+            files = await this.OpenAIClient.FilesEndpoint.ListFilesAsync();
             Assert.IsNotNull(files);
             Assert.IsEmpty(files);
         }

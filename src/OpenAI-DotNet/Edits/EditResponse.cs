@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -19,7 +19,7 @@ namespace OpenAI.Edits
 
         /// The time when the result was generated
         [JsonIgnore]
-        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(this.CreatedUnixTime).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("choices")]
@@ -34,8 +34,8 @@ namespace OpenAI.Edits
         /// </summary>
         public override string ToString()
         {
-            return Choices is { Count: > 0 }
-                ? Choices[0]
+            return this.Choices is { Count: > 0 }
+                ? this.Choices[0]
                 : "Edit result has no valid output";
         }
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -24,7 +25,7 @@ namespace OpenAI.Proxy
         private IAuthenticationFilter authenticationFilter;
 
         // Copied from https://github.com/microsoft/reverse-proxy/blob/51d797986b1fea03500a1ad173d13a1176fb5552/src/ReverseProxy/Forwarder/RequestUtilities.cs#L61-L83
-        private static readonly HashSet<string> ExcludedHeaders = new HashSet<string>()
+        private static readonly HashSet<string> ExcludedHeaders = new()
         {
             HeaderNames.Connection,
             HeaderNames.TransferEncoding,
@@ -47,24 +48,24 @@ namespace OpenAI.Proxy
 #endif
         };
 
-        public void ConfigureServices(IServiceCollection services) { }
+        public static void ConfigureServices() { }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                _ = app.UseDeveloperExceptionPage();
             }
 
-            openAIClient = app.ApplicationServices.GetRequiredService<OpenAIClient>();
-            authenticationFilter = app.ApplicationServices.GetRequiredService<IAuthenticationFilter>();
+            this.openAIClient = app.ApplicationServices.GetRequiredService<OpenAIClient>();
+            this.authenticationFilter = app.ApplicationServices.GetRequiredService<IAuthenticationFilter>();
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
+            _ = app.UseHttpsRedirection();
+            _ = app.UseRouting();
+            _ = app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/health", HealthEndpoint);
-                endpoints.Map($"{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
+                _ = endpoints.MapGet("/health", HealthEndpointAsync);
+                _ = endpoints.Map($"{this.openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", this.HandleRequestAsync);
             });
         }
 
@@ -79,8 +80,8 @@ namespace OpenAI.Proxy
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<OpenAIProxyStartup>();
-                    webBuilder.ConfigureKestrel(options =>
+                    _ = webBuilder.UseStartup<OpenAIProxyStartup>();
+                    _ = webBuilder.ConfigureKestrel(options =>
                     {
                         options.AllowSynchronousIO = false;
                         options.Limits.MinRequestBodyDataRate = null;
@@ -91,12 +92,12 @@ namespace OpenAI.Proxy
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton(openAIClient);
-                    services.AddSingleton<IAuthenticationFilter, T>();
+                    _ = services.AddSingleton(openAIClient);
+                    _ = services.AddSingleton<IAuthenticationFilter, T>();
                 }).Build();
         }
 
-        private static async Task HealthEndpoint(HttpContext context)
+        private static async Task HealthEndpointAsync(HttpContext context)
         {
             // Respond with a 200 OK status code and a plain text message
             context.Response.StatusCode = StatusCodes.Status200OK;
@@ -109,42 +110,45 @@ namespace OpenAI.Proxy
         /// <summary>
         /// Handles incoming requests, validates authentication, and forwards the request to OpenAI API
         /// </summary>
-        private async Task HandleRequest(HttpContext httpContext, string endpoint)
+        private async Task HandleRequestAsync(HttpContext httpContext, string endpoint)
         {
             try
             {
-                authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
+                this.authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
 
                 var method = new HttpMethod(httpContext.Request.Method);
-                var uri = new Uri(string.Format(openAIClient.OpenAIClientSettings.BaseRequestUrlFormat, $"{endpoint}{httpContext.Request.QueryString}"));
-                var openAIRequest = new HttpRequestMessage(method, uri);
-
-                openAIRequest.Content = new StreamContent(httpContext.Request.Body);
+                var uri = new Uri(String.Format(CultureInfo.CurrentCulture, this.openAIClient.OpenAIClientSettings.BaseRequestUrlFormat, $"{endpoint}{httpContext.Request.QueryString}"));
+                var openAIRequest = new HttpRequestMessage(method, uri)
+                {
+                    Content = new StreamContent(httpContext.Request.Body)
+                };
 
                 if (httpContext.Request.ContentType != null)
                 {
                     openAIRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
                 }
 
-                var proxyResponse = await openAIClient.Client.SendAsync(openAIRequest, HttpCompletionOption.ResponseHeadersRead);
+                var proxyResponse = await this.openAIClient.Client.SendAsync(openAIRequest, HttpCompletionOption.ResponseHeadersRead);
                 httpContext.Response.StatusCode = (int)proxyResponse.StatusCode;
 
                 foreach (var (key, value) in proxyResponse.Headers)
                 {
-                    if (ExcludedHeaders.Contains(key)) { continue; }
+                    if (ExcludedHeaders.Contains(key))
+                    { continue; }
                     httpContext.Response.Headers[key] = value.ToArray();
                 }
 
                 foreach (var (key, value) in proxyResponse.Content.Headers)
                 {
-                    if (ExcludedHeaders.Contains(key)) { continue; }
+                    if (ExcludedHeaders.Contains(key))
+                    { continue; }
                     httpContext.Response.Headers[key] = value.ToArray();
                 }
 
-                httpContext.Response.ContentType = proxyResponse.Content.Headers.ContentType?.ToString() ?? string.Empty;
+                httpContext.Response.ContentType = proxyResponse.Content.Headers.ContentType?.ToString() ?? String.Empty;
                 const string streamingContent = "text/event-stream";
 
-                if (httpContext.Response.ContentType.Equals(streamingContent))
+                if (httpContext.Response.ContentType.Equals(streamingContent, StringComparison.OrdinalIgnoreCase))
                 {
                     var stream = await proxyResponse.Content.ReadAsStreamAsync();
                     await WriteServerStreamEventsAsync(httpContext, stream);

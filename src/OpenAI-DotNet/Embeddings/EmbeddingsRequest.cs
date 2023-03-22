@@ -27,7 +27,7 @@ namespace OpenAI.Embeddings
         public EmbeddingsRequest(string input, Model model = null, string user = null)
             : this(new List<string> { input }, model, user)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            if (String.IsNullOrWhiteSpace(input))
             {
                 throw new ArgumentNullException(nameof(input));
             }
@@ -51,23 +51,23 @@ namespace OpenAI.Embeddings
         /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(IEnumerable<string> input, Model model = null, string user = null)
         {
-            Input = input?.ToList();
+            this.Input = input?.ToList();
 
-            if (Input?.Count == 0)
+            if (this.Input?.Count == 0)
             {
                 throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
             }
 
-            Model = model ?? Models.Model.Embedding_Ada_002;
+            this.Model = model ?? Models.Model.Embedding_Ada_002;
 
-            if (!Model.Contains("embedding") &&
-                !Model.Contains("search") &&
-                !Model.Contains("similarity"))
+            if (!this.Model.Contains("embedding") &&
+                !this.Model.Contains("search") &&
+                !this.Model.Contains("similarity"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
 
-            User = user;
+            this.User = user;
         }
 
         [JsonPropertyName("input")]

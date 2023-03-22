@@ -32,8 +32,11 @@ namespace OpenAI.Chat
         public IReadOnlyList<Choice> Choices { get; private set; }
 
         [JsonIgnore]
-        public Choice FirstChoice => Choices.FirstOrDefault();
+        public Choice FirstChoice => this.Choices.FirstOrDefault();
 
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

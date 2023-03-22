@@ -1,4 +1,4 @@
-﻿using OpenAI.Models;
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,7 +91,7 @@ namespace OpenAI.Completions
                 echo,
                 stopSequences);
 
-            return await CreateCompletionAsync(request, cancellationToken).ConfigureAwait(false);
+            return await this.CreateCompletionAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -106,10 +106,10 @@ namespace OpenAI.Completions
         public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = false;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var jsonContent = JsonSerializer.Serialize(completionRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            var response = await this.Api.Client.PostAsync(this.GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<CompletionResult>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<CompletionResult>(responseAsString, this.Api.JsonSerializationOptions);
         }
 
         #endregion Non-Streaming
@@ -183,7 +183,7 @@ namespace OpenAI.Completions
                 echo,
                 stopSequences);
 
-            await StreamCompletionAsync(request, resultHandler, cancellationToken).ConfigureAwait(false);
+            await this.StreamCompletionAsync(request, resultHandler, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -197,19 +197,19 @@ namespace OpenAI.Completions
         public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl())
+            var jsonContent = JsonSerializer.Serialize(completionRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            using var request = new HttpRequestMessage(HttpMethod.Post, this.GetUrl())
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.CurrentCulture))
                 {
                     line = line["data: ".Length..];
                 }
@@ -219,9 +219,9 @@ namespace OpenAI.Completions
                     return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    resultHandler(response.DeserializeResponse<CompletionResult>(line.Trim(), Api.JsonSerializationOptions));
+                    resultHandler(response.DeserializeResponse<CompletionResult>(line.Trim(), this.Api.JsonSerializationOptions));
                 }
             }
         }
@@ -292,7 +292,7 @@ namespace OpenAI.Completions
                 echo,
                 stopSequences);
 
-            return StreamCompletionEnumerableAsync(request, cancellationToken);
+            return this.StreamCompletionEnumerableAsync(request, cancellationToken);
         }
 
         /// <summary>
@@ -309,12 +309,12 @@ namespace OpenAI.Completions
         public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
-            var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl())
+            var jsonContent = JsonSerializer.Serialize(completionRequest, this.Api.JsonSerializationOptions).ToJsonStringContent();
+            using var request = new HttpRequestMessage(HttpMethod.Post, this.GetUrl())
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await this.Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -322,7 +322,7 @@ namespace OpenAI.Completions
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
                    !cancellationToken.IsCancellationRequested)
             {
-                if (line.StartsWith("data: "))
+                if (line.StartsWith("data: ", StringComparison.CurrentCulture))
                 {
                     line = line["data: ".Length..];
                 }
@@ -332,9 +332,9 @@ namespace OpenAI.Completions
                     yield break;
                 }
 
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!String.IsNullOrWhiteSpace(line))
                 {
-                    yield return response.DeserializeResponse<CompletionResult>(line.Trim(), Api.JsonSerializationOptions);
+                    yield return response.DeserializeResponse<CompletionResult>(line.Trim(), this.Api.JsonSerializationOptions);
                 }
             }
         }

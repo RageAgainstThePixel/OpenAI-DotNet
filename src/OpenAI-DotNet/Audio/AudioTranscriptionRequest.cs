@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using OpenAI.Models;
 
 namespace OpenAI.Audio
 {
-    public sealed class AudioTranscriptionRequest
+    public sealed class AudioTranscriptionRequest : IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -93,29 +93,29 @@ namespace OpenAI.Audio
             int? temperature = null,
             string language = null)
         {
-            Audio = audio;
+            this.Audio = audio;
 
-            if (string.IsNullOrWhiteSpace(audioName))
+            if (String.IsNullOrWhiteSpace(audioName))
             {
                 audioName = "audio.wav";
             }
 
-            AudioName = audioName;
+            this.AudioName = audioName;
 
-            Model = model ?? Models.Model.Whisper1;
+            this.Model = model ?? Models.Model.Whisper1;
 
-            if (!Model.Contains("whisper"))
+            if (!this.Model.Contains("whisper"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{this.Model} is not supported", nameof(model));
             }
 
-            Prompt = prompt;
-            ResponseFormat = responseFormat;
-            Temperature = temperature;
-            Language = language;
+            this.Prompt = prompt;
+            this.ResponseFormat = responseFormat;
+            this.Temperature = temperature;
+            this.Language = language;
         }
 
-        ~AudioTranscriptionRequest() => Dispose(false);
+        ~AudioTranscriptionRequest() => this.Dispose(false);
 
         /// <summary>
         /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
@@ -167,14 +167,14 @@ namespace OpenAI.Audio
         {
             if (disposing)
             {
-                Audio?.Close();
-                Audio?.Dispose();
+                this.Audio?.Close();
+                this.Audio?.Dispose();
             }
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
     }
