@@ -15,7 +15,7 @@ namespace OpenAI.FineTuning
     /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
     /// <see href="https://beta.openai.com/docs/guides/fine-tuning"/>
     /// </summary>
-    public class FineTuningEndpoint : BaseEndPoint
+    public sealed class FineTuningEndpoint : BaseEndPoint
     {
         private class FineTuneList
         {
