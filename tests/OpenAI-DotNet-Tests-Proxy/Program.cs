@@ -14,7 +14,7 @@ namespace OpenAI.Tests.Proxy
         private const string TestUserToken = "aAbBcCdDeE123456789";
 
         // ReSharper disable once ClassNeverInstantiated.Local
-        private class AuthenticationFilter : AbstractAuthenticationFilter
+        private sealed class AuthenticationFilter : AbstractAuthenticationFilter
         {
             public override void ValidateAuthentication(IHeaderDictionary request)
             {

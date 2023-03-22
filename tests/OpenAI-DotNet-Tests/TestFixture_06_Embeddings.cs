@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_06_Embeddings : AbstractTestFixture
+    internal sealed class TestFixture_06_Embeddings : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_CreateEmbedding()

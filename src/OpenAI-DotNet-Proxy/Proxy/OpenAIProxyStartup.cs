@@ -18,7 +18,7 @@ namespace OpenAI.Proxy
     /// <summary>
     /// Used in ASP.NET Core WebApps to start your own OpenAI web api proxy.
     /// </summary>
-    public class OpenAIProxyStartup
+    public sealed class OpenAIProxyStartup
     {
         private OpenAIClient openAIClient;
         private IAuthenticationFilter authenticationFilter;

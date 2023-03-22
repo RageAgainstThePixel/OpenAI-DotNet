@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_09_FineTuning : AbstractTestFixture
+    internal sealed class TestFixture_09_FineTuning : AbstractTestFixture
     {
         private async Task<FileData> CreateTestTrainingDataAsync()
         {

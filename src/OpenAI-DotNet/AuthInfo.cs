@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    internal class AuthInfo
+    internal sealed class AuthInfo
     {
         internal const string SecretKeyPrefix = "sk-";
         internal const string SessionKeyPrefix = "sess-";

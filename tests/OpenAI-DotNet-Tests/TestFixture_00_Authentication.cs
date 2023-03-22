@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_00_Authentication
+    internal sealed class TestFixture_00_Authentication
     {
         [SetUp]
         public void Setup()

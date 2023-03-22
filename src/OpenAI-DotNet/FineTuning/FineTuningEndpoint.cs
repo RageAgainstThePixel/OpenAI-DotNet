@@ -15,9 +15,9 @@ namespace OpenAI.FineTuning
     /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
     /// <see href="https://beta.openai.com/docs/guides/fine-tuning"/>
     /// </summary>
-    public class FineTuningEndpoint : BaseEndPoint
+    public sealed class FineTuningEndpoint : BaseEndPoint
     {
-        private class FineTuneList
+        private sealed class FineTuneList
         {
             [JsonPropertyName("object")]
             public string Object { get; set; }
@@ -26,7 +26,7 @@ namespace OpenAI.FineTuning
             public List<FineTuneJob> Data { get; set; }
         }
 
-        private class FineTuneEventList
+        private sealed class FineTuneEventList
         {
             [JsonPropertyName("data")]
             public List<Event> Data { get; set; }

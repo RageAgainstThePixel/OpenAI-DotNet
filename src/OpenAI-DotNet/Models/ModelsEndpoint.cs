@@ -14,13 +14,13 @@ namespace OpenAI.Models
     /// </summary>
     public sealed class ModelsEndpoint : BaseEndPoint
     {
-        private class ModelsList
+        private sealed class ModelsList
         {
             [JsonPropertyName("data")]
             public List<Model> Data { get; set; }
         }
 
-        private class DeleteModelResponse
+        private sealed class DeleteModelResponse
         {
             [JsonConstructor]
             public DeleteModelResponse(string id, string @object, bool deleted)

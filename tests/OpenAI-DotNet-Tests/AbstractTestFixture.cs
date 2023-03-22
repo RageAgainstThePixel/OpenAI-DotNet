@@ -6,7 +6,7 @@ namespace OpenAI.Tests
 {
     internal abstract class AbstractTestFixture
     {
-        protected class TestProxyFactory : WebApplicationFactory<Proxy.Program>
+        protected sealed class TestProxyFactory : WebApplicationFactory<Proxy.Program>
         {
             protected override void ConfigureWebHost(IWebHostBuilder builder)
             {

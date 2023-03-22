@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_07_Audio : AbstractTestFixture
+    internal sealed class TestFixture_07_Audio : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_Transcription()

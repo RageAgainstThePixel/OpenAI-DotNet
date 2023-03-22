@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_05_Images : AbstractTestFixture
+    internal sealed class TestFixture_05_Images : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_GenerateImages()

@@ -191,7 +191,7 @@ In this example, we demonstrate how to set up and use `OpenAIProxyStartup` in a 
 ```csharp
 public partial class Program
 {
-    private class AuthenticationFilter : AbstractAuthenticationFilter
+    private sealed class AuthenticationFilter : AbstractAuthenticationFilter
     {
         public override void ValidateAuthentication(IHeaderDictionary request)
         {

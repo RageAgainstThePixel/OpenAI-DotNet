@@ -2,7 +2,7 @@
 
 namespace OpenAI.Images
 {
-    internal class ImageResult
+    internal sealed class ImageResult
     {
         [JsonInclude]
         [JsonPropertyName("url")]

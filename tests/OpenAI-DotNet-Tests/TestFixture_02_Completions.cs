@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_02_Completions : AbstractTestFixture
+    internal sealed class TestFixture_02_Completions : AbstractTestFixture
     {
         private const string CompletionPrompts = "One Two Three Four Five Six Seven Eight Nine One Two Three Four Five Six Seven Eight";
 

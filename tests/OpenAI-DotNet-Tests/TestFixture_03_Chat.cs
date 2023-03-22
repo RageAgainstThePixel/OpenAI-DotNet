@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_03_Chat : AbstractTestFixture
+    internal sealed class TestFixture_03_Chat : AbstractTestFixture
     {
         [Test]
         public async Task Test_1_GetChatCompletion()

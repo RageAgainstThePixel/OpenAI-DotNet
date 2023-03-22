@@ -13,7 +13,7 @@ namespace OpenAI.Audio
     /// </summary>
     public sealed class AudioEndpoint : BaseEndPoint
     {
-        private class AudioResponse
+        private sealed class AudioResponse
         {
             public AudioResponse(string text)
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TextFixture_11_Proxy : AbstractTestFixture
+    internal sealed class TextFixture_11_Proxy : AbstractTestFixture
     {
         [Test]
         public async Task Test_01_Health()
