@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - OpenAI-DotNet/**
+      - src/OpenAI-DotNet/**
   pull_request:
     branches:
       - '*'
     paths:
-      - OpenAI-DotNet/**
+      - src/OpenAI-DotNet/**
 
   workflow_dispatch:
     inputs:
@@ -44,7 +44,7 @@ jobs:
 
     - name: Build Pack and Publish NuGet Package
       run: |
-        $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
+        $projectPath = "${{ github.workspace }}\src\OpenAI-DotNet"
         dotnet build --configuration Release
         dotnet pack $projectPath --configuration Release --include-symbols
         $out = "$projectPath\bin\Release"
@@ -72,6 +72,6 @@ jobs:
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
         path: |
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
+          ${{ github.workspace }}/src/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
+          ${{ github.workspace }}/src/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
         if-no-files-found: ignore

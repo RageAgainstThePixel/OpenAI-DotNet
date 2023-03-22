@@ -3,14 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet", "OpenAI-DotNet\OpenAI-DotNet.csproj", "{76B6480E-154A-4341-B530-AFE04B254360}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI-DotNet-Proxy", "OpenAI-DotNet-Proxy\OpenAI-DotNet-Proxy.csproj", "{A4D454D4-C21C-49D3-85A7-B4950358C6E7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests", "OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj", "{066EC5A5-47CE-4B91-B924-F236644037C1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests-Proxy", "OpenAI-DotNet-Tests-Proxy\OpenAI-DotNet-Tests-Proxy.csproj", "{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{D70C2956-1138-4184-B663-3B55ADB274C8}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.md = LICENSE.md
@@ -40,28 +32,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{31CD998F-EE9
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet", "src\OpenAI-DotNet\OpenAI-DotNet.csproj", "{4510F132-FA6D-42A3-991F-DE6C2D862293}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Proxy", "src\OpenAI-DotNet-Proxy\OpenAI-DotNet-Proxy.csproj", "{F7C10184-895E-48B9-8A21-3B8817701614}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests", "tests\OpenAI-DotNet-Tests\OpenAI-DotNet-Tests.csproj", "{1DE674CB-A4E7-44F2-BC8D-286EECFDC698}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests-Proxy", "tests\OpenAI-DotNet-Tests-Proxy\OpenAI-DotNet-Tests-Proxy.csproj", "{38E68580-CF75-4B21-B74B-67AB7B5098D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{76B6480E-154A-4341-B530-AFE04B254360}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76B6480E-154A-4341-B530-AFE04B254360}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76B6480E-154A-4341-B530-AFE04B254360}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76B6480E-154A-4341-B530-AFE04B254360}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A4D454D4-C21C-49D3-85A7-B4950358C6E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4D454D4-C21C-49D3-85A7-B4950358C6E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A4D454D4-C21C-49D3-85A7-B4950358C6E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A4D454D4-C21C-49D3-85A7-B4950358C6E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{066EC5A5-47CE-4B91-B924-F236644037C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{066EC5A5-47CE-4B91-B924-F236644037C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{066EC5A5-47CE-4B91-B924-F236644037C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{066EC5A5-47CE-4B91-B924-F236644037C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4510F132-FA6D-42A3-991F-DE6C2D862293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4510F132-FA6D-42A3-991F-DE6C2D862293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4510F132-FA6D-42A3-991F-DE6C2D862293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4510F132-FA6D-42A3-991F-DE6C2D862293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7C10184-895E-48B9-8A21-3B8817701614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7C10184-895E-48B9-8A21-3B8817701614}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7C10184-895E-48B9-8A21-3B8817701614}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7C10184-895E-48B9-8A21-3B8817701614}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DE674CB-A4E7-44F2-BC8D-286EECFDC698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DE674CB-A4E7-44F2-BC8D-286EECFDC698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DE674CB-A4E7-44F2-BC8D-286EECFDC698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DE674CB-A4E7-44F2-BC8D-286EECFDC698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38E68580-CF75-4B21-B74B-67AB7B5098D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38E68580-CF75-4B21-B74B-67AB7B5098D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38E68580-CF75-4B21-B74B-67AB7B5098D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38E68580-CF75-4B21-B74B-67AB7B5098D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
