@@ -38,7 +38,7 @@ Install-Package OpenAI-DotNet
 
 - [Authentication](#authentication)
 - [Azure OpenAI](#azure-openai)
-- [OpenAI API Proxy](#new-openai-api-proxy) :new:
+- [OpenAI API Proxy](#openai-api-proxy) :new:
 - [Models](#models)
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
@@ -149,7 +149,7 @@ var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymen
 var api = new OpenAIClient(auth, settings);
 ```
 
-### :new: OpenAI API Proxy
+### OpenAI API Proxy
 
 Using either the [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) or [com.openai.unity](https://github.com/RageAgainstThePixel/com.openai.unity) packages directly in your front-end app may expose your API keys and other sensitive information. To mitigate this risk, it is recommended to set up an intermediate API that makes requests to OpenAI on behalf of your front-end app. This library can be utilized for both front-end and intermediary host configurations, ensuring secure communication with the OpenAI API.
 
@@ -221,6 +221,8 @@ Once you have set up your proxy server, your end users can now make authenticate
 
 List and describe the various models available in the API. You can refer to the [Models documentation](https://beta.openai.com/docs/models) to understand what models are available and the differences between them.
 
+Also checkout [model endpoint compatibility](https://platform.openai.com/docs/models/model-endpoint-compatibility) to understand which models work with which endpoints.
+
 The Models API is accessed via `OpenAIClient.ModelsEndpoint`
 
 #### [List models](https://beta.openai.com/docs/api-reference/models/list)
@@ -239,7 +241,7 @@ foreach (var model in models)
 
 #### [Retrieve model](https://beta.openai.com/docs/api-reference/models/retrieve)
 
-Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
+Retrieves a model instance, providing basic information about the model such as the owner and permissions.
 
 ```csharp
 var api = new OpenAIClient();
@@ -260,6 +262,8 @@ Assert.IsTrue(result);
 ### [Completions](https://beta.openai.com/docs/api-reference/completions)
 
 Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
+
+The Completions API is accessed via `OpenAIClient.CompletionsEndpoint`
 
 ```csharp
 var api = new OpenAIClient();
@@ -298,6 +302,8 @@ await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAs
 ### [Chat](https://platform.openai.com/docs/api-reference/chat)
 
 Given a chat conversation, the model will return a chat completion response.
+
+The Chat API is accessed via `OpenAIClient.ChatEndpoint`
 
 #### [Chat Completions](https://platform.openai.com/docs/api-reference/chat/create)
 
@@ -394,6 +400,8 @@ Console.WriteLine(result);
 ### [Audio](https://beta.openai.com/docs/api-reference/audio)
 
 Converts audio into text.
+
+The Audio API is accessed via `OpenAIClient.AudioEndpoint`
 
 #### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/create)
 

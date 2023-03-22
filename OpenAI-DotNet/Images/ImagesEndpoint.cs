@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace OpenAI.Images
 {
     /// <summary>
-    /// Creates an image given a prompt.
+    /// Given a prompt and/or an input image, the model will generate a new image.<br/>
+    /// <see href="https://platform.openai.com/docs/api-reference/images"/>
     /// </summary>
     public sealed class ImagesEndpoint : BaseEndPoint
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace OpenAI.Embeddings
 {
     /// <summary>
-    /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
+    /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.<br/>
     /// <see href="https://beta.openai.com/docs/guides/embeddings"/>
     /// </summary>
     public sealed class EmbeddingsEndpoint : BaseEndPoint
