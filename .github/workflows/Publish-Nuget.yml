@@ -11,6 +11,11 @@ on:
       - '*'
     paths:
       - OpenAI-DotNet/**
+    types:
+      - opened
+      - synchronize
+    conditions:
+      - ${{ !github.event.pull_request.draft }}
 
   workflow_dispatch:
     inputs:
