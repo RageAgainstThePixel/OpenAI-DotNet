@@ -45,9 +45,10 @@ jobs:
     - name: Build Pack and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
-        dotnet build $projectPath --configuration Release
+        dotnet build --configuration Release
+        dotnet pack $projectPath --configuration Release --include-symbols
         $out = "$projectPath\bin\Release"
-        $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Recurse -ErrorAction SilentlyContinue
+        $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Exclude '*symbols*' -Recurse -ErrorAction SilentlyContinue
 
         if ($packagePath) {
           Write-Host Package path: $packagePath
@@ -59,7 +60,7 @@ jobs:
         $isRelease = "${{ github.ref == 'refs/heads/main' }}"
 
         if ($isRelease -eq 'true') {
-          dotnet nuget push $packagePath --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push $packagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
 
         $version = $packagePath.Name -replace "^OpenAI-DotNet.(.*).nupkg$",'$1'
@@ -70,5 +71,7 @@ jobs:
       if: always()
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
-        path: ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
+        path: |
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
         if-no-files-found: ignore

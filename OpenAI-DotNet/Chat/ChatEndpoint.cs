@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Chat
 {
+    /// <summary>
+    /// Given a chat conversation, the model will return a chat completion response.<br/>
+    /// <see href="https://platform.openai.com/docs/api-reference/chat"/>
+    /// </summary>
     public sealed class ChatEndpoint : BaseEndPoint
     {
         /// <inheritdoc />

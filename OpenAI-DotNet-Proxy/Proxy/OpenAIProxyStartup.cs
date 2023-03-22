@@ -3,13 +3,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;
 
 namespace OpenAI.Proxy
 {
@@ -20,6 +22,30 @@ namespace OpenAI.Proxy
     {
         private OpenAIClient openAIClient;
         private IAuthenticationFilter authenticationFilter;
+
+        // Copied from https://github.com/microsoft/reverse-proxy/blob/51d797986b1fea03500a1ad173d13a1176fb5552/src/ReverseProxy/Forwarder/RequestUtilities.cs#L61-L83
+        private static readonly HashSet<string> ExcludedHeaders = new HashSet<string>()
+        {
+            HeaderNames.Connection,
+            HeaderNames.TransferEncoding,
+            HeaderNames.KeepAlive,
+            HeaderNames.Upgrade,
+            "Proxy-Connection",
+            "Proxy-Authenticate",
+            "Proxy-Authentication-Info",
+            "Proxy-Authorization",
+            "Proxy-Features",
+            "Proxy-Instruction",
+            "Security-Scheme",
+            "ALPN",
+            "Close",
+            HeaderNames.TE,
+#if NET
+            HeaderNames.AltSvc,
+#else
+            "Alt-Svc",
+#endif
+        };
 
         public void ConfigureServices(IServiceCollection services) { }
 
@@ -74,8 +100,10 @@ namespace OpenAI.Proxy
         {
             // Respond with a 200 OK status code and a plain text message
             context.Response.StatusCode = StatusCodes.Status200OK;
-            context.Response.ContentType = "text/plain";
-            await context.Response.WriteAsync("OK");
+            const string contentType = "text/plain";
+            context.Response.ContentType = contentType;
+            const string content = "OK";
+            await context.Response.WriteAsync(content);
         }
 
         /// <summary>
@@ -101,19 +129,22 @@ namespace OpenAI.Proxy
                 var proxyResponse = await openAIClient.Client.SendAsync(openAIRequest, HttpCompletionOption.ResponseHeadersRead);
                 httpContext.Response.StatusCode = (int)proxyResponse.StatusCode;
 
-                foreach (var header in proxyResponse.Headers)
+                foreach (var (key, value) in proxyResponse.Headers)
                 {
-                    httpContext.Response.Headers[header.Key] = header.Value.ToArray();
+                    if (ExcludedHeaders.Contains(key)) { continue; }
+                    httpContext.Response.Headers[key] = value.ToArray();
                 }
 
-                foreach (var header in proxyResponse.Content.Headers)
+                foreach (var (key, value) in proxyResponse.Content.Headers)
                 {
-                    httpContext.Response.Headers[header.Key] = header.Value.ToArray();
+                    if (ExcludedHeaders.Contains(key)) { continue; }
+                    httpContext.Response.Headers[key] = value.ToArray();
                 }
 
                 httpContext.Response.ContentType = proxyResponse.Content.Headers.ContentType?.ToString() ?? string.Empty;
+                const string streamingContent = "text/event-stream";
 
-                if (httpContext.Response.ContentType.Equals("text/event-stream"))
+                if (httpContext.Response.ContentType.Equals(streamingContent))
                 {
                     var stream = await proxyResponse.Content.ReadAsStreamAsync();
                     await WriteServerStreamEventsAsync(httpContext, stream);
