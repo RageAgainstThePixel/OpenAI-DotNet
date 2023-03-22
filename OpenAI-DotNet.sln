@@ -9,6 +9,35 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests", "Open
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI-DotNet-Tests-Proxy", "OpenAI-DotNet-Tests-Proxy\OpenAI-DotNet-Tests-Proxy.csproj", "{F8B5D079-FD33-4A9E-92C4-CC88C911CFF3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{D70C2956-1138-4184-B663-3B55ADB274C8}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{AD305016-36C6-483A-9751-750A7A6EC175}"
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\FUNDING.yml = .github\FUNDING.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Issue Templates", "Issue Templates", "{73595B69-2048-459D-AE1B-1A002188D61E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{2D2935BA-9255-4814-8207-E4C6FCBE8763}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\Publish-Nuget.yml = .github\workflows\Publish-Nuget.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{31CD998F-EE92-4B15-9FF5-EE1A0CBEEDB7}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +59,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AD305016-36C6-483A-9751-750A7A6EC175} = {D70C2956-1138-4184-B663-3B55ADB274C8}
+		{73595B69-2048-459D-AE1B-1A002188D61E} = {AD305016-36C6-483A-9751-750A7A6EC175}
+		{2D2935BA-9255-4814-8207-E4C6FCBE8763} = {AD305016-36C6-483A-9751-750A7A6EC175}
+		{31CD998F-EE92-4B15-9FF5-EE1A0CBEEDB7} = {D70C2956-1138-4184-B663-3B55ADB274C8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {971477B1-6BBA-40CD-8B76-AEBC01D99130}
