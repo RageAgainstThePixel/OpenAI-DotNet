@@ -9,7 +9,7 @@ namespace OpenAI.FineTuning
     /// where you might input detailed instructions or multiple examples in a single prompt.
     /// <see href="https://beta.openai.com/docs/guides/fine-tuning/specific-guidelines"/>
     /// </summary>
-    public class FineTuningTrainingData
+    public sealed class FineTuningTrainingData
     {
         /// <summary>
         /// Constructor.

@@ -11,6 +11,9 @@ on:
       - '*'
     paths:
       - OpenAI-DotNet/**
+    types:
+      - opened
+      - synchronize
 
   workflow_dispatch:
     inputs:
@@ -24,6 +27,7 @@ env:
 
 jobs:
   build:
+    if: ${{ !github.event_name == 'pull_request' || !github.event.pull_request.draft }}
     runs-on: windows-latest
 
     steps:
@@ -45,7 +49,12 @@ jobs:
     - name: Build Pack and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
+        $proxyProjectPath = "${{ github.workspace }}\OpenAI-DotNet-Proxy"
+
+        # build all
         dotnet build --configuration Release
+
+        # pack OpenAI-DotNet
         dotnet pack $projectPath --configuration Release --include-symbols
         $out = "$projectPath\bin\Release"
         $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Exclude '*symbols*' -Recurse -ErrorAction SilentlyContinue
@@ -57,10 +66,23 @@ jobs:
           exit 1
         }
 
+        # pack OpenAI-DotNet-Proxy
+        dotnet pack $proxyProjectPath --configuration Release --include-symbols
+        $proxyOut = "$proxyProjectPath\bin\Release"
+        $proxyPackagePath = Get-ChildItem -Path $proxyOut -File -Include '*.nupkg' -Exclude '*symbols*' -Recurse -ErrorAction SilentlyContinue
+
+        if ($proxyPackagePath) {
+          Write-Host Package path: $proxyPackagePath
+        } else {
+          Write-Host Failed to find package at $proxyOut
+          exit 1
+        }
+
         $isRelease = "${{ github.ref == 'refs/heads/main' }}"
 
         if ($isRelease -eq 'true') {
           dotnet nuget push $packagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push $proxyPackagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
 
         $version = $packagePath.Name -replace "^OpenAI-DotNet.(.*).nupkg$",'$1'
@@ -74,4 +96,6 @@ jobs:
         path: |
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.symbols.nupkg
         if-no-files-found: ignore

@@ -3,14 +3,95 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>Stephen Hodgson</Authors>
+    <Product>OpenAI-DotNet</Product>
+    <Description>A simple C# .NET client library for OpenAI  to use chat-gpt, gpt-4, gpt-3.5-turbo and Dall-E though their RESTful API (currently in beta). Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
+
+Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
+
+More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
+</Description>
+    <Copyright>2023</Copyright>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
+    <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
+    <Title>OpenAI API</Title>
+    <PackageReleaseNotes>Bump version to 6.4.0
+- Moved OpenAI-DotNet-Proxy back into its own project and package
+- Make a few classes sealed that are not meant to be extended
+Bump version to 6.3.2
+- Attempt to fix dependency requirement for dotnet/runtime docker base images
+- Made internal OpenAIClient constructor with HttpClient public
+- Make sure we only copy the appropriate headers in the proxy
+Bump version to 6.3.1
+- Fixed apikey requiring sk- prefix with Azure OpenAI
+Bump version to 6.3.0
+- Removed OpenAI-DotNet-Proxy and put it directly in package on its own
+Bump version to 6.2.0
+- Added OpenAI-DotNet-Proxy project and package.
+- Added support for custom domains
+- Updated unit tests
+- Updated docs
+Bump version to 6.1.0
+- Added support for gpt-4 models
+Bump version to 6.0.1
+- Updated package info
+- Updated docs
+Bump version to 6.0.0
+- Added support for Azure OpenAI
+Bump version to 5.1.2
+- Fixed an issue when deleting personal account fine tuned models
+Bump version to 5.1.1
+- Refactored Model validation
+- Added additional default models
+- Deprecate OpenAIClient.DefaultModel
+- Implemented chat completion streaming
+- Refactored immutable types
+Bump version to 5.1.0
+- Add support for Audio endpoint and Whisper models
+  - Audio Speech to text
+  - Audio translation
+Bump version to 5.0.2
+- Support multiple inputs in embedding
+- Added better model validation in all endpoints
+Bump version to 5.0.1
+- Fixed chat parameters
+Bump version to 5.0.0
+- Added Chat endpoint
+Bump version to 4.4.4
+- ImageEditRequest mask is now optional so long as texture has alpha transparency
+- ImageVariationRequest added constructor overload for memory stream image
+- Updated AuthInfo parameter validation
+- Renamed OPEN_AI_ORGANIZATION_ID -&gt; OPENAI_ORGANIZATION_ID
+Bump version to 4.4.3
+- added OPEN_AI_ORGANIZATION_ID environment variable
+- deprecated Organization use OrganizationId instead
+Bump version to 4.4.2
+- Removed a useless assert
+- Updated docs
+Bump version to 4.4.1
+- hotfix to CompletionsEndpoint to use IEnumerable&lt;string&gt;
+- hotfix to cleanup Images endpoints
+Bump version to 4.4.0
+- Renamed Choice.Logprobs -&gt; Choice.LogProbabilities
+- Renamed OpenAI.Completions.Logprobs -&gt; OpenAI.Completions.OpenAI.Completions
+- Renamed CompletionRequest parameter names:
+  - max_tokens -&gt; maxTokens
+  - top_p -&gt; topP
+- Updated CompletionRequest to accept IEnumerable&lt;string&gt; values for prompts and stopSequences
+- Refactored all endpoints to use new response validation extension
+- Added CancellationToken to most endpoints that had long running operations</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
-    <NuspecFile>OpenAI-DotNet.nuspec</NuspecFile>
+    <PackageId>OpenAI-DotNet</PackageId>
+    <Version>$(OpenAIDotNetVersion)</Version>
+    <Company>RageAgainstThePixel</Company>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md">

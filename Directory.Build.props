@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <OpenAIDotNetVersion>6.4.0</OpenAIDotNetVersion>
+  </PropertyGroup>
+</Project>

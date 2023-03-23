@@ -1,16 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>OpenAI_DotNet_Proxy</RootNamespace>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <LangVersion>latest</LangVersion>
-    <OutputPath>..\OpenAI-DotNet\bin\$(Configuration)\</OutputPath>
-  </PropertyGroup>
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>false</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <SignAssembly>false</SignAssembly>
+        <Authors>Stephen Hodgson</Authors>
+        <Product>OpenAI-DotNet-Proxy</Product>
+        <Description>A simple Proxy API gateway for OpenAI-DotNet to make authenticated requests from a front end application without exposing your API keys.</Description>
+        <Copyright>2023</Copyright>
+        <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
+        <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-turbo, gpt-3, chatGPT, api-proxy, proxy, gateway</PackageTags>
+        <Title>OpenAI API Proxy</Title>
+        <PackageId>OpenAI-DotNet-Proxy</PackageId>
+        <Version>$(OpenAIDotNetVersion)</Version>
+        <Company>RageAgainstThePixel</Company>
+        <RootNamespace>OpenAI.Proxy</RootNamespace>
+        <PackageIcon>OpenAI-DotNet-Icon.png</PackageIcon>
+        <PackageReleaseNotes>Initial Release!</PackageReleaseNotes>
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <IncludeSymbols>True</IncludeSymbols>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="..\OpenAI-DotNet\Assets\OpenAI-DotNet-Icon.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+      <None Update="Readme.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
 </Project>
