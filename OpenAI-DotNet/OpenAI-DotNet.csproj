@@ -17,7 +17,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Bump version to 6.4.0
+    <PackageReleaseNotes>Bump version to 6.4.1
+- Added ImageEditRequest overloads for optional mask parameter
+Bump version to 6.4.0
 - Moved OpenAI-DotNet-Proxy back into its own project and package
 - Make a few classes sealed that are not meant to be extended
 Bump version to 6.3.2
