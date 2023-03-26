@@ -39,6 +39,7 @@ Install-Package OpenAI-DotNet
 
 - [Authentication](#authentication)
 - [Azure OpenAI](#azure-openai)
+  - [Azure Active Directory Authentication](#azure-active-directory-authentication) :new:
 - [OpenAI API Proxy](#openai-api-proxy) :new:
 - [Models](#models)
   - [List Models](#list-models)
@@ -147,6 +148,20 @@ To setup the client to use your deployment, you'll need to pass in `OpenAIClient
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
 var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id");
+var api = new OpenAIClient(auth, settings);
+```
+
+#### [Azure Active Directory Authentication](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#authentication)
+
+[Authenticate with MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) as usual and get access token, then use the access token when creating your `OpenAIAuthentication`. Then be sure to set useAzureActiveDirectory to true when creating your `OpenAIClientSettings`.
+
+[Tutorial: Desktop app that calls web APIs: Acquire a token](https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-desktop-acquire-token?tabs=dotnet)
+
+```csharp
+// get your access token using any of the MSAL methods
+var accessToken = result.AccessToken;
+var auth = new OpenAIAuthentication(accessToken);
+var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id", useActiveDirectoryAuthentication: true);
 var api = new OpenAIClient(auth, settings);
 ```
 

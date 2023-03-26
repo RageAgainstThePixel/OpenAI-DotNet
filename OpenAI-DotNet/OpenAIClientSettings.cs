@@ -22,6 +22,7 @@ namespace OpenAI
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
+            UseOAuthAuthentication = true;
         }
 
         /// <summary>
@@ -52,6 +53,7 @@ namespace OpenAI
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
+            UseOAuthAuthentication = true;
         }
 
         /// <summary>
@@ -67,7 +69,10 @@ namespace OpenAI
         /// <param name="apiVersion">
         /// Optional, defaults to 2022-12-01
         /// </param>
-        public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = DefaultAzureApiVersion)
+        /// <param name="useActiveDirectoryAuthentication">
+        /// Optional, set to true if you want to use Azure Active Directory for Authentication.
+        /// </param>
+        public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = DefaultAzureApiVersion, bool useActiveDirectoryAuthentication = false)
         {
             if (string.IsNullOrWhiteSpace(resourceName))
             {
@@ -90,6 +95,7 @@ namespace OpenAI
             ApiVersion = apiVersion;
             BaseRequest = $"/openai/deployments/{DeploymentId}/";
             BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}?api-version={ApiVersion}";
+            UseOAuthAuthentication = useActiveDirectoryAuthentication;
         }
 
         public string ResourceName { get; }
@@ -101,6 +107,8 @@ namespace OpenAI
         internal string BaseRequest { get; }
 
         internal string BaseRequestUrlFormat { get; }
+
+        internal bool UseOAuthAuthentication { get; }
 
         public static OpenAIClientSettings Default { get; } = new OpenAIClientSettings();
     }
