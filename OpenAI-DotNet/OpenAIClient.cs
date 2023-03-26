@@ -84,15 +84,16 @@ namespace OpenAI
             client ??= new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain))
-            {
-                if (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
+            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain)
+                && (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
                     (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
-                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix)))
-                {
-                    throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
-                }
+                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
+            {
+                throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
+            }
 
+            if (OpenAIClientSettings.UseOAuthAuthentication)
+            {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             }
             else
@@ -130,6 +131,8 @@ namespace OpenAI
 
         /// <summary>
         /// List and describe the various models available in the API.
+        /// You can refer to the Models documentation to understand what <see href="https://beta.openai.com/docs/models"/> are available and the differences between them.<br/>
+        /// <see href="https://beta.openai.com/docs/api-reference/models"/>
         /// </summary>
         public ModelsEndpoint ModelsEndpoint { get; }
 
