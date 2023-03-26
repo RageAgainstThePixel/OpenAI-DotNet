@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Edits
 {
+    [Obsolete]
     public sealed class EditResponse : BaseResponse
     {
         [JsonInclude]
