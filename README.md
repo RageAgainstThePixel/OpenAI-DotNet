@@ -382,6 +382,7 @@ await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(ch
 ### [Edits](https://beta.openai.com/docs/api-reference/edits)
 
 > :warning: The models for this endpoint have been removed making it no longer usable.
+>
 > [See forum post for more details](https://community.openai.com/t/the-model-text-davinci-edit-001-does-not-exist/116144).
 
 Given a prompt and an instruction, the model will return an edited version of the prompt.
