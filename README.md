@@ -150,7 +150,7 @@ var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymen
 var api = new OpenAIClient(auth, settings);
 ```
 
-### OpenAI API Proxy
+### [OpenAI API Proxy](OpenAI-DotNet-Proxy/Readme.md)
 
 [![NuGet version (OpenAI-DotNet-Proxy)](https://img.shields.io/nuget/v/OpenAI-DotNet-Proxy.svg?label=OpenAI-DotNet-Proxy&logo=nuget)](https://www.nuget.org/packages/OpenAI-DotNet-Proxy/)
 
