@@ -8,6 +8,7 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -70,7 +71,9 @@ namespace OpenAI
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
             ChatEndpoint = new ChatEndpoint(this);
+#pragma warning disable CS0618
             EditsEndpoint = new EditsEndpoint(this);
+#pragma warning restore CS0618
             ImagesEndPoint = new ImagesEndpoint(this);
             EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
             AudioEndpoint = new AudioEndpoint(this);
@@ -156,6 +159,7 @@ namespace OpenAI
         /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
         /// <see href="https://beta.openai.com/docs/api-reference/edits"/>
         /// </summary>
+        [Obsolete("Models removed by OpenAI")]
         public EditsEndpoint EditsEndpoint { get; }
 
         /// <summary>
