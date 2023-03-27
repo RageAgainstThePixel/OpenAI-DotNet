@@ -1,10 +1,9 @@
-﻿using OpenAI.Models;
-using System;
+﻿using System;
 using System.Text.Json.Serialization;
+using OpenAI.Models;
 
 namespace OpenAI.Edits
 {
-    [Obsolete]
     public sealed class EditRequest
     {
         /// <summary>
