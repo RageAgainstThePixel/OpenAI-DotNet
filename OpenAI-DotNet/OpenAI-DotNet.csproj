@@ -17,7 +17,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.5.0
+    <PackageReleaseNotes>Version 6.5.1
+- Removed Obsolete from EditEndpoint as it has now been fixed by OpenAI
+Version 6.5.0
 - Marked EditEndpoint Obsolete as codex and edit models have been removed
 Version 6.4.3
 - Fixed support for Azure Active Directory authentication for Azure OpenAI
@@ -97,7 +99,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.5.0</Version>
+    <Version>6.5.1</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
