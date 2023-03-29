@@ -147,9 +147,17 @@ To setup the client to use your deployment, you'll need to pass in `OpenAIClient
 
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id");
+var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id", apiVersion: "your-api-version");
 var api = new OpenAIClient(auth, settings);
 ```
+For example, when in the Azure Playground, you can click the `View Code` button and view a URL like this:
+
+https://myresource.openai.azure.com/openai/deployments/GPT-35-Turbo/chat/completions?api-version=2023-03-15-preview
+
+That would be translated as follows:
+`resourceName`: myresource
+`deploymentId`: GPT-35-Turbo
+`apiVersion`: 2023-03-15-preview
 
 #### [Azure Active Directory Authentication](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#authentication)
 
