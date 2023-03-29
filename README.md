@@ -172,7 +172,7 @@ var api = new OpenAIClient(auth, settings);
 // get your access token using any of the MSAL methods
 var accessToken = result.AccessToken;
 var auth = new OpenAIAuthentication(accessToken);
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id", useActiveDirectoryAuthentication: true);
+var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
 var api = new OpenAIClient(auth, settings);
 ```
 
