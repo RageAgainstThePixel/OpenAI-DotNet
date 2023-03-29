@@ -151,7 +151,7 @@ var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymen
 var api = new OpenAIClient(auth, settings);
 ```
 For example, when in the Azure Playground, you can click the `View Code` button and view a URL like this:
-
+`https://{resourceName}.openai.azure.com/openai/deployments/{deploymentId}/chat/completions?api-version={apiVersion}`
 
 That would be translated as follows:
 `resourceName`: myresource
