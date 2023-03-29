@@ -143,11 +143,22 @@ var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 ### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)
 
 You can also choose to use Microsoft's Azure OpenAI deployments as well.
+
+You can find the required information in the Azure Playground by clicking the `View Code` button and view a URL like this:
+
+```markdown
+https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}
+```
+
+- `your-resource-name` The name of your Azure OpenAI Resource.
+- `deployment-id` The deployment name you chose when you deployed the model.
+- `api-version` The API version to use for this operation. This follows the YYYY-MM-DD format.
+
 To setup the client to use your deployment, you'll need to pass in `OpenAIClientSettings` into the client constructor.
 
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id");
+var settings = new OpenAIClientSettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
 var api = new OpenAIClient(auth, settings);
 ```
 
@@ -161,7 +172,7 @@ var api = new OpenAIClient(auth, settings);
 // get your access token using any of the MSAL methods
 var accessToken = result.AccessToken;
 var auth = new OpenAIAuthentication(accessToken);
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "your-deployment-id", useActiveDirectoryAuthentication: true);
+var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
 var api = new OpenAIClient(auth, settings);
 ```
 
