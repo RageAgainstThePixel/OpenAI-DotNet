@@ -152,7 +152,6 @@ var api = new OpenAIClient(auth, settings);
 ```
 For example, when in the Azure Playground, you can click the `View Code` button and view a URL like this:
 
-https://myresource.openai.azure.com/openai/deployments/GPT-35-Turbo/chat/completions?api-version=2023-03-15-preview
 
 That would be translated as follows:
 `resourceName`: myresource
