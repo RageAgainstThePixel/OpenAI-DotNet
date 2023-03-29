@@ -165,7 +165,7 @@ namespace OpenAI.Files
             }
 
             var filePath = Path.Combine(directory, fileData.FileName);
-            await using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate).ConfigureAwait(false);
+            await using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate);
             await response.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
             return filePath;
         }
