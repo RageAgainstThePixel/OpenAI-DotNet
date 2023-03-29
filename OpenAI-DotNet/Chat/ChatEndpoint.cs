@@ -52,12 +52,12 @@ namespace OpenAI.Chat
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            await response.CheckResponseAsync(cancellationToken);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync() is { } line)
+            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
                 if (line.StartsWith("data: "))
                 {
@@ -93,12 +93,12 @@ namespace OpenAI.Chat
             {
                 Content = jsonContent
             };
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            await response.CheckResponseAsync(cancellationToken);
+            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync() is { } line &&
+            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
                    !cancellationToken.IsCancellationRequested)
             {
                 if (line.StartsWith("data: "))

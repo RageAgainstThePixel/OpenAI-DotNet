@@ -90,7 +90,7 @@ namespace OpenAI.Images
             if (request.Mask != null)
             {
                 using var maskData = new MemoryStream();
-                await request.Mask.CopyToAsync(maskData, cancellationToken);
+                await request.Mask.CopyToAsync(maskData, cancellationToken).ConfigureAwait(false);
                 content.Add(new ByteArrayContent(maskData.ToArray()), "mask", request.MaskName);
             }
 

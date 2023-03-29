@@ -17,7 +17,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.5.2
+    <PackageReleaseNotes>Version 6.5.3
+- Added missing ConfigureAwait to await calls
+Version 6.5.2
 - Updated SetResponseData to better reflect the difference between OpenAI and Azure responses.
 - Updated ProcessingTime parsing from int to double
 Version 6.5.1
@@ -102,7 +104,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.5.2</Version>
+    <Version>6.5.3</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
