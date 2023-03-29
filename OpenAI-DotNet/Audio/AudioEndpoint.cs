@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -73,7 +73,7 @@ namespace OpenAI.Audio
         }
 
         /// <summary>
-        /// Translates audio into into English.
+        /// Translates audio into English.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
