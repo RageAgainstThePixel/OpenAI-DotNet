@@ -71,6 +71,6 @@ namespace OpenAI.Images
         /// Optional: The format in which the generated images are returned. Must be one of url or b64_json. Defaults to url
         /// </summary>
         [JsonPropertyName("response_format")]
-        public string ResponseFormat { get; } = "url;
+        public string ResponseFormat { get; } = "url";
     }
 }
