@@ -28,9 +28,10 @@ namespace OpenAI.Images
         /// <param name="size">The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.</param>
         /// <param name="user">A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <param name="responseFormat">The format in which the generated images are returned. Must be one of url or b64_json.</param>        
         /// <returns>A list of generated texture urls to download.</returns>
-        public async Task<IReadOnlyList<string>> GenerateImageAsync(string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, CancellationToken cancellationToken = default)
-            => await GenerateImageAsync(new ImageGenerationRequest(prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        public async Task<IReadOnlyList<string>> GenerateImageAsync(string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url", CancellationToken cancellationToken = default)
+            => await GenerateImageAsync(new ImageGenerationRequest(prompt, numberOfResults, size, user, responseFormat), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates an image given a prompt.
