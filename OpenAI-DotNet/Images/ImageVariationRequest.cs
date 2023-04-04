@@ -20,8 +20,11 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
-            : this(File.OpenRead(imagePath), Path.GetFileName(imagePath), numberOfResults, size, user)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
+            : this(File.OpenRead(imagePath), Path.GetFileName(imagePath), numberOfResults, size, user, responseFormat)
         {
         }
 
@@ -43,7 +46,10 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageVariationRequest(Stream image, string imageName, int numberOfResults, ImageSize size, string user)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageVariationRequest(Stream image, string imageName, int numberOfResults, ImageSize size, string user, string responseFormat = "url")
         {
             Image = image;
 
@@ -70,6 +76,7 @@ namespace OpenAI.Images
             };
 
             User = user;
+            ResponseFormat = responseFormat;
         }
 
         ~ImageVariationRequest() => Dispose(false);
@@ -95,6 +102,11 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         public string User { get; }
+
+        /// <summary>
+        /// The format in which the generated images are returned. Must be one of url or b64_json. Defaults to "url"
+        /// </summary>
+        public string ResponseFormat { get; }
 
         private void Dispose(bool disposing)
         {

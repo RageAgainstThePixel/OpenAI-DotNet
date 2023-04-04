@@ -2,6 +2,7 @@
 using OpenAI.Images;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -13,10 +14,11 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
+            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small, responseFormat: "b64_json");
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
+            Assert.IsNotEmpty(results.First());
 
             foreach (var result in results)
             {
