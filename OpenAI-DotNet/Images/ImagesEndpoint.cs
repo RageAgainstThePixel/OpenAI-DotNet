@@ -128,11 +128,14 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<IReadOnlyList<string>> CreateImageVariationAsync(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, CancellationToken cancellationToken = default)
-            => await CreateImageVariationAsync(new ImageVariationRequest(imagePath, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        public async Task<IReadOnlyList<string>> CreateImageVariationAsync(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url", CancellationToken cancellationToken = default)
+            => await CreateImageVariationAsync(new ImageVariationRequest(imagePath, numberOfResults, size, user, responseFormat), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates a variation of a given image.
@@ -149,6 +152,7 @@ namespace OpenAI.Images
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
+            content.Add(new StringContent(request.ResponseFormat), "response_format");
 
             if (!string.IsNullOrWhiteSpace(request.User))
             {
