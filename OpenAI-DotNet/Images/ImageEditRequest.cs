@@ -24,7 +24,10 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageEditRequest(string imagePath, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageEditRequest(string imagePath, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
             : this(imagePath, null, prompt, numberOfResults, size, user)
         {
         }
@@ -52,7 +55,10 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageEditRequest(string imagePath, string maskPath, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageEditRequest(string imagePath, string maskPath, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
             : this(
                 File.OpenRead(imagePath),
                 Path.GetFileName(imagePath),
@@ -61,7 +67,8 @@ namespace OpenAI.Images
                 prompt,
                 numberOfResults,
                 size,
-                user)
+                user,
+                responseFormat)
         {
         }
 
@@ -85,8 +92,11 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageEditRequest(Stream image, string imageName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
-            : this(image, imageName, null, null, prompt, numberOfResults, size, user)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageEditRequest(Stream image, string imageName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
+            : this(image, imageName, null, null, prompt, numberOfResults, size, user, responseFormat)
         {
         }
 
@@ -115,7 +125,10 @@ namespace OpenAI.Images
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        public ImageEditRequest(Stream image, string imageName, Stream mask, string maskName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null)
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// </param>
+        public ImageEditRequest(Stream image, string imageName, Stream mask, string maskName, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
         {
             Image = image;
 
@@ -161,6 +174,7 @@ namespace OpenAI.Images
             };
 
             User = user;
+            ResponseFormat = responseFormat;
         }
 
         ~ImageEditRequest() => Dispose(false);
@@ -200,6 +214,11 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         public string User { get; }
+
+        /// <summary>
+        /// The format in which the generated images are returned. Must be one of url or b64_json. Defaults to "url"
+        /// </summary>
+        public string ResponseFormat { get; }
 
         private void Dispose(bool disposing)
         {
