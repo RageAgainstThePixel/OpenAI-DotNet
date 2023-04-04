@@ -23,14 +23,33 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates an image given a prompt.
         /// </summary>
-        /// <param name="prompt">A text description of the desired image(s). The maximum length is 1000 characters.</param>
-        /// <param name="numberOfResults">The number of images to generate. Must be between 1 and 10.</param>
-        /// <param name="size">The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.</param>
-        /// <param name="user">A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <param name="responseFormat">The format in which the generated images are returned. Must be one of url or b64_json.</param>        
+        /// <param name="prompt">
+        /// A text description of the desired image(s). The maximum length is 1000 characters.
+        /// </param>
+        /// <param name="numberOfResults">
+        /// The number of images to generate. Must be between 1 and 10.
+        /// </param>
+        /// <param name="size">
+        /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
+        /// </param>
+        /// <param name="user">
+        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
+        /// </param>
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Optional, <see cref="CancellationToken"/>.
+        /// </param>
         /// <returns>A list of generated texture urls to download.</returns>
-        public async Task<IReadOnlyList<string>> GenerateImageAsync(string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url", CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<string>> GenerateImageAsync(
+            string prompt,
+            int numberOfResults = 1,
+            ImageSize size = ImageSize.Large,
+            string user = null,
+            ResponseFormat responseFormat = ResponseFormat.Url,
+            CancellationToken cancellationToken = default)
             => await GenerateImageAsync(new ImageGenerationRequest(prompt, numberOfResults, size, user, responseFormat), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -44,7 +63,7 @@ namespace OpenAI.Images
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -67,13 +86,26 @@ namespace OpenAI.Images
         /// <param name="size">
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
         /// </param>
-        /// <param name="user">A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.</param>
-        /// <param name="responseFormat">The format in which the generated images are returned. Must be one of url or b64_json.</param>
+        /// <param name="responseFormat">
+        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// </param>
+        /// <param name="user">
+        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<IReadOnlyList<string>> CreateImageEditAsync(string image, string mask, string prompt, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url", CancellationToken cancellationToken = default)
-            => await CreateImageEditAsync(new ImageEditRequest(image, mask, prompt, numberOfResults, size, user), cancellationToken).ConfigureAwait(false);
+        public async Task<IReadOnlyList<string>> CreateImageEditAsync(
+            string image,
+            string mask,
+            string prompt,
+            int numberOfResults = 1,
+            ImageSize size = ImageSize.Large,
+            ResponseFormat responseFormat = ResponseFormat.Url,
+            string user = null,
+            CancellationToken cancellationToken = default)
+            => await CreateImageEditAsync(new ImageEditRequest(image, mask, prompt, numberOfResults, size, user, responseFormat), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates an edited or extended image given an original image and a prompt.
@@ -107,9 +139,8 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-
             var response = await Api.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -125,16 +156,23 @@ namespace OpenAI.Images
         /// <param name="size">
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
         /// </param>
-        /// <param name="user">
-        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
-        /// </param>
         /// <param name="responseFormat">
         /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// </param>
+        /// <param name="user">
+        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<IReadOnlyList<string>> CreateImageVariationAsync(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url", CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<string>> CreateImageVariationAsync(
+            string imagePath,
+            int numberOfResults = 1,
+            ImageSize size = ImageSize.Large,
+            ResponseFormat responseFormat = ResponseFormat.Url,
+            string user = null,
+            CancellationToken cancellationToken = default)
             => await CreateImageVariationAsync(new ImageVariationRequest(imagePath, numberOfResults, size, user, responseFormat), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -160,12 +198,11 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-
             var response = await Api.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, string responseFormat = "url", CancellationToken cancellationToken = default)
+        private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
@@ -176,11 +213,7 @@ namespace OpenAI.Images
             }
 
             imagesResponse.SetResponseData(response.Headers);
-            
-            if(responseFormat == "b64_json")
-                return imagesResponse.Data.Select(imageResult => imageResult.B64_Json).ToList();
-            
-            return imagesResponse.Data.Select(imageResult => imageResult.Url).ToList();
+            return imagesResponse.Data.Select(imageResult => string.IsNullOrWhiteSpace(imageResult.Url) ? imageResult.B64_Json : imageResult.Url).ToList();
         }
     }
 }

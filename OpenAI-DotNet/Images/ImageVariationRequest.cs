@@ -3,7 +3,7 @@ using System.IO;
 
 namespace OpenAI.Images
 {
-    public sealed class ImageVariationRequest : IDisposable
+    public sealed class ImageVariationRequest : AbstractBaseImageRequest, IDisposable
     {
         /// <summary>
         /// Constructor.
@@ -21,9 +21,11 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <param name="responseFormat">
-        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// The format in which the generated images are returned.
+        /// Must be one of url or b64_json.
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
-        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, string responseFormat = "url")
+        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = Images.ResponseFormat.Url)
             : this(File.OpenRead(imagePath), Path.GetFileName(imagePath), numberOfResults, size, user, responseFormat)
         {
         }
@@ -47,15 +49,19 @@ namespace OpenAI.Images
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <param name="responseFormat">
-        /// The format in which the generated images are returned. Must be one of url or b64_json.
+        /// The format in which the generated images are returned.
+        /// Must be one of url or b64_json.
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
-        public ImageVariationRequest(Stream image, string imageName, int numberOfResults, ImageSize size, string user, string responseFormat = "url")
+        public ImageVariationRequest(Stream image, string imageName, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = Images.ResponseFormat.Url)
+            : base(numberOfResults, size, responseFormat, user)
         {
             Image = image;
 
             if (string.IsNullOrWhiteSpace(imageName))
             {
-                imageName = "image.png";
+                const string defaultImageName = "image.png";
+                imageName = defaultImageName;
             }
 
             ImageName = imageName;
@@ -64,19 +70,6 @@ namespace OpenAI.Images
             {
                 throw new ArgumentOutOfRangeException(nameof(numberOfResults), "The number of results must be between 1 and 10");
             }
-
-            Number = numberOfResults;
-
-            Size = size switch
-            {
-                ImageSize.Small => "256x256",
-                ImageSize.Medium => "512x512",
-                ImageSize.Large => "1024x1024",
-                _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
-            };
-
-            User = user;
-            ResponseFormat = responseFormat;
         }
 
         ~ImageVariationRequest() => Dispose(false);
@@ -87,26 +80,6 @@ namespace OpenAI.Images
         public Stream Image { get; }
 
         public string ImageName { get; }
-
-        /// <summary>
-        /// The number of images to generate. Must be between 1 and 10.
-        /// </summary>
-        public int Number { get; }
-
-        /// <summary>
-        /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
-        /// </summary>
-        public string Size { get; }
-
-        /// <summary>
-        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
-        /// </summary>
-        public string User { get; }
-
-        /// <summary>
-        /// The format in which the generated images are returned. Must be one of url or b64_json. Defaults to "url"
-        /// </summary>
-        public string ResponseFormat { get; }
 
         private void Dispose(bool disposing)
         {

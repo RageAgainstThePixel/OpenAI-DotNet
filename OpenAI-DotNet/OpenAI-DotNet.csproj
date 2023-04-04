@@ -18,7 +18,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>6.5.4
-- Added response_format to image/generations, image/edits and image/variations
+- Added response_format to image/generations, image/edits and image/variations requests
 Version 6.5.3
 - Added missing ConfigureAwait to await calls
 Version 6.5.2
