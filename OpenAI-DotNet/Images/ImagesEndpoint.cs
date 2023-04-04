@@ -44,7 +44,7 @@ namespace OpenAI.Images
         {
             var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -162,10 +162,10 @@ namespace OpenAI.Images
             request.Dispose();
 
             var response = await Api.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, request.ResponseFormat, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
+        private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, string responseFormat = "url", CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
@@ -176,6 +176,10 @@ namespace OpenAI.Images
             }
 
             imagesResponse.SetResponseData(response.Headers);
+            
+            if(responseFormat == "b64_json")
+                return imagesResponse.Data.Select(imageResult => imageResult.B64_Json).ToList();
+            
             return imagesResponse.Data.Select(imageResult => imageResult.Url).ToList();
         }
     }
