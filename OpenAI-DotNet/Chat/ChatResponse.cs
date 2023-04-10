@@ -33,7 +33,5 @@ namespace OpenAI.Chat
 
         [JsonIgnore]
         public Choice FirstChoice => Choices.FirstOrDefault();
-
-        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }
