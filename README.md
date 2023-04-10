@@ -128,7 +128,9 @@ Use your system's environment variables specify an api key and organization to u
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 ```
 
-#### Pass keys directly with constructor (no recommended)
+#### Pass keys directly with constructor
+
+We recommended using an environment variable to load the API key instead of having it persist in the code.
 
 ```csharp
 var api = new OpenAIClient("sk-apiKey");
