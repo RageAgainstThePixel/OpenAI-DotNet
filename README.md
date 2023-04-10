@@ -87,6 +87,22 @@ There are 3 ways to provide your API keys, in order of precedence:
 
 You use the `OpenAIAuthentication` when you initialize the API as shown:
 
+#### Pass keys directly with constructor
+
+:warning: We recommended using the environment variables to load the API key instead of having it hard coded in your source.
+
+It is not recommended use this method in production, but only for accepting user credentials, local testing and quick start scenarios.
+
+```csharp
+var api = new OpenAIClient("sk-apiKey");
+```
+
+Or create a `OpenAIAuthentication` object manually
+
+```csharp
+var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId"));
+```
+
 #### Load key from configuration file
 
 Attempts to load api keys from a configuration file, by default `.openai` in the current directory, optionally traversing up the directory tree or in the user's home directory.
@@ -126,20 +142,6 @@ Use your system's environment variables specify an api key and organization to u
 
 ```csharp
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
-```
-
-#### Pass keys directly with constructor
-
-We recommended using an environment variable to load the API key instead of having it persist in the code.
-
-```csharp
-var api = new OpenAIClient("sk-apiKey");
-```
-
-Or create a `OpenAIAuthentication` object manually
-
-```csharp
-var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId"));
 ```
 
 ### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)
