@@ -6,7 +6,7 @@ namespace OpenAI.Chat
     {
         [JsonInclude]
         [JsonPropertyName("role")]
-        public string Role { get; private set; }
+        public Role Role { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("content")]
