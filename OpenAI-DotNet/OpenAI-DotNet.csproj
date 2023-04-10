@@ -19,7 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Version 6.7.0
 - Deprecated ChatPrompt -&gt; Message
-- Added Role enum for chat messages
+- Added Role enum for Chat.Messages and Chat.Delta
 - Updated ChatRequest constructor to use IEnumerable&lt;Message&gt; messages
 - Updated ChatRequest.Messages to IReadonlyList&lt;Message&gt;
 - Updated unit tests
