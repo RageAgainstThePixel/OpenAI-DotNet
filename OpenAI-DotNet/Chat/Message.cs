@@ -4,15 +4,19 @@ namespace OpenAI.Chat
 {
     public sealed class Message
     {
+        public Message(Role role, string content)
+        {
+            Role = role;
+            Content = content;
+        }
+
         [JsonInclude]
         [JsonPropertyName("role")]
-        public string Role { get; private set; }
+        public Role Role { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("content")]
         public string Content { get; private set; }
-
-        public override string ToString() => Content;
 
         public static implicit operator string(Message message) => message.Content;
     }

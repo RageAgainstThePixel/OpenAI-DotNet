@@ -17,7 +17,13 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>6.6.0
+    <PackageReleaseNotes>Version 6.7.0
+- Deprecated ChatPrompt -&gt; Message
+- Added Role enum for Chat.Messages and Chat.Delta
+- Updated ChatRequest constructor to use IEnumerable&lt;Message&gt; messages
+- Updated ChatRequest.Messages to IReadonlyList&lt;Message&gt;
+- Updated unit tests
+Version 6.6.0
 - Added ResponseFormat to ImageGenerationRequests
 - Refactored Image Requests with AbstractBaseImageRequest
 Version 6.5.3
@@ -107,7 +113,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.6.0</Version>
+    <Version>6.7.0</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>

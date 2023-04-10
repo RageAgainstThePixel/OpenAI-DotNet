@@ -13,14 +13,14 @@ namespace OpenAI.Tests
         public async Task Test_1_GetChatCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            var chatPrompts = new List<ChatPrompt>
+            var messages = new List<Message>
             {
-                new ChatPrompt("system", "You are a helpful assistant."),
-                new ChatPrompt("user", "Who won the world series in 2020?"),
-                new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-                new ChatPrompt("user", "Where was it played?"),
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+                new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+                new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
@@ -32,14 +32,14 @@ namespace OpenAI.Tests
         public async Task Test_2_GetChatStreamingCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            var chatPrompts = new List<ChatPrompt>
+            var messages = new List<Message>
             {
-                new ChatPrompt("system", "You are a helpful assistant."),
-                new ChatPrompt("user", "Who won the world series in 2020?"),
-                new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-                new ChatPrompt("user", "Where was it played?"),
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+                new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+                new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
             var allContent = new List<string>();
 
             await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
@@ -50,21 +50,21 @@ namespace OpenAI.Tests
                 allContent.Add(result.FirstChoice);
             });
 
-            Console.WriteLine(string.Join("", allContent));
+            Console.WriteLine(string.Join(string.Empty, allContent));
         }
 
         [Test]
         public async Task Test_3_GetChatStreamingCompletionEnumerableAsync()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            var chatPrompts = new List<ChatPrompt>
+            var messages = new List<Message>
             {
-                new ChatPrompt("system", "You are a helpful assistant."),
-                new ChatPrompt("user", "Who won the world series in 2020?"),
-                new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-                new ChatPrompt("user", "Where was it played?"),
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+                new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+                new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
             var allContent = new List<string>();
 
             await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
@@ -75,7 +75,7 @@ namespace OpenAI.Tests
                 allContent.Add(result.FirstChoice);
             }
 
-            Console.WriteLine(string.Join("", allContent));
+            Console.WriteLine(string.Join(string.Empty, allContent));
         }
     }
 }

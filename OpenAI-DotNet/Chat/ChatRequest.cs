@@ -12,9 +12,12 @@ namespace OpenAI.Chat
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="messages"></param>
+        /// <param name="messages">
+        /// The list of messages for the current chat session.
+        /// </param>
         /// <param name="model">
-        /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
+        /// ID of the model to use.<br/>
+        /// Currently, only gpt-4, gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
         /// </param>
         /// <param name="temperature">
         /// What sampling temperature to use, between 0 and 2.
@@ -66,7 +69,7 @@ namespace OpenAI.Chat
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         public ChatRequest(
-            IEnumerable<ChatPrompt> messages,
+            IEnumerable<Message> messages,
             Model model = null,
             double? temperature = null,
             double? topP = null,
@@ -104,6 +107,21 @@ namespace OpenAI.Chat
             User = user;
         }
 
+        [Obsolete("Use ChatRequest(IEnumerable<Message> messages) instead")]
+        public ChatRequest(
+            IEnumerable<ChatPrompt> messages,
+            Model model = null,
+            double? temperature = null,
+            double? topP = null,
+            int? number = null,
+            string[] stops = null,
+            int? maxTokens = null,
+            double? presencePenalty = null,
+            double? frequencyPenalty = null,
+            Dictionary<string, double> logitBias = null,
+            string user = null)
+        => throw new NotImplementedException();
+
         /// <summary>
         /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
         /// </summary>
@@ -114,7 +132,7 @@ namespace OpenAI.Chat
         /// The messages to generate chat completions for, in the chat format.
         /// </summary>
         [JsonPropertyName("messages")]
-        public IReadOnlyList<ChatPrompt> Messages { get; }
+        public IReadOnlyList<Message> Messages { get; }
 
         /// <summary>
         /// What sampling temperature to use, between 0 and 2.
@@ -199,7 +217,5 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("user")]
         public string User { get; }
-
-        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }
