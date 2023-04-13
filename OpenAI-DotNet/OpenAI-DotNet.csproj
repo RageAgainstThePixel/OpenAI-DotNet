@@ -17,7 +17,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.7.0
+    <PackageReleaseNotes>Version 6.7.1
+- Fixed parsing old env file format
+- Fixed parsing missing ORGANIZATION env variables
+- Fixed checking of CancellationToken.IsCancellationRequested in streaming endpoints
+- Updated Docs
+Version 6.7.0
 - Deprecated ChatPrompt -&gt; Message
 - Added Role enum for Chat.Messages and Chat.Delta
 - Updated ChatRequest constructor to use IEnumerable&lt;Message&gt; messages
@@ -113,7 +118,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.7.0</Version>
+    <Version>6.7.1</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>

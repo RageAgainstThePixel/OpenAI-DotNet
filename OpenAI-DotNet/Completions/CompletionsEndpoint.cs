@@ -209,6 +209,8 @@ namespace OpenAI.Completions
 
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (line.StartsWith("data: "))
                 {
                     line = line["data: ".Length..];
@@ -319,9 +321,10 @@ namespace OpenAI.Completions
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
-                   !cancellationToken.IsCancellationRequested)
+            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (line.StartsWith("data: "))
                 {
                     line = line["data: ".Length..];

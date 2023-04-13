@@ -89,6 +89,8 @@ You use the `OpenAIAuthentication` when you initialize the API as shown:
 
 #### Pass keys directly with constructor
 
+:warning: We recommended using the environment variables to load the API key instead of having it hard coded in your source. It is not recommended use this method in production, but only for accepting user credentials, local testing and quick start scenarios.
+
 ```csharp
 var api = new OpenAIClient("sk-apiKey");
 ```

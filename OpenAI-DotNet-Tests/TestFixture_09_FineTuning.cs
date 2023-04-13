@@ -135,11 +135,22 @@ namespace OpenAI.Tests
             Console.WriteLine($"{fineTuneJob.Id} ->");
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
+            try
             {
-                Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-                cancellationTokenSource.Cancel();
-            }, cancellationTokenSource.Token);
+                await OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
+                {
+                    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
+                    cancellationTokenSource.Cancel();
+                }, cancellationTokenSource.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                // ignore
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
             var jobInfo = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
             Assert.IsNotNull(jobInfo);
@@ -164,10 +175,21 @@ namespace OpenAI.Tests
             Console.WriteLine($"{fineTuneJob.Id} ->");
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await foreach (var fineTuneEvent in OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancellationTokenSource.Token))
+            try
             {
-                Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-                cancellationTokenSource.Cancel();
+                await foreach (var fineTuneEvent in OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancellationTokenSource.Token))
+                {
+                    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
+                    cancellationTokenSource.Cancel();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // ignore
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
 
             var jobInfo = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
