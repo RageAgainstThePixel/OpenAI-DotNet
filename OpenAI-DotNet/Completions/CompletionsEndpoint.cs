@@ -210,7 +210,9 @@ namespace OpenAI.Completions
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
                     throw new TaskCanceledException();
+                }
 
                 if (line.StartsWith("data: "))
                 {
@@ -325,7 +327,9 @@ namespace OpenAI.Completions
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    yield break;
+                {
+                    throw new TaskCanceledException();
+                }
 
                 if (line.StartsWith("data: "))
                 {
