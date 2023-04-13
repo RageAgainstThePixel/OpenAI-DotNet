@@ -146,9 +146,9 @@ namespace OpenAI.FineTuning
                 var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
                 if (!result)
-                {
                     throw new Exception($"Failed to cancel {jobId}");
-                }
+                else
+                    throw new TaskCanceledException();
             }
         }
 
