@@ -137,7 +137,7 @@ namespace OpenAI
         /// (or if the config file didn't contain correctly formatted API keys)
         /// </returns>
         public static OpenAIAuthentication LoadFromPath(string path)
-            => LoadFromDirectory(Path.GetDirectoryName(path), Path.GetFileName(path));
+            => LoadFromDirectory(Path.GetDirectoryName(path), Path.GetFileName(path), false);
 
         /// <summary>
         /// Attempts to load api keys from a configuration file, by default ".openai" in the current directory,

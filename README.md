@@ -125,10 +125,18 @@ OPENAI_KEY=sk-aaaabbbbbccccddddd
 ORGANIZATION=org-yourOrganizationId
 ```
 
-You can also load the file directly with known path by calling a static method in Authentication:
+You can also load the configuration file directly with known path by calling static methods in Authentication:
+
+- Loads the default .openai config in the current executing directory
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("your/path/to/.openai"));;
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
+```
+
+- Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format.
+
+```csharp
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));;
 ```
 
 #### Use System Environment Variables
