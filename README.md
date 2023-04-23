@@ -136,7 +136,7 @@ var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/
 - Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format:
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));;
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));
 ```
 
 #### Use System Environment Variables
