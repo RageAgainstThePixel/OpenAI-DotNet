@@ -48,6 +48,6 @@ namespace OpenAI.Chat
 
         public override string ToString() => Content;
 
-        public static implicit operator string(Message message) => message.Content;
+        public static implicit operator string(Message message) => message.ToString();
     }
 }
