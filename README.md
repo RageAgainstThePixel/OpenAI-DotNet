@@ -125,15 +125,15 @@ OPENAI_KEY=sk-aaaabbbbbccccddddd
 ORGANIZATION=org-yourOrganizationId
 ```
 
-You can also load the configuration file directly with known path by calling static methods in Authentication:
+You can also load the configuration file directly with known path by calling static methods in `OpenAIAuthentication`:
 
-- Loads the default .openai config in the current executing directory
+- Loads the default `.openai` config in the specified directory:
 
 ```csharp
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
 ```
 
-- Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format.
+- Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format:
 
 ```csharp
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));;
@@ -373,7 +373,7 @@ var chatPrompts = new List<ChatPrompt>
     new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
     new ChatPrompt("user", "Where was it played?"),
 };
-var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+var chatRequest = new ChatRequest(chatPrompts, Model.GPT4);
 
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
@@ -431,8 +431,7 @@ Creates an embedding vector representing the input text.
 
 ```csharp
 var api = new OpenAIClient();
-var model = await api.ModelsEndpoint.GetModelDetailsAsync("text-embedding-ada-002");
-var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", model);
+var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
 Console.WriteLine(result);
 ```
 
