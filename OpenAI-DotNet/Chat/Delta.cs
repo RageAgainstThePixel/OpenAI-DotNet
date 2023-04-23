@@ -11,5 +11,11 @@ namespace OpenAI.Chat
         [JsonInclude]
         [JsonPropertyName("content")]
         public string Content { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("name")]
+        public string Name { get; private set; }
+
+        public override string ToString() => Content;
     }
 }

@@ -17,7 +17,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.7.1
+    <PackageReleaseNotes>Version 6.7.2
+- Made it easier to specify a specific configuration file path
+- Added optional author name property to chat message
+- Added implicit string conversions to make ChatResponses easier to work with
+- Updated Docs
+Version 6.7.1
 - Fixed parsing old env file format
 - Fixed parsing missing ORGANIZATION env variables
 - Fixed checking of CancellationToken.IsCancellationRequested in streaming endpoints
@@ -118,7 +123,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.7.1</Version>
+    <Version>6.7.2</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
