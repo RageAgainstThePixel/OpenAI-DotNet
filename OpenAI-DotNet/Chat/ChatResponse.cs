@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -32,6 +30,10 @@ namespace OpenAI.Chat
         public IReadOnlyList<Choice> Choices { get; private set; }
 
         [JsonIgnore]
-        public Choice FirstChoice => Choices.FirstOrDefault();
+        public Choice FirstChoice => Choices[0];
+
+        public override string ToString() => FirstChoice.ToString();
+
+        public static implicit operator string(ChatResponse response) => response.ToString();
     }
 }

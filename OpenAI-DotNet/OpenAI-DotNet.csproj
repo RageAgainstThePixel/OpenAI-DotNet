@@ -19,6 +19,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Version 6.7.2
 - Made it easier to specify a specific configuration file path
+- Added optional author name property to chat message
+- Added implicit string conversions to make ChatResponses easier to work with
+- Updated Docs
 Version 6.7.1
 - Fixed parsing old env file format
 - Fixed parsing missing ORGANIZATION env variables
