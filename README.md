@@ -262,6 +262,12 @@ List and describe the various models available in the API. You can refer to the 
 
 Also checkout [model endpoint compatibility](https://platform.openai.com/docs/models/model-endpoint-compatibility) to understand which models work with which endpoints.
 
+To specify a custom model not pre-defined in this library:
+
+```csharp
+var model = new Model("model-id");
+```
+
 The Models API is accessed via `OpenAIClient.ModelsEndpoint`
 
 #### [List models](https://beta.openai.com/docs/api-reference/models/list)
