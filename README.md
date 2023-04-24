@@ -356,14 +356,14 @@ Creates a completion for the chat message
 
 ```csharp
 var api = new OpenAIClient();
-var chatPrompts = new List<ChatPrompt>
+var messages = new List<Message>
 {
-    new ChatPrompt("system", "You are a helpful assistant."),
-    new ChatPrompt("user", "Who won the world series in 2020?"),
-    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-    new ChatPrompt("user", "Where was it played?"),
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, "Who won the world series in 2020?"),
+    new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+    new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(chatPrompts);
+var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
 var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine(result.FirstChoice);
 ```
@@ -372,14 +372,14 @@ Console.WriteLine(result.FirstChoice);
 
 ```csharp
 var api = new OpenAIClient();
-var chatPrompts = new List<ChatPrompt>
+var messages = new List<Message>
 {
-    new ChatPrompt("system", "You are a helpful assistant."),
-    new ChatPrompt("user", "Who won the world series in 2020?"),
-    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-    new ChatPrompt("user", "Where was it played?"),
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, "Who won the world series in 2020?"),
+    new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+    new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(chatPrompts, Model.GPT4);
+var chatRequest = new ChatRequest(messages);
 
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
@@ -391,14 +391,14 @@ Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/
 
 ```csharp
 var api = new OpenAIClient();
-var chatPrompts = new List<ChatPrompt>
+var messages = new List<Message>
 {
-    new ChatPrompt("system", "You are a helpful assistant."),
-    new ChatPrompt("user", "Who won the world series in 2020?"),
-    new ChatPrompt("assistant", "The Los Angeles Dodgers won the World Series in 2020."),
-    new ChatPrompt("user", "Where was it played?"),
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, "Who won the world series in 2020?"),
+    new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+    new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(chatPrompts, Model.GPT3_5_Turbo);
+var chatRequest = new ChatRequest(messages);
 
 await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
