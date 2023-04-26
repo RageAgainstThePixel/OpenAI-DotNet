@@ -1,4 +1,5 @@
-﻿using OpenAI.Models;
+﻿using OpenAI.Extensions;
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,4 +1,5 @@
-﻿using OpenAI.Models;
+﻿using OpenAI.Extensions;
+using OpenAI.Models;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
