@@ -4,7 +4,7 @@ using OpenAI.Models;
 
 namespace OpenAI.Audio
 {
-    public sealed class AudioTranslationRequest
+    public sealed class AudioTranslationRequest : IDisposable
     {
         /// <summary>
         /// Constructor.

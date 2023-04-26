@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OpenAI.Extensions;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
