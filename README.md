@@ -380,7 +380,6 @@ var messages = new List<Message>
     new Message(Role.User, "Where was it played?"),
 };
 var chatRequest = new ChatRequest(messages);
-
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
     Console.WriteLine(result.FirstChoice);

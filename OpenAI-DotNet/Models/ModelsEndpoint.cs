@@ -17,28 +17,24 @@ namespace OpenAI.Models
     {
         private class ModelsList
         {
+            [JsonInclude]
             [JsonPropertyName("data")]
-            public List<Model> Data { get; set; }
+            public List<Model> Data { get; private set; }
         }
 
         private class DeleteModelResponse
         {
-            [JsonConstructor]
-            public DeleteModelResponse(string id, string @object, bool deleted)
-            {
-                Id = id;
-                Object = @object;
-                Deleted = deleted;
-            }
-
+            [JsonInclude]
             [JsonPropertyName("id")]
-            public string Id { get; }
+            public string Id { get; private set; }
 
+            [JsonInclude]
             [JsonPropertyName("object")]
-            public string Object { get; }
+            public string Object { get; private set; }
 
+            [JsonInclude]
             [JsonPropertyName("deleted")]
-            public bool Deleted { get; }
+            public bool Deleted { get; private set; }
         }
 
         /// <inheritdoc />

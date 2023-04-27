@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Models
@@ -41,11 +42,18 @@ namespace OpenAI.Models
         public string Object { get; private set; }
 
         [JsonInclude]
+        [JsonPropertyName("created")]
+        public int CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
+
+        [JsonInclude]
         [JsonPropertyName("owned_by")]
         public string OwnedBy { get; private set; }
 
         [JsonInclude]
-        [JsonPropertyName("permissions")]
+        [JsonPropertyName("permission")]
         public IReadOnlyList<Permission> Permissions { get; private set; }
 
         [JsonInclude]
