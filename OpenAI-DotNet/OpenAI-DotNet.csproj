@@ -17,7 +17,14 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.7.4
+    <PackageReleaseNotes>Version 6.8.0
+- Removed Obsolete ChatPrompt
+- ChatEndpoint.StreamCompletionAsync will now also raise completed ChatResponse with completed Message
+- ChatEndpoint.StreamCompletionEnumerableAsync will now also raise completed ChatResponse with completed Message
+- Refactored all streaming endpoints to use a new string extension for centralized parsing of event stream data
+- Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync. Default is false.
+- Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsAsync. Default is false.
+Version 6.7.4
 - Fixed Model.Permissions
 - Added Model.CreatedAt
 Version 6.7.3
@@ -128,7 +135,7 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.7.4</Version>
+    <Version>6.8.0</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>

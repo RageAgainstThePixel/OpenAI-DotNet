@@ -4,6 +4,13 @@ namespace OpenAI.Chat
 {
     public sealed class Choice
     {
+        internal Choice(Message message, string finishReason, int index)
+        {
+            Index = index;
+            Message = message;
+            FinishReason = finishReason;
+        }
+
         [JsonInclude]
         [JsonPropertyName("message")]
         public Message Message { get; private set; }

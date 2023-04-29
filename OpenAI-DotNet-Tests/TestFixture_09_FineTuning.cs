@@ -141,7 +141,7 @@ namespace OpenAI.Tests
                 {
                     Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
                     cancellationTokenSource.Cancel();
-                }, cancellationTokenSource.Token);
+                }, cancelJob: true, cancellationTokenSource.Token);
             }
             catch (TaskCanceledException)
             {
@@ -177,7 +177,7 @@ namespace OpenAI.Tests
 
             try
             {
-                await foreach (var fineTuneEvent in OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancellationTokenSource.Token))
+                await foreach (var fineTuneEvent in OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancelJob: true, cancellationTokenSource.Token))
                 {
                     Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
                     cancellationTokenSource.Cancel();
