@@ -19,8 +19,8 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Version 6.8.0
 - Removed Obsolete ChatPrompt
-- ChatEndpoint.StreamCompletionAsync will now also raise completed ChatResponse with completed Message
-- ChatEndpoint.StreamCompletionEnumerableAsync will now also raise completed ChatResponse with completed Message
+- ChatEndpoint.StreamCompletionAsync will now also raise additional ChatResponse with completed Message
+- ChatEndpoint.StreamCompletionEnumerableAsync will now also raise additional ChatResponse with completed Message
 - Refactored all streaming endpoints to use a new string extension for centralized parsing of event stream data
 - Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync. Default is false.
 - Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsAsync. Default is false.
