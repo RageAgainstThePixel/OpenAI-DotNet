@@ -125,8 +125,8 @@ namespace OpenAI.FineTuning
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData &&
-                   !cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested &&
+                   await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
             {
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
@@ -141,15 +141,15 @@ namespace OpenAI.FineTuning
 
             if (cancellationToken.IsCancellationRequested && cancelJob)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var isCancelled = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
-                if (!result)
+                if (!isCancelled)
                 {
                     throw new Exception($"Failed to cancel {jobId}");
                 }
-
-                throw new TaskCanceledException();
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace OpenAI.FineTuning
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData &&
-                   !cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested &&
+                   await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
             {
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
@@ -177,22 +177,21 @@ namespace OpenAI.FineTuning
                 }
                 else
                 {
-                    yield break;
+                    break;
                 }
-
             }
 
             if (cancellationToken.IsCancellationRequested && cancelJob)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var isCancelled = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
-                if (!result)
+                if (!isCancelled)
                 {
                     throw new Exception($"Failed to cancel {jobId}");
                 }
-
-                throw new TaskCanceledException();
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
     }
 }
