@@ -10,8 +10,8 @@ namespace OpenAI.Models
 {
     /// <summary>
     /// List and describe the various models available in the API.
-    /// You can refer to the Models documentation to understand what <see href="https://beta.openai.com/docs/models"/> are available and the differences between them.<br/>
-    /// <see href="https://beta.openai.com/docs/api-reference/models"/>
+    /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
+    /// <see href="https://platform.openai.com/docs/api-reference/models"/>
     /// </summary>
     public sealed class ModelsEndpoint : BaseEndPoint
     {

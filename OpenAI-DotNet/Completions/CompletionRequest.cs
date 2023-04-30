@@ -8,7 +8,7 @@ namespace OpenAI.Completions
 {
     /// <summary>
     /// Represents a request to the <see cref="CompletionsEndpoint"/>.  Mostly matches the parameters in
-    /// <see href="https://beta.openai.com/docs/api-reference/completions">the OpenAI docs</see>,
+    /// <see href="https://platform.openai.com/docs/api-reference/completions">the OpenAI docs</see>,
     /// although some have been renames or expanded into single/multiple properties for ease of use.
     /// </summary>
     public sealed class CompletionRequest
@@ -156,7 +156,7 @@ namespace OpenAI.Completions
         }
 
         /// <summary>
-        /// The logit bias dictionary of token bias values for modifying likelihoods. Positive biases increases the likelihood of 
+        /// The logit bias dictionary of token bias values for modifying likelihoods. Positive biases increases the likelihood of
         /// generating a token, while negative biases decreases the probability of a token. Very large biases (e.g. -100,100) can
         /// either eliminate or force a token to be generated.
         /// </summary>
@@ -164,7 +164,7 @@ namespace OpenAI.Completions
         public Dictionary<string, double> LogitBias { get; set; }
 
         /// <summary>
-        /// How many different completions to generate.  Interacts with <see cref="NumChoicesPerPrompt"/> to generate top 
+        /// How many different completions to generate.  Interacts with <see cref="NumChoicesPerPrompt"/> to generate top
         /// NumChoicesPerPrompt out of BestOf. In cases where both are set, BestOf should be greater than NumChoicesPerPrompt.
         /// </summary>
         [JsonPropertyName("best_of")]
