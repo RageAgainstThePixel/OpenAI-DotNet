@@ -363,9 +363,9 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
+var chatRequest = new ChatRequest(messages);
 var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
-Console.WriteLine(result.FirstChoice);
+Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content}");
 ```
 
 ##### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
@@ -379,7 +379,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages);
+var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo, number: 2);
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
     foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
@@ -407,8 +407,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages);
-
+var chatRequest = new ChatRequest(messages, Model.GPT4);
 await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
     foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))

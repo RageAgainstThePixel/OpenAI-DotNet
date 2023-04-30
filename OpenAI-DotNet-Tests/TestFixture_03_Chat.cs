@@ -21,12 +21,18 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
+            var choiceCount = 2;
+            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo, number: choiceCount);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
-            Console.WriteLine(result.FirstChoice);
+            Assert.IsTrue(result.Choices.Count == choiceCount);
+
+            foreach (var choice in result.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+            }
         }
 
         [Test]
@@ -49,12 +55,12 @@ namespace OpenAI.Tests
 
                  foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
                  {
-                     Console.WriteLine($"{choice.Index}: {choice.Delta.Content}");
+                     Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
                  }
 
                  foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
                  {
-                     Console.WriteLine($"{choice.Index}: {choice.Message.Content}");
+                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
                  }
              });
 
@@ -81,12 +87,12 @@ namespace OpenAI.Tests
 
                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
                 {
-                    Console.WriteLine($"{choice.Index}: {choice.Delta.Content}");
+                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
                 }
 
                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
                 {
-                    Console.WriteLine($"{choice.Index}: {choice.Message.Content}");
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
                 }
             }
         }
