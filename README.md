@@ -382,7 +382,17 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages);
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
-    Console.WriteLine(result.FirstChoice);
+    foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+    {
+        // Partial response content
+        Console.WriteLine(choice.Delta.Content);
+    }
+
+    foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+    {
+        // Completed response content
+        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
+    }
 });
 ```
 
@@ -401,7 +411,17 @@ var chatRequest = new ChatRequest(messages);
 
 await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
-    Console.WriteLine(result.FirstChoice);
+    foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+    {
+        // Partial response content
+        Console.WriteLine(choice.Delta.Content);
+    }
+
+    foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+    {
+        // Completed response content
+        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
+    }
 }
 ```
 
