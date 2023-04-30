@@ -8,7 +8,7 @@ namespace OpenAI.Chat
     {
         public ChatResponse() { }
 
-        internal ChatResponse(
+        public ChatResponse(
             string id,
             string @object,
             int created,
