@@ -14,7 +14,7 @@ namespace OpenAI.FineTuning
 {
     /// <summary>
     /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
-    /// <see href="https://beta.openai.com/docs/guides/fine-tuning"/>
+    /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
     /// </summary>
     public sealed class FineTuningEndpoint : BaseEndPoint
     {
@@ -91,7 +91,8 @@ namespace OpenAI.FineTuning
             var response = await Api.Client.PostAsync(GetUrl($"/{jobId}/cancel"), null!).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
             var result = response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
-            return result.Status == "cancelled";
+            const string cancelled = "cancelled";
+            return result.Status == cancelled;
         }
 
         /// <summary>
@@ -113,9 +114,10 @@ namespace OpenAI.FineTuning
         /// </summary>
         /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
         /// <param name="fineTuneEventCallback">The event callback handler.</param>
+        /// <param name="cancelJob">Optional, Cancel the job if streaming is aborted. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task StreamFineTuneEventsAsync(string jobId, Action<Event> fineTuneEventCallback, CancellationToken cancellationToken = default)
+        public async Task StreamFineTuneEventsAsync(string jobId, Action<Event> fineTuneEventCallback, bool cancelJob = false, CancellationToken cancellationToken = default)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, GetUrl($"/{jobId}/events?stream=true"));
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
@@ -123,45 +125,41 @@ namespace OpenAI.FineTuning
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
-                   !cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested &&
+                   await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
             {
-                if (line.StartsWith("data: "))
+                if (streamData.TryGetEventStreamData(out var eventData))
                 {
-                    line = line["data: ".Length..];
+                    if (string.IsNullOrWhiteSpace(eventData)) { continue; }
+                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(eventData, Api.JsonSerializationOptions));
                 }
-
-                if (line == "[DONE]")
+                else
                 {
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions));
+                    break;
                 }
             }
 
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested && cancelJob)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var isCancelled = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
-                if (!result)
+                if (!isCancelled)
                 {
                     throw new Exception($"Failed to cancel {jobId}");
                 }
-
-                throw new TaskCanceledException();
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         /// <summary>
         /// Stream the fine-grained status updates for a fine-tune job.
         /// </summary>
         /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
+        /// <param name="cancelJob">Optional, Cancel the job if streaming is aborted. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException"></exception>
-        public async IAsyncEnumerable<Event> StreamFineTuneEventsEnumerableAsync(string jobId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<Event> StreamFineTuneEventsEnumerableAsync(string jobId, bool cancelJob = false, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, GetUrl($"/{jobId}/events?stream=true"));
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
@@ -169,36 +167,31 @@ namespace OpenAI.FineTuning
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line &&
-                   !cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested &&
+                   await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
             {
-                if (line.StartsWith("data: "))
+                if (streamData.TryGetEventStreamData(out var eventData))
                 {
-                    line = line["data: ".Length..];
+                    if (string.IsNullOrWhiteSpace(eventData)) { continue; }
+                    yield return JsonSerializer.Deserialize<Event>(eventData, Api.JsonSerializationOptions);
                 }
-
-                if (line == "[DONE]")
+                else
                 {
-                    yield break;
-                }
-
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    yield return JsonSerializer.Deserialize<Event>(line.Trim(), Api.JsonSerializationOptions);
+                    break;
                 }
             }
 
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested && cancelJob)
             {
-                var result = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
+                var isCancelled = await CancelFineTuneJobAsync(jobId).ConfigureAwait(false);
 
-                if (!result)
+                if (!isCancelled)
                 {
                     throw new Exception($"Failed to cancel {jobId}");
                 }
-
-                throw new TaskCanceledException();
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
     }
 }

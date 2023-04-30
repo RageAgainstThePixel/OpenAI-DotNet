@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
 using OpenAI.Chat;
-using OpenAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -20,12 +20,18 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
+            var choiceCount = 2;
+            var chatRequest = new ChatRequest(messages, number: choiceCount);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
-            Console.WriteLine(result.FirstChoice);
+            Assert.IsTrue(result.Choices.Count == choiceCount);
+
+            foreach (var choice in result.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+            }
         }
 
         [Test]
@@ -39,18 +45,25 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
-            var allContent = new List<string>();
+            var chatRequest = new ChatRequest(messages);
+            var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
+             {
+                 Assert.IsNotNull(result);
+                 Assert.NotNull(result.Choices);
+                 Assert.NotZero(result.Choices.Count);
 
-            await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
-            {
-                Assert.IsNotNull(result);
-                Assert.NotNull(result.Choices);
-                Assert.NotZero(result.Choices.Count);
-                allContent.Add(result.FirstChoice);
-            });
+                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+                 {
+                     Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
+                 }
 
-            Console.WriteLine(string.Join(string.Empty, allContent));
+                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+                 {
+                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                 }
+             });
+
+            Assert.IsNotNull(finalResult);
         }
 
         [Test]
@@ -64,18 +77,23 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
-            var allContent = new List<string>();
-
+            var chatRequest = new ChatRequest(messages);
             await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
             {
                 Assert.IsNotNull(result);
                 Assert.NotNull(result.Choices);
                 Assert.NotZero(result.Choices.Count);
-                allContent.Add(result.FirstChoice);
-            }
 
-            Console.WriteLine(string.Join(string.Empty, allContent));
+                foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
+                }
+
+                foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                }
+            }
         }
     }
 }

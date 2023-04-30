@@ -106,21 +106,6 @@ namespace OpenAI.Chat
             User = user;
         }
 
-        [Obsolete("Use ChatRequest(IEnumerable<Message> messages) instead")]
-        public ChatRequest(
-            IEnumerable<ChatPrompt> messages,
-            Model model = null,
-            double? temperature = null,
-            double? topP = null,
-            int? number = null,
-            string[] stops = null,
-            int? maxTokens = null,
-            double? presencePenalty = null,
-            double? frequencyPenalty = null,
-            Dictionary<string, double> logitBias = null,
-            string user = null)
-        => throw new NotImplementedException();
-
         /// <summary>
         /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
         /// </summary>

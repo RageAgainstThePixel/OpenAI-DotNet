@@ -18,7 +18,7 @@ namespace OpenAI.Completions
 
         [JsonInclude]
         [JsonPropertyName("top_logprobs")]
-        public IList<IDictionary<string, double>> TopLogProbabilities { get; private set; }
+        public IReadOnlyList<IReadOnlyDictionary<string, double>> TopLogProbabilities { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("text_offset")]

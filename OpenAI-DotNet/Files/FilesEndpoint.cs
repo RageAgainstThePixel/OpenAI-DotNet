@@ -12,7 +12,7 @@ namespace OpenAI.Files
 {
     /// <summary>
     /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
-    /// <see href="https://beta.openai.com/docs/api-reference/fine-tunes"/>
+    /// <see href="https://platform.openai.com/docs/api-reference/fine-tunes"/>
     /// </summary>
     public sealed class FilesEndpoint : BaseEndPoint
     {
@@ -139,13 +139,14 @@ namespace OpenAI.Files
         /// </summary>
         /// <param name="fileId">The file id to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
+        /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
-        /// <returns></returns>
+        /// <returns>The full path of the downloaded file.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<string> DownloadFileAsync(string fileId, string directory, CancellationToken cancellationToken = default)
+        public async Task<string> DownloadFileAsync(string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
             var fileData = await GetFileInfoAsync(fileId).ConfigureAwait(false);
-            return await DownloadFileAsync(fileData, directory, cancellationToken).ConfigureAwait(false);
+            return await DownloadFileAsync(fileData, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -153,20 +154,38 @@ namespace OpenAI.Files
         /// </summary>
         /// <param name="fileData"><see cref="FileData"/> to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
+        /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>The full path of the downloaded file.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public async Task<string> DownloadFileAsync(FileData fileData, string directory, CancellationToken cancellationToken = default)
+        public async Task<string> DownloadFileAsync(FileData fileData, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
-            await using var response = await Api.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                throw new ArgumentNullException(nameof(directory));
+            }
 
             if (!Directory.Exists(directory))
             {
-                Directory.CreateDirectory(directory ?? throw new ArgumentNullException(nameof(directory)));
+                Directory.CreateDirectory(directory);
             }
 
             var filePath = Path.Combine(directory, fileData.FileName);
-            await using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate);
+
+            if (File.Exists(filePath))
+            {
+                if (deleteCachedFile)
+                {
+                    File.Delete(filePath);
+                }
+                else
+                {
+                    return filePath;
+                }
+            }
+
+            await using var response = await Api.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
+            await using var fileStream = new FileStream(filePath, FileMode.CreateNew);
             await response.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
             return filePath;
         }
