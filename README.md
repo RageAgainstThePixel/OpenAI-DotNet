@@ -407,7 +407,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4);
+var chatRequest = new ChatRequest(messages, Model.GPT4); // gpt4 access required
 await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
     foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
