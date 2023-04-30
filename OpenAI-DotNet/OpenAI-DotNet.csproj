@@ -22,8 +22,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - ChatEndpoint.StreamCompletionAsync will now also raise additional ChatResponse with completed Message
 - ChatEndpoint.StreamCompletionEnumerableAsync will now also raise additional ChatResponse with completed Message
 - Refactored all streaming endpoints to use a new string extension for centralized parsing of event stream data
-- Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync. Default is false.
-- Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsAsync. Default is false.
+- Added optional paramter cancelJob to FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync. Default is false.
+- Added optional parameter cancelJob to FineTuningEndpoint.StreamFineTuneEventsAsync. Default is false.
+- Added optional parameter deleteCachedFile to FileEndpoint.DownloadFileAsync. Defaults to false.
 - Updated Completions.LogProbabilities.TopLogProbabilities to properly use immutable IReadOnlyList&lt;IReadOnlyDictionary&lt;string, double&gt;&gt;
 Version 6.7.4
 - Fixed Model.Permissions
