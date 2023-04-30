@@ -4,11 +4,19 @@ namespace OpenAI.Chat
 {
     public sealed class Choice
     {
-        internal Choice(Message message, string finishReason, int index)
+        public Choice() { }
+
+        public Choice(
+            Message message,
+            Delta delta,
+            string finishReason,
+            int index)
+            : this()
         {
-            Index = index;
             Message = message;
+            Delta = delta;
             FinishReason = finishReason;
+            Index = index;
         }
 
         [JsonInclude]

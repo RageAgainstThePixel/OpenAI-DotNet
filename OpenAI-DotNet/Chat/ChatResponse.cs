@@ -6,6 +6,8 @@ namespace OpenAI.Chat
 {
     public sealed class ChatResponse : BaseResponse
     {
+        public ChatResponse() { }
+
         internal ChatResponse(
             string id,
             string @object,
@@ -13,6 +15,7 @@ namespace OpenAI.Chat
             string model,
             Usage usage,
             List<Choice> choices)
+            : this()
         {
             Id = id;
             Object = @object;

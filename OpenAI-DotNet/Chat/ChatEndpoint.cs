@@ -96,7 +96,7 @@ namespace OpenAI.Chat
 
                     for (var i = 0; i < choiceCount; i++)
                     {
-                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), "stop", i));
+                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, "stop", i));
                     }
 
                     var finalResponse = new ChatResponse(partialResponse.Id, partialResponse.Object, partialResponse.Created, partialResponse.Model, partialResponse.Usage, finalChoices);
@@ -168,7 +168,7 @@ namespace OpenAI.Chat
 
                     for (var i = 0; i < choiceCount; i++)
                     {
-                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), "stop", i));
+                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, "stop", i));
                     }
 
                     var finalResponse = new ChatResponse(partialResponse.Id, partialResponse.Object, partialResponse.Created, partialResponse.Model, partialResponse.Usage, finalChoices);
