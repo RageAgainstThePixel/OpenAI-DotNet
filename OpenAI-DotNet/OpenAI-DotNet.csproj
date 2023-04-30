@@ -24,6 +24,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - Refactored all streaming endpoints to use a new string extension for centralized parsing of event stream data
 - Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync. Default is false.
 - Added cancelJob to FineTuningEndpoint.StreamFineTuneEventsAsync. Default is false.
+- Updated Completions.LogProbabilities.TopLogProbabilities to properly use immutable IReadOnlyList&lt;IReadOnlyDictionary&lt;string, double&gt;&gt;
 Version 6.7.4
 - Fixed Model.Permissions
 - Added Model.CreatedAt
@@ -130,7 +131,7 @@ Version 4.4.0
 - Updated CompletionRequest to accept IEnumerable&lt;string&gt; values for prompts and stopSequences
 - Refactored all endpoints to use new response validation extension
 - Added CancellationToken to most endpoints that had long running operations
-    </PackageReleaseNotes>
+</PackageReleaseNotes>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
