@@ -17,7 +17,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.8.0
+    <PackageReleaseNotes>Version 6.8.1
+- Fixed Completions.CompletionResult.ToString first completion index lookup
+Version 6.8.0
 - Removed Obsolete ChatPrompt
 - ChatEndpoint.StreamCompletionAsync will now also raise additional ChatResponse with completed Message
 - ChatEndpoint.StreamCompletionEnumerableAsync will now also raise additional ChatResponse with completed Message
