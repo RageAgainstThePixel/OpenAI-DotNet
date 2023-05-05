@@ -47,21 +47,21 @@ namespace OpenAI.Tests
             };
             var chatRequest = new ChatRequest(messages);
             var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
-             {
-                 Assert.IsNotNull(result);
-                 Assert.NotNull(result.Choices);
-                 Assert.NotZero(result.Choices.Count);
+            {
+                Assert.IsNotNull(result);
+                Assert.NotNull(result.Choices);
+                Assert.NotZero(result.Choices.Count);
 
-                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
-                 {
-                     Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
-                 }
+                foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
+                }
 
-                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
-                 {
-                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
-                 }
-             });
+                foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                }
+            });
 
             Assert.IsNotNull(finalResult);
         }
