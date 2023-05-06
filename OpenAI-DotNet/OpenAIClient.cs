@@ -86,7 +86,7 @@ namespace OpenAI
 
         private HttpClient SetupClient(HttpClient client = null)
         {
-            client ??= new HttpClient(new SocketsHttpHandler()
+            client ??= new HttpClient(new SocketsHttpHandler
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(15)
             });
