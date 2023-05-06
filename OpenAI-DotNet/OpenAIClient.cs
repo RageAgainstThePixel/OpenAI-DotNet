@@ -1,4 +1,5 @@
-﻿using OpenAI.Audio;
+﻿using System;
+using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
@@ -85,7 +86,10 @@ namespace OpenAI
 
         private HttpClient SetupClient(HttpClient client = null)
         {
-            client ??= new HttpClient();
+            client ??= new HttpClient(new SocketsHttpHandler()
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+            });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
             if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain)
