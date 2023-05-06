@@ -1,5 +1,4 @@
-﻿using System;
-using OpenAI.Audio;
+﻿using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
@@ -9,6 +8,7 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;

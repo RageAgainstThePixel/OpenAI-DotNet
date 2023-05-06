@@ -19,6 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <PackageReleaseNotes>Version 6.8.1
 - Fixed Completions.CompletionResult.ToString first completion index lookup
+- Update the HttpClient creation to set the PooledConnectionLifetime property per Microsofts recommendation.
 Version 6.8.0
 - Removed Obsolete ChatPrompt
 - ChatEndpoint.StreamCompletionAsync will now also raise additional ChatResponse with completed Message
