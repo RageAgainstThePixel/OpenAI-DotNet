@@ -85,7 +85,10 @@ namespace OpenAI
 
         private HttpClient SetupClient(HttpClient client = null)
         {
-            client ??= new HttpClient();
+            client ??= new HttpClient(new SocketsHttpHandler()
+            {
+                PooledConnectionLifetime = OpenAIClientSettings.PooledConnectionLifetime,
+            });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
             if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain)

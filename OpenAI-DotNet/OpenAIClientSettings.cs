@@ -23,6 +23,7 @@ namespace OpenAI
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
             UseOAuthAuthentication = true;
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15);
         }
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace OpenAI
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"https://{ResourceName}{BaseRequest}{{0}}";
             UseOAuthAuthentication = true;
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15);
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace OpenAI
         /// <param name="useActiveDirectoryAuthentication">
         /// Optional, set to true if you want to use Azure Active Directory for Authentication.
         /// </param>
-        public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = DefaultAzureApiVersion, bool useActiveDirectoryAuthentication = false)
+        public OpenAIClientSettings(string resourceName, string deploymentId, string apiVersion = DefaultAzureApiVersion, bool useActiveDirectoryAuthentication = false, TimeSpan? pooledConnectionLifetime = null)
         {
             if (string.IsNullOrWhiteSpace(resourceName))
             {
@@ -96,6 +98,7 @@ namespace OpenAI
             BaseRequest = $"/openai/deployments/{DeploymentId}/";
             BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}?api-version={ApiVersion}";
             UseOAuthAuthentication = useActiveDirectoryAuthentication;
+            PooledConnectionLifetime = pooledConnectionLifetime ?? TimeSpan.FromMinutes(15);
         }
 
         public string ResourceName { get; }
@@ -103,6 +106,8 @@ namespace OpenAI
         public string ApiVersion { get; }
 
         public string DeploymentId { get; }
+        
+        public TimeSpan PooledConnectionLifetime { get; }
 
         internal string BaseRequest { get; }
 
