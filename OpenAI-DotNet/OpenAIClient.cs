@@ -92,10 +92,10 @@ namespace OpenAI
             });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain)
-                && (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
-                    (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
-                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
+            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
+                (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
+                 (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
+                  !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
             {
                 throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
             }
