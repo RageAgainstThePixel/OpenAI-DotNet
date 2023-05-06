@@ -103,7 +103,7 @@ namespace OpenAI
         public string ApiVersion { get; }
 
         public string DeploymentId { get; }
-        
+
         internal string BaseRequest { get; }
 
         internal string BaseRequestUrlFormat { get; }
