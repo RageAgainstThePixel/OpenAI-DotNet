@@ -1,4 +1,5 @@
-﻿using OpenAI.Audio;
+﻿using System;
+using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
@@ -87,7 +88,7 @@ namespace OpenAI
         {
             client ??= new HttpClient(new SocketsHttpHandler()
             {
-                PooledConnectionLifetime = OpenAIClientSettings.PooledConnectionLifetime,
+                PooledConnectionLifetime = TimeSpan.FromMinutes(15)
             });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
