@@ -77,13 +77,9 @@ namespace OpenAI.Chat
 
                     partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
 
-                    // it is assumed that one response contains at least
-                    // one single choice completion
-                    var choice = partialResponse.Choices[0];
-
-                    if (choice.Delta?.Content != null)
+                    foreach (var choice in partialResponse.Choices)
                     {
-                        partials[choice.Index].Append(choice.Delta.Content);
+                        partials[choice.Index].Append(choice.ToString());
                     }
 
                     resultHandler(partialResponse);
@@ -99,8 +95,13 @@ namespace OpenAI.Chat
                         finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, "stop", i));
                     }
 
-                    var finalResponse = new ChatResponse(partialResponse.Id, partialResponse.Object, partialResponse.Created, partialResponse.Model, partialResponse.Usage, finalChoices);
-
+                    var finalResponse = new ChatResponse(
+                        partialResponse.Id,
+                        partialResponse.Object,
+                        partialResponse.Created,
+                        partialResponse.Model,
+                        partialResponse.Usage,
+                        finalChoices);
                     resultHandler(finalResponse);
                     return finalResponse;
                 }
@@ -149,13 +150,9 @@ namespace OpenAI.Chat
 
                     partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
 
-                    // it is assumed that one response contains at least
-                    // one single choice completion
-                    var choice = partialResponse.Choices[0];
-
-                    if (choice.Delta?.Content != null)
+                    foreach (var choice in partialResponse.Choices)
                     {
-                        partials[choice.Index].Append(choice.Delta.Content);
+                        partials[choice.Index].Append(choice.ToString());
                     }
 
                     yield return partialResponse;
@@ -171,7 +168,13 @@ namespace OpenAI.Chat
                         finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, "stop", i));
                     }
 
-                    var finalResponse = new ChatResponse(partialResponse.Id, partialResponse.Object, partialResponse.Created, partialResponse.Model, partialResponse.Usage, finalChoices);
+                    var finalResponse = new ChatResponse(
+                        partialResponse.Id,
+                        partialResponse.Object,
+                        partialResponse.Created,
+                        partialResponse.Model,
+                        partialResponse.Usage,
+                        finalChoices);
                     yield return finalResponse;
                     yield break;
                 }

@@ -20,13 +20,11 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var choiceCount = 2;
-            var chatRequest = new ChatRequest(messages, number: choiceCount);
+            var chatRequest = new ChatRequest(messages, number: 2);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
-            Assert.NotNull(result.Choices);
-            Assert.NotZero(result.Choices.Count);
-            Assert.IsTrue(result.Choices.Count == choiceCount);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 2);
 
             foreach (var choice in result.Choices)
             {
@@ -45,25 +43,27 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages);
+            var chatRequest = new ChatRequest(messages, number: 2);
             var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
-             {
-                 Assert.IsNotNull(result);
-                 Assert.NotNull(result.Choices);
-                 Assert.NotZero(result.Choices.Count);
+            {
+                Assert.IsNotNull(result);
+                Assert.IsNotNull(result.Choices);
+                Assert.NotZero(result.Choices.Count);
 
-                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
-                 {
-                     Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
-                 }
+                foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
+                }
 
-                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
-                 {
-                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
-                 }
-             });
+                foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+                {
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                }
+            });
 
             Assert.IsNotNull(finalResult);
+            Assert.IsNotNull(finalResult.Choices);
+            Assert.IsTrue(finalResult.Choices.Count == 2);
         }
 
         [Test]
@@ -77,11 +77,11 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages);
+            var chatRequest = new ChatRequest(messages, number: 2);
             await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
             {
                 Assert.IsNotNull(result);
-                Assert.NotNull(result.Choices);
+                Assert.IsNotNull(result.Choices);
                 Assert.NotZero(result.Choices.Count);
 
                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))

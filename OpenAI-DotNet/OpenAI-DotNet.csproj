@@ -17,7 +17,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <PackageReleaseNotes>Version 6.8.0
+    <Version>6.8.1</Version>
+    <PackageReleaseNotes>Version 6.8.1
+- Updated basic and chat completions choices to default to empty string.
+- Fixed Completions.CompletionResult.ToString first completion index lookup
+- Update the HttpClient creation to set the PooledConnectionLifetime property per Microsofts recommendation.
+Version 6.8.0
 - Removed Obsolete ChatPrompt
 - ChatEndpoint.StreamCompletionAsync will now also raise additional ChatResponse with completed Message
 - ChatEndpoint.StreamCompletionEnumerableAsync will now also raise additional ChatResponse with completed Message
@@ -137,7 +142,6 @@ Version 4.4.0
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <DelaySign>true</DelaySign>
     <PackageId>OpenAI-DotNet</PackageId>
-    <Version>6.8.0</Version>
     <Company>RageAgainstThePixel</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
