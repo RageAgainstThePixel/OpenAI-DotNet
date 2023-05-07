@@ -20,13 +20,12 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var choiceCount = 2;
-            var chatRequest = new ChatRequest(messages, number: choiceCount);
+            var chatRequest = new ChatRequest(messages, number: 2);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
-            Assert.IsTrue(result.Choices.Count == choiceCount);
+            Assert.IsTrue(result.Choices.Count == 2);
 
             foreach (var choice in result.Choices)
             {
@@ -45,7 +44,7 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages);
+            var chatRequest = new ChatRequest(messages, number: 2);
             var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
             {
                 Assert.IsNotNull(result);
@@ -64,6 +63,8 @@ namespace OpenAI.Tests
             });
 
             Assert.IsNotNull(finalResult);
+            Assert.NotNull(finalResult.Choices);
+            Assert.IsTrue(finalResult.Choices.Count == 2);
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace OpenAI.Tests
                 new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new Message(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages);
+            var chatRequest = new ChatRequest(messages, number: 2);
             await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
             {
                 Assert.IsNotNull(result);
