@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Completions
@@ -44,14 +45,11 @@ namespace OpenAI.Completions
         [JsonPropertyName("choices")]
         public IReadOnlyList<Choice> Completions { get; private set; }
 
-        /// <summary>
-        /// Gets the text of the first completion, representing the main result
-        /// </summary>
-        public override string ToString()
-        {
-            return Completions is { Count: > 0 }
-                ? Completions[0]
-                : $"CompletionResult {Id} has no valid output";
-        }
+        [JsonIgnore]
+        public Choice FirstChoice => Completions?.FirstOrDefault(choice => choice.Index == 0);
+
+        public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
+
+        public static implicit operator string(CompletionResult response) => response.ToString();
     }
 }

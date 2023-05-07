@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - OpenAI-DotNet/**
+      - OpenAI-DotNet-Proxy/**
   pull_request:
     branches:
       - '*'
     paths:
       - OpenAI-DotNet/**
+      - OpenAI-DotNet-Proxy/**
     types:
       - opened
       - synchronize
@@ -24,6 +26,7 @@ on:
 
 env:
   DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
+  PACKAGE_VERSION: ''
 
 jobs:
   build:

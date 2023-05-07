@@ -8,6 +8,7 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -85,13 +86,16 @@ namespace OpenAI
 
         private HttpClient SetupClient(HttpClient client = null)
         {
-            client ??= new HttpClient();
+            client ??= new HttpClient(new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+            });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
 
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain)
-                && (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
-                    (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
-                     !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
+            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
+                (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
+                 (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
+                  !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
             {
                 throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
             }
