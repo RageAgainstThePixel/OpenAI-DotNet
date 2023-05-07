@@ -23,8 +23,7 @@ namespace OpenAI.Tests
             var chatRequest = new ChatRequest(messages, number: 2);
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
-            Assert.NotNull(result.Choices);
-            Assert.NotZero(result.Choices.Count);
+            Assert.IsNotNull(result.Choices);
             Assert.IsTrue(result.Choices.Count == 2);
 
             foreach (var choice in result.Choices)
@@ -48,7 +47,7 @@ namespace OpenAI.Tests
             var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
             {
                 Assert.IsNotNull(result);
-                Assert.NotNull(result.Choices);
+                Assert.IsNotNull(result.Choices);
                 Assert.NotZero(result.Choices.Count);
 
                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
@@ -63,7 +62,7 @@ namespace OpenAI.Tests
             });
 
             Assert.IsNotNull(finalResult);
-            Assert.NotNull(finalResult.Choices);
+            Assert.IsNotNull(finalResult.Choices);
             Assert.IsTrue(finalResult.Choices.Count == 2);
         }
 
@@ -82,7 +81,7 @@ namespace OpenAI.Tests
             await foreach (var result in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
             {
                 Assert.IsNotNull(result);
-                Assert.NotNull(result.Choices);
+                Assert.IsNotNull(result.Choices);
                 Assert.NotZero(result.Choices.Count);
 
                 foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
