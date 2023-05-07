@@ -77,13 +77,9 @@ namespace OpenAI.Chat
 
                     partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
 
-                    // it is assumed that one response contains at least
-                    // one single choice completion
-                    var choice = partialResponse.Choices[0];
-
-                    if (choice.Delta?.Content != null)
+                    foreach (var choice in partialResponse.Choices)
                     {
-                        partials[choice.Index].Append(choice.Delta.Content);
+                        partials[choice.Index].Append(choice.ToString());
                     }
 
                     resultHandler(partialResponse);
@@ -154,13 +150,9 @@ namespace OpenAI.Chat
 
                     partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
 
-                    // it is assumed that one response contains at least
-                    // one single choice completion
-                    var choice = partialResponse.Choices[0];
-
-                    if (choice.Delta?.Content != null)
+                    foreach (var choice in partialResponse.Choices)
                     {
-                        partials[choice.Index].Append(choice.Delta.Content);
+                        partials[choice.Index].Append(choice.ToString());
                     }
 
                     yield return partialResponse;
