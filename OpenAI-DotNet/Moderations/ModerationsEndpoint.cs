@@ -12,7 +12,7 @@ namespace OpenAI.Moderations
     /// Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/moderations"/>
     /// </summary>
-    public sealed class ModerationsEndpoint : BaseEndPoint
+    public sealed class ModerationsEndpoint : BaseEndPoint, IModerationsEndpoint
     {
         /// <inheritdoc />
         public ModerationsEndpoint(OpenAIClient api) : base(api) { }

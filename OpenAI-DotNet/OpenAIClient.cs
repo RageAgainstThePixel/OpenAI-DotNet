@@ -20,7 +20,7 @@ namespace OpenAI
     /// <summary>
     /// Entry point to the OpenAI API, handling auth and allowing access to the various API endpoints
     /// </summary>
-    public sealed class OpenAIClient
+    public sealed class OpenAIClient : IOpenAIClient
     {
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
@@ -142,7 +142,7 @@ namespace OpenAI
         /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/models"/>
         /// </summary>
-        public ModelsEndpoint ModelsEndpoint { get; }
+        public IModelsEndpoint ModelsEndpoint { get; }
 
         /// <summary>
         /// Text generation is the core function of the API. You give the API a prompt, and it generates a completion.
@@ -152,55 +152,55 @@ namespace OpenAI
         /// (see the prompt library for inspiration).<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/completions"/>
         /// </summary>
-        public CompletionsEndpoint CompletionsEndpoint { get; }
+        public ICompletionsEndpoint CompletionsEndpoint { get; }
 
         /// <summary>
         /// Given a chat conversation, the model will return a chat completion response.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/chat"/>
         /// </summary>
-        public ChatEndpoint ChatEndpoint { get; }
+        public IChatEndpoint ChatEndpoint { get; }
 
         /// <summary>
         /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
         /// </summary>
-        public EditsEndpoint EditsEndpoint { get; }
+        public IEditsEndpoint EditsEndpoint { get; }
 
         /// <summary>
         /// Given a prompt and/or an input image, the model will generate a new image.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/images"/>
         /// </summary>
-        public ImagesEndpoint ImagesEndPoint { get; }
+        public IImagesEndpoint ImagesEndPoint { get; }
 
         /// <summary>
         /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.<br/>
         /// <see href="https://platform.openai.com/docs/guides/embeddings"/>
         /// </summary>
-        public EmbeddingsEndpoint EmbeddingsEndpoint { get; }
+        public IEmbeddingsEndpoint EmbeddingsEndpoint { get; }
 
         /// <summary>
         /// Transforms audio into text.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/audio"/>
         /// </summary>
-        public AudioEndpoint AudioEndpoint { get; }
+        public IAudioEndpoint AudioEndpoint { get; }
 
         /// <summary>
         /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/fine-tunes"/>
         /// </summary>
-        public FilesEndpoint FilesEndpoint { get; }
+        public IFilesEndpoint FilesEndpoint { get; }
 
         /// <summary>
         /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
         /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
         /// </summary>
-        public FineTuningEndpoint FineTuningEndpoint { get; }
+        public IFineTuningEndpoint FineTuningEndpoint { get; }
 
         /// <summary>
         /// The moderation endpoint is a tool you can use to check whether content complies with OpenAI's content policy.
         /// Developers can thus identify content that our content policy prohibits and take action, for instance by filtering it.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/moderations"/>
         /// </summary>
-        public ModerationsEndpoint ModerationsEndpoint { get; }
+        public IModerationsEndpoint ModerationsEndpoint { get; }
     }
 }

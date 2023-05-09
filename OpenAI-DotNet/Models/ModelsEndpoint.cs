@@ -13,7 +13,7 @@ namespace OpenAI.Models
     /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/models"/>
     /// </summary>
-    public sealed class ModelsEndpoint : BaseEndPoint
+    public sealed class ModelsEndpoint : BaseEndPoint, IModelsEndpoint
     {
         private class ModelsList
         {

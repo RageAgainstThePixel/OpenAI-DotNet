@@ -9,7 +9,7 @@ namespace OpenAI.Edits
     /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
     /// </summary>
-    public sealed class EditsEndpoint : BaseEndPoint
+    public sealed class EditsEndpoint : BaseEndPoint, IEditsEndpoint
     {
         /// <inheritdoc />
         public EditsEndpoint(OpenAIClient api) : base(api) { }

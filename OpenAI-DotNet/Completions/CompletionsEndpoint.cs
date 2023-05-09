@@ -19,7 +19,7 @@ namespace OpenAI.Completions
     /// (see the prompt library for inspiration).<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/completions"/>
     /// </summary>
-    public sealed class CompletionsEndpoint : BaseEndPoint
+    public sealed class CompletionsEndpoint : BaseEndPoint, ICompletionsEndpoint
     {
         /// <inheritdoc />
         internal CompletionsEndpoint(OpenAIClient api) : base(api) { }

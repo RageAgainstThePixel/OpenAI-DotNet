@@ -13,7 +13,7 @@ namespace OpenAI.Images
     /// Given a prompt and/or an input image, the model will generate a new image.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/images"/>
     /// </summary>
-    public sealed class ImagesEndpoint : BaseEndPoint
+    public sealed class ImagesEndpoint : BaseEndPoint, IImagesEndpoint
     {
         /// <inheritdoc />
         internal ImagesEndpoint(OpenAIClient api) : base(api) { }
