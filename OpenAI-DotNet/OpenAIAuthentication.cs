@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace OpenAI
 {
     /// <summary>
-    /// Represents authentication to the OpenAPI API endpoint
+    /// Represents authentication to the OpenAI API endpoint
     /// </summary>
     public sealed class OpenAIAuthentication
     {
