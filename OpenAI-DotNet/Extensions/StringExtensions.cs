@@ -27,6 +27,9 @@ namespace OpenAI.Extensions
         }
 
         public static StringContent ToJsonStringContent(this string json)
-            => new StringContent(json, Encoding.UTF8, "application/json");
+        {
+            const string jsonContent = "application/json";
+            return new StringContent(json, Encoding.UTF8, jsonContent);
+        }
     }
 }
