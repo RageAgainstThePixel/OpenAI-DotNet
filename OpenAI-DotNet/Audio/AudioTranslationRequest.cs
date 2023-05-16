@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using OpenAI.Models;
 
 namespace OpenAI.Audio
 {
@@ -31,7 +30,7 @@ namespace OpenAI.Audio
         /// </param>
         public AudioTranslationRequest(
             string audioPath,
-            Model model = null,
+            string model = null,
             string prompt = null,
             AudioResponseFormat responseFormat = AudioResponseFormat.Json,
             int? temperature = null)
@@ -68,7 +67,7 @@ namespace OpenAI.Audio
         public AudioTranslationRequest(
             Stream audio,
             string audioName,
-            Model model = null,
+            string model = null,
             string prompt = null,
             AudioResponseFormat responseFormat = AudioResponseFormat.Json,
             int? temperature = null)
@@ -82,7 +81,7 @@ namespace OpenAI.Audio
 
             AudioName = audioName;
 
-            Model = model ?? Models.Model.Whisper1;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Whisper1 : model;
 
             if (!Model.Contains("whisper"))
             {

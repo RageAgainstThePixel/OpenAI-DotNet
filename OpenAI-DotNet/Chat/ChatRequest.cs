@@ -1,4 +1,3 @@
-using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +68,7 @@ namespace OpenAI.Chat
         /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
-            Model model = null,
+            string model = null,
             double? temperature = null,
             double? topP = null,
             int? number = null,
@@ -80,7 +79,7 @@ namespace OpenAI.Chat
             Dictionary<string, double> logitBias = null,
             string user = null)
         {
-            Model = model ?? Models.Model.GPT3_5_Turbo;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
 
             if (!Model.Contains("turbo") &&
                 !Model.Contains("gpt-4"))

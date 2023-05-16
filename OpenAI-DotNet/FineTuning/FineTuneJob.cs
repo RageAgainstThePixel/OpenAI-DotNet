@@ -8,7 +8,20 @@ namespace OpenAI.FineTuning
     public sealed class FineTuneJob
     {
         [JsonConstructor]
-        public FineTuneJob(string id, string @object, string model, int createdAtUnixTime, IReadOnlyList<Event> events, string fineTunedModel, HyperParams hyperParams, string organizationId, IReadOnlyList<FileData> resultFiles, string status, IReadOnlyList<FileData> validationFiles, IReadOnlyList<FileData> trainingFiles, int updatedAtUnixTime)
+        public FineTuneJob(
+            string id,
+            string @object,
+            string model,
+            int createdAtUnixTime,
+            IReadOnlyList<Event> events,
+            string fineTunedModel,
+            HyperParams hyperParams,
+            string organizationId,
+            IReadOnlyList<FileData> resultFiles,
+            string status,
+            IReadOnlyList<FileData> validationFiles,
+            IReadOnlyList<FileData> trainingFiles,
+            int updatedAtUnixTime)
         {
             Id = id;
             Object = @object;

@@ -1,5 +1,4 @@
 ﻿using System;
-using OpenAI.Models;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Moderations
@@ -21,14 +20,14 @@ namespace OpenAI.Moderations
         /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
         /// </param>
         [JsonConstructor]
-        public ModerationsRequest(string input, Model model = null)
+        public ModerationsRequest(string input, string model = null)
         {
             Input = input;
-            Model = model ?? Models.Model.Moderation_Latest;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Moderation_Latest : model;
 
             if (!Model.Contains("text-moderation"))
             {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
+                throw new ArgumentException($"{model} is not supported", nameof(model));
             }
         }
 

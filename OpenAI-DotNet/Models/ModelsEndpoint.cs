@@ -83,6 +83,10 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
+            if (model.OwnedBy is "openai" or "system" or "openai-dev")
+            {
+                throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
+            }
             try
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);

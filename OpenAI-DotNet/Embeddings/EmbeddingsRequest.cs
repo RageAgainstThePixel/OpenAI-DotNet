@@ -17,14 +17,14 @@ namespace OpenAI.Embeddings
         /// Each input must not exceed 8192 tokens in length.
         /// </param>
         /// <param name="model">
-        /// The <see cref="Models.Model"/> to use.
+        /// ID of the model to use.<br>
         /// Defaults to: <see cref="Model.Embedding_Ada_002"/>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
-        public EmbeddingsRequest(string input, Model model = null, string user = null)
+        public EmbeddingsRequest(string input, string model = null, string user = null)
             : this(new List<string> { input }, model, user)
         {
             if (string.IsNullOrWhiteSpace(input))
@@ -42,14 +42,14 @@ namespace OpenAI.Embeddings
         /// Each input must not exceed 8192 tokens in length.
         /// </param>
         /// <param name="model">
-        /// The <see cref="Models.Model"/> to use.
+        /// The model id to use.
         /// Defaults to: <see cref="Model.Embedding_Ada_002"/>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
-        public EmbeddingsRequest(IEnumerable<string> input, Model model = null, string user = null)
+        public EmbeddingsRequest(IEnumerable<string> input, string model = null, string user = null)
         {
             Input = input?.ToList();
 
@@ -58,7 +58,7 @@ namespace OpenAI.Embeddings
                 throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
             }
 
-            Model = model ?? Models.Model.Embedding_Ada_002;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Embedding_Ada_002 : model;
 
             if (!Model.Contains("embedding") &&
                 !Model.Contains("search") &&
