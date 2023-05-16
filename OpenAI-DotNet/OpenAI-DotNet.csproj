@@ -17,8 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>6.8.2</Version>
-    <PackageReleaseNotes>Version 6.8.2
+    <Version>6.8.3</Version>
+    <PackageReleaseNotes>Version 6.8.3
+- Revert BaseEndpoint.GetUrl changes
+Version 6.8.2
 - Misc internal fixes, formatting, and docs
 Version 6.8.1
 - Updated basic and chat completions choices to default to empty string.

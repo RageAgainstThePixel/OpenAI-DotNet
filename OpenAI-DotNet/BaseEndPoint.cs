@@ -16,6 +16,6 @@
         /// </summary>
         /// <param name="endpoint">The endpoint url.</param>
         protected string GetUrl(string endpoint = "")
-            => string.Format(Api.OpenAIClientSettings.BaseRequestUrlFormat, string.Format(Root, endpoint));
+            => string.Format(Api.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{endpoint}");
     }
 }
