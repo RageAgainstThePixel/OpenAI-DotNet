@@ -83,10 +83,9 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
-            if (model.OwnedBy is "openai" or "system" or "openai-dev")
-            {
-                throw new UnauthorizedAccessException($"{model.Id} is not owned by your organization.");
-            }
+            // We could check ownership is not a system account as is done for the Unity port,
+            // but the API will error out anyways, and maybe an OpenAI employee will use this.
+
             try
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);
