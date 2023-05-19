@@ -1,5 +1,4 @@
 ﻿using OpenAI.Extensions;
-using OpenAI.Models;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -34,7 +33,7 @@ namespace OpenAI.Moderations
         /// <returns>
         /// True, if the text has been flagged by the model as violating OpenAI's content policy.
         /// </returns>
-        public async Task<bool> GetModerationAsync(string input, Model model = null)
+        public async Task<bool> GetModerationAsync(string input, string model = null)
         {
             var result = await CreateModerationAsync(new ModerationsRequest(input, model)).ConfigureAwait(false);
 

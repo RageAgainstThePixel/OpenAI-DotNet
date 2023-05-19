@@ -13,10 +13,17 @@ namespace OpenAI.Models
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="id"></param>
-        public Model(string id)
+        /// <param name="id">Model id.</param>
+        /// <param name="ownedBy">Optional, owned by id.</param>
+        public Model(string id, string ownedBy = null)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new ArgumentNullException(nameof(id), "Missing the id of the specified model.");
+            }
+
             Id = id;
+            OwnedBy = ownedBy;
         }
 
         /// <summary>
@@ -28,7 +35,7 @@ namespace OpenAI.Models
         /// <summary>
         /// Allows a string to be implicitly cast as a <see cref="Model"/>
         /// </summary>
-        public static implicit operator Model(string name) => new Model(name);
+        public static implicit operator Model(string name) => new(name);
 
         /// <inheritdoc />
         public override string ToString() => Id;
@@ -67,56 +74,61 @@ namespace OpenAI.Models
         /// <summary>
         /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat. Will be updated with our latest model iteration.
         /// </summary>
-        public static Model GPT4 { get; } = new Model("gpt-4") { OwnedBy = "openai" };
+        public static Model GPT4 { get; } = new("gpt-4", "openai");
 
         /// <summary>
         /// Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with our latest model iteration.
         /// </summary>
-        public static Model GPT4_32K { get; } = new Model("gpt-4-32k") { OwnedBy = "openai" };
+        public static Model GPT4_32K { get; } = new("gpt-4-32k", "openai");
 
         /// <summary>
         /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
         /// the price per token, we recommend gpt-3.5-turbo for most use cases.
         /// </summary>
-        public static Model GPT3_5_Turbo { get; } = new Model("gpt-3.5-turbo") { OwnedBy = "openai" };
+        public static Model GPT3_5_Turbo { get; } = new("gpt-3.5-turbo", "openai");
 
         /// <summary>
         /// The most powerful, largest engine available, although the speed is quite slow.<para/>
         /// Good at: Complex intent, cause and effect, summarization for audience
         /// </summary>
-        public static Model Davinci { get; } = new Model("text-davinci-003") { OwnedBy = "openai" };
+        public static Model Davinci { get; } = new("text-davinci-003", "openai");
+
+        /// <summary>
+        /// For edit requests.
+        /// </summary>
+        public static Model DavinciEdit { get; } = new("text-davinci-edit-001", "openai");
 
         /// <summary>
         /// The 2nd most powerful engine, a bit faster than <see cref="Davinci"/>, and a bit faster.<para/>
         /// Good at: Language translation, complex classification, text sentiment, summarization.
         /// </summary>
-        public static Model Curie { get; } = new Model("text-curie-001") { OwnedBy = "openai" };
+        public static Model Curie { get; } = new("text-curie-001", "openai");
 
         /// <summary>
         /// The 2nd fastest engine, a bit more powerful than <see cref="Ada"/>, and a bit slower.<para/>
         /// Good at: Moderate classification, semantic search classification
         /// </summary>
-        public static Model Babbage { get; } = new Model("text-babbage-001") { OwnedBy = "openai" };
+        public static Model Babbage { get; } = new("text-babbage-001", "openai");
 
         /// <summary>
         /// The smallest, fastest engine available, although the quality of results may be poor.<para/>
         /// Good at: Parsing text, simple classification, address correction, keywords
         /// </summary>
-        public static Model Ada { get; } = new Model("text-ada-001") { OwnedBy = "openai" };
+        public static Model Ada { get; } = new("text-ada-001", "openai");
 
         /// <summary>
         /// The default model for <see cref="Embeddings.EmbeddingsEndpoint"/>.
         /// </summary>
-        public static Model Embedding_Ada_002 { get; } = new Model("text-embedding-ada-002") { OwnedBy = "openai" };
+        public static Model Embedding_Ada_002 { get; } = new("text-embedding-ada-002", "openai");
 
         /// <summary>
         /// The default model for <see cref="Audio.AudioEndpoint"/>.
         /// </summary>
-        public static Model Whisper1 { get; } = new Model("whisper-1") { OwnedBy = "openai" };
+        public static Model Whisper1 { get; } = new("whisper-1", "openai");
 
         /// <summary>
         /// The default model for <see cref="Moderations.ModerationsEndpoint"/>.
         /// </summary>
-        public static Model Moderation_Latest { get; } = new Model("text-moderation-latest") { OwnedBy = "openai" };
+        public static Model Moderation_Latest { get; } = new("text-moderation-latest", "openai");
     }
 }

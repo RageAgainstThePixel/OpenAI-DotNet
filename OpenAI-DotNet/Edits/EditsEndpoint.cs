@@ -1,5 +1,4 @@
 ﻿using OpenAI.Extensions;
-using OpenAI.Models;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -42,7 +41,7 @@ namespace OpenAI.Edits
             int? editCount,
             double? temperature,
             double? topP,
-            Model model = null)
+            string model = null)
         {
             var request = new EditRequest(input, instruction, editCount, temperature, topP, model);
             var result = await CreateEditAsync(request).ConfigureAwait(false);

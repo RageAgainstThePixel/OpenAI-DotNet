@@ -83,6 +83,8 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
+            // Don't check ownership as API does it for us.
+
             try
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);
