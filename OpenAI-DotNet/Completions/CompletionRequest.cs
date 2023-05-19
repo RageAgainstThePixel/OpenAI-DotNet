@@ -1,5 +1,4 @@
-﻿using OpenAI.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -248,7 +247,7 @@ namespace OpenAI.Completions
         /// <param name="bestOf">Returns the top bestOf results based on the best probability.</param>
         /// <param name="user">A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.</param>
         public CompletionRequest(
-            Model model,
+            string model = null,
             string prompt = null,
             IEnumerable<string> prompts = null,
             string suffix = null,
@@ -275,10 +274,14 @@ namespace OpenAI.Completions
             }
             else
             {
-                throw new ArgumentNullException($"Missing required {nameof(prompt)}(s)");
+                throw new ArgumentNullException(nameof(prompt), $"Missing required prompt or prompts");
             }
 
-            Model = model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
+            Model = string.IsNullOrWhiteSpace(model)
+                    ? (string.IsNullOrWhiteSpace(DefaultCompletionRequestArgs?.Model)
+                        ? Models.Model.Davinci
+                        : DefaultCompletionRequestArgs.Model)
+                    : model;
 
             if (!Model.Contains("davinci") &&
                 !Model.Contains("curie") &&
