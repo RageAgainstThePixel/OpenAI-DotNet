@@ -28,7 +28,7 @@ namespace OpenAI.Tests
 
             foreach (var choice in result.Choices)
             {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
             }
         }
 
@@ -57,7 +57,7 @@ namespace OpenAI.Tests
 
                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
                 {
-                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
                 }
             });
 
@@ -91,7 +91,7 @@ namespace OpenAI.Tests
 
                 foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
                 {
-                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content}");
+                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
                 }
             }
         }

@@ -83,8 +83,7 @@ namespace OpenAI.Models
                 throw new Exception($"Failed to get {modelId} info!");
             }
 
-            // We could check ownership is not a system account as is done for the Unity port,
-            // but the API will error out anyways, and maybe an OpenAI employee will use this.
+            // Don't check ownership as API does it for us.
 
             try
             {
