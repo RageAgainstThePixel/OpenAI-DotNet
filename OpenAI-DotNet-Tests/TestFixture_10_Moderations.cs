@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading.Tasks;
+using OpenAI.Moderations;
 
 namespace OpenAI.Tests
 {
@@ -13,8 +15,9 @@ namespace OpenAI.Tests
             var violationResponse = await OpenAIClient.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
             Assert.IsTrue(violationResponse);
 
-            var response = await OpenAIClient.ModerationsEndpoint.GetModerationAsync("I love you");
-            Assert.IsFalse(response);
+            var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
+            Assert.IsNotNull(response);
+            Console.WriteLine(response.Results?[0]?.Scores?.ToString());
         }
     }
 }

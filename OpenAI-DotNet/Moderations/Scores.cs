@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Moderations
 {
@@ -31,5 +32,16 @@ namespace OpenAI.Moderations
         [JsonInclude]
         [JsonPropertyName("violence/graphic")]
         public double ViolenceGraphic { get; private set; }
+
+        public override string ToString() =>
+            $"{"Hate:",-10}{Hate:0.00 E+00}{Environment.NewLine}" +
+            $"{"Threat:",-10}{HateThreatening:0.00 E+00}{Environment.NewLine}" +
+            $"{"Violence:",-10}{Violence:0.00 E+00}{Environment.NewLine}" +
+            $"{"Graphic:",-10}{ViolenceGraphic:0.00 E+00}{Environment.NewLine}" +
+            $"{"SelfHarm:",-10}{SelfHarm:0.00 E+00}{Environment.NewLine}" +
+            $"{"Sexual:",-10}{Sexual:0.00 E+00}{Environment.NewLine}" +
+            $"{"Minors:",-10}{SexualMinors:0.00 E+00}{Environment.NewLine}";
+
+        public static implicit operator string(Scores scores) => scores.ToString();
     }
 }
