@@ -10,7 +10,7 @@ namespace OpenAI
         internal const string OpenAIDomain = "api.openai.com";
         internal const string DefaultOpenAIApiVersion = "v1";
         internal const string AzureOpenAIDomain = "openai.azure.com";
-        internal const string DefaultAzureApiVersion = "2022-12-01";
+        internal const string DefaultAzureApiVersion = "2023-05-15";
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
@@ -67,7 +67,7 @@ namespace OpenAI
         /// The name of your model deployment. You're required to first deploy a model before you can make calls.
         /// </param>
         /// <param name="apiVersion">
-        /// Optional, defaults to 2022-12-01
+        /// Optional, defaults to 2023-05-15
         /// </param>
         /// <param name="useActiveDirectoryAuthentication">
         /// Optional, set to true if you want to use Azure Active Directory for Authentication.
