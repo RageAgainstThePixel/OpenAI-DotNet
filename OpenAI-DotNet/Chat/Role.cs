@@ -10,5 +10,7 @@ namespace OpenAI.Chat
         Assistant = 2,
         [EnumMember(Value = "user")]
         User = 3,
+        [EnumMember(Value = "function")]
+        Function = 4,
     }
 }
