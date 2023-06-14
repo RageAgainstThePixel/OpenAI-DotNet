@@ -3,6 +3,7 @@ using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -93,6 +94,45 @@ namespace OpenAI.Tests
                 {
                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
                 }
+            }
+        }
+
+        [Test]
+        public async Task Test_4_GetChatFunctionCompletion()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "What's the weather like in Boston?"),
+            };
+            var functions = new List<Function>
+            {
+                new Function(
+                    "get_current_weather",
+                    "Get the current weather in a given location",
+                     new JsonObject
+                     {
+                         ["type"] = "object",
+                         ["properties"] = new JsonObject
+                         {
+                             ["location"] = new JsonObject { ["type"] = "string", ["description"] = "The city and state, e.g. San Francisco, CA"},
+                             ["unit"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray {"celsius", "fahrenheit"} },
+                         },
+                         ["required"] = new JsonArray { "location" }
+                     }
+                    )
+            };
+
+            var chatRequest = new ChatRequest(messages, functions: functions, function_call: "auto", model: "gpt-3.5-turbo-0613");
+            var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 1);
+
+            foreach (var choice in result.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
             }
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -14,8 +15,8 @@ namespace OpenAI.Chat
         /// The list of messages for the current chat session.
         /// </param>
         /// <param name="model">
-        /// ID of the model to use.<br/>
-        /// Currently, only gpt-4, gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
+        /// Id of the model to use.<br/>
+        /// Currently, only gpt-4 and gpt-3.5-turbo and their variants are supported.
         /// </param>
         /// <param name="temperature">
         /// What sampling temperature to use, between 0 and 2.
@@ -68,6 +69,8 @@ namespace OpenAI.Chat
         /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
+            IEnumerable<Function> functions = null,
+            string function_call = null,
             string model = null,
             double? temperature = null,
             double? topP = null,
@@ -92,6 +95,17 @@ namespace OpenAI.Chat
             if (Messages?.Count == 0)
             {
                 throw new ArgumentNullException(nameof(messages), $"Missing required {nameof(messages)} parameter");
+            }
+
+            Functions = functions?.ToList();
+
+            if (Functions != null && Functions.Count > 0 && string.IsNullOrEmpty(function_call))
+            {
+                throw new ArgumentException("If functions are provided, please provide a function_call specifier e.g. (auto, none, or {\"name\": \"<insert-function-name>\"})");
+            }
+            else
+            {
+                FunctionCall = function_call;
             }
 
             Temperature = temperature;
@@ -200,5 +214,17 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("user")]
         public string User { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonPropertyName("functions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public IReadOnlyList<Function> Functions { get; }
+
+        [JsonPropertyName("function_call")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string FunctionCall { get; }
+
     }
 }
