@@ -21,11 +21,15 @@ namespace OpenAI.Chat
         /// </param>
         public Function(string name, string description = null, JsonObject parameters = null)
         {
-            if(string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentException("Function name cannot be null or whitespace.", nameof(name));
+            }
 
-            if(name.Length > 64)
+            if (name.Length > 64)
+            {
                 throw new ArgumentException("Function name cannot be longer than 64 characters.", nameof(name));
+            }
 
             // Not all possible "functions" must follow the following commented rules,
             // as they could be from any language and not all languages have the same parsing restrictions.

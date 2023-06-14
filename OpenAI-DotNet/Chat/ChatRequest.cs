@@ -66,11 +66,11 @@ namespace OpenAI.Chat
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        /// <param name="functions">
-        /// An optional list of functions to get arguments for.
-        /// </param>
         /// <param name="function_call">
         /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// </param>
+        /// <param name="functions">
+        /// An optional list of functions to get arguments for.
         /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
@@ -84,8 +84,8 @@ namespace OpenAI.Chat
             double? frequencyPenalty = null,
             Dictionary<string, double> logitBias = null,
             string user = null,
-            IEnumerable<Function> functions = null,
-            string function_call = null)
+            string function_call = null,
+            IEnumerable <Function> functions = null)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
 
@@ -221,15 +221,20 @@ namespace OpenAI.Chat
         public string User { get; }
 
         /// <summary>
-        /// 
+        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// </summary>
+        [JsonPropertyName("function_call")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string FunctionCall { get; }
+
+        /// <summary>
+        /// An optional list of functions to get arguments for.
         /// </summary>
         [JsonPropertyName("functions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<Function> Functions { get; }
 
-        [JsonPropertyName("function_call")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string FunctionCall { get; }
+
 
     }
 }
