@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -67,10 +66,14 @@ namespace OpenAI.Chat
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
+        /// <param name="functions">
+        /// An optional list of functions to get arguments for.
+        /// </param>
+        /// <param name="function_call">
+        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
-            IEnumerable<Function> functions = null,
-            string function_call = null,
             string model = null,
             double? temperature = null,
             double? topP = null,
@@ -80,7 +83,9 @@ namespace OpenAI.Chat
             double? presencePenalty = null,
             double? frequencyPenalty = null,
             Dictionary<string, double> logitBias = null,
-            string user = null)
+            string user = null,
+            IEnumerable<Function> functions = null,
+            string function_call = null)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
 
@@ -101,7 +106,7 @@ namespace OpenAI.Chat
 
             if (Functions != null && Functions.Count > 0 && string.IsNullOrEmpty(function_call))
             {
-                throw new ArgumentException("If functions are provided, please provide a function_call specifier e.g. (auto, none, or {\"name\": \"<insert-function-name>\"})");
+                throw new ArgumentException("If functions are provided, please also provide a function_call specifier e.g. (auto, none, or {\"name\": \"<insert-function-name>\"})");
             }
             else
             {

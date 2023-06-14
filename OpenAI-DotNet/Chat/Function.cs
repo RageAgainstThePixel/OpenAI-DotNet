@@ -46,7 +46,7 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonObject Parameters { get; private set; }
 
-        public override string ToString() => Name + ": " +Description ?? string.Empty;
+        public override string ToString() => $"{Name}: {Description}";
 
         public static implicit operator string(Function function) => function.ToString();
     }
