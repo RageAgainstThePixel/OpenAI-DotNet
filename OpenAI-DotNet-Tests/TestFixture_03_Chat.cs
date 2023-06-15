@@ -176,9 +176,9 @@ namespace OpenAI.Tests
 
         internal class WeatherService
         {
-            public static string GetCurrentWeather(WeatherArgs args)
+            public static string GetCurrentWeather(WeatherArgs weatherArgs)
             {
-                return $"The current weather in {args.Location} is 20 {args.Unit}";
+                return $"The current weather in {weatherArgs.Location} is 20 {weatherArgs.Unit}";
             }
         }
 
