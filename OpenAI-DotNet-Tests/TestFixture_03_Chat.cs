@@ -3,7 +3,9 @@ using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -103,37 +105,92 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
             {
-                new Message(Role.System, "You are a helpful assistant."),
-                new Message(Role.User, "What's the weather like in Boston?"),
+                new Message(Role.System, "You are a helpful weather assistant."),
+                new Message(Role.User, "What's the weather like today?"),
             };
             var functions = new List<Function>
             {
                 new Function(
-                    "get_current_weather",
+                    "GetCurrentWeather",
                     "Get the current weather in a given location",
                      new JsonObject
                      {
                          ["type"] = "object",
                          ["properties"] = new JsonObject
                          {
-                             ["location"] = new JsonObject { ["type"] = "string", ["description"] = "The city and state, e.g. San Francisco, CA"},
-                             ["unit"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray {"celsius", "fahrenheit"} },
+                             ["location"] = new JsonObject
+                             {
+                                 ["type"] = "string",
+                                 ["description"] = "The city and state, e.g. San Francisco, CA"
+                             },
+                             ["unit"] = new JsonObject
+                             {
+                                 ["type"] = "string",
+                                 ["enum"] = new JsonArray {"celsius", "fahrenheit"}
+                             }
                          },
-                         ["required"] = new JsonArray { "location" }
-                     }
-                    )
+                         ["required"] = new JsonArray { "location", "unit" }
+                     })
             };
 
-            var chatRequest = new ChatRequest(messages, functions: functions, function_call: "auto", model: "gpt-3.5-turbo-0613");
+            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
             Assert.IsTrue(result.Choices.Count == 1);
+            messages.Add(result.FirstChoice.Message);
 
-            foreach (var choice in result.Choices)
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+
+            messages.Add(new Message(Role.User, "I'm in Glasgow, Scotland"));
+            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 1);
+            messages.Add(result.FirstChoice.Message);
+
+            if (!string.IsNullOrWhiteSpace(result.FirstChoice.Message.Content))
             {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
+                Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+
+                messages.Add(new Message(Role.User, "celsius"));
+                chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+                result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+                Assert.IsNotNull(result);
+                Assert.IsNotNull(result.Choices);
+                Assert.IsTrue(result.Choices.Count == 1);
             }
+
+            Assert.IsTrue(result.FirstChoice.FinishReason == "function_call");
+            Assert.IsTrue(result.FirstChoice.Message.Function.Name == nameof(WeatherService.GetCurrentWeather));
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
+            Console.WriteLine($"{result.FirstChoice.Message.Function.Arguments}");
+            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
+            var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+            Assert.IsNotNull(functionResult);
+            Console.WriteLine(functionResult);
+            messages.Add(new Message(Role.Function, functionResult));
+        }
+
+        internal class WeatherService
+        {
+            public static string GetCurrentWeather(WeatherArgs args)
+            {
+                return $"The current weather in {args.Location} is 20 {args.Unit}";
+            }
+        }
+
+        internal class WeatherArgs
+        {
+            [JsonPropertyName("location")]
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+            public string Location { get; set; }
+
+            [JsonPropertyName("unit")]
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+            public string Unit { get; set; }
         }
     }
 }
