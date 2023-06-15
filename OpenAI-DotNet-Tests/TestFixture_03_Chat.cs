@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
 using OpenAI.Chat;
+using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -172,25 +172,6 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             Console.WriteLine(functionResult);
             messages.Add(new Message(Role.Function, functionResult));
-        }
-
-        internal class WeatherService
-        {
-            public static string GetCurrentWeather(WeatherArgs weatherArgs)
-            {
-                return $"The current weather in {weatherArgs.Location} is 20 {weatherArgs.Unit}";
-            }
-        }
-
-        internal class WeatherArgs
-        {
-            [JsonPropertyName("location")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-            public string Location { get; set; }
-
-            [JsonPropertyName("unit")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-            public string Unit { get; set; }
         }
     }
 }
