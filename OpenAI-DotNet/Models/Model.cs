@@ -77,13 +77,18 @@ namespace OpenAI.Models
         public static Model GPT4 { get; } = new("gpt-4", "openai");
 
         /// <summary>
-        /// Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with our latest model iteration.
+        /// Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with our latest model iteration.  Tokens are 2x the price of gpt-4.
         /// </summary>
         public static Model GPT4_32K { get; } = new("gpt-4-32k", "openai");
 
         /// <summary>
-        /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
-        /// the price per token, we recommend gpt-3.5-turbo for most use cases.
+        /// Same capabilities as the base gpt-3.5-turbo mode but with 4x the context length.  Tokens are 2x the price of gpt-3.5-turbo. Will be updated with our latest model iteration.
+        /// </summary>
+        public static Model GPT3_5_Turbo_16K { get; } = new("gpt-3.5-turbo-16k", "openai");
+
+        /// <summary>
+        /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 5% the price per input token and 10% the price per output token of davinci, 
+        /// we recommend gpt-3.5-turbo for most use cases.
         /// </summary>
         public static Model GPT3_5_Turbo { get; } = new("gpt-3.5-turbo", "openai");
 

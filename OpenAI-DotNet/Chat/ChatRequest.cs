@@ -14,8 +14,8 @@ namespace OpenAI.Chat
         /// The list of messages for the current chat session.
         /// </param>
         /// <param name="model">
-        /// ID of the model to use.<br/>
-        /// Currently, only gpt-4, gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
+        /// Id of the model to use.<br/>
+        /// Currently, only gpt-4 and gpt-3.5-turbo and their variants are supported.
         /// </param>
         /// <param name="temperature">
         /// What sampling temperature to use, between 0 and 2.
@@ -66,6 +66,12 @@ namespace OpenAI.Chat
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
+        /// <param name="functionCall">
+        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// </param>
+        /// <param name="functions">
+        /// An optional list of functions to get arguments for.
+        /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
             string model = null,
@@ -76,8 +82,10 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             double? presencePenalty = null,
             double? frequencyPenalty = null,
-            Dictionary<string, double> logitBias = null,
-            string user = null)
+            IReadOnlyDictionary<string, double> logitBias = null,
+            string user = null,
+            string functionCall = null,
+            IEnumerable<Function> functions = null)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
 
@@ -103,6 +111,14 @@ namespace OpenAI.Chat
             FrequencyPenalty = frequencyPenalty;
             LogitBias = logitBias;
             User = user;
+
+            if (string.IsNullOrEmpty(functionCall) && Functions is { Count: > 0 })
+            {
+                throw new ArgumentException("If functions are provided, please also provide a function_call specifier e.g. (auto, none, or {\"name\": \"<insert-function-name>\"})");
+            }
+
+            FunctionCall = functionCall;
+            Functions = functions?.ToList();
         }
 
         /// <summary>
@@ -200,5 +216,19 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("user")]
         public string User { get; }
+
+        /// <summary>
+        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// </summary>
+        [JsonPropertyName("function_call")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string FunctionCall { get; }
+
+        /// <summary>
+        /// An optional list of functions to get arguments for.
+        /// </summary>
+        [JsonPropertyName("functions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public IReadOnlyList<Function> Functions { get; }
     }
 }
