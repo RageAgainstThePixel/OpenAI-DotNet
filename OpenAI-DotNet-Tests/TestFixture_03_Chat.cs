@@ -108,10 +108,16 @@ namespace OpenAI.Tests
                 new Message(Role.System, "You are a helpful weather assistant."),
                 new Message(Role.User, "What's the weather like today?"),
             };
+
+            foreach (var message in messages)
+            {
+                Console.WriteLine($"{message.Role}: {message.Content}");
+            }
+
             var functions = new List<Function>
             {
                 new Function(
-                    "GetCurrentWeather",
+                    nameof(WeatherService.GetCurrentWeather),
                     "Get the current weather in a given location",
                      new JsonObject
                      {
@@ -170,8 +176,8 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            Console.WriteLine(functionResult);
             messages.Add(new Message(Role.Function, functionResult));
+            Console.WriteLine($"{Role.Function}: {functionResult}");
         }
     }
 }
