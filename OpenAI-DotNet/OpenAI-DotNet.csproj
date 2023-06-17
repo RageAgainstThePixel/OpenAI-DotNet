@@ -17,8 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.0.0</Version>
-    <PackageReleaseNotes>Version 7.0.0
+    <Version>7.0.1</Version>
+    <PackageReleaseNotes>Version 7.0.1
+- Fixed streaming chat functions
+Version 7.0.0
 - Added function calling to chat models
 Version 6.8.7
 - Added ToString and string operator to Moderation Scores

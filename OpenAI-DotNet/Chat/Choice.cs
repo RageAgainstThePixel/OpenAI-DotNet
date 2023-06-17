@@ -37,8 +37,35 @@ namespace OpenAI.Chat
         [JsonPropertyName("index")]
         public int Index { get; private set; }
 
-        public override string ToString() => Message?.ToString() ?? Delta?.ToString() ?? string.Empty;
+        public override string ToString() => Message?.Content ?? Delta?.Content ?? string.Empty;
 
         public static implicit operator string(Choice choice) => choice.ToString();
+
+        internal void CopyFrom(Choice other)
+        {
+            if (other?.Message != null)
+            {
+                Message = other.Message;
+            }
+
+            if (other?.Delta != null)
+            {
+                if (Message == null)
+                {
+                    Message = new Message(other.Delta);
+                }
+                else
+                {
+                    Message.CopyFrom(other.Delta);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(other?.FinishReason))
+            {
+                FinishReason = other.FinishReason;
+            }
+
+            Index = other?.Index ?? 0;
+        }
     }
 }

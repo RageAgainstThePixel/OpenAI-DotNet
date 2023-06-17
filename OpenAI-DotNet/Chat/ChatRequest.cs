@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -230,5 +231,8 @@ namespace OpenAI.Chat
         [JsonPropertyName("functions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<Function> Functions { get; }
+
+        /// <inheritdoc />
+        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }

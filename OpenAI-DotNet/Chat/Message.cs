@@ -4,6 +4,11 @@ namespace OpenAI.Chat
 {
     public sealed class Message
     {
+        internal Message(Delta other)
+        {
+            CopyFrom(other);
+        }
+
         /// <summary>
         /// Creates a new message to insert into a chat conversation.
         /// </summary>
@@ -63,5 +68,36 @@ namespace OpenAI.Chat
         public override string ToString() => Content ?? string.Empty;
 
         public static implicit operator string(Message message) => message.ToString();
+
+        internal void CopyFrom(Delta other)
+        {
+            if (Role == 0 &&
+                other?.Role > 0)
+            {
+                Role = other.Role;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other?.Content))
+            {
+                Content += other.Content;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other?.Name))
+            {
+                Name = other.Name;
+            }
+
+            if (other?.Function != null)
+            {
+                if (Function == null)
+                {
+                    Function = new Function(other);
+                }
+                else
+                {
+                    Function.CopyFrom(other);
+                }
+            }
+        }
     }
 }
