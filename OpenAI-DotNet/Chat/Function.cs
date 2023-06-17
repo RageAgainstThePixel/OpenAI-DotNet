@@ -71,9 +71,5 @@ namespace OpenAI.Chat
         [JsonPropertyName("arguments")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode Arguments { get; private set; }
-
-        public override string ToString() => $"{Name}: {Description}";
-
-        public static implicit operator string(Function function) => function.ToString();
     }
 }
