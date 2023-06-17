@@ -20,7 +20,6 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Version>6.7.0</Version>
     <PackageReleaseNotes>Version 6.7.0
 - Added function calling to chat models
-- Added chunk size parameter to embedding request
 Version 6.8.7
 - Added ToString and string operator to Moderation Scores
 Version 6.8.6
