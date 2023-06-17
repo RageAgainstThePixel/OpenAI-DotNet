@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
+    /// <summary>
+    /// <see href="https://platform.openai.com/docs/guides/gpt/function-calling"/>
+    /// </summary>
     public class Function
     {
         /// <summary>
@@ -20,7 +23,7 @@ namespace OpenAI.Chat
         /// An optional JSON object describing the parameters of the function that the model should generate in JSON schema format (json-schema.org).
         /// </param>
         /// <param name="arguments">
-        /// // TODO
+        /// The arguments to use when calling the function.
         /// </param>
         public Function(string name, string description = null, JsonNode parameters = null, JsonNode arguments = null)
         {
@@ -67,13 +70,12 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode Parameters { get; private set; }
 
+        /// <summary>
+        /// The arguments to use when calling the function.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode Arguments { get; private set; }
-
-        public override string ToString() => $"{Name}: {Description}";
-
-        public static implicit operator string(Function function) => function.ToString();
     }
 }

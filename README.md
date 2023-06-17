@@ -39,8 +39,8 @@ Install-Package OpenAI-DotNet
 
 - [Authentication](#authentication)
 - [Azure OpenAI](#azure-openai)
-  - [Azure Active Directory Authentication](#azure-active-directory-authentication) :new:
-- [OpenAI API Proxy](#openai-api-proxy) :new:
+  - [Azure Active Directory Authentication](#azure-active-directory-authentication)
+- [OpenAI API Proxy](#openai-api-proxy)
 - [Models](#models)
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
@@ -50,6 +50,7 @@ Install-Package OpenAI-DotNet
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
+  - [Functions](#chat-functions) :new:
 - [Edits](#edits)
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
@@ -422,6 +423,90 @@ await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(ch
         Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
     }
 }
+```
+
+##### [Chat Functions](https://platform.openai.com/docs/api-reference/chat/create#chat/create-functions)
+
+> Only available with the latest 0613 model series!
+
+```csharp
+var api = new OpenAIClient();
+var messages = new List<Message>
+{
+    new Message(Role.System, "You are a helpful weather assistant."),
+    new Message(Role.User, "What's the weather like today?"),
+};
+
+foreach (var message in messages)
+{
+    Console.WriteLine($"{message.Role}: {message.Content}");
+}
+
+// Define the functions that the assistant is able to use:
+var functions = new List<Function>
+{
+    new Function(
+        nameof(WeatherService.GetCurrentWeather),
+        "Get the current weather in a given location",
+            new JObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JObject
+                {
+                    ["location"] = new JObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "The city and state, e.g. San Francisco, CA"
+                    },
+                    ["unit"] = new JObject
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new JArray {"celsius", "fahrenheit"}
+                    }
+                },
+                ["required"] = new JArray { "location", "unit" }
+            })
+};
+
+var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+messages.Add(result.FirstChoice.Message);
+Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
+messages.Add(locationMessage);
+Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
+chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+messages.Add(result.FirstChoice.Message);
+
+if (!string.IsNullOrWhiteSpace(result.FirstChoice.Message.Content))
+{
+    // It's possible that the assistant will also ask you which units you want the temperature in.
+    Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+
+    var unitMessage = new Message(Role.User, "celsius");
+    messages.Add(unitMessage);
+    Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
+    chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+    result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+}
+
+Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
+Console.WriteLine($"{result.FirstChoice.Message.Function.Arguments}");
+var functionArgs = JsonConvert.DeserializeObject<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
+var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+messages.Add(new Message(Role.Function, functionResult));
+Console.WriteLine($"{Role.Function}: {functionResult}");
+// System: You are a helpful weather assistant.
+// User: What's the weather like today?
+// Assistant: Sure, may I know your current location? | Finish Reason: stop
+// User: I'm in Glasgow, Scotland
+// Assistant: GetCurrentWeather | Finish Reason: function_call
+// {
+//   "location": "Glasgow, Scotland",
+//   "unit": "celsius"
+// }
+// Function: The current weather in Glasgow, Scotland is 20 celsius
 ```
 
 ### [Edits](https://platform.openai.com/docs/api-reference/edits)

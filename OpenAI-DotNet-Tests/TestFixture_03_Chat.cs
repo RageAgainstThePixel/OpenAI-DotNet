@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
 using OpenAI.Chat;
+using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -108,10 +108,16 @@ namespace OpenAI.Tests
                 new Message(Role.System, "You are a helpful weather assistant."),
                 new Message(Role.User, "What's the weather like today?"),
             };
+
+            foreach (var message in messages)
+            {
+                Console.WriteLine($"{message.Role}: {message.Content}");
+            }
+
             var functions = new List<Function>
             {
                 new Function(
-                    "GetCurrentWeather",
+                    nameof(WeatherService.GetCurrentWeather),
                     "Get the current weather in a given location",
                      new JsonObject
                      {
@@ -142,7 +148,9 @@ namespace OpenAI.Tests
 
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
 
-            messages.Add(new Message(Role.User, "I'm in Glasgow, Scotland"));
+            var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
+            messages.Add(locationMessage);
+            Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
             chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
             result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
@@ -155,7 +163,9 @@ namespace OpenAI.Tests
             {
                 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
 
-                messages.Add(new Message(Role.User, "celsius"));
+                var unitMessage = new Message(Role.User, "celsius");
+                messages.Add(unitMessage);
+                Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
                 chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
                 result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
                 Assert.IsNotNull(result);
@@ -170,27 +180,8 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            Console.WriteLine(functionResult);
             messages.Add(new Message(Role.Function, functionResult));
-        }
-
-        internal class WeatherService
-        {
-            public static string GetCurrentWeather(WeatherArgs args)
-            {
-                return $"The current weather in {args.Location} is 20 {args.Unit}";
-            }
-        }
-
-        internal class WeatherArgs
-        {
-            [JsonPropertyName("location")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-            public string Location { get; set; }
-
-            [JsonPropertyName("unit")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-            public string Unit { get; set; }
+            Console.WriteLine($"{Role.Function}: {functionResult}");
         }
     }
 }
