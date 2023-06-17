@@ -21,10 +21,12 @@ namespace OpenAI.Chat
 
         [JsonInclude]
         [JsonPropertyName("message")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Message Message { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Delta Delta { get; private set; }
 
         [JsonInclude]

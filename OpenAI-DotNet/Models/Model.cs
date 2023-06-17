@@ -72,12 +72,14 @@ namespace OpenAI.Models
         public string Parent { get; private set; }
 
         /// <summary>
-        /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat. Will be updated with our latest model iteration.
+        /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
+        /// Will be updated with our latest model iteration.
         /// </summary>
         public static Model GPT4 { get; } = new("gpt-4", "openai");
 
         /// <summary>
-        /// Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with our latest model iteration.
+        /// Same capabilities as the base gpt-4 mode but with 4x the context length.
+        /// Will be updated with our latest model iteration.  Tokens are 2x the price of gpt-4.
         /// </summary>
         public static Model GPT4_32K { get; } = new("gpt-4-32k", "openai");
 
@@ -86,6 +88,12 @@ namespace OpenAI.Models
         /// the price per token, we recommend gpt-3.5-turbo for most use cases.
         /// </summary>
         public static Model GPT3_5_Turbo { get; } = new("gpt-3.5-turbo", "openai");
+
+        /// <summary>
+        /// Same capabilities as the base gpt-3.5-turbo mode but with 4x the context length.
+        /// Tokens are 2x the price of gpt-3.5-turbo. Will be updated with our latest model iteration.
+        /// </summary>
+        public static Model GPT3_5_Turbo_16K { get; } = new("gpt-3.5-turbo-16k", "openai");
 
         /// <summary>
         /// The most powerful, largest engine available, although the speed is quite slow.<para/>
