@@ -33,6 +33,8 @@ namespace OpenAI.Tests
             {
                 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
             }
+
+            result.GetUsage();
         }
 
         [Test]
@@ -47,26 +49,27 @@ namespace OpenAI.Tests
                 new Message(Role.User, "Where was it played?"),
             };
             var chatRequest = new ChatRequest(messages, number: 2);
-            var finalResult = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
+            var result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
-                Assert.IsNotNull(result);
-                Assert.IsNotNull(result.Choices);
-                Assert.NotZero(result.Choices.Count);
+                Assert.IsNotNull(partialResponse);
+                Assert.IsNotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
 
-                foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Delta?.Content)))
+                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Delta?.Content)))
                 {
                     Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
                 }
 
-                foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Message?.Content)))
+                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Message?.Content)))
                 {
                     Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
                 }
             });
 
-            Assert.IsNotNull(finalResult);
-            Assert.IsNotNull(finalResult.Choices);
-            Assert.IsTrue(finalResult.Choices.Count == 2);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 2);
+            result.GetUsage();
         }
 
         [Test]

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
@@ -33,5 +34,7 @@ namespace OpenAI
                 TotalTokens = other.TotalTokens.Value;
             }
         }
+
+        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }

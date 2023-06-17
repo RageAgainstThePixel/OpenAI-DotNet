@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -108,6 +109,18 @@ namespace OpenAI.Chat
                     choices[otherChoice.Index].CopyFrom(otherChoice);
                 }
             }
+        }
+
+        public string GetUsage(bool log = true)
+        {
+            var message = $"{Id} | {Model} | {Usage}";
+
+            if (log)
+            {
+                Console.WriteLine(message);
+            }
+
+            return message;
         }
     }
 }
