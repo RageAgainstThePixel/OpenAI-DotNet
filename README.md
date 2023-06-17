@@ -383,13 +383,13 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo, number: 2);
 await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
 {
-    foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Delta?.Content)))
     {
         // Partial response content
         Console.WriteLine(choice.Delta.Content);
     }
 
-    foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Message?.Content)))
     {
         // Completed response content
         Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
@@ -411,13 +411,13 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages, Model.GPT4); // gpt4 access required
 await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
-    foreach (var choice in result.Choices.Where(choice => choice.Delta?.Content != null))
+    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Delta?.Content)))
     {
         // Partial response content
         Console.WriteLine(choice.Delta.Content);
     }
 
-    foreach (var choice in result.Choices.Where(choice => choice.Message?.Content != null))
+    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice.Message?.Content)))
     {
         // Completed response content
         Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");

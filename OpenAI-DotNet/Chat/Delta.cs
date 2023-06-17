@@ -16,6 +16,12 @@ namespace OpenAI.Chat
         [JsonPropertyName("name")]
         public string Name { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("function_call")]
+        public Function Function { get; private set; }
+
         public override string ToString() => Content ?? string.Empty;
+
+        public static implicit operator string(Delta delta) => delta.ToString();
     }
 }

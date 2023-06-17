@@ -8,6 +8,8 @@ namespace OpenAI.Chat
     {
         public ChatResponse() { }
 
+        internal ChatResponse(ChatResponse other) => CopyFrom(other);
+
         public ChatResponse(
             string id,
             string @object,
@@ -45,9 +47,16 @@ namespace OpenAI.Chat
         [JsonPropertyName("usage")]
         public Usage Usage { get; private set; }
 
+        [JsonIgnore]
+        private List<Choice> choices;
+
         [JsonInclude]
         [JsonPropertyName("choices")]
-        public IReadOnlyList<Choice> Choices { get; private set; }
+        public IReadOnlyList<Choice> Choices
+        {
+            get => choices;
+            private set => choices = value.ToList();
+        }
 
         [JsonIgnore]
         public Choice FirstChoice => Choices?.FirstOrDefault(choice => choice.Index == 0);
@@ -55,5 +64,50 @@ namespace OpenAI.Chat
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
         public static implicit operator string(ChatResponse response) => response.ToString();
+
+        internal void CopyFrom(ChatResponse other)
+        {
+            if (!string.IsNullOrWhiteSpace(other?.Id))
+            {
+                Id = other.Id;
+            }
+
+            if (!string.IsNullOrEmpty(other?.Object))
+            {
+                Object = other.Object;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other?.Model))
+            {
+                Model = other.Model;
+            }
+
+            if (other?.Usage != null)
+            {
+                if (Usage == null)
+                {
+                    Usage = other.Usage;
+                }
+                else
+                {
+                    Usage.CopyFrom(other.Usage);
+                }
+            }
+
+            if (other?.Choices is { Count: > 0 })
+            {
+                choices ??= new List<Choice>();
+
+                foreach (var otherChoice in other.Choices)
+                {
+                    if (otherChoice.Index + 1 > choices.Count)
+                    {
+                        choices.Insert(otherChoice.Index, otherChoice);
+                    }
+
+                    choices[otherChoice.Index].CopyFrom(otherChoice);
+                }
+            }
+        }
     }
 }
