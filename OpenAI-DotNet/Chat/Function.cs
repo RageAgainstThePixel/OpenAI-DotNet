@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -9,6 +8,11 @@ namespace OpenAI.Chat
     /// </summary>
     public class Function
     {
+        internal Function(Delta other)
+        {
+            CopyFrom(other);
+        }
+
         /// <summary>
         /// Creates a new function description to insert into a chat conversation.
         /// </summary>
@@ -27,16 +31,6 @@ namespace OpenAI.Chat
         /// </param>
         public Function(string name, string description = null, JsonNode parameters = null, JsonNode arguments = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException($"{nameof(name)} cannot be null or whitespace.", nameof(name));
-            }
-
-            if (name.Length > 64)
-            {
-                throw new ArgumentException($"{nameof(name)} cannot be longer than 64 characters.", nameof(name));
-            }
-
             Name = name;
             Description = description;
             Parameters = parameters;
@@ -50,7 +44,6 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; private set; }
 
         /// <summary>
@@ -58,8 +51,11 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("description")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Description { get; private set; }
+
+        private string parametersString;
+
+        private JsonNode parameters;
 
         /// <summary>
         /// The optional parameters of the function.
@@ -67,15 +63,69 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("parameters")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public JsonNode Parameters { get; private set; }
+        public JsonNode Parameters
+        {
+            get
+            {
+                if (parameters == null &&
+                    !string.IsNullOrWhiteSpace(parametersString))
+                {
+                    parameters = JsonNode.Parse(parametersString);
+                }
+
+                return parameters;
+            }
+            set => parameters = value;
+        }
+
+
+        private string argumentsString;
+
+        private JsonNode arguments;
 
         /// <summary>
         /// The arguments to use when calling the function.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public JsonNode Arguments { get; private set; }
+        public JsonNode Arguments
+        {
+            get
+            {
+                if (arguments == null &&
+                    !string.IsNullOrWhiteSpace(argumentsString))
+                {
+                    arguments = JsonNode.Parse(argumentsString);
+                }
+
+                return arguments;
+            }
+            set => arguments = value;
+        }
+
+        internal void CopyFrom(Delta other)
+        {
+            var otherFunction = other.Function;
+
+            if (!string.IsNullOrWhiteSpace(otherFunction.Name))
+            {
+                Name = otherFunction.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(otherFunction.Description))
+            {
+                Description = otherFunction.Description;
+            }
+
+            if (otherFunction.Arguments != null)
+            {
+                argumentsString += otherFunction.Arguments.ToString();
+            }
+
+            if (otherFunction.Parameters != null)
+            {
+                parametersString += otherFunction.Parameters.ToString();
+            }
+        }
     }
 }

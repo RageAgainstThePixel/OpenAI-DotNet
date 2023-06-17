@@ -58,63 +58,36 @@ namespace OpenAI.Chat
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
-            var choiceCount = chatRequest.Number ?? 1;
-            ChatResponse partialResponse = null;
-            var finishReasons = new List<string>(choiceCount);
-            var partials = new List<StringBuilder>(choiceCount);
-
-            for (var i = 0; i < choiceCount; i++)
-            {
-                finishReasons.Add(string.Empty);
-                partials.Add(new StringBuilder());
-            }
+            ChatResponse chatResponse = null;
 
             while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (streamData.TryGetEventStreamData(out var eventData))
+                if (!streamData.TryGetEventStreamData(out var eventData)) { continue; }
+                if (string.IsNullOrWhiteSpace(eventData)) { continue; }
+
+                var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
+
+                if (chatResponse == null)
                 {
-                    if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-
-                    partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
-
-                    foreach (var choice in partialResponse.Choices)
-                    {
-                        partials[choice.Index].Append(choice.ToString());
-
-                        if (!string.IsNullOrWhiteSpace(choice.FinishReason))
-                        {
-                            finishReasons[choice.Index] = choice.FinishReason;
-                        }
-                    }
-
-                    resultHandler(partialResponse);
+                    chatResponse = new ChatResponse(partialResponse);
                 }
                 else
                 {
-                    if (partialResponse == null) { return null; }
-
-                    var finalChoices = new List<Choice>(choiceCount);
-
-                    for (var i = 0; i < choiceCount; i++)
-                    {
-                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, finishReasons[i], i));
-                    }
-
-                    var finalResponse = new ChatResponse(
-                        partialResponse.Id,
-                        partialResponse.Object,
-                        partialResponse.Created,
-                        partialResponse.Model,
-                        partialResponse.Usage,
-                        finalChoices);
-                    resultHandler(finalResponse);
-                    return finalResponse;
+                    chatResponse.CopyFrom(partialResponse);
                 }
+
+                resultHandler(partialResponse);
             }
 
-            return null;
+            response.EnsureSuccessStatusCode();
+
+            if (chatResponse == null) { return null; }
+
+            chatResponse.SetResponseData(response.Headers);
+            resultHandler(chatResponse);
+            return chatResponse;
         }
 
         /// <summary>
@@ -138,61 +111,35 @@ namespace OpenAI.Chat
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
-            var choiceCount = chatRequest.Number ?? 1;
-            ChatResponse partialResponse = null;
-            var finishReasons = new List<string>(choiceCount);
-            var partials = new List<StringBuilder>(choiceCount);
-
-            for (var i = 0; i < choiceCount; i++)
-            {
-                finishReasons.Add(string.Empty);
-                partials.Add(new StringBuilder());
-            }
+            ChatResponse chatResponse = null;
 
             while (await reader.ReadLineAsync() is { } streamData)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (streamData.TryGetEventStreamData(out var eventData))
+                if (!streamData.TryGetEventStreamData(out var eventData)) { continue; }
+                if (string.IsNullOrWhiteSpace(eventData)) { continue; }
+
+                var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
+
+                if (chatResponse == null)
                 {
-                    if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-
-                    partialResponse = response.DeserializeResponse<ChatResponse>(eventData, Api.JsonSerializationOptions);
-
-                    foreach (var choice in partialResponse.Choices)
-                    {
-                        partials[choice.Index].Append(choice.ToString());
-
-                        if (!string.IsNullOrWhiteSpace(choice.FinishReason))
-                        {
-                            finishReasons[choice.Index] = choice.FinishReason;
-                        }
-                    }
-
-                    yield return partialResponse;
+                    chatResponse = new ChatResponse(partialResponse);
                 }
                 else
                 {
-                    if (partialResponse == null) { yield break; }
-
-                    var finalChoices = new List<Choice>(choiceCount);
-
-                    for (var i = 0; i < choiceCount; i++)
-                    {
-                        finalChoices.Add(new Choice(new Message(Role.Assistant, partials[i].ToString()), null, finishReasons[i], i));
-                    }
-
-                    var finalResponse = new ChatResponse(
-                        partialResponse.Id,
-                        partialResponse.Object,
-                        partialResponse.Created,
-                        partialResponse.Model,
-                        partialResponse.Usage,
-                        finalChoices);
-                    yield return finalResponse;
-                    yield break;
+                    chatResponse.CopyFrom(partialResponse);
                 }
+
+                yield return partialResponse;
             }
+
+            response.EnsureSuccessStatusCode();
+
+            if (chatResponse == null) { yield break; }
+
+            chatResponse.SetResponseData(response.Headers);
+            yield return chatResponse;
         }
     }
 }
