@@ -148,7 +148,9 @@ namespace OpenAI.Tests
 
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
 
-            messages.Add(new Message(Role.User, "I'm in Glasgow, Scotland"));
+            var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
+            messages.Add(locationMessage);
+            Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
             chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
             result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
@@ -161,7 +163,9 @@ namespace OpenAI.Tests
             {
                 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
 
-                messages.Add(new Message(Role.User, "celsius"));
+                var unitMessage = new Message(Role.User, "celsius");
+                messages.Add(unitMessage);
+                Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
                 chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
                 result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
                 Assert.IsNotNull(result);
