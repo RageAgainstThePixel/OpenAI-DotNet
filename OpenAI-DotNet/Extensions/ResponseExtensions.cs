@@ -22,8 +22,15 @@ namespace OpenAI.Extensions
                 response.Organization = headers.GetValues(Organization).FirstOrDefault();
             }
 
-            response.ProcessingTime = TimeSpan.FromMilliseconds(double.Parse(headers.GetValues(ProcessingTime).First()));
-            response.RequestId = headers.GetValues(RequestId).FirstOrDefault();
+            if (headers.Contains(ProcessingTime))
+            {
+                response.ProcessingTime = TimeSpan.FromMilliseconds(double.Parse(headers.GetValues(ProcessingTime).First()));
+            }
+
+            if (headers.Contains(RequestId))
+            {
+                response.RequestId = headers.GetValues(RequestId).FirstOrDefault();
+            }
         }
 
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
