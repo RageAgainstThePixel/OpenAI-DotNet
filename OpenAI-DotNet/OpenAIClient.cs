@@ -33,6 +33,7 @@ namespace OpenAI
         /// <param name="clientSettings">
         /// Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure or proxy domain.
         /// </param>
+        /// <param name="client">A <see cref="HttpClient"/>.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
         public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null, HttpClient client = null)
         {
