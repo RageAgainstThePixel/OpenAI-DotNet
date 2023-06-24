@@ -68,10 +68,10 @@ namespace OpenAI.Chat
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <param name="functionCall">
-        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// Null or string "auto" to let the OpenAI service decide, "none" if none are to be called, or JsonObject {["name"] = "FunctionName"} to force.
         /// </param>
         /// <param name="functions">
-        /// An optional list of functions to get arguments for.
+        /// An optional list of functions to get arguments for.  Null or empty for none.
         /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
@@ -85,7 +85,7 @@ namespace OpenAI.Chat
             double? frequencyPenalty = null,
             IReadOnlyDictionary<string, double> logitBias = null,
             string user = null,
-            string functionCall = null,
+            object functionCall = null,
             IEnumerable<Function> functions = null)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
@@ -112,12 +112,6 @@ namespace OpenAI.Chat
             FrequencyPenalty = frequencyPenalty;
             LogitBias = logitBias;
             User = user;
-
-            if (string.IsNullOrEmpty(functionCall) && Functions is { Count: > 0 })
-            {
-                throw new ArgumentException("If functions are provided, please also provide a function_call specifier e.g. (auto, none, or {\"name\": \"<insert-function-name>\"})");
-            }
-
             FunctionCall = functionCall;
             Functions = functions?.ToList();
         }
@@ -223,7 +217,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("function_call")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string FunctionCall { get; }
+        public object FunctionCall { get; }
 
         /// <summary>
         /// An optional list of functions to get arguments for.

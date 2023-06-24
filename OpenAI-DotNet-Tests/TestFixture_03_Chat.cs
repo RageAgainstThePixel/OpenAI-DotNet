@@ -313,5 +313,80 @@ namespace OpenAI.Tests
             messages.Add(new Message(Role.Function, functionResult));
             Console.WriteLine($"{Role.Function}: {functionResult}");
         }
+
+        [Test]
+        public async Task Test_6_GetChatFunctionForceCompletion()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful weather assistant."),
+                new Message(Role.User, "What's the weather like today?"),
+            };
+
+            foreach (var message in messages)
+            {
+                Console.WriteLine($"{message.Role}: {message.Content}");
+            }
+
+            var functions = new List<Function>
+            {
+                new Function(
+                    nameof(WeatherService.GetCurrentWeather),
+                    "Get the current weather in a given location",
+                     new JsonObject
+                     {
+                         ["type"] = "object",
+                         ["properties"] = new JsonObject
+                         {
+                             ["location"] = new JsonObject
+                             {
+                                 ["type"] = "string",
+                                 ["description"] = "The city and state, e.g. San Francisco, CA"
+                             },
+                             ["unit"] = new JsonObject
+                             {
+                                 ["type"] = "string",
+                                 ["enum"] = new JsonArray {"celsius", "fahrenheit"}
+                             }
+                         },
+                         ["required"] = new JsonArray { "location", "unit" }
+                     })
+            };
+
+            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: null, model: "gpt-3.5-turbo-0613");
+            var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 1);
+            messages.Add(result.FirstChoice.Message);
+
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+
+            var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
+            messages.Add(locationMessage);
+            Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
+            chatRequest = new ChatRequest(
+                messages, functions: 
+                functions, 
+                functionCall: new JsonObject { ["name"] = $"{nameof(WeatherService.GetCurrentWeather)}" }, 
+                model: "gpt-3.5-turbo-0613");
+            result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Assert.IsTrue(result.Choices.Count == 1);
+            messages.Add(result.FirstChoice.Message);
+
+            Assert.IsTrue(result.FirstChoice.FinishReason == "stop");
+            Assert.IsTrue(result.FirstChoice.Message.Function.Name == nameof(WeatherService.GetCurrentWeather));
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
+            Console.WriteLine($"{result.FirstChoice.Message.Function.Arguments}");
+            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
+            var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+            Assert.IsNotNull(functionResult);
+            messages.Add(new Message(Role.Function, functionResult));
+            Console.WriteLine($"{Role.Function}: {functionResult}");
+        }
     }
 }
