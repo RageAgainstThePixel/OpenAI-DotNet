@@ -73,7 +73,7 @@ namespace OpenAI.Chat
                 Id = other.Id;
             }
 
-            if (!string.IsNullOrEmpty(other?.Object))
+            if (!string.IsNullOrWhiteSpace(other?.Object))
             {
                 Object = other.Object;
             }
