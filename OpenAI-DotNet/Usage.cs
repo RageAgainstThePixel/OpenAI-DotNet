@@ -5,6 +5,15 @@ namespace OpenAI
 {
     public sealed class Usage
     {
+        public Usage() { }
+
+        public Usage(int promptTokens, int completionTokens, int totalTokens)
+        {
+            PromptTokens = promptTokens;
+            CompletionTokens = completionTokens;
+            TotalTokens = totalTokens;
+        }
+
         [JsonInclude]
         [JsonPropertyName("prompt_tokens")]
         public int? PromptTokens { get; private set; }
@@ -36,5 +45,11 @@ namespace OpenAI
         }
 
         public override string ToString() => JsonSerializer.Serialize(this);
+
+        public static Usage operator +(Usage a, Usage b)
+            => new Usage(
+                (a.PromptTokens ?? 0) + (b.PromptTokens ?? 0),
+                (a.CompletionTokens ?? 0) + (b.CompletionTokens ?? 0),
+                (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0));
     }
 }

@@ -17,8 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.0.3</Version>
-    <PackageReleaseNotes>Version 7.0.3
+    <Version>7.0.4</Version>
+    <PackageReleaseNotes>Version 7.0.4
+- Fixed ChatRequest forced function calls
+Version 7.0.3
 - Fixed chat streaming message copy from delta
 Version 7.0.2
 - Only set response header properties if they exist
