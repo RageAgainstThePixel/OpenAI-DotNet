@@ -19,7 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <Version>7.0.4</Version>
     <PackageReleaseNotes>Version 7.0.4
-- Fixed bug 125, ChatRequest function_call does not support forced function calls
+- Fixed ChatRequest forced function calls
 Version 7.0.3
 - Fixed chat streaming message copy from delta
 Version 7.0.2
