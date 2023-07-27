@@ -46,17 +46,10 @@ namespace OpenAI
 
         public override string ToString() => JsonSerializer.Serialize(this);
 
-        public string ToPrintableString() =>
-            $"{"PromptTokens:",-18}{PromptTokens}{System.Environment.NewLine}" +
-            $"{"CompletionTokens:",-18}{CompletionTokens}{System.Environment.NewLine}" +
-            $"{"TotalTokens:",-18}{TotalTokens}{System.Environment.NewLine}";
-
-        public static Usage operator+(Usage a, Usage b)
-        {
-            return new Usage(
+        public static Usage operator +(Usage a, Usage b)
+            => new Usage(
                 (a.PromptTokens ?? 0) + (b.PromptTokens ?? 0),
                 (a.CompletionTokens ?? 0) + (b.CompletionTokens ?? 0),
                 (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0));
-        }
     }
 }
