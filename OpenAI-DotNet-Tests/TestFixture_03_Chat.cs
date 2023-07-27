@@ -382,8 +382,8 @@ namespace OpenAI.Tests
             messages.Add(locationMessage);
             Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
             chatRequest = new ChatRequest(
-                messages, functions:
-                functions,
+                messages,
+                functions: functions,
                 functionCall: new JsonObject { ["name"] = $"{nameof(WeatherService.GetCurrentWeather)}" },
                 model: "gpt-3.5-turbo-0613");
             result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
