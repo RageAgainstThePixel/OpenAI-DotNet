@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
@@ -68,7 +69,7 @@ namespace OpenAI.Chat
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
         /// <param name="functionCall">
-        /// Null or string "auto" to let the OpenAI service decide, "none" if none are to be called, or JsonObject {["name"] = "FunctionName"} to force.
+        /// Pass "auto" to let the OpenAI service decide, "none" if none are to be called, or "functionName" to force function call. Defaults to "auto".
         /// </param>
         /// <param name="functions">
         /// An optional list of functions to get arguments for.  Null or empty for none.
@@ -85,7 +86,7 @@ namespace OpenAI.Chat
             double? frequencyPenalty = null,
             IReadOnlyDictionary<string, double> logitBias = null,
             string user = null,
-            dynamic functionCall = null,
+            string functionCall = null,
             IEnumerable<Function> functions = null)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
@@ -112,8 +113,30 @@ namespace OpenAI.Chat
             FrequencyPenalty = frequencyPenalty;
             LogitBias = logitBias;
             User = user;
-            FunctionCall = functionCall;
-            Functions = functions?.ToList();
+
+            var functionList = functions?.ToList();
+
+            if (functionList != null && functionList.Any())
+            {
+                if (string.IsNullOrWhiteSpace(functionCall))
+                {
+                    FunctionCall = "auto";
+                }
+                else
+                {
+                    if (!functionCall.Equals("none") &&
+                        !functionCall.Equals("auto"))
+                    {
+                        FunctionCall = new JsonObject { ["name"] = functionCall };
+                    }
+                    else
+                    {
+                        FunctionCall = functionCall;
+                    }
+                }
+            }
+
+            Functions = functionList?.ToList();
         }
 
         /// <summary>
@@ -213,7 +236,7 @@ namespace OpenAI.Chat
         public string User { get; }
 
         /// <summary>
-        /// If functions is not null or empty, this is required.  Pass "auto" to let the API decide, "none" if none are to be called, or {"name": "function-name"}
+        /// Pass "auto" to let the OpenAI service decide, "none" if none are to be called, or "functionName" to force function call. Defaults to "auto".
         /// </summary>
         [JsonPropertyName("function_call")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
