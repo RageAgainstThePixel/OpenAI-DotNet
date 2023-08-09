@@ -198,8 +198,11 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            messages.Add(new Message(Role.Function, functionResult));
+            messages.Add(new Message(Role.Function, functionResult, "GetCurrentWeather"));
             Console.WriteLine($"{Role.Function}: {functionResult}");
+            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Console.WriteLine(result);
         }
 
         [Test]

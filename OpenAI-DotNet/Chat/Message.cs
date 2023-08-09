@@ -45,7 +45,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public string Content { get; private set; }
 
         /// <summary>
