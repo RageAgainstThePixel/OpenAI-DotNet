@@ -157,7 +157,7 @@ namespace OpenAI.Tests
                      })
             };
 
-            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -169,7 +169,7 @@ namespace OpenAI.Tests
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
             Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
-            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
             result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
             Assert.IsNotNull(result);
@@ -184,7 +184,7 @@ namespace OpenAI.Tests
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
                 Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
-                chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+                chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
                 result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Choices);
@@ -198,8 +198,11 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            messages.Add(new Message(Role.Function, functionResult));
+            messages.Add(new Message(Role.Function, functionResult, nameof(WeatherService.GetCurrentWeather)));
             Console.WriteLine($"{Role.Function}: {functionResult}");
+            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Console.WriteLine(result);
         }
 
         [Test]
@@ -241,7 +244,7 @@ namespace OpenAI.Tests
                     })
             };
 
-            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
             var result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -266,7 +269,7 @@ namespace OpenAI.Tests
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
             Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
-            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+            chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
             result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -295,7 +298,7 @@ namespace OpenAI.Tests
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
                 Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
-                chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+                chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
                 result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
                 {
                     Assert.IsNotNull(partialResponse);
@@ -325,7 +328,7 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            messages.Add(new Message(Role.Function, functionResult));
+            messages.Add(new Message(Role.Function, functionResult, nameof(WeatherService.GetCurrentWeather)));
             Console.WriteLine($"{Role.Function}: {functionResult}");
         }
 
@@ -369,7 +372,7 @@ namespace OpenAI.Tests
                      })
             };
 
-            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: null, model: "gpt-3.5-turbo-0613");
+            var chatRequest = new ChatRequest(messages, functions: functions, functionCall: null, model: "gpt-3.5-turbo");
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -400,7 +403,7 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            messages.Add(new Message(Role.Function, functionResult));
+            messages.Add(new Message(Role.Function, functionResult, nameof(WeatherService.GetCurrentWeather)));
             Console.WriteLine($"{Role.Function}: {functionResult}");
         }
     }

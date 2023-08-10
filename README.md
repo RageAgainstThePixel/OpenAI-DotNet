@@ -467,7 +467,7 @@ var functions = new List<Function>
          })
 };
 
-var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
 var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(result.FirstChoice.Message);
 
@@ -476,7 +476,7 @@ Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Messa
 var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
 messages.Add(locationMessage);
 Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
-chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
 result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(result.FirstChoice.Message);
@@ -488,7 +488,7 @@ if (!string.IsNullOrEmpty(result.FirstChoice.Message.Content))
     var unitMessage = new Message(Role.User, "celsius");
     messages.Add(unitMessage);
     Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
-    chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo-0613");
+    chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
     result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 }
 
@@ -496,7 +496,7 @@ Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Messa
 Console.WriteLine($"{result.FirstChoice.Message.Function.Arguments}");
 var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
 var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-messages.Add(new Message(Role.Function, functionResult));
+messages.Add(new Message(Role.Function, functionResult, nameof(WeatherService.GetCurrentWeather)));
 Console.WriteLine($"{Role.Function}: {functionResult}");
 // System: You are a helpful weather assistant.
 // User: What's the weather like today?
