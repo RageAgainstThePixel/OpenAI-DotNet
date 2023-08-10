@@ -19,7 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <Version>7.0.5</Version>
     <PackageReleaseNotes>Version 7.0.5
-- Fixed Message.Content serializaiton in Role.Function message history
+- Fixed Message.Content serialization in Role.Function message history
 Version 7.0.4
 - Fixed ChatRequest forced function calls
 Version 7.0.3
