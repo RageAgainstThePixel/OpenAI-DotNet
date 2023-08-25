@@ -17,8 +17,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.0.5</Version>
-    <PackageReleaseNotes>Version 7.0.5
+    <Version>7.0.8</Version>
+    <PackageReleaseNotes>Version 7.0.8
+- Fixed AudioTranscriptionRequest.Temperature type. int? -> float?
+- Updated Moderations Categories and Scores with new metrics
+Version 7.0.5
 - Fixed Message.Content serialization in Role.Function message history
 Version 7.0.4
 - Fixed ChatRequest forced function calls
