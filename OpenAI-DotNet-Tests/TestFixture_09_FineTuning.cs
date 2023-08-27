@@ -229,7 +229,7 @@ namespace OpenAI.Tests
             }
             catch (UnauthorizedAccessException)
             {
-                Console.WriteLine("Your account does not have permissions to delete models.");
+                Console.WriteLine("You have insufficient permissions for this operation. You need to be this role: Owner.");
             }
         }
     }

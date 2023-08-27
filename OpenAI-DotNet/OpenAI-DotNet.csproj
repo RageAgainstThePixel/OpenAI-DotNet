@@ -17,8 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.0.8</Version>
-    <PackageReleaseNotes>Version 7.0.8
+    <Version>7.0.9</Version>
+    <PackageReleaseNotes>Version 7.0.9
+- Fixed Model permission Unauthorized Access check
+Version 7.0.8
 - Fixed AudioTranscriptionRequest.Temperature type. int? -> float?
 - Updated Moderations Categories and Scores with new metrics
 Version 7.0.5
