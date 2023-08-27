@@ -19,7 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <Version>7.0.9</Version>
     <PackageReleaseNotes>Version 7.0.9
-- Fixed Model permission Unauthorized Access check
+- Fixed Model delete permission Unauthorized Access check
 Version 7.0.8
 - Fixed AudioTranscriptionRequest.Temperature type. int? -> float?
 - Updated Moderations Categories and Scores with new metrics
