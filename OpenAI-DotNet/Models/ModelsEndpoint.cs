@@ -93,9 +93,9 @@ namespace OpenAI.Models
             }
             catch (Exception e)
             {
-                if (e.Message.Contains("api.delete"))
+                if (e.Message.Contains("You have insufficient permissions for this operation. You need to be this role: Owner."))
                 {
-                    throw new UnauthorizedAccessException($"You do not have permissions to delete models for this organization.\n{e}");
+                    throw new UnauthorizedAccessException($"You have insufficient permissions for this operation. You need to be this role: Owner.\n{e}");
                 }
 
                 throw;
