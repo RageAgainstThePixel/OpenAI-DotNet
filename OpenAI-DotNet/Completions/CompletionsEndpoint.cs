@@ -199,10 +199,8 @@ namespace OpenAI.Completions
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl())
-            {
-                Content = jsonContent
-            };
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
+            request.Content = jsonContent;
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -309,10 +307,8 @@ namespace OpenAI.Completions
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl())
-            {
-                Content = jsonContent
-            };
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
+            request.Content = jsonContent;
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
