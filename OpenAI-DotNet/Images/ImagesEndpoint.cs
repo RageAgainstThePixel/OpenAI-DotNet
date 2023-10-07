@@ -206,14 +206,13 @@ namespace OpenAI.Images
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var imagesResponse = JsonSerializer.Deserialize<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
+            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
 
             if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)
             {
                 throw new HttpRequestException($"{nameof(DeserializeResponseAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
             }
 
-            imagesResponse.SetResponseData(response.Headers);
             return imagesResponse.Data.Select(imageResult => string.IsNullOrWhiteSpace(imageResult.Url) ? imageResult.B64_Json : imageResult.Url).ToList();
         }
     }

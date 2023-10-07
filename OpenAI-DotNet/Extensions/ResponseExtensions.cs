@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,25 +12,34 @@ namespace OpenAI.Extensions
 {
     internal static class ResponseExtensions
     {
-        private const string Organization = "Openai-Organization";
         private const string RequestId = "X-Request-ID";
+        private const string Organization = "Openai-Organization";
         private const string ProcessingTime = "Openai-Processing-Ms";
+
+        private static readonly NumberFormatInfo numberFormatInfo = new NumberFormatInfo
+        {
+            NumberGroupSeparator = ",",
+            NumberDecimalSeparator = "."
+        };
 
         internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers)
         {
-            if (headers.Contains(Organization))
+            if (headers == null) { return; }
+
+            if (headers.TryGetValues(RequestId, out var requestId))
             {
-                response.Organization = headers.GetValues(Organization).FirstOrDefault();
+                response.RequestId = requestId.First();
             }
 
-            if (headers.Contains(ProcessingTime))
+            if (headers.TryGetValues(Organization, out var organization))
             {
-                response.ProcessingTime = TimeSpan.FromMilliseconds(double.Parse(headers.GetValues(ProcessingTime).First()));
+                response.Organization = organization.First();
             }
 
-            if (headers.Contains(RequestId))
+            if (headers.TryGetValues(ProcessingTime, out var processingTimeString) &&
+                double.TryParse(processingTimeString.First(), NumberStyles.AllowDecimalPoint, numberFormatInfo, out var processingTime))
             {
-                response.RequestId = headers.GetValues(RequestId).FirstOrDefault();
+                response.ProcessingTime = TimeSpan.FromMilliseconds(processingTime);
             }
         }
 

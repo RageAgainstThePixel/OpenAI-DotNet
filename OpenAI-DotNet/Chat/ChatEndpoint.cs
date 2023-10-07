@@ -49,10 +49,8 @@ namespace OpenAI.Chat
         {
             chatRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"))
-            {
-                Content = jsonContent
-            };
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
+            request.Content = jsonContent;
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -102,10 +100,8 @@ namespace OpenAI.Chat
         {
             chatRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(chatRequest, Api.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"))
-            {
-                Content = jsonContent
-            };
+            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
+            request.Content = jsonContent;
             var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
