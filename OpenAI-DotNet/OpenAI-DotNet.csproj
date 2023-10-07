@@ -189,5 +189,5 @@ Version 4.4.0
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-</ItemGroup>
+  </ItemGroup>
 </Project>
