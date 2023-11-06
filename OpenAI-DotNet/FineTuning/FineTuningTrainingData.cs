@@ -57,6 +57,6 @@ namespace OpenAI.FineTuning
 
         public static implicit operator string(FineTuningTrainingData data) => data.ToString();
 
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
     }
 }

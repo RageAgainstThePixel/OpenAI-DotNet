@@ -242,6 +242,6 @@ namespace OpenAI.Chat
         public IReadOnlyList<Function> Functions { get; }
 
         /// <inheritdoc />
-        public override string ToString() => JsonSerializer.Serialize(this);
+        public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
     }
 }
