@@ -110,8 +110,8 @@ namespace OpenAI.Files
                     if (responseAsString.Contains("File is still processing. Check back later."))
                     {
                         // back off requests on each attempt
-                        await Task.Delay(1000 * attempt, cancellationToken).ConfigureAwait(false);
-                        return await InternalDeleteFileAsync(attempt + 1).ConfigureAwait(false);
+                        await Task.Delay(1000 * attempt++, cancellationToken).ConfigureAwait(false);
+                        return await InternalDeleteFileAsync(attempt).ConfigureAwait(false);
                     }
 
                     throw new HttpRequestException($"{nameof(DeleteFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");

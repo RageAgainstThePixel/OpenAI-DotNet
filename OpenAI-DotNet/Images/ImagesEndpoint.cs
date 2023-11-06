@@ -208,7 +208,7 @@ namespace OpenAI.Images
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
 
-            if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)
+            if (imagesResponse?.Data is not { Count: not 0 })
             {
                 throw new HttpRequestException($"{nameof(DeserializeResponseAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
             }
