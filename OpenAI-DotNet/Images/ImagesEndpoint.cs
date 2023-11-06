@@ -62,7 +62,7 @@ namespace OpenAI.Images
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
@@ -206,7 +206,7 @@ namespace OpenAI.Images
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
+            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
 
             if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)
             {

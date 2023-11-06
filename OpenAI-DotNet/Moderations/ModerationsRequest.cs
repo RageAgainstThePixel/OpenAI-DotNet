@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace OpenAI.Moderations
 {
@@ -24,11 +23,6 @@ namespace OpenAI.Moderations
         {
             Input = input;
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Moderation_Latest : model;
-
-            if (!Model.Contains("text-moderation"))
-            {
-                throw new ArgumentException($"{model} is not supported", nameof(model));
-            }
         }
 
         [JsonPropertyName("input")]

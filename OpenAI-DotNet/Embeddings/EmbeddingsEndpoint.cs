@@ -61,10 +61,10 @@ namespace OpenAI.Embeddings
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }

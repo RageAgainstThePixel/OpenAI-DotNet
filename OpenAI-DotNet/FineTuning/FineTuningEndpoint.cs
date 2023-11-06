@@ -49,10 +49,10 @@ namespace OpenAI.FineTuning
         /// <exception cref="HttpRequestException">.</exception>
         public async Task<FineTuneJob> CreateFineTuneJobAsync(CreateFineTuneJobRequest jobRequest)
         {
-            var jsonContent = JsonSerializer.Serialize(jobRequest, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(jobRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FineTuneList>(responseAsString, Api.JsonSerializationOptions)?.Data.OrderBy(job => job.CreatedAtUnixTime).ToArray();
+            return JsonSerializer.Deserialize<FineTuneList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Data.OrderBy(job => job.CreatedAtUnixTime).ToArray();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{jobId}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<FineTuneJobResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.PostAsync(GetUrl($"/{jobId}/cancel"), null!).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            var result = response.DeserializeResponse<FineTuneJobResponse>(responseAsString, Api.JsonSerializationOptions);
+            var result = response.DeserializeResponse<FineTuneJobResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
             const string cancelled = "cancelled";
             return result.Status == cancelled;
         }
@@ -106,7 +106,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{jobId}/events"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FineTuneEventList>(responseAsString, Api.JsonSerializationOptions)?.Data.OrderBy(@event => @event.CreatedAtUnixTime).ToArray();
+            return JsonSerializer.Deserialize<FineTuneEventList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Data.OrderBy(@event => @event.CreatedAtUnixTime).ToArray();
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace OpenAI.FineTuning
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(eventData, Api.JsonSerializationOptions));
+                    fineTuneEventCallback(JsonSerializer.Deserialize<Event>(eventData, OpenAIClient.JsonSerializationOptions));
                 }
                 else
                 {
@@ -173,7 +173,7 @@ namespace OpenAI.FineTuning
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    yield return JsonSerializer.Deserialize<Event>(eventData, Api.JsonSerializationOptions);
+                    yield return JsonSerializer.Deserialize<Event>(eventData, OpenAIClient.JsonSerializationOptions);
                 }
                 else
                 {

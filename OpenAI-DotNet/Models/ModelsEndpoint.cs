@@ -52,7 +52,7 @@ namespace OpenAI.Models
         {
             var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<ModelsList>(responseAsString, Api.JsonSerializationOptions)?.Data;
+            return JsonSerializer.Deserialize<ModelsList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Data;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace OpenAI.Models
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{id}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<Model>(responseAsString, Api.JsonSerializationOptions);
+            return JsonSerializer.Deserialize<Model>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace OpenAI.Models
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}")).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
             catch (Exception e)
             {

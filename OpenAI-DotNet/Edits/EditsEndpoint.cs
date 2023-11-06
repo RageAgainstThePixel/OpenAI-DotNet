@@ -55,10 +55,10 @@ namespace OpenAI.Edits
         /// <returns><see cref="EditResponse"/></returns>
         public async Task<EditResponse> CreateEditAsync(EditRequest request)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<EditResponse>(responseAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<EditResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }

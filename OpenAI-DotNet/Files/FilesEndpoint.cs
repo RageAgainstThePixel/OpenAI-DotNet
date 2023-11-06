@@ -43,7 +43,7 @@ namespace OpenAI.Files
         {
             var response = await Api.Client.GetAsync(GetUrl()).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FilesList>(resultAsString, Api.JsonSerializationOptions)?.Data;
+            return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Data;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace OpenAI.Files
 
             var response = await Api.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
+            return JsonSerializer.Deserialize<FileData>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace OpenAI.Files
                     throw new HttpRequestException($"{nameof(DeleteFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
                 }
 
-                return JsonSerializer.Deserialize<FileDeleteResponse>(responseAsString, Api.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<FileDeleteResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
         }
 
@@ -131,7 +131,7 @@ namespace OpenAI.Files
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{fileId}")).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileData>(responseAsString, Api.JsonSerializationOptions);
+            return JsonSerializer.Deserialize<FileData>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>

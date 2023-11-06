@@ -36,14 +36,7 @@ namespace OpenAI.Moderations
         public async Task<bool> GetModerationAsync(string input, string model = null)
         {
             var result = await CreateModerationAsync(new ModerationsRequest(input, model)).ConfigureAwait(false);
-
-            if (result?.Results == null ||
-                result.Results.Count == 0)
-            {
-                return false;
-            }
-
-            return result.Results.Any(moderationResult => moderationResult.Flagged);
+            return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
         }
 
         /// <summary>
@@ -53,10 +46,10 @@ namespace OpenAI.Moderations
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<ModerationsResponse>(resultAsString, Api.JsonSerializationOptions);
+            return response.DeserializeResponse<ModerationsResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }
