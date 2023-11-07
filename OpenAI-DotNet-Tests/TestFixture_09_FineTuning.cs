@@ -145,7 +145,7 @@ namespace OpenAI.Tests
                     continue;
                 }
 
-                var eventList = await OpenAIClient.FineTuningEndpoint.ListEventsAsync(job);
+                var eventList = await OpenAIClient.FineTuningEndpoint.ListJobEventsAsync(job);
                 Assert.IsNotNull(eventList);
                 Assert.IsNotEmpty(eventList.Events);
 
