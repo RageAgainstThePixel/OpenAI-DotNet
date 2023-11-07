@@ -22,7 +22,7 @@ namespace OpenAI.FineTuning
 
         /// <summary>
         /// Creates a job that fine-tunes a specified model from a given dataset.
-        /// Response includes details of the enqueued job including job status and
+        /// Response includes details of the queued job including job status and
         /// the name of the fine-tuned models once complete.
         /// </summary>
         /// <param name="jobRequest"><see cref="CreateFineTuneJobRequest"/>.</param>

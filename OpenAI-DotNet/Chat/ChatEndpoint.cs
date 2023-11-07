@@ -36,7 +36,6 @@ namespace OpenAI.Chat
             return response.DeserializeResponse<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
-
         /// <summary>
         /// Created a completion for the chat message and stream the results to the <paramref name="resultHandler"/> as they come in.
         /// </summary>

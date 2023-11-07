@@ -31,7 +31,7 @@ namespace OpenAI.Moderations
         /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
         /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
         /// </param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>
         /// True, if the text has been flagged by the model as violating OpenAI's content policy.
         /// </returns>
@@ -45,7 +45,7 @@ namespace OpenAI.Moderations
         /// Classifies if text violates OpenAI's Content Policy
         /// </summary>
         /// <param name="request"><see cref="ModerationsRequest"/></param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {

@@ -194,11 +194,7 @@ namespace OpenAI.Completions
         /// <param name="basedOn">The <see cref="CompletionRequest"/> to copy</param>
         public CompletionRequest(CompletionRequest basedOn)
         {
-            if (basedOn == null)
-            {
-                return;
-            }
-
+            if (basedOn == null) { return; }
             Model = basedOn.Model ?? DefaultCompletionRequestArgs?.Model ?? Models.Model.Davinci;
             Prompts = basedOn.Prompts;
             Suffix = basedOn.Suffix ?? DefaultCompletionRequestArgs?.Suffix;
@@ -274,7 +270,7 @@ namespace OpenAI.Completions
             }
             else
             {
-                throw new ArgumentNullException(nameof(prompts), $"Missing required prompt or prompts");
+                throw new ArgumentNullException(nameof(prompts), "Missing required prompt or prompts");
             }
 
             Model = string.IsNullOrWhiteSpace(model)

@@ -6,16 +6,16 @@ namespace OpenAI.FineTuning
     {
         NotStarted = 0,
         [EnumMember(Value = "validating_files")]
-        ValidatingFiles = 1,
+        ValidatingFiles,
         [EnumMember(Value = "queued")]
-        Queued = 2,
+        Queued,
         [EnumMember(Value = "running")]
-        Running = 3,
+        Running,
         [EnumMember(Value = "succeeded")]
-        Succeeded = 4,
+        Succeeded,
         [EnumMember(Value = "failed")]
-        Failed = 5,
+        Failed,
         [EnumMember(Value = "cancelled")]
-        Cancelled = 6,
+        Cancelled
     }
 }
