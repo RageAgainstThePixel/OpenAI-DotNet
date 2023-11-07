@@ -50,31 +50,31 @@ Install-Package OpenAI-DotNet
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
-  - [Functions](#chat-functions) :new:
+  - [Functions](#chat-functions)
 - [Edits](#edits)
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
-- [Audio](#audio)
+- [Audio](#audio) :construction:
+  - [Create Speech](#create-speech) :new:
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images)
-  - [Create Image](#create-image)
-  - [Edit Image](#edit-image)
-  - [Create Image Variation](#create-image-variation)
+- [Images](#images) :construction:
+  - [Create Image](#create-image) :new:
+  - [Edit Image](#edit-image) :new:
+  - [Create Image Variation](#create-image-variation) :new:
 - [Files](#files)
   - [List Files](#list-files)
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
   - [Retrieve File Info](#retrieve-file-info)
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning)
-  - [Create Fine Tune Job](#create-fine-tune-job)
-  - [List Fine Tune Jobs](#list-fine-tune-jobs)
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
-  - [Cancel Fine Tune Job](#cancel-fine-tune-job)
-  - [List Fine Tune Events](#list-fine-tune-events)
-  - [Stream Fine Tune Events](#stream-fine-tune-events)
+- [Fine Tuning](#fine-tuning) :construction:
+  - [Create Fine Tune Job](#create-fine-tune-job) :new:
+  - [List Fine Tune Jobs](#list-fine-tune-jobs) :new:
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :new:
+  - [Cancel Fine Tune Job](#cancel-fine-tune-job) :new:
+  - [List Fine Tune Job Events](#list-fine-tune-job-events) :new:
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
 
@@ -131,13 +131,13 @@ You can also load the configuration file directly with known path by calling sta
 - Loads the default `.openai` config in the specified directory:
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
+var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromDirectory("path/to/your/directory"));
 ```
 
 - Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format:
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));
+var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromPath("path/to/your/file.json"));
 ```
 
 #### Use System Environment Variables
@@ -148,7 +148,7 @@ Use your system's environment variables specify an api key and organization to u
 - Use `OPENAI_ORGANIZATION_ID` to specify an organization.
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromEnv());
 ```
 
 ### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)
@@ -364,7 +364,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages);
+var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
 var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content}");
 ```
@@ -442,6 +442,7 @@ foreach (var message in messages)
     Console.WriteLine($"{message.Role}: {message.Content}");
 }
 
+// Define the functions that the assistant is able to use:
 var functions = new List<Function>
 {
     new Function(
@@ -512,6 +513,8 @@ Console.WriteLine($"{Role.Function}: {functionResult}");
 
 ### [Edits](https://platform.openai.com/docs/api-reference/edits)
 
+> Deprecated, and soon to be removed.
+
 Given a prompt and an instruction, the model will return an edited version of the prompt.
 
 The Edits API is accessed via `OpenAIClient.EditsEndpoint`
@@ -551,7 +554,18 @@ Converts audio into text.
 
 The Audio API is accessed via `OpenAIClient.AudioEndpoint`
 
-#### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/create)
+#### [Create Speech](https://platform.openai.com/docs/api-reference/audio/createSpeech)
+
+Generates audio from the input text.
+
+```csharp
+var api = new OpenAIClient();
+var request = new SpeechRequest("Hello world!");
+var audioData = await api.AudioEndpoint.CreateSpeechAsync(request);
+// play audio data
+```
+
+#### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/createTranscription)
 
 Transcribes audio into the input language.
 
@@ -585,12 +599,13 @@ Creates an image given a prompt.
 
 ```csharp
 var api = new OpenAIClient();
-var results = await api.ImagesEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
+var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2);
+var results = await api.ImagesEndPoint.GenerateImageAsync(request);
 
 foreach (var result in results)
 {
     Console.WriteLine(result);
-    // result == file://path/to/image.png
+    // result == file://path/to/image.png or b64_string
 }
 ```
 
@@ -600,12 +615,13 @@ Creates an edited or extended image given an original image and a prompt.
 
 ```csharp
 var api = new OpenAIClient();
-var results = await api.ImagesEndPoint.CreateImageEditAsync(Path.GetFullPath(imageAssetPath), Path.GetFullPath(maskAssetPath), "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
+var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
+var results = await api.ImagesEndPoint.CreateImageEditAsync(request);
 
 foreach (var result in results)
 {
     Console.WriteLine(result);
-    // result == file://path/to/image.png
+    // result == file://path/to/image.png or b64_string
 }
 ```
 
@@ -615,12 +631,13 @@ Creates a variation of a given image.
 
 ```csharp
 var api = new OpenAIClient();
-var results = await api.ImagesEndPoint.CreateImageVariationAsync(Path.GetFullPath(imageAssetPath), 1, ImageSize.Small);
+var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
+var results = await api.ImagesEndPoint.CreateImageVariationAsync(request);
 
 foreach (var result in results)
 {
     Console.WriteLine(result);
-    // result == file://path/to/image.png
+    // result == file://path/to/image.png or b64_string
 }
 ```
 
@@ -685,7 +702,7 @@ Console.WriteLine(downloadedFilePath);
 Assert.IsTrue(File.Exists(downloadedFilePath));
 ```
 
-### [Fine Tuning](https://platform.openai.com/docs/api-reference/fine-tunes)
+### [Fine Tuning](https://platform.openai.com/docs/api-reference/fine-tuning)
 
 Manage fine-tuning jobs to tailor a model to your specific training data.
 
@@ -693,7 +710,7 @@ Related guide: [Fine-tune models](https://platform.openai.com/docs/guides/fine-t
 
 The Files API is accessed via `OpenAIClient.FineTuningEndpoint`
 
-#### [Create Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tunes/create)
+#### [Create Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tuning/create)
 
 Creates a job that fine-tunes a specified model from a given dataset.
 
@@ -701,20 +718,21 @@ Response includes details of the enqueued job including job status and the name 
 
 ```csharp
 var api = new OpenAIClient();
-var request = new CreateFineTuneRequest(fileData);
-var fineTuneJob = await api.FineTuningEndpoint.CreateFineTuneJobAsync(request);
-Console.WriteLine(fineTuneJob.Id);
+var fileId = "file-abc123";
+var request = new CreateFineTuneRequest(fileId);
+var job = await api.FineTuningEndpoint.CreateJobAsync(Model.GPT3_5_Turbo, request);
+Console.WriteLine($"Started {job.Id} | Status: {job.Status}");
 ```
 
-#### [List Fine Tune Jobs](https://platform.openai.com/docs/api-reference/fine-tunes/list)
+#### [List Fine Tune Jobs](https://platform.openai.com/docs/api-reference/fine-tuning/list)
 
 List your organization's fine-tuning jobs.
 
 ```csharp
 var api = new OpenAIClient();
-var fineTuneJobs = await api.FineTuningEndpoint.ListFineTuneJobsAsync();
+var list = await api.FineTuningEndpoint.ListJobsAsync();
 
-foreach (var job in fineTuneJobs)
+foreach (var job in list.Jobs)
 {
     Console.WriteLine($"{job.Id} -> {job.Status}");
 }
@@ -726,8 +744,8 @@ Gets info about the fine-tune job.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
-Console.WriteLine($"{result.Id} -> {result.Status}");
+var job = await api.FineTuningEndpoint.GetJobInfoAsync(fineTuneJob);
+Console.WriteLine($"{job.Id} -> {job.Status}");
 ```
 
 #### [Cancel Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tunes/cancel)
@@ -740,33 +758,18 @@ var result = await api.FineTuningEndpoint.CancelFineTuneJobAsync(fineTuneJob);
 Assert.IsTrue(result);
 ```
 
-#### [List Fine Tune Events](https://platform.openai.com/docs/api-reference/fine-tunes/events)
+#### [List Fine Tune Job Events](https://platform.openai.com/docs/api-reference/fine-tuning/list-events)
 
-Get fine-grained status updates for a fine-tune job.
-
-```csharp
-var api = new OpenAIClient();
-var fineTuneEvents = await api.FineTuningEndpoint.ListFineTuneEventsAsync(fineTuneJob);
-Console.WriteLine($"{fineTuneJob.Id} -> status: {fineTuneJob.Status} | event count: {fineTuneEvents.Count}");
-```
-
-#### [Stream Fine Tune Events](https://platform.openai.com/docs/api-reference/fine-tunes/events#fine-tunes/events-stream)
+Get status updates for a fine-tuning job.
 
 ```csharp
 var api = new OpenAIClient();
-await api.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
+var eventList = await api.FineTuningEndpoint.ListJobEventsAsync(fineTuneJob);
+Console.WriteLine($"{fineTuneJob.Id} -> status: {fineTuneJob.Status} | event count: {eventList.Events.Count}");
+
+foreach (var @event in eventList.Events.OrderByDescending(@event => @event.CreatedAt))
 {
-    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-});
-```
-
-Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
-
-```csharp
-var api = new OpenAIClient();
-await foreach (var fineTuneEvent in api.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob))
-{
-    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
+    Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message.Replace("\n", " ")}");
 }
 ```
 
