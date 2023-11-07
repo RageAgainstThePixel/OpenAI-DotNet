@@ -13,7 +13,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2);
+            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -30,7 +31,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync("A house riding a velociraptor", 1, ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2, responseFormat: ResponseFormat.B64_Json);
+            var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -47,10 +49,11 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
-            var maskAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_mask.png");
+            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var maskAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_mask.png");
 
-            var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
+            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
+            var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -66,10 +69,11 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
-            var maskAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_mask.png");
+            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var maskAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_mask.png");
 
-            var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", 1, ImageSize.Small);
+            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -85,9 +89,9 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
-
-            var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(imageAssetPath, 1, ImageSize.Small);
+            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
+            var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -103,9 +107,9 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath("..\\..\\..\\Assets\\image_edit_original.png");
-
-            var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(imageAssetPath, 1, ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);

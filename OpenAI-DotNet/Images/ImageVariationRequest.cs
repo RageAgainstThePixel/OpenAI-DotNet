@@ -25,7 +25,7 @@ namespace OpenAI.Images
         /// Must be one of url or b64_json.
         /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
-        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = Images.ResponseFormat.Url)
+        public ImageVariationRequest(string imagePath, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = ResponseFormat.Url)
             : this(File.OpenRead(imagePath), Path.GetFileName(imagePath), numberOfResults, size, user, responseFormat)
         {
         }
@@ -53,7 +53,7 @@ namespace OpenAI.Images
         /// Must be one of url or b64_json.
         /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
-        public ImageVariationRequest(Stream image, string imageName, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = Images.ResponseFormat.Url)
+        public ImageVariationRequest(Stream image, string imageName, int numberOfResults = 1, ImageSize size = ImageSize.Large, string user = null, ResponseFormat responseFormat = ResponseFormat.Url)
             : base(numberOfResults, size, responseFormat, user)
         {
             Image = image;

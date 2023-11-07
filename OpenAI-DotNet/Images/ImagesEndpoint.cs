@@ -1,4 +1,5 @@
 ﻿using OpenAI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,7 @@ namespace OpenAI.Images
         /// Optional, <see cref="CancellationToken"/>.
         /// </param>
         /// <returns>A list of generated texture urls to download.</returns>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> GenerateImageAsync(
             string prompt,
             int numberOfResults = 1,
@@ -97,6 +99,7 @@ namespace OpenAI.Images
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> CreateImageEditAsync(
             string image,
             string mask,
@@ -132,7 +135,7 @@ namespace OpenAI.Images
             content.Add(new StringContent(request.Prompt), "prompt");
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat), "response_format");
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
 
             if (!string.IsNullOrWhiteSpace(request.User))
             {
@@ -167,6 +170,7 @@ namespace OpenAI.Images
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> CreateImageVariationAsync(
             string imagePath,
             int numberOfResults = 1,
@@ -191,7 +195,7 @@ namespace OpenAI.Images
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat), "response_format");
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
 
             if (!string.IsNullOrWhiteSpace(request.User))
             {

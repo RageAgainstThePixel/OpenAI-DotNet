@@ -27,14 +27,15 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="Images.ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
         public ImageEditRequest(
             string imagePath,
             string prompt,
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
-            string user = null, ResponseFormat responseFormat = Images.ResponseFormat.Url)
+            string user = null,
+            ResponseFormat responseFormat = ResponseFormat.Url)
             : this(imagePath, null, prompt, numberOfResults, size, user, responseFormat)
         {
         }
@@ -74,7 +75,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ResponseFormat responseFormat = Images.ResponseFormat.Url)
+            ResponseFormat responseFormat = ResponseFormat.Url)
             : this(
                 File.OpenRead(imagePath),
                 Path.GetFileName(imagePath),
@@ -120,7 +121,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ResponseFormat responseFormat = Images.ResponseFormat.Url)
+            ResponseFormat responseFormat = ResponseFormat.Url)
             : this(image, imageName, null, null, prompt, numberOfResults, size, user, responseFormat)
         {
         }
@@ -164,7 +165,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ResponseFormat responseFormat = Images.ResponseFormat.Url)
+            ResponseFormat responseFormat = ResponseFormat.Url)
             : base(numberOfResults, size, responseFormat, user)
         {
             Image = image;
