@@ -94,11 +94,10 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var fileData = await CreateTestTrainingDataAsync();
             var request = new CreateFineTuneJobRequest(Model.GPT3_5_Turbo, fileData);
-            var fineTuneResponse = await OpenAIClient.FineTuningEndpoint.CreateJobAsync(request);
+            var job = await OpenAIClient.FineTuningEndpoint.CreateJobAsync(request);
 
-            Assert.IsNotNull(fineTuneResponse);
-            var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(fileData);
-            Assert.IsTrue(result);
+            Assert.IsNotNull(job);
+            Console.WriteLine($"Started {job.Id} | Status: {job.Status}");
         }
 
         [Test]
@@ -177,6 +176,9 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result);
                     Console.WriteLine($"{job.Id} -> cancelled");
+                    result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(job.TrainingFile);
+                    Assert.IsTrue(result);
+                    Console.WriteLine($"{job.TrainingFile} -> deleted");
                 }
             }
         }

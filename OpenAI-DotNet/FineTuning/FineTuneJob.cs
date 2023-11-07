@@ -46,19 +46,7 @@ namespace OpenAI.FineTuning
 
         [JsonInclude]
         [JsonPropertyName("status")]
-        public string JobStatus { get; private set; }
-
-        [JsonIgnore]
-        public JobStatus Status => JobStatus switch
-        {
-            "validating_files" => FineTuning.JobStatus.ValidatingFiles,
-            "queued" => FineTuning.JobStatus.Queued,
-            "running" => FineTuning.JobStatus.Running,
-            "succeeded" => FineTuning.JobStatus.Succeeded,
-            "cancelled" => FineTuning.JobStatus.Cancelled,
-            "failed" => FineTuning.JobStatus.Failed,
-            _ => throw new ArgumentOutOfRangeException($"{nameof(JobStatus)}: {JobStatus}")
-        };
+        public JobStatus Status { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("validation_file")]
