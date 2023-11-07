@@ -560,9 +560,15 @@ Generates audio from the input text.
 
 ```csharp
 var api = new OpenAIClient();
-var request = new SpeechRequest("Hello world!");
-var audioData = await api.AudioEndpoint.CreateSpeechAsync(request);
-// play audio data
+var request = new SpeechRequest("Hello World!");
+async Task ChunkCallback(ReadOnlyMemory<byte> chunkCallback)
+{
+    // TODO Implement audio playback as chunks arrive
+    await Task.CompletedTask;
+}
+
+var result = await api.AudioEndpoint.CreateSpeechAsync(request, ChunkCallback);
+await File.WriteAllBytesAsync(@"..\..\..\Assets\HelloWorld.mp3", result.ToArray());
 ```
 
 #### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/createTranscription)
