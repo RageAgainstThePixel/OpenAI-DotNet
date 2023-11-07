@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 .vscode
+OpenAI-DotNet-Tests/Assets/HelloWorld.mp3

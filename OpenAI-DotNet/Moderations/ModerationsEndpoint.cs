@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Moderations
@@ -30,33 +31,28 @@ namespace OpenAI.Moderations
         /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
         /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
         /// </param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>
         /// True, if the text has been flagged by the model as violating OpenAI's content policy.
         /// </returns>
-        public async Task<bool> GetModerationAsync(string input, string model = null)
+        public async Task<bool> GetModerationAsync(string input, string model = null, CancellationToken cancellationToken = default)
         {
-            var result = await CreateModerationAsync(new ModerationsRequest(input, model)).ConfigureAwait(false);
-
-            if (result?.Results == null ||
-                result.Results.Count == 0)
-            {
-                return false;
-            }
-
-            return result.Results.Any(moderationResult => moderationResult.Flagged);
+            var result = await CreateModerationAsync(new ModerationsRequest(input, model), cancellationToken).ConfigureAwait(false);
+            return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
         }
 
         /// <summary>
         /// Classifies if text violates OpenAI's Content Policy
         /// </summary>
         /// <param name="request"><see cref="ModerationsRequest"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request)
+        public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<ModerationsResponse>(resultAsString, Api.JsonSerializationOptions);
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.DeserializeResponse<ModerationsResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }

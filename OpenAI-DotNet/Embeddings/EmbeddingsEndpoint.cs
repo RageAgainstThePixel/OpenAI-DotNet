@@ -1,6 +1,7 @@
 ﻿using OpenAI.Extensions;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Embeddings
@@ -51,20 +52,23 @@ namespace OpenAI.Embeddings
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
-        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, string model = null, string user = null)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user)).ConfigureAwait(false);
+        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, string model = null, string user = null, CancellationToken cancellationToken = default)
+            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
         /// </summary>
+        /// <param name="request"><see cref="EmbeddingsRequest"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="EmbeddingsResponse"/></returns>
-        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request)
+        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
-            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, Api.JsonSerializationOptions);
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }

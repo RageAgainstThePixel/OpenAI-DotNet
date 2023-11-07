@@ -1,4 +1,5 @@
 ﻿using OpenAI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,7 @@ namespace OpenAI.Images
         /// Optional, <see cref="CancellationToken"/>.
         /// </param>
         /// <returns>A list of generated texture urls to download.</returns>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> GenerateImageAsync(
             string prompt,
             int numberOfResults = 1,
@@ -62,7 +64,7 @@ namespace OpenAI.Images
         /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<string>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, Api.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
@@ -97,6 +99,7 @@ namespace OpenAI.Images
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> CreateImageEditAsync(
             string image,
             string mask,
@@ -132,7 +135,7 @@ namespace OpenAI.Images
             content.Add(new StringContent(request.Prompt), "prompt");
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat), "response_format");
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
 
             if (!string.IsNullOrWhiteSpace(request.User))
             {
@@ -167,6 +170,7 @@ namespace OpenAI.Images
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         /// <exception cref="HttpRequestException"></exception>
+        [Obsolete]
         public async Task<IReadOnlyList<string>> CreateImageVariationAsync(
             string imagePath,
             int numberOfResults = 1,
@@ -191,7 +195,7 @@ namespace OpenAI.Images
             content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
             content.Add(new StringContent(request.Number.ToString()), "n");
             content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat), "response_format");
+            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
 
             if (!string.IsNullOrWhiteSpace(request.User))
             {
@@ -205,15 +209,15 @@ namespace OpenAI.Images
 
         private async Task<IReadOnlyList<string>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
-            var resultAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, Api.JsonSerializationOptions);
+            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
 
-            if (imagesResponse?.Data == null || imagesResponse.Data.Count == 0)
+            if (imagesResponse?.Results is not { Count: not 0 })
             {
                 throw new HttpRequestException($"{nameof(DeserializeResponseAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
             }
 
-            return imagesResponse.Data.Select(imageResult => string.IsNullOrWhiteSpace(imageResult.Url) ? imageResult.B64_Json : imageResult.Url).ToList();
+            return imagesResponse.Results.Select(imageResult => string.IsNullOrWhiteSpace(imageResult.Url) ? imageResult.B64_Json : imageResult.Url).ToList();
         }
     }
 }

@@ -11,6 +11,6 @@ namespace OpenAI.Images
 
         [JsonInclude]
         [JsonPropertyName("data")]
-        public IReadOnlyList<ImageResult> Data { get; private set; }
+        public IReadOnlyList<ImageResult> Results { get; private set; }
     }
 }

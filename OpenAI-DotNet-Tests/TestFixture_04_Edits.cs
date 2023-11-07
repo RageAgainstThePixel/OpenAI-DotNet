@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
+    [Obsolete]
     internal class TestFixture_04_Edits : AbstractTestFixture
     {
         [Test]

@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace OpenAI.Extensions
@@ -26,10 +28,24 @@ namespace OpenAI.Extensions
             return eventData != doneTag;
         }
 
-        public static StringContent ToJsonStringContent(this string json)
+        public static StringContent ToJsonStringContent(this string json, bool debug)
         {
             const string jsonContent = "application/json";
+
+            if (debug)
+            {
+                Console.WriteLine(json);
+            }
+
             return new StringContent(json, Encoding.UTF8, jsonContent);
         }
+
+        public static string ToSnakeCase(string @string)
+            => string.IsNullOrEmpty(@string)
+                ? @string
+                : string.Concat(
+                    @string.Select((x, i) => i > 0 && char.IsUpper(x)
+                        ? $"_{x}"
+                        : x.ToString())).ToLower();
     }
 }

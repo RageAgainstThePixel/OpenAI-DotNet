@@ -59,14 +59,6 @@ namespace OpenAI.Embeddings
             }
 
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Embedding_Ada_002 : model;
-
-            if (!Model.Contains("embedding") &&
-                !Model.Contains("search") &&
-                !Model.Contains("similarity"))
-            {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
-            }
-
             User = user;
         }
 

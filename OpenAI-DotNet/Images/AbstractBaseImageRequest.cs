@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenAI.Extensions;
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
@@ -23,10 +24,10 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="Images.ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        protected AbstractBaseImageRequest(int numberOfResults = 1, ImageSize size = ImageSize.Large, ResponseFormat responseFormat = Images.ResponseFormat.Url, string user = null)
+        protected AbstractBaseImageRequest(int numberOfResults = 1, ImageSize size = ImageSize.Large, ResponseFormat responseFormat = ResponseFormat.Url, string user = null)
         {
             Number = numberOfResults;
 
@@ -39,12 +40,7 @@ namespace OpenAI.Images
             };
 
             User = user;
-            ResponseFormat = responseFormat switch
-            {
-                Images.ResponseFormat.Url => "url",
-                Images.ResponseFormat.B64_Json => "b64_json",
-                _ => throw new ArgumentOutOfRangeException(nameof(responseFormat), responseFormat, null)
-            };
+            ResponseFormat = responseFormat;
         }
 
         /// <summary>
@@ -56,10 +52,11 @@ namespace OpenAI.Images
         /// <summary>
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="Images.ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
         /// </summary>
         [JsonPropertyName("response_format")]
-        public string ResponseFormat { get; }
+        [JsonConverter(typeof(JsonStringEnumConverter<ResponseFormat>))]
+        public ResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.

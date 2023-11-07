@@ -80,14 +80,7 @@ namespace OpenAI.Audio
             }
 
             AudioName = audioName;
-
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.Whisper1 : model;
-
-            if (!Model.Contains("whisper"))
-            {
-                throw new ArgumentException($"{Model} is not supported", nameof(model));
-            }
-
             Prompt = prompt;
             ResponseFormat = responseFormat;
             Temperature = temperature;
