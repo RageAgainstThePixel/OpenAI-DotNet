@@ -76,7 +76,7 @@ namespace OpenAI.FineTuning
             var response = await Api.Client.GetAsync(GetUrl($"/jobs/{jobId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             var job = JsonSerializer.Deserialize<FineTuneJob>(responseAsString, OpenAIClient.JsonSerializationOptions);
-            job.Events = (await ListEventsAsync(job, cancellationToken: cancellationToken).ConfigureAwait(false)).Events;
+            job.Events = (await ListJobEventsAsync(job, cancellationToken: cancellationToken).ConfigureAwait(false)).Events;
             return job;
         }
 
@@ -104,7 +104,7 @@ namespace OpenAI.FineTuning
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of events for <see cref="FineTuneJob"/>.</returns>
         /// <exception cref="HttpRequestException"></exception>
-        public async Task<EventList> ListEventsAsync(string jobId, int? limit = null, string after = null, CancellationToken cancellationToken = default)
+        public async Task<EventList> ListJobEventsAsync(string jobId, int? limit = null, string after = null, CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
 
