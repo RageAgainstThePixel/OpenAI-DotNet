@@ -66,7 +66,7 @@ namespace OpenAI.Audio
             request.Dispose();
 
             var response = await Api.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json
                 ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
@@ -103,7 +103,7 @@ namespace OpenAI.Audio
             request.Dispose();
 
             var response = await Api.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json
                 ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text

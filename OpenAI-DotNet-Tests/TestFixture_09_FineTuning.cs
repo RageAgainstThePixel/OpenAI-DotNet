@@ -1,10 +1,12 @@
 ﻿using NUnit.Framework;
+using OpenAI.Chat;
 using OpenAI.Files;
 using OpenAI.FineTuning;
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -13,14 +15,72 @@ namespace OpenAI.Tests
     {
         private async Task<FileData> CreateTestTrainingDataAsync()
         {
-            var lines = new List<string>
+            var conersations = new List<Conversation>
             {
-                new FineTuningTrainingData("Company: BHFF insurance\\nProduct: allround insurance\\nAd:One stop shop for all your insurance needs!\\nSupported:", "yes"),
-                new FineTuningTrainingData("Company: Loft conversion specialists\\nProduct: -\\nAd:Straight teeth in weeks!\\nSupported:", "no")
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "What's the capital of France?"),
+                    new Message(Role.Assistant, "Paris, as if everyone doesn't know that already.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "Who wrote 'Romeo and Juliet'?"),
+                    new Message(Role.Assistant, "Oh, just some guy named William Shakespeare. Ever heard of him?")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "How far is the Moon from Earth?"),
+                    new Message(Role.Assistant, "Around 384,400 kilometers. Give or take a few, like that really matters.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "What's the capital of France?"),
+                    new Message(Role.Assistant, "Paris, as if everyone doesn't know that already.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "Who wrote 'Romeo and Juliet'?"),
+                    new Message(Role.Assistant, "Oh, just some guy named William Shakespeare. Ever heard of him?")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "How far is the Moon from Earth?"),
+                    new Message(Role.Assistant, "Around 384,400 kilometers. Give or take a few, like that really matters.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "What's the capital of France?"),
+                    new Message(Role.Assistant, "Paris, as if everyone doesn't know that already.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "Who wrote 'Romeo and Juliet'?"),
+                    new Message(Role.Assistant, "Oh, just some guy named William Shakespeare. Ever heard of him?")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "How far is the Moon from Earth?"),
+                    new Message(Role.Assistant, "Around 384,400 kilometers. Give or take a few, like that really matters.")
+                }),
+                new Conversation(new List<Message>
+                {
+                    new Message(Role.System, "Marv is a factual chatbot that is also sarcastic."),
+                    new Message(Role.User, "How far is the Moon from Earth?"),
+                    new Message(Role.Assistant, "Around 384,400 kilometers. Give or take a few, like that really matters.")
+                })
             };
 
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
-            await File.WriteAllLinesAsync(localTrainingDataPath, lines);
+            await File.WriteAllLinesAsync(localTrainingDataPath, conersations.Select(conversation => conversation.ToString()));
 
             var fileData = await OpenAIClient.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);
@@ -33,8 +93,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var fileData = await CreateTestTrainingDataAsync();
-            var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await OpenAIClient.FineTuningEndpoint.CreateFineTuneJobAsync(request);
+            var request = new CreateFineTuneJobRequest(Model.GPT3_5_Turbo, fileData);
+            var fineTuneResponse = await OpenAIClient.FineTuningEndpoint.CreateJobAsync(request);
 
             Assert.IsNotNull(fineTuneResponse);
             var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(fileData);
@@ -45,11 +105,11 @@ namespace OpenAI.Tests
         public async Task Test_02_ListFineTuneJobs()
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var fineTuneJobs = await OpenAIClient.FineTuningEndpoint.ListFineTuneJobsAsync();
-            Assert.IsNotNull(fineTuneJobs);
-            Assert.IsNotEmpty(fineTuneJobs);
+            var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
+            Assert.IsNotNull(list);
+            Assert.IsNotEmpty(list.Jobs);
 
-            foreach (var job in fineTuneJobs)
+            foreach (var job in list.Jobs.OrderByDescending(job => job.CreatedAt))
             {
                 Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
             }
@@ -59,13 +119,13 @@ namespace OpenAI.Tests
         public async Task Test_03_RetrieveFineTuneJobInfo()
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var fineTuneJobs = await OpenAIClient.FineTuningEndpoint.ListFineTuneJobsAsync();
-            Assert.IsNotNull(fineTuneJobs);
-            Assert.IsNotEmpty(fineTuneJobs);
+            var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
+            Assert.IsNotNull(list);
+            Assert.IsNotEmpty(list.Jobs);
 
-            foreach (var job in fineTuneJobs)
+            foreach (var job in list.Jobs.OrderByDescending(job => job.CreatedAt))
             {
-                var request = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(job);
+                var request = await OpenAIClient.FineTuningEndpoint.GetJobInfoAsync(job);
                 Assert.IsNotNull(request);
                 Console.WriteLine($"{request.Id} -> {request.Status}");
             }
@@ -75,24 +135,24 @@ namespace OpenAI.Tests
         public async Task Test_04_ListFineTuneEvents()
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var fineTuneJobs = await OpenAIClient.FineTuningEndpoint.ListFineTuneJobsAsync();
-            Assert.IsNotNull(fineTuneJobs);
-            Assert.IsNotEmpty(fineTuneJobs);
+            var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
+            Assert.IsNotNull(list);
+            Assert.IsNotEmpty(list.Jobs);
 
-            foreach (var job in fineTuneJobs)
+            foreach (var job in list.Jobs)
             {
-                if (job.Status == "cancelled")
+                if (job.Status == JobStatus.Cancelled)
                 {
                     continue;
                 }
 
-                var fineTuneEvents = await OpenAIClient.FineTuningEndpoint.ListFineTuneEventsAsync(job);
-                Assert.IsNotNull(fineTuneEvents);
-                Assert.IsNotEmpty(fineTuneEvents);
+                var eventList = await OpenAIClient.FineTuningEndpoint.ListEventsAsync(job);
+                Assert.IsNotNull(eventList);
+                Assert.IsNotEmpty(eventList.Events);
 
-                Console.WriteLine($"{job.Id} -> status: {job.Status} | event count: {fineTuneEvents.Count}");
+                Console.WriteLine($"{job.Id} -> status: {job.Status} | event count: {eventList.Events.Count}");
 
-                foreach (var @event in fineTuneEvents)
+                foreach (var @event in eventList.Events.OrderByDescending(@event => @event.CreatedAt))
                 {
                     Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message}");
                 }
@@ -105,15 +165,15 @@ namespace OpenAI.Tests
         public async Task Test_05_CancelFineTuneJob()
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var fineTuneJobs = await OpenAIClient.FineTuningEndpoint.ListFineTuneJobsAsync();
-            Assert.IsNotNull(fineTuneJobs);
-            Assert.IsNotEmpty(fineTuneJobs);
+            var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
+            Assert.IsNotNull(list);
+            Assert.IsNotEmpty(list.Jobs);
 
-            foreach (var job in fineTuneJobs)
+            foreach (var job in list.Jobs)
             {
-                if (job.Status == "pending")
+                if (job.Status is > JobStatus.NotStarted and < JobStatus.Succeeded)
                 {
-                    var result = await OpenAIClient.FineTuningEndpoint.CancelFineTuneJobAsync(job);
+                    var result = await OpenAIClient.FineTuningEndpoint.CancelJobAsync(job);
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result);
                     Console.WriteLine($"{job.Id} -> cancelled");
@@ -122,86 +182,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_06_StreamFineTuneEvents()
-        {
-            Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var fileData = await CreateTestTrainingDataAsync();
-            var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await OpenAIClient.FineTuningEndpoint.CreateFineTuneJobAsync(request);
-            Assert.IsNotNull(fineTuneResponse);
-
-            var fineTuneJob = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
-            Assert.IsNotNull(fineTuneJob);
-            Console.WriteLine($"{fineTuneJob.Id} ->");
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            try
-            {
-                await OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsAsync(fineTuneJob, fineTuneEvent =>
-                {
-                    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-                    cancellationTokenSource.Cancel();
-                }, cancelJob: true, cancellationTokenSource.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                // ignore
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            var jobInfo = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
-            Assert.IsNotNull(jobInfo);
-            Console.WriteLine($"{jobInfo.Id} -> {jobInfo.Status}");
-            Assert.IsTrue(jobInfo.Status == "cancelled");
-            var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(fileData, CancellationToken.None);
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public async Task Test_07_StreamFineTuneEventsEnumerable()
-        {
-            Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-
-            var fileData = await CreateTestTrainingDataAsync();
-            var request = new CreateFineTuneJobRequest(fileData);
-            var fineTuneResponse = await OpenAIClient.FineTuningEndpoint.CreateFineTuneJobAsync(request);
-            Assert.IsNotNull(fineTuneResponse);
-
-            var fineTuneJob = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneResponse);
-            Assert.IsNotNull(fineTuneJob);
-            Console.WriteLine($"{fineTuneJob.Id} ->");
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            try
-            {
-                await foreach (var fineTuneEvent in OpenAIClient.FineTuningEndpoint.StreamFineTuneEventsEnumerableAsync(fineTuneJob, cancelJob: true, cancellationTokenSource.Token))
-                {
-                    Console.WriteLine($"  {fineTuneEvent.CreatedAt} [{fineTuneEvent.Level}] {fineTuneEvent.Message}");
-                    cancellationTokenSource.Cancel();
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                // ignore
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            var jobInfo = await OpenAIClient.FineTuningEndpoint.RetrieveFineTuneJobInfoAsync(fineTuneJob);
-            Assert.IsNotNull(jobInfo);
-            Console.WriteLine($"{jobInfo.Id} -> {jobInfo.Status}");
-            Assert.IsTrue(jobInfo.Status == "cancelled");
-            var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(fileData, CancellationToken.None);
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public async Task Test_08_DeleteFineTunedModel()
+        public async Task Test_06_DeleteFineTunedModel()
         {
             Assert.IsNotNull(OpenAIClient.ModelsEndpoint);
 

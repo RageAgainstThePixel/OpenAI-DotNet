@@ -3,6 +3,7 @@ using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
 using OpenAI.Embeddings;
+using OpenAI.Extensions;
 using OpenAI.Files;
 using OpenAI.FineTuning;
 using OpenAI.Images;
@@ -104,7 +105,7 @@ namespace OpenAI
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters =
             {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                new JsonStringEnumConverter(new SnakeCaseNamingPolicy())
             }
         };
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OpenAI
 {
@@ -94,7 +95,8 @@ namespace OpenAI
             DeploymentId = deploymentId;
             ApiVersion = apiVersion;
             BaseRequest = $"/openai/deployments/{DeploymentId}/";
-            BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}?api-version={ApiVersion}";
+            BaseRequestUrlFormat = $"https://{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}";
+            defaultQueryParameters.Add("api-version", ApiVersion);
             UseOAuthAuthentication = useActiveDirectoryAuthentication;
         }
 
@@ -109,6 +111,10 @@ namespace OpenAI
         internal string BaseRequestUrlFormat { get; }
 
         internal bool UseOAuthAuthentication { get; }
+
+        private readonly Dictionary<string, string> defaultQueryParameters = new Dictionary<string, string>();
+
+        internal IReadOnlyDictionary<string, string> DefaultQueryParameters => defaultQueryParameters;
 
         public static OpenAIClientSettings Default { get; } = new OpenAIClientSettings();
     }

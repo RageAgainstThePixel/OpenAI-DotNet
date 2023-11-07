@@ -1,5 +1,6 @@
 ﻿using OpenAI.Extensions;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Edits
@@ -34,6 +35,7 @@ namespace OpenAI.Edits
         /// We generally recommend altering this or temperature but not both.
         /// </param>
         /// <param name="model">ID of the model to use. Defaults to text-davinci-edit-001.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The top edit result choice.</returns>
         public async Task<string> CreateEditAsync(
             string input,
@@ -41,10 +43,11 @@ namespace OpenAI.Edits
             int? editCount,
             double? temperature,
             double? topP,
-            string model = null)
+            string model = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new EditRequest(input, instruction, editCount, temperature, topP, model);
-            var result = await CreateEditAsync(request).ConfigureAwait(false);
+            var result = await CreateEditAsync(request, cancellationToken).ConfigureAwait(false);
             return result.ToString();
         }
 
@@ -52,12 +55,13 @@ namespace OpenAI.Edits
         /// Creates a new edit for the provided input, instruction, and parameters
         /// </summary>
         /// <param name="request"><see cref="EditRequest"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="EditResponse"/></returns>
-        public async Task<EditResponse> CreateEditAsync(EditRequest request)
+        public async Task<EditResponse> CreateEditAsync(EditRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync().ConfigureAwait(false);
+            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<EditResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
