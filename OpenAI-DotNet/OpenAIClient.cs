@@ -107,7 +107,7 @@ namespace OpenAI
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters =
             {
-                new CustomEnumConverterFactory()
+                new JsonStringEnumConverterFactory()
             }
         };
 

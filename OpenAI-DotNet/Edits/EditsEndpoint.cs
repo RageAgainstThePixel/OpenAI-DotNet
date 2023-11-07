@@ -61,7 +61,7 @@ namespace OpenAI.Edits
         /// <returns><see cref="EditResponse"/></returns>
         public async Task<EditResponse> CreateEditAsync(EditRequest request, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<EditResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
