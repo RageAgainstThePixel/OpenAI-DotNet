@@ -4,21 +4,6 @@ namespace OpenAI.Chat
 {
     public sealed class Choice
     {
-        public Choice() { }
-
-        public Choice(
-            Message message,
-            Delta delta,
-            string finishReason,
-            int index)
-            : this()
-        {
-            Message = message;
-            Delta = delta;
-            FinishReason = finishReason;
-            Index = index;
-        }
-
         [JsonInclude]
         [JsonPropertyName("message")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -34,10 +19,14 @@ namespace OpenAI.Chat
         public string FinishReason { get; private set; }
 
         [JsonInclude]
+        [JsonPropertyName("finish_details")]
+        public FinishDetails FinishDetails { get; private set; }
+
+        [JsonInclude]
         [JsonPropertyName("index")]
         public int Index { get; private set; }
 
-        public override string ToString() => Message?.Content ?? Delta?.Content ?? string.Empty;
+        public override string ToString() => Message?.Content?.ToString() ?? Delta?.Content ?? string.Empty;
 
         public static implicit operator string(Choice choice) => choice.ToString();
 
@@ -63,6 +52,11 @@ namespace OpenAI.Chat
             if (!string.IsNullOrWhiteSpace(other?.FinishReason))
             {
                 FinishReason = other.FinishReason;
+            }
+
+            if (other?.FinishDetails != null)
+            {
+                FinishDetails = other.FinishDetails;
             }
 
             Index = other?.Index ?? 0;

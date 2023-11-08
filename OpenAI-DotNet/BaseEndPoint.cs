@@ -37,10 +37,16 @@ namespace OpenAI
             return result;
         }
 
+        private bool enableDebug;
+
         /// <summary>
         /// Enables or disables the logging of all http responses of header and body information for this endpoint.<br/>
         /// WARNING! Enabling this in your production build, could potentially leak sensitive information!
         /// </summary>
-        public bool EnableDebug { get; set; }
+        public bool EnableDebug
+        {
+            get => enableDebug || Api.EnableDebug;
+            set => enableDebug = value;
+        }
     }
 }

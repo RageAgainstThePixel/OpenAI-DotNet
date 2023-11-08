@@ -28,7 +28,10 @@ namespace OpenAI.Tests
             var domain = $"{HttpClient.BaseAddress?.Authority}:{HttpClient.BaseAddress?.Port}";
             var settings = new OpenAIClientSettings(domain: domain);
             var auth = new OpenAIAuthentication(TestUserToken);
-            OpenAIClient = new OpenAIClient(auth, settings, HttpClient);
+            OpenAIClient = new OpenAIClient(auth, settings, HttpClient)
+            {
+                EnableDebug = true
+            };
         }
     }
 }

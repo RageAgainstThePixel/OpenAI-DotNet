@@ -63,6 +63,11 @@ namespace OpenAI.Chat
                 if (!streamData.TryGetEventStreamData(out var eventData)) { continue; }
                 if (string.IsNullOrWhiteSpace(eventData)) { continue; }
 
+                if (EnableDebug)
+                {
+                    Console.WriteLine(eventData);
+                }
+
                 var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
 
                 if (chatResponse == null)
@@ -74,7 +79,7 @@ namespace OpenAI.Chat
                     chatResponse.CopyFrom(partialResponse);
                 }
 
-                resultHandler(partialResponse);
+                resultHandler?.Invoke(partialResponse);
             }
 
             response.EnsureSuccessStatusCode();
@@ -82,7 +87,7 @@ namespace OpenAI.Chat
             if (chatResponse == null) { return null; }
 
             chatResponse.SetResponseData(response.Headers);
-            resultHandler(chatResponse);
+            resultHandler?.Invoke(chatResponse);
             return chatResponse;
         }
 
@@ -113,6 +118,11 @@ namespace OpenAI.Chat
 
                 if (!streamData.TryGetEventStreamData(out var eventData)) { continue; }
                 if (string.IsNullOrWhiteSpace(eventData)) { continue; }
+
+                if (EnableDebug)
+                {
+                    Console.WriteLine(eventData);
+                }
 
                 var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
 

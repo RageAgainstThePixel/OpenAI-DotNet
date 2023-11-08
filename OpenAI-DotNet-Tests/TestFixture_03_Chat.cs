@@ -13,7 +13,7 @@ namespace OpenAI.Tests
     internal class TestFixture_03_Chat : AbstractTestFixture
     {
         [Test]
-        public async Task Test_1_GetChatCompletion()
+        public async Task Test_01_GetChatCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -38,7 +38,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_2_GetChatStreamingCompletion()
+        public async Task Test_02_GetChatStreamingCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             const int choiceCount = 2;
@@ -65,7 +65,6 @@ namespace OpenAI.Tests
 
                 foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
                 {
-                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
                     cumulativeDelta[choice.Index] += choice.Delta.Content;
                 }
             });
@@ -88,7 +87,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_3_GetChatStreamingCompletionEnumerableAsync()
+        public async Task Test_03_GetChatStreamingCompletionEnumerableAsync()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -104,22 +103,12 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Choices);
                 Assert.NotZero(result.Choices.Count);
-
-                foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Delta?.Content)))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
-                }
-
-                foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Message?.Content)))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                }
             }
         }
 
         [Test]
         [Obsolete]
-        public async Task Test_4_GetChatFunctionCompletion()
+        public async Task Test_04_GetChatFunctionCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -208,7 +197,7 @@ namespace OpenAI.Tests
 
         [Test]
         [Obsolete]
-        public async Task Test_5_GetChatFunctionCompletion_Streaming()
+        public async Task Test_05_GetChatFunctionCompletion_Streaming()
         {
             var messages = new List<Message>
             {
@@ -252,16 +241,6 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(partialResponse);
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-
-                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrEmpty(choice.Delta?.Content)))
-                {
-                    Console.WriteLine($"{choice.Delta.Content}");
-                }
-
-                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrEmpty(choice.Message?.Content)))
-                {
-                    Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                }
             });
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -277,16 +256,6 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(partialResponse);
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-
-                foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
-                }
-
-                foreach (var choice in partialResponse.Choices.Where(choice => choice.Message?.Content != null))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                }
             });
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -306,16 +275,6 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(partialResponse);
                     Assert.NotNull(partialResponse.Choices);
                     Assert.NotZero(partialResponse.Choices.Count);
-
-                    foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
-                    {
-                        Console.WriteLine($"{choice.Delta.Content}");
-                    }
-
-                    foreach (var choice in partialResponse.Choices.Where(choice => choice.Message?.Content != null))
-                    {
-                        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                    }
                 });
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Choices);
@@ -336,7 +295,7 @@ namespace OpenAI.Tests
 
         [Test]
         [Obsolete]
-        public async Task Test_6_GetChatFunctionForceCompletion()
+        public async Task Test_06_GetChatFunctionForceCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -411,10 +370,9 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_7_GetChatToolCompletion()
+        public async Task Test_07_GetChatToolCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            OpenAIClient.ChatEndpoint.EnableDebug = true;
 
             var messages = new List<Message>
             {
@@ -502,7 +460,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_8_GetChatToolCompletion_Streaming()
+        public async Task Test_08_GetChatToolCompletion_Streaming()
         {
             var messages = new List<Message>
             {
@@ -546,16 +504,6 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(partialResponse);
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-
-                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrEmpty(choice.Delta?.Content)))
-                {
-                    Console.WriteLine($"{choice.Delta.Content}");
-                }
-
-                foreach (var choice in partialResponse.Choices.Where(choice => !string.IsNullOrEmpty(choice.Message?.Content)))
-                {
-                    Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                }
             });
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -571,16 +519,6 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(partialResponse);
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-
-                foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Delta.Content}");
-                }
-
-                foreach (var choice in partialResponse.Choices.Where(choice => choice.Message?.Content != null))
-                {
-                    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                }
             });
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -600,16 +538,6 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(partialResponse);
                     Assert.NotNull(partialResponse.Choices);
                     Assert.NotZero(partialResponse.Choices.Count);
-
-                    foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
-                    {
-                        Console.WriteLine($"{choice.Delta.Content}");
-                    }
-
-                    foreach (var choice in partialResponse.Choices.Where(choice => choice.Message?.Content != null))
-                    {
-                        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
-                    }
                 });
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Choices);
@@ -630,7 +558,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_9_GetChatToolForceCompletion()
+        public async Task Test_09_GetChatToolForceCompletion()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -702,6 +630,65 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
+        }
+
+        [Test]
+        public async Task Test_10_GetChatVision()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var content = new List<Content>
+            {
+                new Content(ContentType.Text, "What's in this image?"),
+                new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+            };
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, content)
+            };
+            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+
+            foreach (var choice in result.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishDetails}");
+            }
+
+            result.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_10_GetChatVisionStreaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var content = new List<Content>
+            {
+                new Content(ContentType.Text, "What's in this image?"),
+                new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+            };
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, content)
+            };
+            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            {
+                Assert.IsNotNull(partialResponse);
+                Assert.NotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
+            });
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+
+            foreach (var choice in result.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishDetails}");
+            }
+
+            result.GetUsage();
         }
     }
 }

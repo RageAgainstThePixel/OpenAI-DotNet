@@ -195,7 +195,7 @@ namespace OpenAI.Chat
             MaxTokens = maxTokens;
             Number = number;
             PresencePenalty = presencePenalty;
-            ResponseFormat = responseFormat;
+            ResponseFormat = ChatResponseFormat.Json == responseFormat ? responseFormat : null;
             Seed = seed;
             Stops = stops;
             Temperature = temperature;
@@ -272,6 +272,7 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormat ResponseFormat { get; }
 
         /// <summary>
@@ -295,6 +296,7 @@ namespace OpenAI.Chat
         /// Defaults to false
         /// </summary>
         [JsonPropertyName("stream")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Stream { get; internal set; }
 
         /// <summary>

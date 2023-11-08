@@ -29,6 +29,23 @@ namespace OpenAI.Chat
         /// The contents of the message.
         /// </param>
         /// <param name="name"></param>
+        public Message(Role role, IEnumerable<Content> content, string name = null)
+        {
+            Role = role;
+            Content = content.ToList();
+            Name = name;
+        }
+
+        /// <summary>
+        /// Creates a new message to insert into a chat conversation.
+        /// </summary>
+        /// <param name="role">
+        /// The <see cref="Chat.Role"/> of the author of this message.
+        /// </param>
+        /// <param name="content">
+        /// The contents of the message.
+        /// </param>
+        /// <param name="name"></param>
         public Message(Role role, string content, string name = null)
         {
             Role = role;
@@ -36,12 +53,19 @@ namespace OpenAI.Chat
             Name = name;
         }
 
+        /// <inheritdoc />
+        public Message(Tool tool, string content)
+            : this(Role.Tool, content, tool.Function.Name)
+        {
+            ToolCallId = tool.Id;
+        }
+
         /// <summary>
         /// Creates a new message to insert into a chat conversation.
         /// </summary>
         /// <param name="tool">Tool used for message.</param>
         /// <param name="content">Tool function response.</param>
-        public Message(Tool tool, string content)
+        public Message(Tool tool, IEnumerable<Content> content)
             : this(Role.Tool, content, tool.Function.Name)
         {
             ToolCallId = tool.Id;
@@ -60,7 +84,7 @@ namespace OpenAI.Chat
         [JsonInclude]
         [JsonPropertyName("content")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public string Content { get; private set; }
+        public dynamic Content { get; private set; }
 
         private List<Tool> toolCalls;
 
@@ -147,7 +171,6 @@ namespace OpenAI.Chat
                 }
             }
 
-#pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
             if (other?.Function != null)
             {
@@ -161,7 +184,6 @@ namespace OpenAI.Chat
                 }
             }
 #pragma warning restore CS0618 // Type or member is obsolete
-#pragma warning restore CS0612 // Type or member is obsolete
         }
     }
 }
