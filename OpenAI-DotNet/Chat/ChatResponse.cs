@@ -14,7 +14,7 @@ namespace OpenAI.Chat
         public ChatResponse(
             string id,
             string @object,
-            int created,
+            int createdAt,
             string model,
             Usage usage,
             List<Choice> choices)
@@ -22,12 +22,15 @@ namespace OpenAI.Chat
         {
             Id = id;
             Object = @object;
-            Created = created;
+            CreatedAtUnixTimeSeconds = createdAt;
             Model = model;
             Usage = usage;
             Choices = choices;
         }
 
+        /// <summary>
+        /// A unique identifier for the chat completion.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("id")]
         public string Id { get; private set; }
@@ -36,13 +39,31 @@ namespace OpenAI.Chat
         [JsonPropertyName("object")]
         public string Object { get; private set; }
 
+        [Obsolete("Use CreatedAtUnixTimeSeconds")]
+        public int Created => CreatedAtUnixTimeSeconds;
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) of when the chat completion was created.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("created")]
-        public int Created { get; private set; }
+        public int CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("model")]
         public string Model { get; private set; }
+
+        /// <summary>
+        /// This fingerprint represents the backend configuration that the model runs with.
+        /// Can be used in conjunction with the seed request parameter to understand when
+        /// backend changes have been made that might impact determinism.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("system_fingerprint")]
+        public string Fingerprint { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("usage")]
@@ -51,6 +72,9 @@ namespace OpenAI.Chat
         [JsonIgnore]
         private List<Choice> choices;
 
+        /// <summary>
+        /// A list of chat completion choices. Can be more than one if n is greater than 1.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("choices")]
         public IReadOnlyList<Choice> Choices

@@ -24,7 +24,7 @@ namespace OpenAI.Proxy
         private IAuthenticationFilter authenticationFilter;
 
         // Copied from https://github.com/microsoft/reverse-proxy/blob/51d797986b1fea03500a1ad173d13a1176fb5552/src/ReverseProxy/Forwarder/RequestUtilities.cs#L61-L83
-        private static readonly HashSet<string> ExcludedHeaders = new HashSet<string>()
+        private static readonly HashSet<string> ExcludedHeaders = new HashSet<string>
         {
             HeaderNames.Connection,
             HeaderNames.TransferEncoding,
@@ -39,6 +39,7 @@ namespace OpenAI.Proxy
             "Security-Scheme",
             "ALPN",
             "Close",
+            "Set-Cookie",
             HeaderNames.TE,
 #if NET
             HeaderNames.AltSvc,
@@ -118,7 +119,6 @@ namespace OpenAI.Proxy
                 var method = new HttpMethod(httpContext.Request.Method);
                 var uri = new Uri(string.Format(openAIClient.OpenAIClientSettings.BaseRequestUrlFormat, $"{endpoint}{httpContext.Request.QueryString}"));
                 var openAIRequest = new HttpRequestMessage(method, uri);
-
                 openAIRequest.Content = new StreamContent(httpContext.Request.Body);
 
                 if (httpContext.Request.ContentType != null)
