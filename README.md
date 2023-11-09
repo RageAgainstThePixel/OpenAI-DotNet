@@ -50,32 +50,32 @@ Install-Package OpenAI-DotNet
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
-  - [Tools](#chat-tools)
-  - [Vision](#chat-vision)
+  - [Tools](#chat-tools) :new:
+  - [Vision](#chat-vision) :new:
 - [Edits](#edits)
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
-- [Audio](#audio) :construction:
-  - [Create Speech](#create-speech) :new:
+- [Audio](#audio)
+  - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
 - [Images](#images) :construction:
-  - [Create Image](#create-image) :new:
-  - [Edit Image](#edit-image) :new:
-  - [Create Image Variation](#create-image-variation) :new:
+  - [Create Image](#create-image)
+  - [Edit Image](#edit-image)
+  - [Create Image Variation](#create-image-variation)
 - [Files](#files)
   - [List Files](#list-files)
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
   - [Retrieve File Info](#retrieve-file-info)
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning) :construction:
-  - [Create Fine Tune Job](#create-fine-tune-job) :new:
-  - [List Fine Tune Jobs](#list-fine-tune-jobs) :new:
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :new:
-  - [Cancel Fine Tune Job](#cancel-fine-tune-job) :new:
-  - [List Fine Tune Job Events](#list-fine-tune-job-events) :new:
+- [Fine Tuning](#fine-tuning)
+  - [Create Fine Tune Job](#create-fine-tune-job)
+  - [List Fine Tune Jobs](#list-fine-tune-jobs)
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
+  - [Cancel Fine Tune Job](#cancel-fine-tune-job)
+  - [List Fine Tune Job Events](#list-fine-tune-job-events)
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
 
