@@ -63,7 +63,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("system_fingerprint")]
-        public string Fingerprint { get; private set; }
+        public string SystemFingerprint { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("usage")]

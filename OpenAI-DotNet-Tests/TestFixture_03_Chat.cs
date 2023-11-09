@@ -553,7 +553,7 @@ namespace OpenAI.Tests
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
-            messages.Add(new Message(Role.Tool, functionResult, nameof(WeatherService.GetCurrentWeather)));
+            messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
         }
 
@@ -636,26 +636,20 @@ namespace OpenAI.Tests
         public async Task Test_10_GetChatVision()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            var content = new List<Content>
-            {
-                new Content(ContentType.Text, "What's in this image?"),
-                new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
-            };
             var messages = new List<Message>
             {
                 new Message(Role.System, "You are a helpful assistant."),
-                new Message(Role.User, content)
+                new Message(Role.User, new List<Content>
+                {
+                    new Content(ContentType.Text, "What's in this image?"),
+                    new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+                })
             };
             var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
-
-            foreach (var choice in result.Choices)
-            {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishDetails}");
-            }
-
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
             result.GetUsage();
         }
 
@@ -663,15 +657,14 @@ namespace OpenAI.Tests
         public async Task Test_10_GetChatVisionStreaming()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-            var content = new List<Content>
-            {
-                new Content(ContentType.Text, "What's in this image?"),
-                new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
-            };
             var messages = new List<Message>
             {
                 new Message(Role.System, "You are a helpful assistant."),
-                new Message(Role.User, content)
+                new Message(Role.User, new List<Content>
+                {
+                    new Content(ContentType.Text, "What's in this image?"),
+                    new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+                })
             };
             var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
             var result = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
@@ -682,12 +675,7 @@ namespace OpenAI.Tests
             });
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
-
-            foreach (var choice in result.Choices)
-            {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishDetails}");
-            }
-
+            Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
             result.GetUsage();
         }
     }
