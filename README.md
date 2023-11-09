@@ -468,7 +468,7 @@ var tools = new List<Tool>
 };
 
 var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(result.FirstChoice.Message);
 
 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
@@ -477,7 +477,7 @@ var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
 messages.Add(locationMessage);
 Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
 chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(result.FirstChoice.Message);
 
@@ -489,7 +489,7 @@ if (!string.IsNullOrEmpty(result.FirstChoice.Message.Content))
     messages.Add(unitMessage);
     Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
     chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-    result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+    result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 }
 
 var usedTool = result.FirstChoice.Message.ToolCalls[0];
@@ -525,7 +525,7 @@ var messages = new List<Message>
     })
 };
 var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
-var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
 ```
 
