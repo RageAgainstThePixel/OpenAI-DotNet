@@ -654,7 +654,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_10_GetChatVisionStreaming()
+        public async Task Test_11_GetChatVisionStreaming()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>

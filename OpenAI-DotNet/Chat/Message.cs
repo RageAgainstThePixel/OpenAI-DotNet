@@ -123,7 +123,7 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; private set; }
 
-        public override string ToString() => Content ?? string.Empty;
+        public override string ToString() => Content?.ToString() ?? string.Empty;
 
         public static implicit operator string(Message message) => message.ToString();
 

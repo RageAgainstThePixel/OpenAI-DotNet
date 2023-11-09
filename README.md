@@ -60,7 +60,7 @@ Install-Package OpenAI-DotNet
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images) :construction:
+- [Images](#images)
   - [Create Image](#create-image)
   - [Edit Image](#edit-image)
   - [Create Image Variation](#create-image-variation)
