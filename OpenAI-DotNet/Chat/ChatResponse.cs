@@ -11,23 +11,6 @@ namespace OpenAI.Chat
 
         internal ChatResponse(ChatResponse other) => CopyFrom(other);
 
-        public ChatResponse(
-            string id,
-            string @object,
-            int createdAt,
-            string model,
-            Usage usage,
-            List<Choice> choices)
-            : this()
-        {
-            Id = id;
-            Object = @object;
-            CreatedAtUnixTimeSeconds = createdAt;
-            Model = model;
-            Usage = usage;
-            Choices = choices;
-        }
-
         /// <summary>
         /// A unique identifier for the chat completion.
         /// </summary>

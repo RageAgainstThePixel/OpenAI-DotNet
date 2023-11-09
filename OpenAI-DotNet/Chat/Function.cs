@@ -72,9 +72,8 @@ namespace OpenAI.Chat
 
                 return parameters;
             }
-            set => parameters = value;
+            private set => parameters = value;
         }
-
 
         private string argumentsString;
 
@@ -97,7 +96,7 @@ namespace OpenAI.Chat
 
                 return arguments;
             }
-            set => arguments = value;
+            private set => arguments = value;
         }
 
         internal void CopyFrom(Function other)

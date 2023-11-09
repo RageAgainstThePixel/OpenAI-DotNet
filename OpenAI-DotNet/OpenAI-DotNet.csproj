@@ -17,8 +17,14 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.2.0</Version>
-    <PackageReleaseNotes>Version 7.2.0
+    <Version>7.2.1</Version>
+    <PackageReleaseNotes>Version 7.2.1
+- Fixed a NRE with chat Message.ToString call when dynamic content is json element
+- Removed improper set accessors for Function.Arguments and Function.Parameters properties
+- Removed improper ChatResponse constructor
+- Fixed unit test names
+- Updated docs
+Version 7.2.0
 - Updated chat endpoint features
   - json mode
   - gpt-vision

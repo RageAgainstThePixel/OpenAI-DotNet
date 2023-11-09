@@ -9,6 +9,6 @@ namespace OpenAI.Chat
         User,
         [Obsolete("Use Tool")]
         Function,
-        Tool,
+        Tool
     }
 }
