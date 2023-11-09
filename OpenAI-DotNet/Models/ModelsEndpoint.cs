@@ -16,14 +16,14 @@ namespace OpenAI.Models
     /// </summary>
     public sealed class ModelsEndpoint : BaseEndPoint
     {
-        private class ModelsList
+        private sealed class ModelsList
         {
             [JsonInclude]
             [JsonPropertyName("data")]
-            public List<Model> Data { get; private set; }
+            public List<Model> Models { get; private set; }
         }
 
-        private class DeleteModelResponse
+        private sealed class DeleteModelResponse
         {
             [JsonInclude]
             [JsonPropertyName("id")]
@@ -54,7 +54,7 @@ namespace OpenAI.Models
         {
             var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<ModelsList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Data;
+            return JsonSerializer.Deserialize<ModelsList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Models;
         }
 
         /// <summary>

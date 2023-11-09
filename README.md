@@ -50,31 +50,32 @@ Install-Package OpenAI-DotNet
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
-  - [Functions](#chat-functions)
+  - [Tools](#chat-tools) :new:
+  - [Vision](#chat-vision) :new:
 - [Edits](#edits)
   - [Create Edit](#create-edit)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
-- [Audio](#audio) :construction:
-  - [Create Speech](#create-speech) :new:
+- [Audio](#audio)
+  - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
 - [Images](#images) :construction:
-  - [Create Image](#create-image) :new:
-  - [Edit Image](#edit-image) :new:
-  - [Create Image Variation](#create-image-variation) :new:
+  - [Create Image](#create-image)
+  - [Edit Image](#edit-image)
+  - [Create Image Variation](#create-image-variation)
 - [Files](#files)
   - [List Files](#list-files)
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
   - [Retrieve File Info](#retrieve-file-info)
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning) :construction:
-  - [Create Fine Tune Job](#create-fine-tune-job) :new:
-  - [List Fine Tune Jobs](#list-fine-tune-jobs) :new:
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :new:
-  - [Cancel Fine Tune Job](#cancel-fine-tune-job) :new:
-  - [List Fine Tune Job Events](#list-fine-tune-job-events) :new:
+- [Fine Tuning](#fine-tuning)
+  - [Create Fine Tune Job](#create-fine-tune-job)
+  - [List Fine Tune Jobs](#list-fine-tune-jobs)
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
+  - [Cancel Fine Tune Job](#cancel-fine-tune-job)
+  - [List Fine Tune Job Events](#list-fine-tune-job-events)
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
 
@@ -425,9 +426,7 @@ await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(ch
 }
 ```
 
-##### [Chat Functions](https://platform.openai.com/docs/api-reference/chat/create#chat/create-functions)
-
-> Only available with the latest 0613 model series!
+##### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
 
 ```csharp
 var api = new OpenAIClient();
@@ -442,33 +441,33 @@ foreach (var message in messages)
     Console.WriteLine($"{message.Role}: {message.Content}");
 }
 
-// Define the functions that the assistant is able to use:
-var functions = new List<Function>
+// Define the tools that the assistant is able to use:
+var tools = new List<Tool>
 {
     new Function(
         nameof(WeatherService.GetCurrentWeather),
         "Get the current weather in a given location",
-         new JsonObject
-         {
-             ["type"] = "object",
-             ["properties"] = new JsonObject
-             {
-                 ["location"] = new JsonObject
-                 {
-                     ["type"] = "string",
-                     ["description"] = "The city and state, e.g. San Francisco, CA"
-                 },
-                 ["unit"] = new JsonObject
-                 {
-                     ["type"] = "string",
-                     ["enum"] = new JsonArray {"celsius", "fahrenheit"}
-                 }
-             },
-             ["required"] = new JsonArray { "location", "unit" }
-         })
+            new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["location"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "The city and state, e.g. San Francisco, CA"
+                    },
+                    ["unit"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new JsonArray {"celsius", "fahrenheit"}
+                    }
+                },
+                ["required"] = new JsonArray { "location", "unit" }
+            })
 };
 
-var chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
+var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(result.FirstChoice.Message);
 
@@ -477,7 +476,7 @@ Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Messa
 var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
 messages.Add(locationMessage);
 Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
-chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
+chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(result.FirstChoice.Message);
@@ -489,26 +488,45 @@ if (!string.IsNullOrEmpty(result.FirstChoice.Message.Content))
     var unitMessage = new Message(Role.User, "celsius");
     messages.Add(unitMessage);
     Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
-    chatRequest = new ChatRequest(messages, functions: functions, functionCall: "auto", model: "gpt-3.5-turbo");
+    chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
     result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 }
 
-Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
-Console.WriteLine($"{result.FirstChoice.Message.Function.Arguments}");
-var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.Function.Arguments.ToString());
+var usedTool = result.FirstChoice.Message.ToolCalls[0];
+Console.WriteLine($"{result.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
+Console.WriteLine($"{usedTool.Function.Arguments}");
+var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
 var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-messages.Add(new Message(Role.Function, functionResult, nameof(WeatherService.GetCurrentWeather)));
-Console.WriteLine($"{Role.Function}: {functionResult}");
+messages.Add(new Message(usedTool, functionResult));
+Console.WriteLine($"{Role.Tool}: {functionResult}");
 // System: You are a helpful weather assistant.
 // User: What's the weather like today?
 // Assistant: Sure, may I know your current location? | Finish Reason: stop
 // User: I'm in Glasgow, Scotland
-// Assistant: GetCurrentWeather | Finish Reason: function_call
+// Assistant: GetCurrentWeather | Finish Reason: tool_calls
 // {
 //   "location": "Glasgow, Scotland",
 //   "unit": "celsius"
 // }
-// Function: The current weather in Glasgow, Scotland is 20 celsius
+// Tool: The current weather in Glasgow, Scotland is 20 celsius
+```
+
+##### [Chat Vision](https://platform.openai.com/docs/guides/vision)
+
+```csharp
+var api = new OpenAIClient();
+var messages = new List<Message>
+{
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, new List<Content>
+    {
+        new Content(ContentType.Text, "What's in this image?"),
+        new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+    })
+};
+var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
 ```
 
 ### [Edits](https://platform.openai.com/docs/api-reference/edits)

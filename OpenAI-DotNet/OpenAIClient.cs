@@ -122,6 +122,11 @@ namespace OpenAI
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
         /// <summary>
+        /// Enables or disables debugging for the whole client.
+        /// </summary>
+        public bool EnableDebug { get; set; }
+
+        /// <summary>
         /// List and describe the various models available in the API.
         /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/models"/>

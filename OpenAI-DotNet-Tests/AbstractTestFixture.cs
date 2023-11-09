@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http;
 
@@ -28,7 +29,11 @@ namespace OpenAI.Tests
             var domain = $"{HttpClient.BaseAddress?.Authority}:{HttpClient.BaseAddress?.Port}";
             var settings = new OpenAIClientSettings(domain: domain);
             var auth = new OpenAIAuthentication(TestUserToken);
-            OpenAIClient = new OpenAIClient(auth, settings, HttpClient);
+            HttpClient.Timeout = TimeSpan.FromMinutes(3);
+            OpenAIClient = new OpenAIClient(auth, settings, HttpClient)
+            {
+                EnableDebug = true
+            };
         }
     }
 }

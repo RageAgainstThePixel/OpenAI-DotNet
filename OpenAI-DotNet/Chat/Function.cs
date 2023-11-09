@@ -8,10 +8,7 @@ namespace OpenAI.Chat
     /// </summary>
     public class Function
     {
-        internal Function(Delta other)
-        {
-            CopyFrom(other);
-        }
+        internal Function(Function other) => CopyFrom(other);
 
         /// <summary>
         /// Creates a new function description to insert into a chat conversation.
@@ -103,28 +100,26 @@ namespace OpenAI.Chat
             set => arguments = value;
         }
 
-        internal void CopyFrom(Delta other)
+        internal void CopyFrom(Function other)
         {
-            var otherFunction = other.Function;
-
-            if (!string.IsNullOrWhiteSpace(otherFunction.Name))
+            if (!string.IsNullOrWhiteSpace(other.Name))
             {
-                Name = otherFunction.Name;
+                Name = other.Name;
             }
 
-            if (!string.IsNullOrWhiteSpace(otherFunction.Description))
+            if (!string.IsNullOrWhiteSpace(other.Description))
             {
-                Description = otherFunction.Description;
+                Description = other.Description;
             }
 
-            if (otherFunction.Arguments != null)
+            if (other.Arguments != null)
             {
-                argumentsString += otherFunction.Arguments.ToString();
+                argumentsString += other.Arguments.ToString();
             }
 
-            if (otherFunction.Parameters != null)
+            if (other.Parameters != null)
             {
-                parametersString += otherFunction.Parameters.ToString();
+                parametersString += other.Parameters.ToString();
             }
         }
     }
