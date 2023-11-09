@@ -56,7 +56,7 @@ namespace OpenAI.Chat
         public ChatRequest(
             IEnumerable<Message> messages,
             IEnumerable<Tool> tools,
-            dynamic toolChoice = null,
+            string toolChoice = null,
             string model = null,
             double? frequencyPenalty = null,
             IReadOnlyDictionary<string, double> logitBias = null,
