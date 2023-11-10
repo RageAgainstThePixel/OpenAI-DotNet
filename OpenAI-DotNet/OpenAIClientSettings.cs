@@ -112,6 +112,8 @@ namespace OpenAI
 
         internal bool UseOAuthAuthentication { get; }
 
+        internal bool IsAzureDeployment => BaseRequestUrlFormat.Contains(AzureOpenAIDomain);
+
         private readonly Dictionary<string, string> defaultQueryParameters = new Dictionary<string, string>();
 
         internal IReadOnlyDictionary<string, string> DefaultQueryParameters => defaultQueryParameters;
