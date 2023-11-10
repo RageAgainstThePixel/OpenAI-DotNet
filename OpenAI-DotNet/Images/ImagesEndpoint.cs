@@ -65,7 +65,8 @@ namespace OpenAI.Images
         public async Task<IReadOnlyList<string>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var endpoint = GetUrl($"/generations{(Api.OpenAIClientSettings.IsAzureDeployment ? ":submit" : string.Empty)}");
+            var response = await Api.Client.PostAsync(endpoint, jsonContent, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
