@@ -84,6 +84,15 @@ namespace OpenAI.Models
         public static Model GPT4_32K { get; } = new("gpt-4-32k", "openai");
 
         /// <summary>
+        /// GPT-4 Turbo is our latest generation model. It’s more capable, has an updated knowledge 
+        /// cutoff of April 2023 and introduces a 128k context window (the equivalent of 300 pages 
+        /// of text in a single prompt). The model is also 3X cheaper for input tokens and 2X 
+        /// cheaper for output tokens compared to the original GPT-4 model. The maximum number 
+        /// of output tokens for this model is 4096
+        /// </summary>
+        public static Model GPT4_Turbo { get; } = new("gpt-4-1106-preview", "openai");
+
+        /// <summary>
         /// Because gpt-3.5-turbo performs at a similar capability to text-davinci-003 but at 10%
         /// the price per token, we recommend gpt-3.5-turbo for most use cases.
         /// </summary>
