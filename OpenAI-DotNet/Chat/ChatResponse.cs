@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class ChatResponse : BaseResponse
+    public sealed class ChatResponse : BaseResponse,IUseRateLimits
     {
         public ChatResponse() { }
 
@@ -129,5 +129,7 @@ namespace OpenAI.Chat
 
             return message;
         }
+        [JsonIgnore]
+        public RateLimits RateLimits { get; set; }
     }
 }

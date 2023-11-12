@@ -22,5 +22,11 @@ namespace OpenAI
         /// </summary>
         [JsonIgnore]
         public string RequestId { get; internal set; }
+
+        /// <summary>
+        /// The version of the API used to generate this response, as reported in the response headers.
+        /// </summary>
+        [JsonIgnore]public string OpenAIVersion { get; set; }
+
     }
 }

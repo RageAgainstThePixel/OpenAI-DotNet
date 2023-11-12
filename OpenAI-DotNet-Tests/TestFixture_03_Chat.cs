@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using OpenAI.Models;
 
 namespace OpenAI.Tests
 {
@@ -676,6 +677,31 @@ namespace OpenAI.Tests
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
+            result.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_12_ReadRateLimitHeaders()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "x=1;y=2;z=x+y; so z?"),
+            };
+            var chatRequest = new ChatRequest(messages, model: Model.GPT3_5_Turbo);
+            var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Choices);
+            Console.WriteLine(result.OpenAIVersion);
+            Assert.IsNotNull(result.RateLimits);
+            Console.WriteLine(result.RateLimits.LimitRequests);
+            Console.WriteLine(result.RateLimits.RemainingRequests);
+            Console.WriteLine(result.RateLimits.ResetRequests);
+            Console.WriteLine(result.RateLimits.LimitTokens);
+            Console.WriteLine(result.RateLimits.RemainingTokens);
+            Console.WriteLine(result.RateLimits.ResetTokens);
+            
             result.GetUsage();
         }
     }

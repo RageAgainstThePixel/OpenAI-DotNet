@@ -8,7 +8,7 @@ namespace OpenAI.Completions
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.
     /// </summary>
-    public sealed class CompletionResult : BaseResponse
+    public sealed class CompletionResult : BaseResponse,IUseRateLimits
     {
         /// <summary>
         /// The identifier of the result, which may be used during troubleshooting
@@ -51,5 +51,6 @@ namespace OpenAI.Completions
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
         public static implicit operator string(CompletionResult response) => response.ToString();
+        [JsonIgnore]public RateLimits RateLimits { get; set; }
     }
 }
