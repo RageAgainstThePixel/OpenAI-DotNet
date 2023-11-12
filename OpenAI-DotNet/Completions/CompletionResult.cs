@@ -50,7 +50,5 @@ namespace OpenAI.Completions
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
         public static implicit operator string(CompletionResult response) => response.ToString();
-        
-
     }
 }
