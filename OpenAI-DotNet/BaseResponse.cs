@@ -34,25 +34,25 @@ namespace OpenAI
         /// </summary>
 
         [JsonIgnore] 
-        public int LimitRequests { get; internal set; }
+        public int? LimitRequests { get; internal set; }
 
         /// <summary>
         /// The maximum number of tokens that are permitted before exhausting the rate limit.
         /// </summary>
         [JsonIgnore]
-        public int LimitTokens { get; internal set; }
+        public int? LimitTokens { get; internal set; }
 
         /// <summary>
         /// The remaining number of requests that are permitted before exhausting the rate limit.
         /// </summary>
         [JsonIgnore]
-        public int RemainingRequests { get; internal set; }
+        public int? RemainingRequests { get; internal set; }
 
         /// <summary>
         /// The remaining number of tokens that are permitted before exhausting the rate limit.
         /// </summary>
         [JsonIgnore]
-        public int RemainingTokens { get; internal set; }
+        public int? RemainingTokens { get; internal set; }
 
         /// <summary>
         /// The time until the rate limit (based on requests) resets to its initial state.
