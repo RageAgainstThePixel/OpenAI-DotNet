@@ -47,6 +47,7 @@ namespace OpenAI.Completions
 
         [JsonIgnore]
         public Choice FirstChoice => Completions?.FirstOrDefault(choice => choice.Index == 0);
+
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
         public static implicit operator string(CompletionResult response) => response.ToString();

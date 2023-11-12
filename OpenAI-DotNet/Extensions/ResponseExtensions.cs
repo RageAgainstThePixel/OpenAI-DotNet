@@ -44,8 +44,7 @@ namespace OpenAI.Extensions
             }
 
             if (headers.TryGetValues(ProcessingTime, out var processingTimeString) &&
-                double.TryParse(processingTimeString.First(), NumberStyles.AllowDecimalPoint, numberFormatInfo,
-                    out var processingTime))
+                double.TryParse(processingTimeString.First(), NumberStyles.AllowDecimalPoint, numberFormatInfo, out var processingTime))
             {
                 response.ProcessingTime = TimeSpan.FromMilliseconds(processingTime);
             }
