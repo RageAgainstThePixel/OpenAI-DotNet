@@ -42,7 +42,6 @@ namespace OpenAI.Tests
             Console.WriteLine(result.LimitTokens);
             Console.WriteLine(result.RemainingTokens);
             Console.WriteLine(result.ResetTokens);
-
         }
 
         [Test]

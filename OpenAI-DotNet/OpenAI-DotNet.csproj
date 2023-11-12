@@ -19,8 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI API</Title>
     <Version>7.2.3</Version>
     <PackageReleaseNotes>Version 7.2.3
-- Added support for reading RateLimit information from the Headers in Completions and Chat endpoints.
-- Updated chatEndpoint.GetCompletionAsync to handle Headers processing.
+- Added support for reading RateLimit information from the Headers
 Version 7.2.2
 - Fixed Image Generation for Azure
 Version 7.2.1
