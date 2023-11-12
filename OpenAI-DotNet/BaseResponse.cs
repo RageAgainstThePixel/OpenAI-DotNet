@@ -65,6 +65,5 @@ namespace OpenAI
         /// </summary>
         [JsonIgnore]
         public string ResetTokens { get; internal set; }
-
     }
 }
