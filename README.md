@@ -132,13 +132,13 @@ You can also load the configuration file directly with known path by calling sta
 - Loads the default `.openai` config in the specified directory:
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromDirectory("path/to/your/directory"));
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromDirectory("path/to/your/directory"));
 ```
 
 - Loads the configuration file from a specific path. File does not need to be named `.openai` as long as it conforms to the json format:
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromPath("path/to/your/file.json"));
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromPath("path/to/your/file.json"));
 ```
 
 #### Use System Environment Variables
@@ -149,7 +149,7 @@ Use your system's environment variables specify an api key and organization to u
 - Use `OPENAI_ORGANIZATION_ID` to specify an organization.
 
 ```csharp
-var api = new OpenAIClient(OpenAIAuthentication.Default.LoadFromEnv());
+var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 ```
 
 ### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)

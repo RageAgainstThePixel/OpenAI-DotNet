@@ -35,6 +35,13 @@ namespace OpenAI.Tests
             }
 
             result.GetUsage();
+
+            Console.WriteLine(result.LimitRequests);
+            Console.WriteLine(result.RemainingRequests);
+            Console.WriteLine(result.ResetRequests);
+            Console.WriteLine(result.LimitTokens);
+            Console.WriteLine(result.RemainingTokens);
+            Console.WriteLine(result.ResetTokens);
         }
 
         [Test]

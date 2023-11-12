@@ -17,8 +17,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.2.2</Version>
-    <PackageReleaseNotes>Version 7.2.2
+    <Version>7.2.3</Version>
+    <PackageReleaseNotes>Version 7.2.3
+- Added support for reading RateLimit information from the Headers
+Version 7.2.2
 - Fixed Image Generation for Azure
 Version 7.2.1
 - Fixed a NRE with chat Message.ToString call when dynamic content is json element

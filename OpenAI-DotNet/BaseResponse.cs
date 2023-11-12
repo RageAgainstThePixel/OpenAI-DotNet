@@ -22,5 +22,48 @@ namespace OpenAI
         /// </summary>
         [JsonIgnore]
         public string RequestId { get; internal set; }
+
+        /// <summary>
+        /// The version of the API used to generate this response, as reported in the response headers.
+        /// </summary>
+        [JsonIgnore]
+        public string OpenAIVersion { get; internal set; }
+
+        /// <summary>
+        /// The maximum number of requests that are permitted before exhausting the rate limit.
+        /// </summary>
+
+        [JsonIgnore] 
+        public int? LimitRequests { get; internal set; }
+
+        /// <summary>
+        /// The maximum number of tokens that are permitted before exhausting the rate limit.
+        /// </summary>
+        [JsonIgnore]
+        public int? LimitTokens { get; internal set; }
+
+        /// <summary>
+        /// The remaining number of requests that are permitted before exhausting the rate limit.
+        /// </summary>
+        [JsonIgnore]
+        public int? RemainingRequests { get; internal set; }
+
+        /// <summary>
+        /// The remaining number of tokens that are permitted before exhausting the rate limit.
+        /// </summary>
+        [JsonIgnore]
+        public int? RemainingTokens { get; internal set; }
+
+        /// <summary>
+        /// The time until the rate limit (based on requests) resets to its initial state.
+        /// </summary>
+        [JsonIgnore]
+        public string ResetRequests { get; internal set; }
+
+        /// <summary>
+        /// The time until the rate limit (based on tokens) resets to its initial state.
+        /// </summary>
+        [JsonIgnore]
+        public string ResetTokens { get; internal set; }
     }
 }
