@@ -33,9 +33,7 @@ namespace OpenAI.Chat
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var chatResponse = response.DeserializeResponse<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
-            chatResponse.SetResponseData(response.Headers);
-            return chatResponse;
+            return response.DeserializeResponse<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>

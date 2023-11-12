@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class ChatResponse : BaseResponse, IUseRateLimits
+    public sealed class ChatResponse : BaseResponse
     {
         public ChatResponse() { }
 
@@ -68,9 +68,6 @@ namespace OpenAI.Chat
 
         [JsonIgnore]
         public Choice FirstChoice => Choices?.FirstOrDefault(choice => choice.Index == 0);
-        
-        [JsonIgnore]
-        public RateLimits RateLimits { get; set; }
 
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
