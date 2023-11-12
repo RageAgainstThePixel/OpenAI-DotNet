@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAI;
-
-public interface IUseRateLimits
+namespace OpenAI
 {
-    [JsonIgnore]
-    public RateLimits RateLimits { get; set; }
+
+    public interface IUseRateLimits
+    {
+        [JsonIgnore]
+        public RateLimits RateLimits { get; set; }
+    }
 }
