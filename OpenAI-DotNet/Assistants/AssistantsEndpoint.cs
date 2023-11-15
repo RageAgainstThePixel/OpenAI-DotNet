@@ -1,5 +1,4 @@
 using OpenAI.Extensions;
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -24,9 +23,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -39,9 +36,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var assistant = JsonSerializer.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return assistant;
+            return response.DeserializeResponse<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -56,9 +51,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var modified = JsonSerializer.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return modified;
+            return response.DeserializeResponse<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -88,21 +81,33 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<AssistantsList> ListAssistantsAsync(
-            int? limit = null, string order = "desc", string after = null, string before = null,
-            CancellationToken cancellationToken = default)
+        public async Task<AssistantsList> ListAssistantsAsync(int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!string.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!string.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl(queryParameters: parameters), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var list = JsonSerializer.Deserialize<AssistantsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return list;
+            return response.DeserializeResponse<AssistantsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -117,9 +122,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}/files"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -133,9 +136,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -166,22 +167,33 @@ namespace OpenAI.Assistants
         /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<AssistantFilesList> ListAssistantFilesAsync(
-            string assistantId,
-            int? limit = null, string order = "desc", string after = null, string before = null,
-            CancellationToken cancellationToken = default)
+        public async Task<AssistantFilesList> ListAssistantFilesAsync(string assistantId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!string.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!string.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", parameters), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var list = JsonSerializer.Deserialize<AssistantFilesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return list;
+            return response.DeserializeResponse<AssistantFilesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }
