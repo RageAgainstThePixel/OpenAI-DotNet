@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_13_Threads : AbstractTestFixture
+    internal class TestFixture_12_Threads : AbstractTestFixture
     {
         private static CreateThreadRequest TestThread { get; } = new CreateThreadRequest(
             new List<Message>
