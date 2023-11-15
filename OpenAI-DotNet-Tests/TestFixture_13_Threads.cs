@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using OpenAI.Threads;
 
@@ -30,7 +31,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("thread", result.Object);
 
             Assert.IsNotNull(result.Metadata);
-            Assert.Contains("text", result.Metadata.Keys);
+            Assert.Contains("text", result.Metadata.Keys.ToList());
             Assert.AreEqual("test", result.Metadata["text"]);
         }
 
@@ -54,7 +55,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(retrieved);
             Assert.AreEqual(created.Id, retrieved.Id);
             Assert.IsNotNull(retrieved.Metadata);
-            Assert.Contains("text", retrieved.Metadata.Keys);
+            Assert.Contains("text", retrieved.Metadata.Keys.ToList());
             Assert.AreEqual("test", retrieved.Metadata["text"]);
         }
 
@@ -75,7 +76,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(modified);
             Assert.AreEqual(created.Id, modified.Id);
             Assert.IsNotNull(modified.Metadata);
-            Assert.Contains("text", modified.Metadata.Keys);
+            Assert.Contains("text", modified.Metadata.Keys.ToList());
             Assert.AreEqual("test2", modified.Metadata["text"]);
         }
 
