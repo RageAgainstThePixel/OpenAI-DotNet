@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads;
 
-public class Thread
+public sealed class Thread
 {
     /// <summary>
     /// The identifier, which can be referenced in API endpoints.
@@ -30,5 +30,5 @@ public class Thread
     /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, string> Metadata { get; set; }
+    public IReadOnlyDictionary<string, string> Metadata { get; set; }
 }

@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using OpenAI.Chat;
 
 namespace OpenAI.Threads;
 
-public class CreateThreadRequest
+public sealed class CreateThreadRequest
 {
     /// <summary>
     /// A list of messages to start the thread with.
@@ -25,6 +26,7 @@ public class CreateThreadRequest
 
         public Message(string content)
         {
+            Role = Role.User;
             Content = content;
         }
 
@@ -32,7 +34,7 @@ public class CreateThreadRequest
         /// The role of the entity that is creating the message. Currently only user is supported.
         /// </summary>
         [JsonPropertyName("role")]
-        public string Role { get; set; } = "user";
+        public Role Role { get; set; }
 
         /// <summary>
         /// The content of the message.
