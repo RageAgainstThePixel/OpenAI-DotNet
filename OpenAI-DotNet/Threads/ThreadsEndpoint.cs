@@ -14,7 +14,7 @@ namespace OpenAI.Threads
     {
         public ThreadsEndpoint(OpenAIClient api) : base(api) { }
 
-        protected override string Root => "/threads";
+        protected override string Root => "threads";
 
         /// <summary>
         /// Create a thread.
@@ -27,7 +27,7 @@ namespace OpenAI.Threads
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.DeserializeResponse<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace OpenAI.Threads
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.DeserializeResponse<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace OpenAI.Threads
         /// <returns><see cref="Thread"/>.</returns>
         public async Task<Thread> ModifyThreadAsync(string threadId, IReadOnlyDictionary<string, string> metaData, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(metaData, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var jsonContent = JsonSerializer.Serialize(new { metadata = metaData }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.DeserializeResponse<Thread>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class Thread
+    public sealed class Thread : BaseResponse
     {
         public static implicit operator string(Thread thread) => thread?.Id;
 
