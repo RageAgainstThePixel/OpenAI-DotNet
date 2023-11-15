@@ -34,10 +34,7 @@ namespace OpenAI.Tests
                 },
                 Tools = new List<AssistantTool>
                 {
-                    new()
-                    {
-                        Type = "retrieval"
-                    }
+                    new(AssistantToolType.Retrieval)
                 },
                 FileIds = new List<string> { assistantFileId }
             };

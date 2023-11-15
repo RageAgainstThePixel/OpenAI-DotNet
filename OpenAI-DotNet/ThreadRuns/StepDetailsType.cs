@@ -1,12 +1,13 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.ThreadRuns;
-
-public enum StepDetailsType
+namespace OpenAI.ThreadRuns
 {
-    [EnumMember(Value = "message_creation")]
-    MessageCreation,
-    [EnumMember(Value = "tool_calls")]
-    ToolCalls
+    public enum StepDetailsType
+    {
+        [EnumMember(Value = "message_creation")]
+        MessageCreation,
+        [EnumMember(Value = "tool_calls")]
+        ToolCalls
         
+    }
 }

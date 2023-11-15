@@ -20,9 +20,8 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new CreateThreadRequest());
             var file = await CreateFileForAssistant();
 
-            var request = new CreateThreadMessageRequest
+            var request = new CreateThreadMessageRequest("Test content")
             {
-                Content = "Test content",
                 FileIds = new[] { file.Id },
                 Metadata = new Dictionary<string, string>
                 {

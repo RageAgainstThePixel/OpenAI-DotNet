@@ -1,8 +1,8 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.ThreadRuns
+namespace OpenAI.Assistants
 {
-    public enum RunStepToolCallType
+    public enum AssistantToolType
     {
         [EnumMember(Value = "code_interpreter")]
         CodeInterpreter,

@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.ThreadMessages
+namespace OpenAI.ThreadRuns
 {
-    public class ThreadMessagesList
+    public sealed class RunStepsList
     {
         [JsonPropertyName("object")]
         public string Object { get; set; } = "list";
     
         [JsonPropertyName("data")]
-        public List<ThreadMessage> Data { get; set; }
+        public IReadOnlyList<RunStep> Data { get; set; }
 
         [JsonPropertyName("first_id")]
         public string FirstId { get; set; }

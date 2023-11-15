@@ -1,12 +1,13 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.ThreadMessages;
-
-public enum ThreadRole
+namespace OpenAI.ThreadMessages
 {
-    [EnumMember(Value = "user")]
-    User,
+    public enum ThreadRole
+    {
+        [EnumMember(Value = "user")]
+        User,
 
-    [EnumMember(Value = "assistant")]
-    Assistant
+        [EnumMember(Value = "assistant")]
+        Assistant
+    }
 }

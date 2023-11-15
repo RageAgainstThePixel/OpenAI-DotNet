@@ -1,11 +1,12 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.ThreadRuns;
-
-public enum CodeInterpreterOutputType
+namespace OpenAI.ThreadRuns
 {
-    [EnumMember(Value = "logs")]
-    Logs,
-    [EnumMember(Value = "image")]
-    Image
+    public enum CodeInterpreterOutputType
+    {
+        [EnumMember(Value = "logs")]
+        Logs,
+        [EnumMember(Value = "image")]
+        Image
+    }
 }
