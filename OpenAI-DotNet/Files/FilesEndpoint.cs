@@ -19,13 +19,7 @@ namespace OpenAI.Files
         private class FilesList
         {
             [JsonPropertyName("data")]
-            public List<FileData> Data { get; set; }
-        }
-
-        private class FileDeleteResponse
-        {
-            [JsonPropertyName("deleted")]
-            public bool Deleted { get; set; }
+            public IReadOnlyList<FileData> Files { get; set; }
         }
 
         /// <inheritdoc />
@@ -44,7 +38,7 @@ namespace OpenAI.Files
         {
             var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Data;
+            return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Files;
         }
 
         /// <summary>
@@ -118,7 +112,7 @@ namespace OpenAI.Files
                     throw new HttpRequestException($"{nameof(DeleteFileAsync)} Failed!  HTTP status code: {response.StatusCode}. Response: {responseAsString}");
                 }
 
-                return JsonSerializer.Deserialize<FileDeleteResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
         }
 

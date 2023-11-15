@@ -18,13 +18,13 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonPropertyName("object")]
         public string Object { get; set; } = "assistant.file";
-        
+
         /// <summary>
         /// The Unix timestamp (in seconds) for when the assistant file was created.
         /// </summary>
         [JsonPropertyName("created_at")]
         public int CreatedAt { get; set; }
-        
+
         /// <summary>
         /// The assistant ID that the file is attached to.
         /// </summary>

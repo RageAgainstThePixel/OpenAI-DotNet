@@ -23,21 +23,6 @@ namespace OpenAI.Models
             public List<Model> Models { get; private set; }
         }
 
-        private sealed class DeleteModelResponse
-        {
-            [JsonInclude]
-            [JsonPropertyName("id")]
-            public string Id { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("object")]
-            public string Object { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("deleted")]
-            public bool Deleted { get; private set; }
-        }
-
         /// <inheritdoc />
         public ModelsEndpoint(OpenAIClient api) : base(api) { }
 
@@ -93,7 +78,7 @@ namespace OpenAI.Models
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
             catch (Exception e)
             {

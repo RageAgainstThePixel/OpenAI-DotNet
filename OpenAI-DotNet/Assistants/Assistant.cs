@@ -22,7 +22,7 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonPropertyName("created_at")]
         public int CreatedAt { get; set; }
-    
+
         /// <summary>
         /// The name of the assistant. The maximum length is 256 characters.
         /// </summary>

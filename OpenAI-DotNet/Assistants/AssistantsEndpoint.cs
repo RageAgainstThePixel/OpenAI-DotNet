@@ -1,10 +1,9 @@
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAI.Extensions;
 
 namespace OpenAI.Assistants
 {
@@ -13,7 +12,7 @@ namespace OpenAI.Assistants
         internal AssistantsEndpoint(OpenAIClient api) : base(api) { }
 
         protected override string Root => "assistants";
-    
+
         /// <summary>
         /// Create an assistant with a model and instructions.
         /// </summary>
@@ -44,7 +43,7 @@ namespace OpenAI.Assistants
 
             return assistant;
         }
-    
+
         /// <summary>
         /// Modifies an assistant.
         /// </summary>
@@ -72,11 +71,9 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.DeleteAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var status = JsonSerializer.Deserialize<DeletionStatus>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return status.Deleted;
+            return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
         }
-    
+
         /// <summary>
         /// Get list of assistants.
         /// </summary>
@@ -152,9 +149,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.DeleteAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var status = JsonSerializer.Deserialize<DeletionStatus>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return status.Deleted;
+            return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
         }
 
         /// <summary>
@@ -187,21 +182,6 @@ namespace OpenAI.Assistants
             var list = JsonSerializer.Deserialize<AssistantFilesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
 
             return list;
-        }
-
-        private sealed class DeletionStatus
-        {
-            [JsonInclude]
-            [JsonPropertyName("id")]
-            public string Id { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("object")]
-            public string Object { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("deleted")]
-            public bool Deleted { get; private set; }
         }
     }
 }
