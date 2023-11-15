@@ -1,22 +1,23 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Assistants;
-
-public class AssistantFilesList
+namespace OpenAI.Assistants
 {
-    [JsonPropertyName("object")]
-    public string Object { get; set; } = "list";
+    public class AssistantFilesList
+    {
+        [JsonPropertyName("object")]
+        public string Object { get; set; } = "list";
     
-    [JsonPropertyName("data")]
-    public IReadOnlyList<AssistantFile> Data { get; set; }
+        [JsonPropertyName("data")]
+        public IReadOnlyList<AssistantFile> Data { get; set; }
 
-    [JsonPropertyName("first_id")]
-    public string FirstId { get; set; }
+        [JsonPropertyName("first_id")]
+        public string FirstId { get; set; }
 
-    [JsonPropertyName("last_id")]
-    public string LastId { get; set; }
+        [JsonPropertyName("last_id")]
+        public string LastId { get; set; }
 
-    [JsonPropertyName("has_more")]
-    public bool HasMore { get; set; }
+        [JsonPropertyName("has_more")]
+        public bool HasMore { get; set; }
+    }
 }

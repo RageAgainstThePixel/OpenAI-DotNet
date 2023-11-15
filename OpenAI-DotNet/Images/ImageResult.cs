@@ -16,7 +16,7 @@ namespace OpenAI.Images
         [JsonPropertyName("revised_prompt")]
         public string RevisedPrompt { get; private set; }
 
-        public static implicit operator string(ImageResult result) => result.ToString();
+        public static implicit operator string(ImageResult result) => result?.ToString();
 
         public override string ToString()
             => !string.IsNullOrWhiteSpace(Url)
