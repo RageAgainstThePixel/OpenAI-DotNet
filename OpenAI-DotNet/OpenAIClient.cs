@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OpenAI.Threads;
 using OpenAI.Assistants;
 
 namespace OpenAI
@@ -60,6 +61,7 @@ namespace OpenAI
             FilesEndpoint = new FilesEndpoint(this);
             FineTuningEndpoint = new FineTuningEndpoint(this);
             ModerationsEndpoint = new ModerationsEndpoint(this);
+            ThreadsEndpoint = new ThreadsEndpoint(this);
             AssistantsEndpoint = new AssistantsEndpoint(this);
         }
 
@@ -195,6 +197,12 @@ namespace OpenAI
         /// <see href="https://platform.openai.com/docs/api-reference/moderations"/>
         /// </summary>
         public ModerationsEndpoint ModerationsEndpoint { get; }
+
+        /// <summary>
+        /// Create threads that assistants can interact with.
+        /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
+        /// </summary>
+        public ThreadsEndpoint ThreadsEndpoint { get; }
 
         /// <summary>
         /// Build assistants that can call models and use tools to perform tasks.<br/>
