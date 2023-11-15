@@ -3,21 +3,26 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants
 {
-    public class AssistantFilesList
+    public sealed class AssistantFilesList : BaseResponse
     {
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; set; } = "list";
-    
+        public string Object { get; private set; }
+
+        [JsonInclude]
         [JsonPropertyName("data")]
-        public IReadOnlyList<AssistantFile> Data { get; set; }
+        public IReadOnlyList<AssistantFile> Files { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("first_id")]
-        public string FirstId { get; set; }
+        public string FirstId { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("last_id")]
-        public string LastId { get; set; }
+        public string LastId { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("has_more")]
-        public bool HasMore { get; set; }
+        public bool HasMore { get; private set; }
     }
 }

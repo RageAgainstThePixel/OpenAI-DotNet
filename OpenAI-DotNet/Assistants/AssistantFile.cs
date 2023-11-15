@@ -5,31 +5,35 @@ namespace OpenAI.Assistants
     /// <summary>
     /// File attached to an assistant.
     /// </summary>
-    public sealed class AssistantFile
+    public sealed class AssistantFile : BaseResponse
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// The object type, which is always assistant.file.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; set; } = "assistant.file";
+        public string Object { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the assistant file was created.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedAt { get; set; }
+        public int CreatedAt { get; private set; }
 
         /// <summary>
         /// The assistant ID that the file is attached to.
         /// </summary>
         /// <returns></returns>
+        [JsonInclude]
         [JsonPropertyName("assistant_id")]
-        public string AssistantId { get; set; }
+        public string AssistantId { get; private set; }
     }
 }
