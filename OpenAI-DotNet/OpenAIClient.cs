@@ -15,6 +15,9 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OpenAI.Assistants;
+using OpenAI.ThreadMessages;
+using OpenAI.Threads;
 
 namespace OpenAI
 {
@@ -59,6 +62,10 @@ namespace OpenAI
             FilesEndpoint = new FilesEndpoint(this);
             FineTuningEndpoint = new FineTuningEndpoint(this);
             ModerationsEndpoint = new ModerationsEndpoint(this);
+            AssistantsEndpoint = new AssistantsEndpoint(this);
+            ThreadsEndpoint = new ThreadsEndpoint(this);
+            ThreadMessagesEndpoint = new ThreadMessagesEndpoint(this);
+            ThreadRunsEndpoint = new ThreadRunsEndpoint(this);
         }
 
         private HttpClient SetupClient(HttpClient client = null)
@@ -68,6 +75,7 @@ namespace OpenAI
                 PooledConnectionLifetime = TimeSpan.FromMinutes(15)
             });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
+            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
 
             if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
@@ -192,5 +200,17 @@ namespace OpenAI
         /// <see href="https://platform.openai.com/docs/api-reference/moderations"/>
         /// </summary>
         public ModerationsEndpoint ModerationsEndpoint { get; }
+
+        /// <summary>
+        /// Build assistants that can call models and use tools to perform tasks.<br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
+        /// </summary>
+        public AssistantsEndpoint AssistantsEndpoint { get; }
+        
+        public ThreadsEndpoint ThreadsEndpoint { get; }
+        
+        public ThreadMessagesEndpoint ThreadMessagesEndpoint { get; }
+        
+        public ThreadRunsEndpoint ThreadRunsEndpoint { get; }
     }
 }
