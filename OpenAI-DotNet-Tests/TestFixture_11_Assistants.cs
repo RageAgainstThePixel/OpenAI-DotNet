@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_12_Assistants : AbstractTestFixture
+    internal class TestFixture_11_Assistants : AbstractTestFixture
     {
         [Test]
         public async Task Test_01_CreateAssistant()
