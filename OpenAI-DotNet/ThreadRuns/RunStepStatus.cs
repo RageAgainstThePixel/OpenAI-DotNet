@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.ThreadMessages;
+namespace OpenAI.ThreadRuns;
 
 public enum RunStepStatus
 {

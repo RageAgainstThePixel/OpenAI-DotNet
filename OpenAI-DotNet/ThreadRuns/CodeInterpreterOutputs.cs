@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using OpenAI.Extensions;
 
-namespace OpenAI.ThreadMessages;
+namespace OpenAI.ThreadRuns;
 
 public sealed class CodeInterpreterOutputs
 {

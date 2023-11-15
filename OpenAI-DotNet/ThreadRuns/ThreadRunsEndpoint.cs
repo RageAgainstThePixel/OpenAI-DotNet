@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenAI.Extensions;
 using OpenAI.ThreadRuns;
 
-namespace OpenAI.ThreadMessages;
+namespace OpenAI.ThreadRuns;
 
 public class ThreadRunsEndpoint : BaseEndPoint
 {

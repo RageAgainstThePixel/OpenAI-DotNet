@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.ThreadMessages;
+namespace OpenAI.ThreadRuns;
 
 public sealed class StepDetails
 {

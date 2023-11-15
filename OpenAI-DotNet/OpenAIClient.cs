@@ -17,6 +17,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenAI.ThreadMessages;
 using OpenAI.Assistants;
+using OpenAI.ThreadRuns;
 using OpenAI.Threads;
 
 namespace OpenAI

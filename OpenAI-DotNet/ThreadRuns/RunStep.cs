@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using OpenAI.Extensions;
 using OpenAI.ThreadRuns;
 
-namespace OpenAI.ThreadMessages;
+namespace OpenAI.ThreadRuns;
 
 /// <summary>
 /// Represents a step in execution of a run.
