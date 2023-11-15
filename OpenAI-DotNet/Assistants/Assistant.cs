@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -21,7 +22,10 @@ namespace OpenAI.Assistants
         /// The Unix timestamp (in seconds) for when the assistant was created.
         /// </summary>
         [JsonPropertyName("created_at")]
-        public int CreatedAt { get; set; }
+        public int CreatedAtUnixTimeSeconds { get; set; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         /// <summary>
         /// The name of the assistant. The maximum length is 256 characters.

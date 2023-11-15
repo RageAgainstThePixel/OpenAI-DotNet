@@ -15,8 +15,10 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenAI.Threads;
+using OpenAI.ThreadMessages;
 using OpenAI.Assistants;
+using OpenAI.ThreadRuns;
+using OpenAI.Threads;
 
 namespace OpenAI
 {
@@ -63,6 +65,8 @@ namespace OpenAI
             ModerationsEndpoint = new ModerationsEndpoint(this);
             ThreadsEndpoint = new ThreadsEndpoint(this);
             AssistantsEndpoint = new AssistantsEndpoint(this);
+            ThreadMessagesEndpoint = new ThreadMessagesEndpoint(this);
+            ThreadRunsEndpoint = new ThreadRunsEndpoint(this);
         }
 
         private HttpClient SetupClient(HttpClient client = null)
@@ -209,5 +213,16 @@ namespace OpenAI
         /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
         /// </summary>
         public AssistantsEndpoint AssistantsEndpoint { get; }
+
+        /// Create messages within threads
+        /// <see href="https://platform.openai.com/docs/api-reference/messages"/>
+        /// </summary>
+        public ThreadMessagesEndpoint ThreadMessagesEndpoint { get; }
+
+        /// <summary>
+        /// Represents an execution run on a thread.
+        /// <see href="https://platform.openai.com/docs/api-reference/runs"/>
+        /// </summary>
+        public ThreadRunsEndpoint ThreadRunsEndpoint { get; }
     }
 }

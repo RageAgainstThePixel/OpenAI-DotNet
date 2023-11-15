@@ -22,23 +22,19 @@ namespace OpenAI.Tests
 
             var assistantFileId = file.Id;
 
-            var request = new CreateAssistantRequest
+            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106")
             {
                 Name = "Test",
                 Description = "Test description",
                 Instructions = "You are test assistant",
-                Model = "gpt-3.5-turbo-1106",
                 Metadata = new Dictionary<string, object>
                 {
-                    ["int"] = 1,
+                    ["int"] = "1",
                     ["text"] = "test"
                 },
                 Tools = new List<AssistantTool>
                 {
-                    new()
-                    {
-                        Type = "retrieval"
-                    }
+                    new(AssistantToolType.Retrieval)
                 },
                 FileIds = new List<string> { assistantFileId }
             };
