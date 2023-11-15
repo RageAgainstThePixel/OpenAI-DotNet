@@ -18,10 +18,10 @@ namespace OpenAI.Tests
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
-            Assert.IsNotEmpty(results[0]);
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
@@ -36,10 +36,10 @@ namespace OpenAI.Tests
 
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
-            Assert.IsNotEmpty(results[0]);
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
@@ -60,6 +60,7 @@ namespace OpenAI.Tests
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
@@ -80,6 +81,7 @@ namespace OpenAI.Tests
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
@@ -98,6 +100,7 @@ namespace OpenAI.Tests
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
@@ -116,6 +119,7 @@ namespace OpenAI.Tests
 
             foreach (var result in results)
             {
+                Assert.IsNotNull(result);
                 Console.WriteLine(result);
             }
         }
