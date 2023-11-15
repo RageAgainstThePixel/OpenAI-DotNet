@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants;
 
-public class AssistantsList
+public sealed class AssistantsList
 {
     [JsonPropertyName("object")]
     public string Object { get; set; } = "list";
-    
+
     [JsonPropertyName("data")]
-    public List<Assistant> Data { get; set; }
+    public IReadOnlyList<Assistant> Data { get; set; }
 
     [JsonPropertyName("first_id")]
     public string FirstId { get; set; }

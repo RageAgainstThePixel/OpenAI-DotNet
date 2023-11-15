@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants;
 
-public class ModifyAssistantRequest
+public sealed class ModifyAssistantRequest
 {
     /// <summary>
     /// ID of the model to use. You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.

@@ -9,7 +9,7 @@ public class AssistantFilesList
     public string Object { get; set; } = "list";
     
     [JsonPropertyName("data")]
-    public List<AssistantFile> Data { get; set; }
+    public IReadOnlyList<AssistantFile> Data { get; set; }
 
     [JsonPropertyName("first_id")]
     public string FirstId { get; set; }

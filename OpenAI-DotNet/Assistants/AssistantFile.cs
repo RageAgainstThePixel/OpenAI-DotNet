@@ -5,7 +5,7 @@ namespace OpenAI.Assistants;
 /// <summary>
 /// File attached to an assistant.
 /// </summary>
-public class AssistantFile
+public sealed class AssistantFile
 {
     /// <summary>
     /// The identifier, which can be referenced in API endpoints.

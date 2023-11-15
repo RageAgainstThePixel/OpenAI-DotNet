@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants;
 
-public class CreateAssistantFileRequest
+public sealed class CreateAssistantFileRequest
 {
     /// <summary>
     /// A File ID (with purpose="assistants") that the assistant should use.
