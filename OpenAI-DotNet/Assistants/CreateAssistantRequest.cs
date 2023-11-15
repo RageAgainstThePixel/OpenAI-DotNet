@@ -5,6 +5,11 @@ namespace OpenAI.Assistants;
 
 public sealed class CreateAssistantRequest
 {
+    public CreateAssistantRequest(string model)
+    {
+        Model = model;
+    }
+
     /// <summary>
     /// ID of the model to use. You can use the List models API to see all of your available models, or see our Model overview for descriptions of them.
     /// </summary>
