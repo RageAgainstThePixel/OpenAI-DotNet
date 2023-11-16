@@ -8,7 +8,6 @@ using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Chat;
 using OpenAI.Tests.Weather;
-using OpenAI.ThreadRuns;
 using OpenAI.Threads;
 using Message = OpenAI.Threads.Message;
 
@@ -32,7 +31,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_01_CreateThreadRun()
         {
-            Assert.NotNull(OpenAIClient.ThreadRunsEndpoint);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
 
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistant);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
@@ -47,7 +46,7 @@ namespace OpenAI.Tests
                 }
             };
 
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             Assert.IsNotNull(run);
             Assert.AreEqual("gpt-3.5-turbo", run.Model);
@@ -80,7 +79,7 @@ namespace OpenAI.Tests
                 }
             };
 
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadAndRunAsync(request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadAndRunAsync(request);
 
             Assert.IsNotNull(run);
             Assert.AreEqual("gpt-3.5-turbo", run.Model);
@@ -100,9 +99,9 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
 
             var request = new CreateThreadRunRequest(assistant.Id);
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
-            var list = await OpenAIClient.ThreadRunsEndpoint.ListThreadRunsAsync(thread.Id);
+            var list = await OpenAIClient.ThreadsEndpoint.ListThreadRunsAsync(thread.Id);
 
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Data);
@@ -110,7 +109,7 @@ namespace OpenAI.Tests
             foreach (var threadRun in list.Data)
             {
                 var retrieved =
-                    await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(threadRun.ThreadId, threadRun.Id);
+                    await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadRun.ThreadId, threadRun.Id);
 
                 Assert.IsNotNull(retrieved);
 
@@ -125,7 +124,7 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
 
             var request = new CreateThreadRunRequest(assistant.Id);
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // run in Queued and InProgress can't be modified
             var loopCounter = 0;
@@ -133,7 +132,7 @@ namespace OpenAI.Tests
             {
                 await Task.Delay(2_000);
                 loopCounter++;
-                run = await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
                 if (loopCounter == 10)
                 {
@@ -141,7 +140,7 @@ namespace OpenAI.Tests
                 }
             }
 
-            var modified = await OpenAIClient.ThreadRunsEndpoint.ModifyThreadRunAsync(
+            var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadRunAsync(
                 thread.Id,
                 run.Id,
                 new Dictionary<string, string>
@@ -163,16 +162,16 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
 
             var request = new CreateThreadRunRequest(assistant.Id);
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
-            run = await OpenAIClient.ThreadRunsEndpoint.CancelThreadRunAsync(thread.Id, run.Id);
+            run = await OpenAIClient.ThreadsEndpoint.CancelThreadRunAsync(thread.Id, run.Id);
 
             var loopCounter = 0;
             while (run.Status == RunStatus.Cancelling)
             {
                 await Task.Delay(2_000);
                 loopCounter++;
-                run = await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
                 if (loopCounter == 10)
                 {
@@ -224,7 +223,7 @@ namespace OpenAI.Tests
                 Tools = new [] { functionTool }
             };
 
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
             var loopCounter = 0;
@@ -232,7 +231,7 @@ namespace OpenAI.Tests
             {
                 await Task.Delay(2_000);
                 loopCounter++;
-                run = await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
                 if (loopCounter == 10)
                 {
@@ -263,7 +262,7 @@ namespace OpenAI.Tests
                 }
             };
 
-            run = await OpenAIClient.ThreadRunsEndpoint.SubmitToolOutputsAsync(thread.Id, run.Id, submitRequest);
+            run = await OpenAIClient.ThreadsEndpoint.SubmitToolOutputsAsync(thread.Id, run.Id, submitRequest);
             
             // waiting while run in Queued and InProgress
             loopCounter = 0;
@@ -271,7 +270,7 @@ namespace OpenAI.Tests
             {
                 await Task.Delay(2_000);
                 loopCounter++;
-                run = await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
                 if (loopCounter == 10)
                 {
@@ -289,7 +288,7 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
 
             var request = new CreateThreadRunRequest(assistant.Id);
-            var run = await OpenAIClient.ThreadRunsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
             var loopCounter = 0;
@@ -297,7 +296,7 @@ namespace OpenAI.Tests
             {
                 await Task.Delay(2_000);
                 loopCounter++;
-                run = await OpenAIClient.ThreadRunsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
                 if (loopCounter == 10)
                 {
@@ -305,7 +304,7 @@ namespace OpenAI.Tests
                 }
             }
             
-            var list = await OpenAIClient.ThreadRunsEndpoint.ListTheadRunStepsAsync(thread.Id, run.Id);
+            var list = await OpenAIClient.ThreadsEndpoint.ListTheadRunStepsAsync(thread.Id, run.Id);
 
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Data);
@@ -313,7 +312,7 @@ namespace OpenAI.Tests
             foreach (var step in list.Data)
             {
                 var retrieved =
-                    await OpenAIClient.ThreadRunsEndpoint.RetrieveTheadRunStepAsync(thread.Id, run.Id, step.Id);
+                    await OpenAIClient.ThreadsEndpoint.RetrieveTheadRunStepAsync(thread.Id, run.Id, step.Id);
                 
                 Assert.IsNotNull(retrieved);
 

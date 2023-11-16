@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using OpenAI.Chat;
 using OpenAI.Files;
-using OpenAI.ThreadMessages;
 using OpenAI.Threads;
 using Message = OpenAI.Threads.Message;
 
@@ -27,7 +26,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_01_CreateThreadMessage()
         {
-            Assert.IsNotNull(OpenAIClient.ThreadMessagesEndpoint);
+            Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
 
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
             var file = await CreateFileForAssistant();
@@ -41,7 +40,7 @@ namespace OpenAI.Tests
                 }
             };
 
-            var created = await OpenAIClient.ThreadMessagesEndpoint.CreateThreadMessageAsync(thread.Id, request);
+            var created = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, request);
 
             Assert.IsNotNull(created);
             Assert.AreEqual("thread.message", created.Object);
@@ -67,19 +66,19 @@ namespace OpenAI.Tests
         {
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
             
-            var message1 = await OpenAIClient.ThreadMessagesEndpoint.CreateThreadMessageAsync(
+            var message1 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
                 thread.Id, new CreateThreadMessageRequest("Test content"));
             
-            var message2 = await OpenAIClient.ThreadMessagesEndpoint.CreateThreadMessageAsync(
+            var message2 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
                 thread.Id, new CreateThreadMessageRequest("Test content 2"));
 
-            var list = await OpenAIClient.ThreadMessagesEndpoint.ListThreadMessagesAsync(thread.Id);
+            var list = await OpenAIClient.ThreadsEndpoint.ListThreadMessagesAsync(thread.Id);
 
             Assert.IsNotNull(list);
 
             foreach (var message in list.Data)
             {
-                var retrieved = await OpenAIClient.ThreadMessagesEndpoint.RetrieveThreadMessageAsync(message.ThreadId, message.Id);
+                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveThreadMessageAsync(message.ThreadId, message.Id);
                 Assert.NotNull(retrieved);
 
                 Console.WriteLine($"[{retrieved.Id}] {retrieved.Content}");
@@ -91,10 +90,10 @@ namespace OpenAI.Tests
         {
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
             
-            var message = await OpenAIClient.ThreadMessagesEndpoint.CreateThreadMessageAsync(
+            var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
                 thread.Id, new CreateThreadMessageRequest("Test content"));
 
-            var modified = await OpenAIClient.ThreadMessagesEndpoint.ModifyThreadMessageAsync(
+            var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadMessageAsync(
                 message.ThreadId,
                 message.Id,
                 new Dictionary<string, string>
@@ -120,9 +119,9 @@ namespace OpenAI.Tests
                 FileIds = new[] { file1.Id, file2.Id }
             };
 
-            var message = await OpenAIClient.ThreadMessagesEndpoint.CreateThreadMessageAsync(thread.Id, createRequest);
+            var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, createRequest);
 
-            var list = await OpenAIClient.ThreadMessagesEndpoint.ListMessageFilesAsync(message.ThreadId, message.Id);
+            var list = await OpenAIClient.ThreadsEndpoint.ListMessageFilesAsync(message.ThreadId, message.Id);
             
             Assert.IsNotNull(list);
             Assert.AreEqual(2, list.Data.Count);
@@ -130,7 +129,7 @@ namespace OpenAI.Tests
             foreach (var file in list.Data)
             {
                 var retrieved =
-                    await OpenAIClient.ThreadMessagesEndpoint.RetrieveMessageFile(thread.Id, message.Id, file.Id);
+                    await OpenAIClient.ThreadsEndpoint.RetrieveMessageFile(thread.Id, message.Id, file.Id);
 
                 Assert.IsNotNull(retrieved);
 
