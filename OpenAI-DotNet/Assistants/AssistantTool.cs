@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using OpenAI.Chat;
-using OpenAI.Extensions;
 
 namespace OpenAI.Assistants
 {
@@ -8,20 +7,17 @@ namespace OpenAI.Assistants
     {
         public AssistantTool() { }
 
-        public AssistantTool(AssistantToolType type)
+        public AssistantTool(string type)
         {
             Type = type;
         }
 
-        public AssistantTool(Function function)
-        {
-            Type = AssistantToolType.Function;
-            Function = function;
-        }
+        public static AssistantTool CodeInterpreter => new ("code_interpreter");
+        public static AssistantTool Retrieval => new ("retrieval");
+        public static AssistantTool ForFunction(Function function) => new("function") { Function = function };
 
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<AssistantToolType>))]
-        public AssistantToolType Type { get; set; }
+        public string Type { get; set; }
 
         [JsonPropertyName("function")]
         public Function Function { get; set; }

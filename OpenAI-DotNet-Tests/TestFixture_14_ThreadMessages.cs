@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using OpenAI.Chat;
 using OpenAI.Files;
@@ -44,20 +45,20 @@ namespace OpenAI.Tests
 
             Assert.IsNotNull(created);
             Assert.AreEqual("thread.message", created.Object);
-            Assert.AreEqual(ThreadRole.User, created.Role);
+            Assert.AreEqual(Role.User, created.Role);
             Assert.AreEqual(thread.Id, created.ThreadId);
 
             Assert.IsNotNull(created.Content);
-            Assert.AreEqual(1, created.Content.Length);
+            Assert.AreEqual(1, created.Content.Count);
             Assert.AreEqual(ContentType.Text, created.Content[0].Type);
             Assert.AreEqual("Test content", created.Content[0].Text.Value);
 
             Assert.IsNotEmpty(created.FileIds);
-            Assert.AreEqual(1, created.FileIds.Length);
+            Assert.AreEqual(1, created.FileIds.Count);
             Assert.AreEqual(file.Id, created.FileIds[0]);
 
             Assert.IsNotNull(created.Metadata);
-            Assert.Contains("test", created.Metadata.Keys);
+            Assert.Contains("test", created.Metadata.Keys.ToList());
             Assert.AreEqual("value", created.Metadata["test"]);
         }
 
@@ -103,7 +104,7 @@ namespace OpenAI.Tests
             
             Assert.IsNotNull(modified);
             Assert.IsNotNull(modified.Metadata);
-            Assert.Contains("test", modified.Metadata.Keys);
+            Assert.Contains("test", modified.Metadata.Keys.ToList());
             Assert.AreEqual("value", modified.Metadata["test"]);
         }
 

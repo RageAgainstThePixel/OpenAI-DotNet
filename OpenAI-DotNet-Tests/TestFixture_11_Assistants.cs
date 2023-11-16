@@ -34,7 +34,7 @@ namespace OpenAI.Tests
                 },
                 Tools = new List<AssistantTool>
                 {
-                    new(AssistantToolType.Retrieval)
+                    AssistantTool.Retrieval
                 },
                 FileIds = new List<string> { assistantFileId }
             };

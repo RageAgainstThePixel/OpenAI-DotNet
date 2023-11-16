@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using OpenAI.Chat;
 
 namespace OpenAI.Threads
 {
@@ -46,14 +47,14 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("role")]
-        public ThreadRole Role { get; private set; }
+        public Role Role { get; private set; }
 
         /// <summary>
         /// The content of the message in array of text and/or images.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public ThreadMessageContent[] Content { get; private set; }
+        public IReadOnlyList<ThreadMessageContent> Content { get; private set; }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
@@ -76,7 +77,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_ids")]
-        public string[] FileIds { get; private set; }
+        public IReadOnlyList<string> FileIds { get; private set; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
@@ -85,6 +86,6 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
-        public Dictionary<string, string> Metadata { get; private set; }
+        public IReadOnlyDictionary<string, string> Metadata { get; private set; }
     }
 }

@@ -217,7 +217,7 @@ namespace OpenAI.Tests
                         ["required"] = new JsonArray { "location", "unit" }
                     });
 
-            var functionTool = new AssistantTool(function);
+            var functionTool = AssistantTool.ForFunction(function);
             var request = new CreateThreadRunRequest(assistant.Id)
             {
                 Tools = new [] { functionTool }
