@@ -5,7 +5,7 @@ using OpenAI.Chat;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadMessage
+    public sealed class ThreadMessage : BaseResponse
     {
         public static implicit operator string(ThreadMessage message) => message?.Id;
 

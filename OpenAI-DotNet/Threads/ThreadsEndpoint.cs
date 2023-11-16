@@ -90,9 +90,7 @@ namespace OpenAI.Threads
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/messages"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -106,9 +104,7 @@ namespace OpenAI.Threads
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -131,9 +127,7 @@ namespace OpenAI.Threads
             var jsonContent = JsonSerializer.Serialize(new { metadata = metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/messages/{messageId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -157,16 +151,29 @@ namespace OpenAI.Threads
             CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!String.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!String.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!String.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", parameters), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var messages = JsonSerializer.Deserialize<ThreadMessagesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return messages;
+            return response.DeserializeResponse<ThreadMessagesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -183,9 +190,7 @@ namespace OpenAI.Threads
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadMessageFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadMessageFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     
         /// <summary>
@@ -210,16 +215,29 @@ namespace OpenAI.Threads
             CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!String.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!String.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!String.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", parameters), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var messages = JsonSerializer.Deserialize<ThreadMessageFilesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return messages;
+            return response.DeserializeResponse<ThreadMessageFilesList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -237,9 +255,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/runs"), jsonContent, cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -255,9 +271,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}"), cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var run = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return run;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -281,9 +295,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}"), jsonContent, cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -305,17 +317,30 @@ namespace OpenAI.Threads
             CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!String.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!String.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!String.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", parameters), cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var runs = JsonSerializer.Deserialize<ThreadRunsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return runs;
+            return response.DeserializeResponse<ThreadRunsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -343,9 +368,7 @@ namespace OpenAI.Threads
                 .ConfigureAwait(false);
 
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var run = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return run;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -361,9 +384,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}/cancel"), content: null, cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     
         /// <summary>
@@ -379,9 +400,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.PostAsync(GetUrl($"/runs"), jsonContent, cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var created = JsonSerializer.Deserialize<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return created;
+            return response.DeserializeResponse<ThreadRun>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -397,9 +416,7 @@ namespace OpenAI.Threads
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps/{stepId}"), cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var step = JsonSerializer.Deserialize<RunStep>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return step;
+            return response.DeserializeResponse<RunStep>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -423,17 +440,30 @@ namespace OpenAI.Threads
             CancellationToken cancellationToken = default)
         {
             var parameters = new Dictionary<string, string>();
-            if (limit.HasValue) parameters.Add("limit", limit.ToString());
-            if (!String.IsNullOrEmpty(order)) parameters.Add("order", order);
-            if (!String.IsNullOrEmpty(after)) parameters.Add("after", after);
-            if (!String.IsNullOrEmpty(before)) parameters.Add("before", before);
+            if (limit.HasValue)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+
+            if (!String.IsNullOrEmpty(order))
+            {
+                parameters.Add("order", order);
+            }
+
+            if (!String.IsNullOrEmpty(after))
+            {
+                parameters.Add("after", after);
+            }
+
+            if (!String.IsNullOrEmpty(before))
+            {
+                parameters.Add("before", before);
+            }
 
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", parameters), cancellationToken)
                 .ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var step = JsonSerializer.Deserialize<RunStepsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
-
-            return step;
+            return response.DeserializeResponse<RunStepsList>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }

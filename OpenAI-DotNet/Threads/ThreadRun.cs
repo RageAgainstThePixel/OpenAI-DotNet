@@ -6,7 +6,7 @@ using OpenAI.Extensions;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadRun
+    public sealed class ThreadRun : BaseResponse
     {
         public static implicit operator string(ThreadRun run) => run?.Id;
         

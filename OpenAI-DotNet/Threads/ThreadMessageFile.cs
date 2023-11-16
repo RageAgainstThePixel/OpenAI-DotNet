@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadMessageFile
+    public sealed class ThreadMessageFile : BaseResponse
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.

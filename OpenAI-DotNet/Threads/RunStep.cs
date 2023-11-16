@@ -8,7 +8,7 @@ namespace OpenAI.Threads
     /// <summary>
     /// Represents a step in execution of a run.
     /// </summary>
-    public sealed class RunStep
+    public sealed class RunStep : BaseResponse
     {
         public static implicit operator string(RunStep step) => step?.Id;
 
