@@ -1,7 +1,8 @@
-using System.Text.Json.Serialization;
 using OpenAI.Extensions;
+using OpenAI.Threads;
+using System.Text.Json.Serialization;
 
-namespace OpenAI.Threads
+namespace OpenAI
 {
     public sealed class Annotation
     {
@@ -18,15 +19,16 @@ namespace OpenAI.Threads
         public string Text { get; private set; }
 
         /// <summary>
-        /// A citation within the message that points to a specific quote from a specific File associated with the assistant or the message.
-        /// Generated when the assistant uses the "retrieval" tool to search files.
+        /// A citation within the message that points to a specific quote from a
+        /// specific File associated with the assistant or the message.
+        /// Generated when the assistant uses the 'retrieval' tool to search files.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_citation")]
         public FileCitation FileCitation { get; private set; }
 
         /// <summary>
-        /// A URL for the file that's generated when the assistant used the code_interpreter tool to generate a file.
+        /// A URL for the file that's generated when the assistant used the 'code_interpreter' tool to generate a file.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_path")]

@@ -7,7 +7,7 @@ namespace OpenAI.Chat
     public sealed class Delta
     {
         /// <summary>
-        /// The <see cref="Chat.Role"/> of the author of this message.
+        /// The <see cref="OpenAI.Role"/> of the author of this message.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("role")]

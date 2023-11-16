@@ -10,7 +10,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("file_id")]
         public string FileId { get; private set; }
-        
+
         /// <summary>
         /// The specific quote in the file.
         /// </summary>

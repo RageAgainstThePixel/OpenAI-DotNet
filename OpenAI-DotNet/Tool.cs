@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public sealed class Tool
     {

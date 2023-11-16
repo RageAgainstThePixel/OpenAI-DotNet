@@ -1,50 +1,55 @@
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using OpenAI.Assistants;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
     public sealed class CreateThreadRunRequest
     {
-        public CreateThreadRunRequest(string assistantId)
+        public CreateThreadRunRequest(Assistant assistant, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
-            AssistantId = assistantId;
+            AssistantId = assistant.Id;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
+            Instructions = instructions;
+            Tools = tools?.ToList();
+            Metadata = metadata;
         }
-    
+
         /// <summary>
         /// The ID of the assistant used for execution of this run.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("assistant_id")]
-        public string AssistantId { get; set; }
-    
+        public string AssistantId { get; }
+
         /// <summary>
         /// The model that the assistant used for this run.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string Model { get; }
 
         /// <summary>
         /// The instructions that the assistant used for this run.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("instructions")]
-        public string Instructions { get; set; }
-    
+        public string Instructions { get; }
+
         /// <summary>
         /// The list of tools that the assistant used for this run.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("tools")]
-        public AssistantTool[] Tools { get; set; }
+        public IReadOnlyList<Tool> Tools { get; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonPropertyName("metadata")]
-        public Dictionary<string, string> Metadata { get; set; }
+        public IReadOnlyDictionary<string, string> Metadata { get; }
     }
 }

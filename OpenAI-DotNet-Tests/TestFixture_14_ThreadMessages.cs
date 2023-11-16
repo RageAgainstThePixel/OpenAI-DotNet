@@ -1,12 +1,11 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using OpenAI.Files;
+using OpenAI.Threads;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenAI.Chat;
-using OpenAI.Files;
-using OpenAI.Threads;
 using Message = OpenAI.Threads.Message;
 
 namespace OpenAI.Tests
@@ -32,14 +31,12 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
             var file = await CreateFileForAssistant();
 
-            var request = new CreateThreadMessageRequest("Test content")
-            {
-                FileIds = new[] { file.Id },
-                Metadata = new Dictionary<string, string>
+            var request = new CreateThreadMessageRequest("Test content",
+                new[] { file.Id },
+                new Dictionary<string, string>
                 {
                     ["test"] = "value"
-                }
-            };
+                });
 
             var created = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, request);
 
@@ -66,13 +63,10 @@ namespace OpenAI.Tests
         public async Task Test_02_ListThreadMessages()
         {
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
-            
-            var message1 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
-                thread.Id, new CreateThreadMessageRequest("Test content"));
-            
-            var message2 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
-                thread.Id, new CreateThreadMessageRequest("Test content 2"));
-
+            var message1 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, new CreateThreadMessageRequest("Test content"));
+            Assert.IsNotNull(message1);
+            var message2 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, new CreateThreadMessageRequest("Test content 2"));
+            Assert.IsNotNull(message2);
             var list = await OpenAIClient.ThreadsEndpoint.ListThreadMessagesAsync(thread.Id);
 
             Assert.IsNotNull(list);
@@ -90,7 +84,7 @@ namespace OpenAI.Tests
         public async Task Test_03_ModifyThreadMessage()
         {
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
-            
+
             var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(
                 thread.Id, new CreateThreadMessageRequest("Test content"));
 
@@ -101,7 +95,7 @@ namespace OpenAI.Tests
                 {
                     ["test"] = "value"
                 });
-            
+
             Assert.IsNotNull(modified);
             Assert.IsNotNull(modified.Metadata);
             Assert.Contains("test", modified.Metadata.Keys.ToList());
@@ -114,23 +108,16 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
             var file1 = await CreateFileForAssistant();
             var file2 = await CreateFileForAssistant();
-
-            var createRequest = new CreateThreadMessageRequest("Test content")
-            {
-                FileIds = new[] { file1.Id, file2.Id }
-            };
-
+            var createRequest = new CreateThreadMessageRequest("Test content", new[] { file1.Id, file2.Id });
             var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(thread.Id, createRequest);
-
             var list = await OpenAIClient.ThreadsEndpoint.ListMessageFilesAsync(message.ThreadId, message.Id);
-            
+
             Assert.IsNotNull(list);
             Assert.AreEqual(2, list.Items.Count);
 
             foreach (var file in list.Items)
             {
-                var retrieved =
-                    await OpenAIClient.ThreadsEndpoint.RetrieveMessageFile(thread.Id, message.Id, file.Id);
+                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveMessageFile(thread.Id, message.Id, file.Id);
 
                 Assert.IsNotNull(retrieved);
 

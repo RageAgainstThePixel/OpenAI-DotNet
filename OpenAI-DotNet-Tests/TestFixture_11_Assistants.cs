@@ -14,31 +14,32 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
 
-            var testData = "Some useful knowledge";
             var fileName = "test.txt";
-            await File.WriteAllTextAsync(fileName, testData);
-            Assert.IsTrue(File.Exists(fileName));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(fileName, "assistants");
 
-            var assistantFileId = file.Id;
-
-            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106")
+            if (File.Exists(fileName))
             {
-                Name = "Test",
-                Description = "Test description",
-                Instructions = "You are test assistant",
-                Metadata = new Dictionary<string, object>
+                File.Delete(fileName);
+            }
+
+            await File.WriteAllTextAsync(fileName, "Some useful knowledge");
+            Assert.IsTrue(File.Exists(fileName));
+
+            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(fileName, "assistants");
+            var assistantFileId = file.Id;
+            var request = new AssistantRequest("gpt-3.5-turbo-1106",
+                name: "Test",
+                description: "Test description",
+                instructions: "You are test assistant",
+                metadata: new Dictionary<string, object>
                 {
                     ["int"] = "1",
                     ["text"] = "test"
                 },
-                Tools = new List<AssistantTool>
+                tools: new List<Tool>
                 {
-                    AssistantTool.Retrieval
+                    // Tool.Retrieval
                 },
-                FileIds = new List<string> { assistantFileId }
-            };
-
+                fileIds: new List<string> { assistantFileId });
             var result = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
 
             Assert.IsNotNull(result);
@@ -140,14 +141,11 @@ namespace OpenAI.Tests
 
             foreach (var assistant in assistantsList.Items)
             {
-                var request = new ModifyAssistantRequest
-                {
-                    Name = "Test modified",
-                    Description = "Modified description",
-                    Instructions = "You are modified test assistant",
-                    Model = "gpt-3.5-turbo",
-                    Tools = new List<AssistantTool>()
-                };
+                var request = new AssistantRequest(
+                    model: "gpt-3.5-turbo",
+                    name: "Test modified",
+                    description: "Modified description",
+                    instructions: "You are modified test assistant");
 
                 var modified = await OpenAIClient.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, request);
 

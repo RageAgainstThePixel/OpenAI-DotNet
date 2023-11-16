@@ -10,7 +10,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("code")]
         public string Code { get; private set; }
-    
+
         /// <summary>
         /// A human-readable description of the error.
         /// </summary>

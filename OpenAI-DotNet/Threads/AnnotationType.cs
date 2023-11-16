@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.Threads
+namespace OpenAI
 {
     public enum AnnotationType
     {

@@ -8,10 +8,15 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class SubmitThreadRunToolOutputsRequest
     {
+        public SubmitThreadRunToolOutputsRequest(IReadOnlyList<ToolOutput> toolOutputs)
+        {
+            ToolOutputs = toolOutputs;
+        }
+
         /// <summary>
         /// A list of tools for which the outputs are being submitted.
         /// </summary>
         [JsonPropertyName("tool_outputs")]
-        public List<ToolOutput> ToolOutputs { get; set; }
+        public IReadOnlyList<ToolOutput> ToolOutputs { get; }
     }
 }

@@ -1,7 +1,7 @@
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using OpenAI.Extensions;
 
 namespace OpenAI.Threads
 {
@@ -44,21 +44,21 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
-    
+
         /// <summary>
         /// The ID of the thread that was run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("thread_id")]
         public string ThreadId { get; private set; }
-        
+
         /// <summary>
         /// The ID of the run that this run step is a part of.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("run_id")]
         public string RunId { get; private set; }
-        
+
         /// <summary>
         /// The type of run step, which can be either message_creation or tool_calls.
         /// </summary>
@@ -66,7 +66,7 @@ namespace OpenAI.Threads
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter<RunStepType>))]
         public RunStepType Type { get; private set; }
-        
+
         /// <summary>
         /// The status of the run step, which can be either in_progress, cancelled, failed, completed, or expired.
         /// </summary>
@@ -74,7 +74,7 @@ namespace OpenAI.Threads
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter<RunStepStatus>))]
         public RunStepStatus Status { get; private set; }
-        
+
         /// <summary>
         /// The details of the run step.
         /// </summary>

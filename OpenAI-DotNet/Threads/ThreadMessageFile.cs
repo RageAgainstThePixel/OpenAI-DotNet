@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -18,20 +19,22 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("object")]
-        public string Object { get; private set;  }
+        public string Object { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the message file was created.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedAt { get; private set;  }
+        public int CreatedAtUnixTimeSeconds { get; private set; }
+
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         /// <summary>
         /// The ID of the message that the File is attached to.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("message_id")]
-        public string MessageId { get; private set;  }
+        public string MessageId { get; private set; }
     }
 }

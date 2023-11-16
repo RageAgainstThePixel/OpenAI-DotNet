@@ -1,14 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public sealed class ImageUrl
     {
         [JsonConstructor]
-        public ImageUrl(string url)
-        {
-            Url = url;
-        }
+        public ImageUrl(string url) => Url = url;
 
         [JsonInclude]
         [JsonPropertyName("url")]

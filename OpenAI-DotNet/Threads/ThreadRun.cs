@@ -1,15 +1,14 @@
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using OpenAI.Assistants;
-using OpenAI.Extensions;
 
 namespace OpenAI.Threads
 {
     public sealed class ThreadRun : BaseResponse
     {
         public static implicit operator string(ThreadRun run) => run?.Id;
-        
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -60,14 +59,16 @@ namespace OpenAI.Threads
         public RunStatus Status { get; private set; }
 
         /// <summary>
-        /// Details on the action required to continue the run.Will be null if no action is required.
+        /// Details on the action required to continue the run.
+        /// Will be null if no action is required.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("required_action")]
         public ThreadRunRequiredAction RequiredAction { get; private set; }
 
         /// <summary>
-        /// The Last error Associated with this run. Will Be null if there Are no errors.
+        /// The Last error Associated with this run.
+        /// Will be null if there are no errors.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("last_error")]
@@ -79,7 +80,10 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("expires_at")]
-        public int? ExpiresAt { get; private set; }
+        public int? ExpiresAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime ExpiresAt => DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixTimeSeconds ?? 0).DateTime;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was started.
@@ -87,7 +91,10 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("started_at")]
-        public int? StartedAt { get; private set; }
+        public int? StartedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime StartedAt => DateTimeOffset.FromUnixTimeSeconds(StartedAtUnixTimeSeconds ?? 0).DateTime;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was cancelled.
@@ -95,7 +102,10 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
-        public int? CancelledAt { get; private set; }
+        public int? CancelledAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CancelledAt => DateTimeOffset.FromUnixTimeSeconds(CancelledAtUnixTimeSeconds ?? 0).DateTime;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run failed.
@@ -103,7 +113,10 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
-        public int? FailedAt { get; private set; }
+        public int? FailedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime FailedAt => DateTimeOffset.FromUnixTimeSeconds(FailedAtUnixTimeSeconds ?? 0).DateTime;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was completed.
@@ -111,7 +124,10 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
-        public int? CompletedAt { get; private set; }
+        public int? CompletedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CompletedAt => DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds ?? 0).DateTime;
 
         /// <summary>
         /// The model that the assistant used for this run.
@@ -135,7 +151,7 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("tools")]
-        public AssistantTool[] Tools { get; private set; }
+        public IReadOnlyList<Tool> Tools { get; private set; }
 
         /// <summary>
         /// The list of File IDs the assistant used for this run.
@@ -143,12 +159,12 @@ namespace OpenAI.Threads
         /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("file_ids")]
-        public string[] FileIds { get; private set; }
+        public IReadOnlyList<string> FileIds { get; private set; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public class CodeInterpreter
+    public sealed class CodeInterpreter
     {
         /// <summary>
         /// The input to the Code Interpreter tool call.
@@ -11,7 +11,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("input")]
         public string Input { get; private set; }
-    
+
         /// <summary>
         /// The outputs from the Code Interpreter tool call.
         /// Code Interpreter can output one or more items, including text (logs) or images (image).

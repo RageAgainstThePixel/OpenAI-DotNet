@@ -9,6 +9,6 @@ namespace OpenAI.Assistants
         /// Useful for tools like 'retrieval' and 'code_interpreter' that can access files.
         /// </summary>
         [JsonPropertyName("file_id")]
-        public string FileId { get; set; }
+        public string FileId { get; }
     }
 }

@@ -1,4 +1,3 @@
-using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -7,6 +6,8 @@ namespace OpenAI.Threads
 {
     public sealed class Message
     {
+        public static implicit operator Message(string content) => new Message(content);
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -31,7 +32,8 @@ namespace OpenAI.Threads
         }
 
         /// <summary>
-        /// The role of the entity that is creating the message. Currently only user is supported.
+        /// The role of the entity that is creating the message.
+        /// Currently only user is supported.
         /// </summary>
         [JsonPropertyName("role")]
         public Role Role { get; }

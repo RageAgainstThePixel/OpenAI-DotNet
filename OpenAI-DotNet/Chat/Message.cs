@@ -23,7 +23,7 @@ namespace OpenAI.Chat
         /// Creates a new message to insert into a chat conversation.
         /// </summary>
         /// <param name="role">
-        /// The <see cref="Chat.Role"/> of the author of this message.
+        /// The <see cref="OpenAI.Role"/> of the author of this message.
         /// </param>
         /// <param name="content">
         /// The contents of the message.
@@ -40,7 +40,7 @@ namespace OpenAI.Chat
         /// Creates a new message to insert into a chat conversation.
         /// </summary>
         /// <param name="role">
-        /// The <see cref="Chat.Role"/> of the author of this message.
+        /// The <see cref="OpenAI.Role"/> of the author of this message.
         /// </param>
         /// <param name="content">
         /// The contents of the message.
@@ -72,7 +72,7 @@ namespace OpenAI.Chat
         }
 
         /// <summary>
-        /// The <see cref="Chat.Role"/> of the author of this message.
+        /// The <see cref="OpenAI.Role"/> of the author of this message.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("role")]

@@ -1,10 +1,9 @@
-using System.Text.Json.Serialization;
-using OpenAI.Chat;
 using OpenAI.Extensions;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadMessageContent
+    public sealed class MessageContent
     {
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -14,7 +13,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("text")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ThreadMessageContentText Text { get; private set; }
+        public TextContent Text { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("image_url")]

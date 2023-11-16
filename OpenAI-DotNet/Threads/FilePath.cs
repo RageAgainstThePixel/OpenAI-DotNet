@@ -9,6 +9,6 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_id")]
-        public string FileId { get; private set;  }
+        public string FileId { get; private set; }
     }
 }

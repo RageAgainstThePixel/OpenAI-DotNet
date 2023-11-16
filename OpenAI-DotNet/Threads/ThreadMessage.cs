@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using OpenAI.Chat;
 
 namespace OpenAI.Threads
 {
@@ -44,7 +43,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The entity that produced the message. One of user or assistant.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("role")]
         public Role Role { get; private set; }
@@ -54,12 +52,11 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public IReadOnlyList<ThreadMessageContent> Content { get; private set; }
+        public IReadOnlyList<MessageContent> Content { get; private set; }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
@@ -67,13 +64,14 @@ namespace OpenAI.Threads
         /// <summary>
         /// If applicable, the ID of the run associated with the authoring of this message.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("run_id")]
         public string RunId { get; private set; }
 
         /// <summary>
-        /// A list of file IDs that the assistant should use. Useful for tools like retrieval and code_interpreter that can access files. A maximum of 10 files can be attached to a message.
+        /// A list of file IDs that the assistant should use.
+        /// Useful for tools like retrieval and code_interpreter that can access files.
+        /// A maximum of 10 files can be attached to a message.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_ids")]
@@ -82,7 +80,7 @@ namespace OpenAI.Threads
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]

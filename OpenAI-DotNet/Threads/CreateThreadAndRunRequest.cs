@@ -1,14 +1,18 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using OpenAI.Assistants;
 
 namespace OpenAI.Threads
 {
     public sealed class CreateThreadAndRunRequest
     {
-        public CreateThreadAndRunRequest(string assistantId)
+        public CreateThreadAndRunRequest(string assistantId, Thread thread, string model, string instructions, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
             AssistantId = assistantId;
+            Thread = thread;
+            Model = model;
+            Instructions = instructions;
+            Tools = tools;
+            Metadata = metadata;
         }
 
         /// <summary>
@@ -16,58 +20,42 @@ namespace OpenAI.Threads
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("assistant_id")]
-        public string AssistantId { get; set; }
+        public string AssistantId { get; }
 
         /// <summary>
         /// Thread
         /// </summary>
         [JsonPropertyName("thread")]
-        public ThreadForRun Thread { get; set; }
+        public Thread Thread { get; }
 
         /// <summary>
         /// The ID of the Model to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string Model { get; }
 
         /// <summary>
         /// Override the default system message of the assistant. This is useful for modifying the behavior on a per-run basis.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("instructions")]
-        public string Instructions { get; set; }
+        public string Instructions { get; }
 
         /// <summary>
-        /// Override the tools the assistant can use for this run. This is useful for modifying the behavior on a per-run basis.
+        /// Override the tools the assistant can use for this run.
+        /// This is useful for modifying the behavior on a per-run basis.
         /// </summary>
         /// <returns></returns>
         [JsonPropertyName("tools")]
-        public AssistantTool[] Tools { get; set; }
+        public IReadOnlyList<Tool> Tools { get; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonPropertyName("metadata")]
-        public Dictionary<string, string> Metadata { get; set; }
-
-        public class ThreadForRun
-        {
-            /// <summary>
-            /// A list of messages to start the thread with.
-            /// </summary>
-            [JsonPropertyName("messages")]
-            public List<Message> Messages { get; set; } = new();
-
-            /// <summary>
-            /// Set of 16 key-value pairs that can be attached to an object.
-            /// This can be useful for storing additional information about the object in a structured format.
-            /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
-            /// </summary>
-            [JsonPropertyName("metadata")]
-            public Dictionary<string, string> Metadata { get; set; }
-        }
+        public IReadOnlyDictionary<string, string> Metadata { get; }
     }
 }

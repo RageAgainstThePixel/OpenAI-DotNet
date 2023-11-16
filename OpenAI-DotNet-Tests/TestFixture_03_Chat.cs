@@ -418,6 +418,7 @@ namespace OpenAI.Tests
             };
 
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            OpenAIClient.ChatEndpoint.EnableDebug = true;
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
@@ -451,8 +452,9 @@ namespace OpenAI.Tests
                 Assert.IsTrue(result.Choices.Count == 1);
             }
 
-            var usedTool = result.FirstChoice.Message.ToolCalls[0];
             Assert.IsTrue(result.FirstChoice.FinishReason == "tool_calls");
+            var usedTool = result.FirstChoice.Message.ToolCalls[0];
+            Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name == nameof(WeatherService.GetCurrentWeather));
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
             Console.WriteLine($"{usedTool.Function.Arguments}");
@@ -553,6 +555,7 @@ namespace OpenAI.Tests
 
             Assert.IsTrue(result.FirstChoice.FinishReason == "tool_calls");
             var usedTool = result.FirstChoice.Message.ToolCalls[0];
+            Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name == nameof(WeatherService.GetCurrentWeather));
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
             Console.WriteLine($"{usedTool.Function.Arguments}");
@@ -627,12 +630,13 @@ namespace OpenAI.Tests
             Assert.IsTrue(result.Choices.Count == 1);
             messages.Add(result.FirstChoice.Message);
 
-            var usedTool = result.FirstChoice.Message.ToolCalls[0];
             Assert.IsTrue(result.FirstChoice.FinishReason == "stop");
+            var usedTool = result.FirstChoice.Message.ToolCalls[0];
+            Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name == nameof(WeatherService.GetCurrentWeather));
             Console.WriteLine($"{result.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
             Console.WriteLine($"{usedTool.Function.Arguments}");
-            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(result.FirstChoice.Message.ToolCalls[0].Function.Arguments.ToString());
+            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));

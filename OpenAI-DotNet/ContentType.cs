@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public enum ContentType
     {

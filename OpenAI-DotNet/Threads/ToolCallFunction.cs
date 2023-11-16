@@ -10,7 +10,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("name")]
         public string Name { get; private set; }
-    
+
         /// <summary>
         /// The arguments that the model expects you to pass to the function.
         /// </summary>
