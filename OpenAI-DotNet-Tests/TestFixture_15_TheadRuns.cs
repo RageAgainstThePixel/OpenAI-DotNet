@@ -127,18 +127,7 @@ namespace OpenAI.Tests
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // run in Queued and InProgress can't be modified
-            var loopCounter = 0;
-            while (run.Status == RunStatus.InProgress || run.Status == RunStatus.Queued)
-            {
-                await Task.Delay(2_000);
-                loopCounter++;
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
-
-                if (loopCounter == 10)
-                {
-                    Assert.Fail("Spent too much in long in InProgress/Queued status");
-                }
-            }
+            run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
 
             var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadRunAsync(
                 thread.Id,
@@ -166,18 +155,8 @@ namespace OpenAI.Tests
 
             run = await OpenAIClient.ThreadsEndpoint.CancelThreadRunAsync(thread.Id, run.Id);
 
-            var loopCounter = 0;
-            while (run.Status == RunStatus.Cancelling)
-            {
-                await Task.Delay(2_000);
-                loopCounter++;
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
-
-                if (loopCounter == 10)
-                {
-                    Assert.Fail("Spent too much in Cancelling status");
-                }
-            }
+            // waiting while run in Queued and InProgress
+            run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Cancelling);
 
             Assert.AreEqual(RunStatus.Cancelled, run.Status);
         }
@@ -226,18 +205,7 @@ namespace OpenAI.Tests
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
-            var loopCounter = 0;
-            while (run.Status == RunStatus.InProgress || run.Status == RunStatus.Queued)
-            {
-                await Task.Delay(2_000);
-                loopCounter++;
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
-
-                if (loopCounter == 10)
-                {
-                    Assert.Fail("Spent too much in long in InProgress/Queued status");
-                }
-            }
+            run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
             
             Assert.AreEqual(RunStatus.RequiresAction, run.Status);
             Assert.IsNotNull(run.RequiredAction);
@@ -263,21 +231,10 @@ namespace OpenAI.Tests
             };
 
             run = await OpenAIClient.ThreadsEndpoint.SubmitToolOutputsAsync(thread.Id, run.Id, submitRequest);
-            
-            // waiting while run in Queued and InProgress
-            loopCounter = 0;
-            while (run.Status == RunStatus.InProgress || run.Status == RunStatus.Queued)
-            {
-                await Task.Delay(2_000);
-                loopCounter++;
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
 
-                if (loopCounter == 10)
-                {
-                    Assert.Fail("Spent too much in long in InProgress/Queued status");
-                }
-            }
-            
+            // waiting while run in Queued and InProgress
+            run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
+
             Assert.AreEqual(RunStatus.Completed, run.Status);
         }
 
@@ -291,19 +248,8 @@ namespace OpenAI.Tests
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
-            var loopCounter = 0;
-            while (run.Status == RunStatus.Queued)
-            {
-                await Task.Delay(2_000);
-                loopCounter++;
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread.Id, run.Id);
+            run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
 
-                if (loopCounter == 10)
-                {
-                    Assert.Fail("Spent too much in long in Queued status");
-                }
-            }
-            
             var list = await OpenAIClient.ThreadsEndpoint.ListTheadRunStepsAsync(thread.Id, run.Id);
 
             Assert.IsNotNull(list);
@@ -318,6 +264,25 @@ namespace OpenAI.Tests
 
                 Console.WriteLine($"[{retrieved.ThreadId}] -> {retrieved.Id}");
             }
+        }
+
+        private async Task<ThreadRun> WaitRunPassThroughStatusAsync(string threadId, string runId, params RunStatus[] statuses)
+        {
+            var loopCounter = 0;
+            ThreadRun run;
+            do
+            {
+                loopCounter++;
+                if (loopCounter > 10)
+                {
+                    Assert.Fail($"Spent too much in long in {String.Join(',', statuses)} statuses");
+                }
+
+                await Task.Delay(2_000);
+                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadId, runId);
+            } while (statuses.Contains(run.Status));
+
+            return run;
         }
     }
 }
