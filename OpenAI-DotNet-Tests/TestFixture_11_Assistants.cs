@@ -22,23 +22,19 @@ namespace OpenAI.Tests
 
             var assistantFileId = file.Id;
 
-            var request = new CreateAssistantRequest
+            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106")
             {
                 Name = "Test",
                 Description = "Test description",
                 Instructions = "You are test assistant",
-                Model = "gpt-3.5-turbo-1106",
                 Metadata = new Dictionary<string, object>
                 {
-                    ["int"] = 1,
+                    ["int"] = "1",
                     ["text"] = "test"
                 },
                 Tools = new List<AssistantTool>
                 {
-                    new()
-                    {
-                        Type = "retrieval"
-                    }
+                    AssistantTool.Retrieval
                 },
                 FileIds = new List<string> { assistantFileId }
             };
@@ -60,9 +56,9 @@ namespace OpenAI.Tests
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
 
             Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Assistants);
+            Assert.IsNotEmpty(assistantsList.Items);
 
-            foreach (var assistant in assistantsList.Assistants)
+            foreach (var assistant in assistantsList.Items)
             {
                 var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistant.Id);
                 Assert.NotNull(retrieved);
@@ -78,16 +74,16 @@ namespace OpenAI.Tests
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
 
             Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Assistants);
+            Assert.IsNotEmpty(assistantsList.Items);
 
-            foreach (var assistant in assistantsList.Assistants)
+            foreach (var assistant in assistantsList.Items)
             {
                 var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
 
                 Assert.IsNotNull(assistantsList);
-                Assert.IsNotEmpty(assistantsList.Assistants);
+                Assert.IsNotEmpty(assistantsList.Items);
 
-                foreach (var file in filesList.Files)
+                foreach (var file in filesList.Items)
                 {
                     Assert.IsNotNull(file);
 
@@ -107,16 +103,16 @@ namespace OpenAI.Tests
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
 
             Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Assistants);
+            Assert.IsNotEmpty(assistantsList.Items);
 
-            foreach (var assistant in assistantsList.Assistants)
+            foreach (var assistant in assistantsList.Items)
             {
                 var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
 
                 Assert.IsNotNull(filesList);
-                Assert.IsNotEmpty(filesList.Files);
+                Assert.IsNotEmpty(filesList.Items);
 
-                foreach (var file in filesList.Files)
+                foreach (var file in filesList.Items)
                 {
                     Assert.IsNotNull(file);
 
@@ -129,7 +125,7 @@ namespace OpenAI.Tests
                 filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
 
                 Assert.IsNotNull(filesList);
-                Assert.IsEmpty(filesList.Files);
+                Assert.IsEmpty(filesList.Items);
             }
         }
 
@@ -140,9 +136,9 @@ namespace OpenAI.Tests
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
 
             Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Assistants);
+            Assert.IsNotEmpty(assistantsList.Items);
 
-            foreach (var assistant in assistantsList.Assistants)
+            foreach (var assistant in assistantsList.Items)
             {
                 var request = new ModifyAssistantRequest
                 {
@@ -171,9 +167,9 @@ namespace OpenAI.Tests
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
 
             Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Assistants);
+            Assert.IsNotEmpty(assistantsList.Items);
 
-            foreach (var assistant in assistantsList.Assistants)
+            foreach (var assistant in assistantsList.Items)
             {
                 var result = await OpenAIClient.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id);
                 Assert.IsTrue(result);
@@ -182,7 +178,7 @@ namespace OpenAI.Tests
 
             assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
             Assert.IsNotNull(assistantsList);
-            Assert.IsEmpty(assistantsList.Assistants);
+            Assert.IsEmpty(assistantsList.Items);
         }
     }
 }

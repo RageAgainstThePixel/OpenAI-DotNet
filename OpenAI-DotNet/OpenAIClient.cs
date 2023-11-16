@@ -15,8 +15,8 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenAI.Threads;
 using OpenAI.Assistants;
+using OpenAI.Threads;
 
 namespace OpenAI
 {
