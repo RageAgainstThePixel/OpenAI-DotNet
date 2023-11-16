@@ -104,9 +104,9 @@ namespace OpenAI.Tests
             var list = await OpenAIClient.ThreadsEndpoint.ListThreadRunsAsync(thread.Id);
 
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Runs);
+            Assert.IsNotEmpty(list.Items);
 
-            foreach (var threadRun in list.Runs)
+            foreach (var threadRun in list.Items)
             {
                 var retrieved =
                     await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadRun.ThreadId, threadRun.Id);
@@ -307,9 +307,9 @@ namespace OpenAI.Tests
             var list = await OpenAIClient.ThreadsEndpoint.ListTheadRunStepsAsync(thread.Id, run.Id);
 
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Data);
+            Assert.IsNotEmpty(list.Items);
             
-            foreach (var step in list.Data)
+            foreach (var step in list.Items)
             {
                 var retrieved =
                     await OpenAIClient.ThreadsEndpoint.RetrieveTheadRunStepAsync(thread.Id, run.Id, step.Id);
