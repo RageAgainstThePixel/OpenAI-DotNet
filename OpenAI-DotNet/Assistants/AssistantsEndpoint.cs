@@ -1,7 +1,6 @@
 using OpenAI.Extensions;
 using OpenAI.Files;
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,42 +71,12 @@ namespace OpenAI.Assistants
         /// <summary>
         /// Get list of assistants.
         /// </summary>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.</param>
-        /// <param name="before">A cursor for use in pagination. before is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-        /// </param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{Assistant}"/></returns>
-        public async Task<ListResponse<Assistant>> ListAssistantsAsync(int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<Assistant>> ListAssistantsAsync(ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl(queryParameters: parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl(queryParameters: request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<Assistant>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -166,41 +135,12 @@ namespace OpenAI.Assistants
         /// Returns a list of assistant files.
         /// </summary>
         /// <param name="assistantId">The ID of the assistant the file belongs to.</param>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.</param>
-        /// <param name="before">A cursor for use in pagination. before is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.</param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{AssistantFile}"/>.</returns>
-        public async Task<ListResponse<AssistantFile>> ListAssistantFilesAsync(string assistantId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<AssistantFile>> ListAssistantFilesAsync(string assistantId, ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<AssistantFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }

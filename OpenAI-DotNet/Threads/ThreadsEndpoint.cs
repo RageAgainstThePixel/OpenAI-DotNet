@@ -134,43 +134,12 @@ namespace OpenAI.Threads
         /// Returns a list of messages for a given thread.
         /// </summary>
         /// <param name="threadId">The id of the thread the messages belong to.</param>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-        /// </param>
-        /// <param name="before">A cursor for use in pagination. before is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-        /// </param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessage}"/>.</returns>
-        public async Task<ListResponse<ThreadMessage>> ListThreadMessagesAsync(string threadId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadMessage>> ListThreadMessagesAsync(string threadId, ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<ThreadMessage>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -199,43 +168,12 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread that the message and files belong to.</param>
         /// <param name="messageId">The id of the message that the files belongs to.</param>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-        /// </param>
-        /// <param name="before">A cursor for use in pagination. before is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-        /// </param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        public async Task<ListResponse<ThreadMessageFile>> ListMessageFilesAsync(string threadId, string messageId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadMessageFile>> ListMessageFilesAsync(string threadId, string messageId, ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<ThreadMessageFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -298,41 +236,12 @@ namespace OpenAI.Threads
         /// Returns a list of runs belonging to a thread.
         /// </summary>
         /// <param name="threadId">The id of the thread the run belongs to.</param>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.</param>
-        /// <param name="before">A cursor for use in pagination. before is an object id that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.</param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of run objects.</returns>
-        public async Task<ListResponse<ThreadRun>> ListThreadRunsAsync(string threadId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadRun>> ListThreadRunsAsync(string threadId, ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<ThreadRun>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -403,41 +312,12 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
         /// <param name="runId">The id of the run to which the run step belongs.</param>
-        /// <param name="limit">A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.</param>
-        /// <param name="order">Sort order by the created_at timestamp of the objects. asc for ascending order and desc for descending order.</param>
-        /// <param name="after">A cursor for use in pagination. after is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include after=obj_foo in order to fetch the next page of the list.</param>
-        /// <param name="before">A cursor for use in pagination. before is an object ID that defines your place in the list.
-        /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
-        /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.</param>
+        /// <param name="request"><see cref="ListRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
-        public async Task<ListResponse<RunStep>> ListTheadRunStepsAsync(string threadId, string runId, int? limit = null, string order = "desc", string after = null, string before = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<RunStep>> ListTheadRunStepsAsync(string threadId, string runId, ListRequest request = null, CancellationToken cancellationToken = default)
         {
-            var parameters = new Dictionary<string, string>();
-
-            if (limit.HasValue)
-            {
-                parameters.Add("limit", limit.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(order))
-            {
-                parameters.Add("order", order);
-            }
-
-            if (!string.IsNullOrEmpty(after))
-            {
-                parameters.Add("after", after);
-            }
-
-            if (!string.IsNullOrEmpty(before))
-            {
-                parameters.Add("before", before);
-            }
-
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", parameters), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", request), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.DeserializeResponse<ListResponse<RunStep>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
