@@ -418,7 +418,6 @@ namespace OpenAI.Tests
             };
 
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-            OpenAIClient.ChatEndpoint.EnableDebug = true;
             var result = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Choices);
