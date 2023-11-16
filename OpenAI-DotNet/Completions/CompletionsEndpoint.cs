@@ -59,8 +59,10 @@ namespace OpenAI.Completions
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
         /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Asynchronously returns the completion result.
-        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
+        /// <returns>
+        /// Asynchronously returns the completion result.
+        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.
+        /// </returns>
         public async Task<CompletionResult> CreateCompletionAsync(
             string prompt = null,
             IEnumerable<string> prompts = null,
@@ -101,16 +103,17 @@ namespace OpenAI.Completions
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Asynchronously returns the completion result.
-        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
+        /// <returns>
+        /// Asynchronously returns the completion result.
+        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.
+        /// </returns>
         public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = false;
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<CompletionResult>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<CompletionResult>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         #endregion Non-Streaming
@@ -149,9 +152,11 @@ namespace OpenAI.Completions
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
         /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>An async enumerable with each of the results as they come in.
+        /// <returns>
+        /// An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
-        /// for more details on how to consume an async enumerable.</returns>
+        /// for more details on how to consume an async enumerable.
+        /// </returns>
         public async Task StreamCompletionAsync(
             Action<CompletionResult> resultHandler,
             string prompt = null,
@@ -194,7 +199,6 @@ namespace OpenAI.Completions
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
@@ -214,7 +218,7 @@ namespace OpenAI.Completions
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
 
-                    resultHandler(response.DeserializeResponse<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions));
+                    resultHandler(response.Deserialize<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions));
                 }
                 else
                 {
@@ -299,10 +303,11 @@ namespace OpenAI.Completions
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>An async enumerable with each of the results as they come in.
+        /// <returns>
+        /// An async enumerable with each of the results as they come in.
         /// See <seealso href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams"/>
-        /// for more details on how to consume an async enumerable.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
+        /// for more details on how to consume an async enumerable.
+        /// </returns>
         public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
@@ -321,7 +326,7 @@ namespace OpenAI.Completions
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    yield return response.DeserializeResponse<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions);
+                    yield return response.Deserialize<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions);
                 }
                 else
                 {

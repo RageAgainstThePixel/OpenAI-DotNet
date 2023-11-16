@@ -33,7 +33,7 @@ namespace OpenAI.Chat
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -43,7 +43,6 @@ namespace OpenAI.Chat
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
@@ -68,7 +67,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
 
                 if (chatResponse == null)
                 {
@@ -99,7 +98,6 @@ namespace OpenAI.Chat
         /// <param name="chatRequest">The chat request which contains the message content.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
@@ -124,7 +122,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.DeserializeResponse<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
 
                 if (chatResponse == null)
                 {

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Message = OpenAI.Threads.Message;
 
 namespace OpenAI.Tests
 {
@@ -20,8 +19,7 @@ namespace OpenAI.Tests
             new Dictionary<string, string>
             {
                 ["text"] = "test"
-            }
-        );
+            });
 
         [Test]
         public async Task Test_01_CreateThreadMessage()

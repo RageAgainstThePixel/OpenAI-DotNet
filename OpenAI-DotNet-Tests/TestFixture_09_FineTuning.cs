@@ -106,9 +106,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Jobs);
+            Assert.IsNotEmpty(list.Items);
 
-            foreach (var job in list.Jobs.OrderByDescending(job => job.CreatedAt))
+            foreach (var job in list.Items.OrderByDescending(job => job.CreatedAt))
             {
                 Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
             }
@@ -120,9 +120,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Jobs);
+            Assert.IsNotEmpty(list.Items);
 
-            foreach (var job in list.Jobs.OrderByDescending(job => job.CreatedAt))
+            foreach (var job in list.Items.OrderByDescending(job => job.CreatedAt))
             {
                 var request = await OpenAIClient.FineTuningEndpoint.GetJobInfoAsync(job);
                 Assert.IsNotNull(request);
@@ -136,22 +136,18 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Jobs);
+            Assert.IsNotEmpty(list.Items);
 
-            foreach (var job in list.Jobs)
+            foreach (var job in list.Items)
             {
-                if (job.Status == JobStatus.Cancelled)
-                {
-                    continue;
-                }
+                if (job.Status == JobStatus.Cancelled) { continue; }
 
                 var eventList = await OpenAIClient.FineTuningEndpoint.ListJobEventsAsync(job);
                 Assert.IsNotNull(eventList);
-                Assert.IsNotEmpty(eventList.Events);
+                Assert.IsNotEmpty(eventList.Items);
+                Console.WriteLine($"{job.Id} -> status: {job.Status} | event count: {eventList.Items.Count}");
 
-                Console.WriteLine($"{job.Id} -> status: {job.Status} | event count: {eventList.Events.Count}");
-
-                foreach (var @event in eventList.Events.OrderByDescending(@event => @event.CreatedAt))
+                foreach (var @event in eventList.Items.OrderByDescending(@event => @event.CreatedAt))
                 {
                     Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message}");
                 }
@@ -166,9 +162,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Jobs);
+            Assert.IsNotEmpty(list.Items);
 
-            foreach (var job in list.Jobs)
+            foreach (var job in list.Items)
             {
                 if (job.Status is > JobStatus.NotStarted and < JobStatus.Succeeded)
                 {

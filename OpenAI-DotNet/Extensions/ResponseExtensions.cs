@@ -116,7 +116,7 @@ namespace OpenAI.Extensions
             }
         }
 
-        internal static T DeserializeResponse<T>(this HttpResponseMessage response, string json, JsonSerializerOptions settings) where T : BaseResponse
+        internal static T Deserialize<T>(this HttpResponseMessage response, string json, JsonSerializerOptions settings) where T : BaseResponse
         {
             var result = JsonSerializer.Deserialize<T>(json, settings);
             result.SetResponseData(response.Headers);

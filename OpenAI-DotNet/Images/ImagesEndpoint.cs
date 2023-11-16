@@ -60,7 +60,6 @@ namespace OpenAI.Images
         /// <param name="request"><see cref="ImageGenerationRequest"/></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
@@ -97,8 +96,7 @@ namespace OpenAI.Images
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
-        /// <exception cref="HttpRequestException"></exception>
-        [Obsolete]
+        [Obsolete("Use new constructor")]
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(
             string image,
             string mask,
@@ -116,7 +114,6 @@ namespace OpenAI.Images
         /// <param name="request"><see cref="ImageEditRequest"/></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(ImageEditRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
@@ -168,8 +165,7 @@ namespace OpenAI.Images
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
-        /// <exception cref="HttpRequestException"></exception>
-        [Obsolete]
+        [Obsolete("Use new constructor")]
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(
             string imagePath,
             int numberOfResults = 1,
@@ -185,7 +181,6 @@ namespace OpenAI.Images
         /// <param name="request"><see cref="ImageVariationRequest"/></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(ImageVariationRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
@@ -209,7 +204,7 @@ namespace OpenAI.Images
         private async Task<IReadOnlyList<ImageResult>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var imagesResponse = response.DeserializeResponse<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
+            var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
 
             if (imagesResponse?.Results is not { Count: not 0 })
             {

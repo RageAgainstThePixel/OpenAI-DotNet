@@ -33,7 +33,6 @@ namespace OpenAI.Files
         /// </summary>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of <see cref="FileData"/>.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<IReadOnlyList<FileData>> ListFilesAsync(CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
@@ -56,7 +55,6 @@ namespace OpenAI.Files
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FileData"/>.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
             => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken).ConfigureAwait(false);
 
@@ -68,7 +66,6 @@ namespace OpenAI.Files
         /// <param name="request"><see cref="FileUploadRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FileData"/>.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> UploadFileAsync(FileUploadRequest request, CancellationToken cancellationToken = default)
         {
             using var fileData = new MemoryStream();
@@ -89,7 +86,6 @@ namespace OpenAI.Files
         /// <param name="fileId">The ID of the file to use for this request</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was successfully deleted.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFileAsync(string fileId, CancellationToken cancellationToken = default)
         {
             return await InternalDeleteFileAsync(1).ConfigureAwait(false);
@@ -122,7 +118,6 @@ namespace OpenAI.Files
         /// <param name="fileId">The ID of the file to use for this request.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FileData"/></returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<FileData> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
@@ -138,7 +133,6 @@ namespace OpenAI.Files
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>The full path of the downloaded file.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<string> DownloadFileAsync(string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
             var fileData = await GetFileInfoAsync(fileId, cancellationToken).ConfigureAwait(false);
@@ -153,7 +147,6 @@ namespace OpenAI.Files
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>The full path of the downloaded file.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public async Task<string> DownloadFileAsync(FileData fileData, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(directory))

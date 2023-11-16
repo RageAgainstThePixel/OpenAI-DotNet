@@ -1,6 +1,5 @@
 ﻿using OpenAI.Extensions;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,13 +45,12 @@ namespace OpenAI.Moderations
         /// </summary>
         /// <param name="request"><see cref="ModerationsRequest"/></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<ModerationsResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ModerationsResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
         }
     }
 }
