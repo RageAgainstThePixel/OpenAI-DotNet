@@ -7,6 +7,7 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the file that was generated.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("file_id")]
         public string FileId { get; private set;  }
     }

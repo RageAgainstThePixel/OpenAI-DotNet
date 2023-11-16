@@ -7,6 +7,7 @@ namespace OpenAI.Threads
         /// <summary>
         /// The file ID of the image.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("file_id")]
         public string FileId { get; private set; }
     }

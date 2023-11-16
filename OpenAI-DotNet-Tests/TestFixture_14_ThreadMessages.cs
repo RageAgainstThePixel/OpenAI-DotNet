@@ -76,7 +76,7 @@ namespace OpenAI.Tests
 
             Assert.IsNotNull(list);
 
-            foreach (var message in list.Data)
+            foreach (var message in list.Messages)
             {
                 var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveThreadMessageAsync(message.ThreadId, message.Id);
                 Assert.NotNull(retrieved);
@@ -124,9 +124,9 @@ namespace OpenAI.Tests
             var list = await OpenAIClient.ThreadsEndpoint.ListMessageFilesAsync(message.ThreadId, message.Id);
             
             Assert.IsNotNull(list);
-            Assert.AreEqual(2, list.Data.Count);
+            Assert.AreEqual(2, list.Files.Count);
 
-            foreach (var file in list.Data)
+            foreach (var file in list.Files)
             {
                 var retrieved =
                     await OpenAIClient.ThreadsEndpoint.RetrieveMessageFile(thread.Id, message.Id, file.Id);

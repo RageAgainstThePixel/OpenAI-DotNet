@@ -7,6 +7,7 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the message that was created by this run step.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("message_id")]
         public string MessageId { get; private set; }
     }

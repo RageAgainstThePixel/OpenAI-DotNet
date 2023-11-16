@@ -7,12 +7,14 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the specific File the citation is from.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("file_id")]
         public string FileId { get; private set; }
         
         /// <summary>
         /// The specific quote in the file.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("file_id")]
         public string Quote { get; private set; }
     }
