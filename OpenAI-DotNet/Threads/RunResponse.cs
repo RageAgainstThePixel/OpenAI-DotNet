@@ -5,10 +5,13 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadRun : BaseResponse
+    /// <summary>
+    /// An invocation of an Assistant on a Thread.
+    /// The Assistant uses it’s configuration and the Thread’s Messages to perform tasks by calling models and tools.
+    /// As part of a Run, the Assistant appends Messages to the Thread.
+    /// </summary>
+    public sealed class RunResponse : BaseResponse
     {
-        public static implicit operator string(ThreadRun run) => run?.Id;
-
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -157,5 +160,9 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        public static implicit operator string(RunResponse run) => run?.ToString();
+
+        public override string ToString() => Id;
     }
 }

@@ -225,10 +225,10 @@ namespace OpenAI.Tests
             }
         }
 
-        private async Task<ThreadRun> WaitRunPassThroughStatusAsync(string threadId, string runId, params RunStatus[] statuses)
+        private async Task<RunResponse> WaitRunPassThroughStatusAsync(string threadId, string runId, params RunStatus[] statuses)
         {
             var loopCounter = 0;
-            ThreadRun run;
+            RunResponse runResponse;
 
             do
             {
@@ -238,10 +238,10 @@ namespace OpenAI.Tests
                 }
 
                 await Task.Delay(2000);
-                run = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadId, runId);
-            } while (statuses.Contains(run.Status));
+                runResponse = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadId, runId);
+            } while (statuses.Contains(runResponse.Status));
 
-            return run;
+            return runResponse;
         }
     }
 }

@@ -4,10 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class Thread : BaseResponse
+    /// <summary>
+    /// A conversation session between an Assistant and a user.
+    /// Threads store Messages and automatically handle truncation to fit content into a model’s context.
+    /// </summary>
+    public sealed class ThreadResponse : BaseResponse
     {
-        public static implicit operator string(Thread thread) => thread?.Id;
-
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -40,5 +42,9 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        public static implicit operator string(ThreadResponse thread) => thread?.ToString();
+
+        public override string ToString() => Id;
     }
 }

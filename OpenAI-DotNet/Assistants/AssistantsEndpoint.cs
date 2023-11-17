@@ -18,13 +18,13 @@ namespace OpenAI.Assistants
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="Assistant"/>.</returns>
-        public async Task<Assistant> CreateAssistantAsync(AssistantRequest request, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AssistantResponse"/>.</returns>
+        public async Task<AssistantResponse> CreateAssistantAsync(AssistantRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -32,12 +32,12 @@ namespace OpenAI.Assistants
         /// </summary>
         /// <param name="assistantId">The ID of the assistant to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="Assistant"/>.</returns>
-        public async Task<Assistant> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AssistantResponse"/>.</returns>
+        public async Task<AssistantResponse> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -46,13 +46,13 @@ namespace OpenAI.Assistants
         /// <param name="assistantId">The ID of the assistant to modify.</param>
         /// <param name="request"></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="Assistant"/>.</returns>
-        public async Task<Assistant> ModifyAssistantAsync(string assistantId, AssistantRequest request, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AssistantResponse"/>.</returns>
+        public async Task<AssistantResponse> ModifyAssistantAsync(string assistantId, AssistantRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<Assistant>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -74,11 +74,11 @@ namespace OpenAI.Assistants
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{Assistant}"/></returns>
-        public async Task<ListResponse<Assistant>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<AssistantResponse>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<Assistant>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<AssistantResponse>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>

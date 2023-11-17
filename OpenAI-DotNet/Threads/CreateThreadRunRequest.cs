@@ -7,7 +7,7 @@ namespace OpenAI.Threads
 {
     public sealed class CreateThreadRunRequest
     {
-        public CreateThreadRunRequest(Assistant assistant, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateThreadRunRequest(AssistantResponse assistant, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
             AssistantId = assistant.Id;
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;

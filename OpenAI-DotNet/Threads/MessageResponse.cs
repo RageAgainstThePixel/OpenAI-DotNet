@@ -4,6 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
+    /// <summary>
+    /// A message created by an Assistant or a user.
+    /// Messages can include text, images, and other files.
+    /// Messages stored as a list on the Thread.
+    /// </summary>
     public sealed class MessageResponse : BaseResponse
     {
         /// <summary>
@@ -83,7 +88,7 @@ namespace OpenAI.Threads
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
-        public static implicit operator string(MessageResponse messageResponse) => messageResponse?.ToString();
+        public static implicit operator string(MessageResponse message) => message?.ToString();
 
         public override string ToString() => Id;
     }

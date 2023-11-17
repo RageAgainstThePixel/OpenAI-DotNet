@@ -6,9 +6,11 @@ using System.Text.Json.Serialization;
 namespace OpenAI.Threads
 {
     /// <summary>
-    /// Represents a step in execution of a run.
+    /// A detailed list of steps the Assistant took as part of a Run.
+    /// An Assistant can call tools or create Messages during it’s run.
+    /// Examining Run Steps allows you to introspect how the Assistant is getting to it’s final results.
     /// </summary>
-    public sealed class RunStep : BaseResponse
+    public sealed class RunStepResponse : BaseResponse
     {
         /// <summary>
         /// The identifier of the run step, which can be referenced in API endpoints.
@@ -119,7 +121,7 @@ namespace OpenAI.Threads
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
-        public static implicit operator string(RunStep step) => step?.ToString();
+        public static implicit operator string(RunStepResponse runStep) => runStep?.ToString();
 
         public override string ToString() => Id;
     }

@@ -4,7 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants
 {
-    public sealed class Assistant : BaseResponse
+    /// <summary>
+    /// Purpose-built AI that uses OpenAI’s models and calls tools.
+    /// </summary>
+    public sealed class AssistantResponse : BaseResponse
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
@@ -90,7 +93,7 @@ namespace OpenAI.Assistants
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
-        public static implicit operator string(Assistant assistant) => assistant?.Id;
+        public static implicit operator string(AssistantResponse assistant) => assistant?.Id;
 
         public override string ToString() => Id;
     }
