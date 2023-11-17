@@ -4,10 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadMessage : BaseResponse
+    public sealed class MessageResponse : BaseResponse
     {
-        public static implicit operator string(ThreadMessage message) => message?.Id;
-
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -25,7 +23,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the thread was created.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
@@ -52,7 +49,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public IReadOnlyList<MessageContent> Content { get; private set; }
+        public IReadOnlyList<Content> Content { get; private set; }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
@@ -85,5 +82,9 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        public static implicit operator string(MessageResponse messageResponse) => messageResponse?.ToString();
+
+        public override string ToString() => Id;
     }
 }

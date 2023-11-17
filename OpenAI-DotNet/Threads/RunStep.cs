@@ -10,8 +10,6 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class RunStep : BaseResponse
     {
-        public static implicit operator string(RunStep step) => step?.Id;
-
         /// <summary>
         /// The identifier of the run step, which can be referenced in API endpoints.
         /// </summary>
@@ -26,7 +24,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was created.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
@@ -37,7 +34,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the assistant associated with the run step.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
@@ -89,7 +85,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step expired. A step is considered expired if the parent run is expired.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("expires_at")]
         public int? ExpiresAt { get; private set; }
@@ -97,7 +92,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was cancelled.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
         public int? CancelledAt { get; private set; }
@@ -105,7 +99,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step failed.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
         public int? FailedAt { get; private set; }
@@ -113,7 +106,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step completed.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
         public int? CompletedAt { get; private set; }
@@ -121,10 +113,14 @@ namespace OpenAI.Threads
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        public static implicit operator string(RunStep step) => step?.ToString();
+
+        public override string ToString() => Id;
     }
 }

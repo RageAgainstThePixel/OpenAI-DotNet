@@ -18,7 +18,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the assistant to use to execute this run.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; }
 
@@ -31,14 +30,12 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the Model to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("model")]
         public string Model { get; }
 
         /// <summary>
         /// Override the default system message of the assistant. This is useful for modifying the behavior on a per-run basis.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("instructions")]
         public string Instructions { get; }
 
@@ -46,7 +43,6 @@ namespace OpenAI.Threads
         /// Override the tools the assistant can use for this run.
         /// This is useful for modifying the behavior on a per-run basis.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("tools")]
         public IReadOnlyList<Tool> Tools { get; }
 

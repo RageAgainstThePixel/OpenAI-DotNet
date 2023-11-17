@@ -85,13 +85,13 @@ namespace OpenAI.Threads
         /// <param name="threadId">The id of the thread to create a message for.</param>
         /// <param name="request"></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ThreadMessage"/>.</returns>
-        public async Task<ThreadMessage> CreateThreadMessageAsync(string threadId, CreateThreadMessageRequest request, CancellationToken cancellationToken = default)
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public async Task<MessageResponse> CreateThreadMessageAsync(string threadId, CreateThreadMessageRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/messages"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<MessageResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -101,18 +101,18 @@ namespace OpenAI.Threads
         /// <param name="messageId">The id of the message to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The message object matching the specified id.</returns>
-        public async Task<ThreadMessage> RetrieveThreadMessageAsync(string threadId, string messageId, CancellationToken cancellationToken = default)
+        public async Task<MessageResponse> RetrieveThreadMessageAsync(string threadId, string messageId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<MessageResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
         /// Modifies a message.
         /// </summary>
         /// <remarks>
-        /// Only the <see cref="ThreadMessage.Metadata"/> can be modified.
+        /// Only the <see cref="MessageResponse.Metadata"/> can be modified.
         /// </remarks>
         /// <param name="threadId">The id of the thread to which this message belongs.</param>
         /// <param name="messageId">The id of the message to modify.</param>
@@ -121,13 +121,13 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ThreadMessage"/>.</returns>
-        public async Task<ThreadMessage> ModifyThreadMessageAsync(string threadId, string messageId, Dictionary<string, string> metadata, CancellationToken cancellationToken = default)
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public async Task<MessageResponse> ModifyThreadMessageAsync(string threadId, string messageId, Dictionary<string, string> metadata, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/messages/{messageId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ThreadMessage>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<MessageResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -137,11 +137,11 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessage}"/>.</returns>
-        public async Task<ListResponse<ThreadMessage>> ListThreadMessagesAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<MessageResponse>> ListThreadMessagesAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<ThreadMessage>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<MessageResponse>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         #endregion Messages
@@ -155,12 +155,12 @@ namespace OpenAI.Threads
         /// <param name="messageId">The id of the message the file belongs to.</param>
         /// <param name="fileId">The id of the file being retrieved.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ThreadMessageFile"/>.</returns>
-        public async Task<ThreadMessageFile> RetrieveMessageFile(string threadId, string messageId, string fileId, CancellationToken cancellationToken = default)
+        /// <returns><see cref="MessageFileResponse"/>.</returns>
+        public async Task<MessageFileResponse> RetrieveMessageFile(string threadId, string messageId, string fileId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ThreadMessageFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<MessageFileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         /// <summary>
@@ -171,11 +171,11 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        public async Task<ListResponse<ThreadMessageFile>> ListMessageFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<MessageFileResponse>> ListMessageFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<ThreadMessageFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<MessageFileResponse>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
         #endregion Files

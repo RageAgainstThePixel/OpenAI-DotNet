@@ -19,28 +19,24 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the assistant used for execution of this run.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; }
 
         /// <summary>
         /// The model that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("model")]
         public string Model { get; }
 
         /// <summary>
         /// The instructions that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("instructions")]
         public string Instructions { get; }
 
         /// <summary>
         /// The list of tools that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("tools")]
         public IReadOnlyList<Tool> Tools { get; }
 

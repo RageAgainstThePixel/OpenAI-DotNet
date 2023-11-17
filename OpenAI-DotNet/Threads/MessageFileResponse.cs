@@ -3,12 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadMessageFile : BaseResponse
+    public sealed class MessageFileResponse : BaseResponse
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("id")]
         public string Id { get; private set; }
@@ -16,7 +15,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The object type, which is always thread.message.file.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }

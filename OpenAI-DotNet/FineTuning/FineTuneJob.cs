@@ -67,6 +67,8 @@ namespace OpenAI.FineTuning
         [JsonIgnore]
         public IReadOnlyList<Event> Events { get; internal set; } = new List<Event>();
 
-        public static implicit operator string(FineTuneJob job) => job.Id;
+        public static implicit operator string(FineTuneJob job) => job?.ToString();
+
+        public override string ToString() => Id;
     }
 }

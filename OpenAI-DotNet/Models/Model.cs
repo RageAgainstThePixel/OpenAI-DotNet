@@ -30,7 +30,7 @@ namespace OpenAI.Models
         /// Allows a model to be implicitly cast to the string of its id.
         /// </summary>
         /// <param name="model">The <see cref="Model"/> to cast to a string.</param>
-        public static implicit operator string(Model model) => model.Id;
+        public static implicit operator string(Model model) => model?.ToString();
 
         /// <summary>
         /// Allows a string to be implicitly cast as a <see cref="Model"/>

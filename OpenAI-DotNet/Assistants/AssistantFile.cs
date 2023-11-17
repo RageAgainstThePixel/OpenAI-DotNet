@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Assistants
@@ -26,12 +27,14 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedAt { get; private set; }
+        public int CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         /// <summary>
         /// The assistant ID that the file is attached to.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }

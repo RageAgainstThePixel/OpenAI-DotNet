@@ -84,10 +84,12 @@ namespace OpenAI.Assistants
         /// <summary>
         /// Create an assistant file by attaching a File to an assistant.
         /// </summary>
-        /// <param name="assistantId">The ID of the assistant for which to create a File.</param>
+        /// <param name="assistantId">The ID of the assistant for which to create a File.
+        /// </param>
         /// <param name="file">
         /// A <see cref="FileData"/> (with purpose="assistants") that the assistant should use.
-        /// Useful for tools like retrieval and code_interpreter that can access files.</param>
+        /// Useful for tools like retrieval and code_interpreter that can access files.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFile"/>.</returns>
         public async Task<AssistantFile> CreateAssistantFileAsync(string assistantId, FileData file, CancellationToken cancellationToken = default)
@@ -116,6 +118,15 @@ namespace OpenAI.Assistants
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
+
+        /// <summary>
+        /// Delete an assistant file.
+        /// </summary>
+        /// <param name="file"><see cref="AssistantFile"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>True, if file was deleted.</returns>
+        public async Task<bool> DeleteAssistantFileAsync(AssistantFile file, CancellationToken cancellationToken = default)
+            => await DeleteAssistantFileAsync(file.AssistantId, file.Id, cancellationToken);
 
         /// <summary>
         /// Delete an assistant file.

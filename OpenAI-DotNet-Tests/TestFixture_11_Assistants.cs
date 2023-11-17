@@ -9,173 +9,124 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_11_Assistants : AbstractTestFixture
     {
+        private static string testAssistantId;
+
         [Test]
         public async Task Test_01_CreateAssistant()
         {
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-
-            var fileName = "test.txt";
-
-            if (File.Exists(fileName))
-            {
-                File.Delete(fileName);
-            }
-
-            await File.WriteAllTextAsync(fileName, "Some useful knowledge");
-            Assert.IsTrue(File.Exists(fileName));
-
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(fileName, "assistants");
-            var assistantFileId = file.Id;
+            const string testFilePath = "assistant_test.txt";
+            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
+            Assert.IsTrue(File.Exists(testFilePath));
+            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
+            File.Delete(testFilePath);
+            Assert.IsFalse(File.Exists(testFilePath));
             var request = new AssistantRequest("gpt-3.5-turbo-1106",
-                name: "Test",
-                description: "Test description",
+                name: "test-assistant",
+                description: "Used for unit testing.",
                 instructions: "You are test assistant",
-                metadata: new Dictionary<string, object>
+                metadata: new Dictionary<string, string>
                 {
                     ["int"] = "1",
-                    ["text"] = "test"
+                    ["test"] = Guid.NewGuid().ToString()
                 },
-                tools: new List<Tool>
+                tools: new[]
                 {
                     Tool.Retrieval
                 },
-                fileIds: new List<string> { assistantFileId });
-            var result = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual("Test", result.Name);
-            Assert.AreEqual("Test description", result.Description);
-            Assert.AreEqual("You are test assistant", result.Instructions);
-            Assert.AreEqual("gpt-3.5-turbo-1106", result.Model);
+                fileIds: new[] { file.Id });
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
+            Assert.IsNotNull(assistant);
+            Assert.AreEqual("test-assistant", assistant.Name);
+            Assert.AreEqual("Used for unit testing.", assistant.Description);
+            Assert.AreEqual("You are test assistant", assistant.Instructions);
+            Assert.AreEqual("gpt-3.5-turbo-1106", assistant.Model);
+            Assert.IsNotEmpty(assistant.Metadata);
+            testAssistantId = assistant.Id;
+            Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
         }
 
         [Test]
         public async Task Test_02_ListAssistants()
         {
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-
             var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
-
             Assert.IsNotNull(assistantsList);
             Assert.IsNotEmpty(assistantsList.Items);
 
             foreach (var assistant in assistantsList.Items)
             {
-                var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistant.Id);
-                Assert.NotNull(retrieved);
-
-                Console.WriteLine($"[{retrieved.Id}] {retrieved.Name}: {retrieved.Description}");
+                Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
             }
         }
 
         [Test]
         public async Task Test_03_ListAssistantFiles()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+            var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
+            Assert.IsNotNull(filesList);
+            Assert.IsNotEmpty(filesList.Items);
 
-            Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Items);
-
-            foreach (var assistant in assistantsList.Items)
+            foreach (var file in filesList.Items)
             {
-                var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
-
-                Assert.IsNotNull(assistantsList);
-                Assert.IsNotEmpty(assistantsList.Items);
-
-                foreach (var file in filesList.Items)
-                {
-                    Assert.IsNotNull(file);
-
-                    var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantFileAsync(file.AssistantId, file.Id);
-
-                    Assert.IsNotNull(retrieved);
-
-                    Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
-                }
+                Assert.IsNotNull(file);
+                var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantFileAsync(file.AssistantId, file.Id);
+                Assert.IsNotNull(retrieved);
+                Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
             }
         }
 
         [Test]
         public async Task Test_04_DeleteAssistantFile()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+            var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
+            Assert.IsNotNull(filesList);
+            Assert.IsNotEmpty(filesList.Items);
 
-            Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Items);
-
-            foreach (var assistant in assistantsList.Items)
+            foreach (var file in filesList.Items)
             {
-                var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
-
-                Assert.IsNotNull(filesList);
-                Assert.IsNotEmpty(filesList.Items);
-
-                foreach (var file in filesList.Items)
-                {
-                    Assert.IsNotNull(file);
-
-                    var isDeleted = await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file.AssistantId, file.Id);
-
-                    Assert.IsTrue(isDeleted);
-                }
-
-                filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id);
-
-                Assert.IsNotNull(filesList);
-                Assert.IsEmpty(filesList.Items);
+                Assert.IsNotNull(file);
+                var isDeleted = await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file);
+                Assert.IsTrue(isDeleted);
             }
+
+            filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
+            Assert.IsNotNull(filesList);
+            Assert.IsEmpty(filesList.Items);
         }
 
         [Test]
         public async Task Test_05_ModifyAssistants()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
-
-            Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Items);
-
-            foreach (var assistant in assistantsList.Items)
-            {
-                var request = new AssistantRequest(
-                    model: "gpt-3.5-turbo",
-                    name: "Test modified",
-                    description: "Modified description",
-                    instructions: "You are modified test assistant");
-
-                var modified = await OpenAIClient.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, request);
-
-                Assert.AreEqual("Test modified", modified.Name);
-                Assert.AreEqual("Modified description", modified.Description);
-                Assert.AreEqual("You are modified test assistant", modified.Instructions);
-                Assert.AreEqual("gpt-3.5-turbo", modified.Model);
-
-                Console.WriteLine($"{assistant.Id} -> modified");
-            }
+            var request = new AssistantRequest(
+                model: "gpt-4-1106-preview",
+                name: "Test modified",
+                description: "Modified description",
+                instructions: "You are modified test assistant");
+            var assistant = await OpenAIClient.AssistantsEndpoint.ModifyAssistantAsync(testAssistantId, request);
+            Assert.IsNotNull(assistant);
+            Assert.AreEqual("Test modified", assistant.Name);
+            Assert.AreEqual("Modified description", assistant.Description);
+            Assert.AreEqual("You are modified test assistant", assistant.Instructions);
+            Assert.AreEqual("gpt-4-1106-preview", assistant.Model);
+            Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
+            Console.WriteLine($"{assistant.Id} -> modified");
         }
 
         [Test]
         public async Task Test_06_DeleteAssistant()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
-
-            Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Items);
-
-            foreach (var assistant in assistantsList.Items)
-            {
-                var result = await OpenAIClient.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id);
-                Assert.IsTrue(result);
-                Console.WriteLine($"{assistant.Id} -> deleted");
-            }
-
-            assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
-            Assert.IsNotNull(assistantsList);
-            Assert.IsEmpty(assistantsList.Items);
+            var result = await OpenAIClient.AssistantsEndpoint.DeleteAssistantAsync(testAssistantId);
+            Assert.IsTrue(result);
+            Console.WriteLine($"{testAssistantId} -> deleted");
         }
     }
 }

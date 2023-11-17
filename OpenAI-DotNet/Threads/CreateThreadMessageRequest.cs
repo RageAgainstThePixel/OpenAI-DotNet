@@ -35,7 +35,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The content of the message.
         /// </summary>
-        /// <returns></returns>
         [JsonPropertyName("content")]
         public string Content { get; }
 

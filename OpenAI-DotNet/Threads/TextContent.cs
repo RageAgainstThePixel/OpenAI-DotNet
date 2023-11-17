@@ -8,7 +8,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The data that makes up the text.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("value")]
         public string Value { get; private set; }

@@ -89,5 +89,9 @@ namespace OpenAI.Assistants
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        public static implicit operator string(Assistant assistant) => assistant?.Id;
+
+        public override string ToString() => Id;
     }
 }
