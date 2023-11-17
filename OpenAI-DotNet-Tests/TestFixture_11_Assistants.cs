@@ -90,7 +90,9 @@ namespace OpenAI.Tests
             foreach (var file in filesList.Items)
             {
                 Assert.IsNotNull(file);
-                var isDeleted = await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file);
+                var isRemoved = await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file);
+                Assert.IsTrue(isRemoved);
+                var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
                 Assert.IsTrue(isDeleted);
             }
 

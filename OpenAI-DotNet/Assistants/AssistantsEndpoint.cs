@@ -122,6 +122,11 @@ namespace OpenAI.Assistants
         /// <summary>
         /// Delete an assistant file.
         /// </summary>
+        /// <remarks>
+        /// Note that deleting an AssistantFile does not delete the original File object,
+        /// it simply deletes the association between that File and the Assistant.
+        /// To delete a File, use the File delete endpoint instead.
+        /// </remarks>
         /// <param name="file"><see cref="AssistantFile"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was deleted.</returns>
@@ -131,6 +136,11 @@ namespace OpenAI.Assistants
         /// <summary>
         /// Delete an assistant file.
         /// </summary>
+        /// <remarks>
+        /// Note that deleting an AssistantFile does not delete the original File object,
+        /// it simply deletes the association between that File and the Assistant.
+        /// To delete a File, use the File delete endpoint instead.
+        /// </remarks>
         /// <param name="assistantId">The ID of the assistant that the file belongs to.</param>
         /// <param name="fileId">The ID of the file to delete.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>

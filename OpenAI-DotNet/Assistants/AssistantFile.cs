@@ -38,5 +38,9 @@ namespace OpenAI.Assistants
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
+
+        public static implicit operator string(AssistantFile file) => file?.ToString();
+
+        public override string ToString() => Id;
     }
 }
