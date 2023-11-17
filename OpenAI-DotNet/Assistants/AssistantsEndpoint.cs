@@ -123,29 +123,29 @@ namespace OpenAI.Assistants
         /// Delete an assistant file.
         /// </summary>
         /// <remarks>
-        /// Note that deleting an AssistantFile does not delete the original File object,
-        /// it simply deletes the association between that File and the Assistant.
+        /// Note that removing an AssistantFile does not delete the original File object,
+        /// it simply removes the association between that File and the Assistant.
         /// To delete a File, use the File delete endpoint instead.
         /// </remarks>
         /// <param name="file"><see cref="AssistantFile"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>True, if file was deleted.</returns>
-        public async Task<bool> DeleteAssistantFileAsync(AssistantFile file, CancellationToken cancellationToken = default)
-            => await DeleteAssistantFileAsync(file.AssistantId, file.Id, cancellationToken);
+        /// <returns>True, if file was removed.</returns>
+        public async Task<bool> RemoveAssistantFileAsync(AssistantFile file, CancellationToken cancellationToken = default)
+            => await RemoveAssistantFileAsync(file.AssistantId, file.Id, cancellationToken);
 
         /// <summary>
-        /// Delete an assistant file.
+        /// Remove an assistant file.
         /// </summary>
         /// <remarks>
-        /// Note that deleting an AssistantFile does not delete the original File object,
-        /// it simply deletes the association between that File and the Assistant.
+        /// Note that removing an AssistantFile does not delete the original File object,
+        /// it simply removes the association between that File and the Assistant.
         /// To delete a File, use the File delete endpoint instead.
         /// </remarks>
         /// <param name="assistantId">The ID of the assistant that the file belongs to.</param>
         /// <param name="fileId">The ID of the file to delete.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>True, if file was deleted.</returns>
-        public async Task<bool> DeleteAssistantFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
+        /// <returns>True, if file was removed.</returns>
+        public async Task<bool> RemoveAssistantFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.DeleteAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
