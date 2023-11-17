@@ -34,10 +34,14 @@ namespace OpenAI.Files
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int CreatedUnixTime { get; private set; }
+        public int CreatedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        [Obsolete("Use CreatedAtUnixTimeSeconds")]
+        public int CreatedUnixTime => CreatedAtUnixTimeSeconds;
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         /// <summary>
         /// The name of the file.

@@ -27,16 +27,6 @@ namespace OpenAI.Threads
         public string Object { get; private set; }
 
         /// <summary>
-        /// The Unix timestamp (in seconds) for when the thread was created.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("created_at")]
-        public int CreatedAtUnixTimeSeconds { get; private set; }
-
-        [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
-
-        /// <summary>
         /// The thread ID that this run belongs to.
         /// </summary>
         [JsonInclude]
@@ -75,6 +65,16 @@ namespace OpenAI.Threads
         public RunLastError LastError { get; private set; }
 
         /// <summary>
+        /// The Unix timestamp (in seconds) for when the thread was created.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("created_at")]
+        public int CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
+
+        /// <summary>
         /// The Unix timestamp (in seconds) for when the run will expire.
         /// </summary>
         [JsonInclude]
@@ -82,7 +82,10 @@ namespace OpenAI.Threads
         public int? ExpiresAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime ExpiresAt => DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixTimeSeconds ?? 0).DateTime;
+        public DateTime? ExpiresAt
+            => ExpiresAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was started.
@@ -92,7 +95,10 @@ namespace OpenAI.Threads
         public int? StartedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime StartedAt => DateTimeOffset.FromUnixTimeSeconds(StartedAtUnixTimeSeconds ?? 0).DateTime;
+        public DateTime? StartedAt
+            => StartedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(StartedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was cancelled.
@@ -102,7 +108,10 @@ namespace OpenAI.Threads
         public int? CancelledAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime CancelledAt => DateTimeOffset.FromUnixTimeSeconds(CancelledAtUnixTimeSeconds ?? 0).DateTime;
+        public DateTime? CancelledAt
+            => CancelledAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CancelledAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run failed.
@@ -112,7 +121,10 @@ namespace OpenAI.Threads
         public int? FailedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime FailedAt => DateTimeOffset.FromUnixTimeSeconds(FailedAtUnixTimeSeconds ?? 0).DateTime;
+        public DateTime? FailedAt
+            => FailedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(FailedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was completed.
@@ -122,7 +134,10 @@ namespace OpenAI.Threads
         public int? CompletedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime CompletedAt => DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds ?? 0).DateTime;
+        public DateTime? CompletedAt
+            => CompletedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The model that the assistant used for this run.
