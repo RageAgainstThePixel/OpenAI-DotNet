@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class MessageContent
+    public sealed class Content
     {
         [JsonInclude]
         [JsonPropertyName("type")]
