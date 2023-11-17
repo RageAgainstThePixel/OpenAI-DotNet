@@ -22,17 +22,6 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
-
-        /// <summary>
-        /// The Unix timestamp (in seconds) for when the run step was created.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("created_at")]
-        public int CreatedAtUnixTimeSeconds { get; private set; }
-
-        [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
-
         /// <summary>
         /// The ID of the assistant associated with the run step.
         /// </summary>
@@ -85,32 +74,69 @@ namespace OpenAI.Threads
         public RunLastError LastError { get; private set; }
 
         /// <summary>
+        /// The Unix timestamp (in seconds) for when the run step was created.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("created_at")]
+        public int? CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? CreatedAt
+            => CreatedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds.Value).DateTime
+                : null;
+
+        /// <summary>
         /// The Unix timestamp (in seconds) for when the run step expired. A step is considered expired if the parent run is expired.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("expires_at")]
-        public int? ExpiresAt { get; private set; }
+        public int? ExpiresAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? ExpiresAt
+            => ExpiresAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was cancelled.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
-        public int? CancelledAt { get; private set; }
+        public int? CancelledAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? CancelledAt
+            => CancelledAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CancelledAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step failed.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
-        public int? FailedAt { get; private set; }
+        public int? FailedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? FailedAt
+            => FailedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(FailedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step completed.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
-        public int? CompletedAt { get; private set; }
+        public int? CompletedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? CompletedAt
+            => CompletedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
