@@ -65,8 +65,8 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<RunStepStatus>))]
-        public RunStepStatus Status { get; private set; }
+        [JsonConverter(typeof(JsonStringEnumConverter<RunStatus>))]
+        public RunStatus Status { get; private set; }
 
         /// <summary>
         /// The details of the run step.
