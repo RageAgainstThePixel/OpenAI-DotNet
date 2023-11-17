@@ -70,7 +70,7 @@ namespace OpenAI.Threads
 
         /// <summary>
         /// A list of file IDs that the assistant should use.
-        /// Useful for tools like retrieval and code_interpreter that can access files.
+        /// Useful for tools like 'retrieval' and 'code_interpreter' that can access files.
         /// A maximum of 10 files can be attached to a message.
         /// </summary>
         [JsonInclude]

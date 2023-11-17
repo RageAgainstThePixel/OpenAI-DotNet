@@ -9,7 +9,8 @@ namespace OpenAI.FineTuning
 {
     /// <summary>
     /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
-    /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
+    /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/><br/>
+    /// <see href="https://platform.openai.com/docs/api-reference/fine-tuning"/>
     /// </summary>
     public sealed class FineTuningEndpoint : BaseEndPoint
     {
@@ -58,12 +59,12 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// List your organization's fine-tuning jobs.
         /// </summary>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of <see cref="FineTuneJob"/>s.</returns>
-        public async Task<ListResponse<FineTuneJob>> ListJobsAsync(ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<FineTuneJob>> ListJobsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl("/jobs", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl("/jobs", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<FineTuneJob>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -121,12 +122,12 @@ namespace OpenAI.FineTuning
         /// Get fine-grained status updates for a fine-tune job.
         /// </summary>
         /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of events for <see cref="FineTuneJob"/>.</returns>
-        public async Task<ListResponse<Event>> ListJobEventsAsync(string jobId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<Event>> ListJobEventsAsync(string jobId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/jobs/{jobId}/events", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/jobs/{jobId}/events", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<Event>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }

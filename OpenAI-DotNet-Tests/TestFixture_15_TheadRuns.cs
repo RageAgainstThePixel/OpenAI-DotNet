@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Message = OpenAI.Threads.Message;
 
 namespace OpenAI.Tests
 {
@@ -76,10 +75,8 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
             var request = new CreateThreadRunRequest(assistant);
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
-
             Assert.IsNotNull(run);
             var list = await OpenAIClient.ThreadsEndpoint.ListThreadRunsAsync(run.ThreadId);
-
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Items);
 
@@ -96,10 +93,12 @@ namespace OpenAI.Tests
         public async Task Test_04_ModifyThreadRun()
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
+            Assert.IsNotNull(assistant);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-
+            Assert.IsNotNull(thread);
             var request = new CreateThreadRunRequest(assistant);
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            Assert.IsNotNull(run);
 
             // run in Queued and InProgress can't be modified
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
@@ -126,9 +125,9 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
             var request = new CreateThreadRunRequest(assistant);
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
-
+            Assert.IsNotNull(run);
             run = await OpenAIClient.ThreadsEndpoint.CancelThreadRunAsync(thread.Id, run.Id);
-
+            Assert.IsNotNull(run);
             // waiting while run in Queued and InProgress
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Cancelling);
 
@@ -182,13 +181,13 @@ namespace OpenAI.Tests
             Assert.AreEqual(1, run.RequiredAction.SubmitToolOutputs.ToolCalls.Count);
             var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
             Assert.AreEqual("function", toolCall.Type);
-            Assert.IsNotNull(toolCall.Function);
-            Assert.AreEqual(nameof(WeatherService.GetCurrentWeather), toolCall.Function.Name);
-            Assert.IsNotNull(toolCall.Function.Arguments);
+            Assert.IsNotNull(toolCall.FunctionCall);
+            Assert.AreEqual(nameof(WeatherService.GetCurrentWeather), toolCall.FunctionCall.Name);
+            Assert.IsNotNull(toolCall.FunctionCall.Arguments);
 
-            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.Function.Arguments);
+            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-            var submitRequest = new SubmitThreadRunToolOutputsRequest(new List<ToolOutput>
+            var submitRequest = new SubmitToolOutputsRequest(new List<ToolOutput>
             {
                 new ToolOutput(toolCall.Id, functionResult)
             });

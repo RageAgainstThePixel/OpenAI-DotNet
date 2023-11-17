@@ -13,8 +13,7 @@ namespace OpenAI.Threads
         public string Id { get; private set; }
 
         /// <summary>
-        /// The type of tool call the output is required for.
-        /// For now, this is always 'function'.
+        /// The type of tool call the output is required for. For now, this is always 'function'.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -25,6 +24,6 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("function")]
-        public ToolCallFunction Function { get; private set; }
+        public FunctionCall FunctionCall { get; private set; }
     }
 }

@@ -8,6 +8,8 @@ namespace OpenAI
     /// </summary>
     public class Function
     {
+        public Function() { }
+
         internal Function(Function other) => CopyFrom(other);
 
         /// <summary>

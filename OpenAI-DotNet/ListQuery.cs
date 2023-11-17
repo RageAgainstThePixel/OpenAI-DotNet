@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 namespace OpenAI
 {
-    public sealed class ListRequest
+    public sealed class ListQuery
     {
         /// <summary>
-        /// List Request.
+        /// List Query.
         /// </summary>
         /// <param name="limit">
         /// A limit on the number of objects to be returned.
@@ -25,7 +25,7 @@ namespace OpenAI
         /// For instance, if you make a list request and receive 100 objects, ending with obj_foo,
         /// your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
         /// </param>
-        public ListRequest(int? limit = null, SortOrder order = SortOrder.Descending, string after = null, string before = null)
+        public ListQuery(int? limit = null, SortOrder order = SortOrder.Descending, string after = null, string before = null)
         {
             Limit = limit;
             Order = order;
@@ -41,17 +41,17 @@ namespace OpenAI
 
         public string Before { get; set; }
 
-        public static implicit operator Dictionary<string, string>(ListRequest request)
+        public static implicit operator Dictionary<string, string>(ListQuery query)
         {
-            if (request == null) { return null; }
+            if (query == null) { return null; }
             var parameters = new Dictionary<string, string>();
 
-            if (request.Limit.HasValue)
+            if (query.Limit.HasValue)
             {
-                parameters.Add("limit", request.Limit.ToString());
+                parameters.Add("limit", query.Limit.ToString());
             }
 
-            switch (request.Order)
+            switch (query.Order)
             {
                 case SortOrder.Descending:
                     parameters.Add("order", "desc");
@@ -61,14 +61,14 @@ namespace OpenAI
                     break;
             }
 
-            if (!string.IsNullOrEmpty(request.After))
+            if (!string.IsNullOrEmpty(query.After))
             {
-                parameters.Add("after", request.After);
+                parameters.Add("after", query.After);
             }
 
-            if (!string.IsNullOrEmpty(request.Before))
+            if (!string.IsNullOrEmpty(query.Before))
             {
-                parameters.Add("before", request.Before);
+                parameters.Add("before", query.Before);
             }
 
             return parameters;

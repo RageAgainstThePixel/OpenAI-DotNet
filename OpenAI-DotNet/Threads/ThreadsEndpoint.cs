@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OpenAI.Threads
 {
     /// <summary>
-    /// Create threads that assistants can interact with.
+    /// Create threads that assistants can interact with.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
     /// </summary>
     public class ThreadsEndpoint : BaseEndPoint
@@ -134,12 +134,12 @@ namespace OpenAI.Threads
         /// Returns a list of messages for a given thread.
         /// </summary>
         /// <param name="threadId">The id of the thread the messages belong to.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessage}"/>.</returns>
-        public async Task<ListResponse<ThreadMessage>> ListThreadMessagesAsync(string threadId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadMessage>> ListThreadMessagesAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<ThreadMessage>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -168,12 +168,12 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread that the message and files belong to.</param>
         /// <param name="messageId">The id of the message that the files belongs to.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        public async Task<ListResponse<ThreadMessageFile>> ListMessageFilesAsync(string threadId, string messageId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadMessageFile>> ListMessageFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<ThreadMessageFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -224,7 +224,7 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadRun"/>.</returns>
-        public async Task<ThreadRun> ModifyThreadRunAsync(string threadId, string runId, Dictionary<string, string> metadata, CancellationToken cancellationToken = default)
+        public async Task<ThreadRun> ModifyThreadRunAsync(string threadId, string runId, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}"), jsonContent, cancellationToken).ConfigureAwait(false);
@@ -236,12 +236,12 @@ namespace OpenAI.Threads
         /// Returns a list of runs belonging to a thread.
         /// </summary>
         /// <param name="threadId">The id of the thread the run belongs to.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of run objects.</returns>
-        public async Task<ListResponse<ThreadRun>> ListThreadRunsAsync(string threadId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<ThreadRun>> ListThreadRunsAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<ThreadRun>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -253,10 +253,10 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread to which this run belongs.</param>
         /// <param name="runId">The id of the run that requires the tool output submission.</param>
-        /// <param name="request"></param>
+        /// <param name="request"><see cref="SubmitToolOutputsRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadRun"/>.</returns>
-        public async Task<ThreadRun> SubmitToolOutputsAsync(string threadId, string runId, SubmitThreadRunToolOutputsRequest request, CancellationToken cancellationToken = default)
+        public async Task<ThreadRun> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}/submit_tool_outputs"), jsonContent, cancellationToken).ConfigureAwait(false);
@@ -312,12 +312,12 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
         /// <param name="runId">The id of the run to which the run step belongs.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
-        public async Task<ListResponse<RunStep>> ListTheadRunStepsAsync(string threadId, string runId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<RunStep>> ListTheadRunStepsAsync(string threadId, string runId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<RunStep>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }

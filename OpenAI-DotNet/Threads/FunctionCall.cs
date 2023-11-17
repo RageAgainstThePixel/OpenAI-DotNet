@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ToolCallFunction
+    public sealed class FunctionCall
     {
         /// <summary>
         /// The name of the function.

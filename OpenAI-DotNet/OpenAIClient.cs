@@ -52,9 +52,9 @@ namespace OpenAI
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
             ChatEndpoint = new ChatEndpoint(this);
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
             EditsEndpoint = new EditsEndpoint(this);
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             ImagesEndPoint = new ImagesEndpoint(this);
             EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
             AudioEndpoint = new AudioEndpoint(this);
@@ -158,7 +158,7 @@ namespace OpenAI
         /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
         /// </summary>
-        [Obsolete]
+        [Obsolete("Deprecated")]
         public EditsEndpoint EditsEndpoint { get; }
 
         /// <summary>
@@ -187,7 +187,8 @@ namespace OpenAI
 
         /// <summary>
         /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
-        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
+        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/><br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/fine-tuning"/>
         /// </summary>
         public FineTuningEndpoint FineTuningEndpoint { get; }
 
@@ -199,15 +200,15 @@ namespace OpenAI
         public ModerationsEndpoint ModerationsEndpoint { get; }
 
         /// <summary>
-        /// Create threads that assistants can interact with.
-        /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
-        /// </summary>
-        public ThreadsEndpoint ThreadsEndpoint { get; }
-
-        /// <summary>
         /// Build assistants that can call models and use tools to perform tasks.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
         /// </summary>
         public AssistantsEndpoint AssistantsEndpoint { get; }
+
+        /// <summary>
+        /// Create threads that assistants can interact with.<br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
+        /// </summary>
+        public ThreadsEndpoint ThreadsEndpoint { get; }
     }
 }

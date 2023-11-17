@@ -19,9 +19,6 @@ namespace OpenAI.Threads
         [JsonPropertyName("id")]
         public string Id { get; private set; }
 
-        /// <summary>
-        /// The object type, which is always `thread.run.step`.
-        /// </summary>
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
@@ -60,7 +57,7 @@ namespace OpenAI.Threads
         public string RunId { get; private set; }
 
         /// <summary>
-        /// The type of run step, which can be either message_creation or tool_calls.
+        /// The type of run step.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -68,7 +65,7 @@ namespace OpenAI.Threads
         public RunStepType Type { get; private set; }
 
         /// <summary>
-        /// The status of the run step, which can be either in_progress, cancelled, failed, completed, or expired.
+        /// The status of the run step.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]

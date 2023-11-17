@@ -11,6 +11,6 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_calls")]
-        public IReadOnlyList<Tool> ToolCalls { get; private set; }
+        public IReadOnlyList<ToolCall> ToolCalls { get; private set; }
     }
 }

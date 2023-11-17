@@ -37,7 +37,7 @@ namespace OpenAI.Tests
                 },
                 tools: new List<Tool>
                 {
-                    // Tool.Retrieval
+                    Tool.Retrieval
                 },
                 fileIds: new List<string> { assistantFileId });
             var result = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
@@ -117,8 +117,7 @@ namespace OpenAI.Tests
                 {
                     Assert.IsNotNull(file);
 
-                    var isDeleted =
-                        await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file.AssistantId, file.Id);
+                    var isDeleted = await OpenAIClient.AssistantsEndpoint.DeleteAssistantFileAsync(file.AssistantId, file.Id);
 
                     Assert.IsTrue(isDeleted);
                 }

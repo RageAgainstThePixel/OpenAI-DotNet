@@ -1,16 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    /// <summary>
-    /// Request to submit tool outputs to run
-    /// </summary>
-    public sealed class SubmitThreadRunToolOutputsRequest
+    public sealed class SubmitToolOutputsRequest
     {
-        public SubmitThreadRunToolOutputsRequest(IReadOnlyList<ToolOutput> toolOutputs)
+        public SubmitToolOutputsRequest(IEnumerable<ToolOutput> toolOutputs)
         {
-            ToolOutputs = toolOutputs;
+            ToolOutputs = toolOutputs?.ToList();
         }
 
         /// <summary>

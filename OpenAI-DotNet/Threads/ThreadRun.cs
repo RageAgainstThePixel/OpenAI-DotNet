@@ -26,7 +26,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the thread was created.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
@@ -44,7 +43,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The ID of the assistant used for execution of this run.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
@@ -52,7 +50,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The status of the run, which can be either queued, in_progress, requires_action, cancelling, cancelled, failed, completed, or expired.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter<RunStatus>))]
@@ -77,7 +74,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run will expire.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("expires_at")]
         public int? ExpiresAtUnixTimeSeconds { get; private set; }
@@ -88,7 +84,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was started.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("started_at")]
         public int? StartedAtUnixTimeSeconds { get; private set; }
@@ -99,7 +94,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was cancelled.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
         public int? CancelledAtUnixTimeSeconds { get; private set; }
@@ -110,7 +104,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run failed.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
         public int? FailedAtUnixTimeSeconds { get; private set; }
@@ -121,7 +114,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run was completed.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
         public int? CompletedAtUnixTimeSeconds { get; private set; }
@@ -132,7 +124,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The model that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("model")]
         public string Model { get; private set; }
@@ -140,7 +131,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The instructions that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("instructions")]
         public string Instructions { get; private set; }
@@ -148,7 +138,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The list of tools that the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("tools")]
         public IReadOnlyList<Tool> Tools { get; private set; }
@@ -156,7 +145,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The list of File IDs the assistant used for this run.
         /// </summary>
-        /// <returns></returns>
         [JsonInclude]
         [JsonPropertyName("file_ids")]
         public IReadOnlyList<string> FileIds { get; private set; }

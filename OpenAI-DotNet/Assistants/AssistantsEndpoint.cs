@@ -71,12 +71,12 @@ namespace OpenAI.Assistants
         /// <summary>
         /// Get list of assistants.
         /// </summary>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{Assistant}"/></returns>
-        public async Task<ListResponse<Assistant>> ListAssistantsAsync(ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<Assistant>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl(queryParameters: request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<Assistant>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -135,12 +135,12 @@ namespace OpenAI.Assistants
         /// Returns a list of assistant files.
         /// </summary>
         /// <param name="assistantId">The ID of the assistant the file belongs to.</param>
-        /// <param name="request"><see cref="ListRequest"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{AssistantFile}"/>.</returns>
-        public async Task<ListResponse<AssistantFile>> ListAssistantFilesAsync(string assistantId, ListRequest request = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<AssistantFile>> ListAssistantFilesAsync(string assistantId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", request), cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<AssistantFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
