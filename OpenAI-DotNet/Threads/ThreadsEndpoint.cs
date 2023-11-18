@@ -50,15 +50,15 @@ namespace OpenAI.Threads
         /// Only the <see cref="ThreadResponse.Metadata"/> can be modified.
         /// </remarks>
         /// <param name="threadId">The id of the <see cref="ThreadResponse"/> to modify.</param>
-        /// <param name="metaData">Set of 16 key-value pairs that can be attached to an object.
+        /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadResponse"/>.</returns>
-        public async Task<ThreadResponse> ModifyThreadAsync(string threadId, IReadOnlyDictionary<string, string> metaData, CancellationToken cancellationToken = default)
+        public async Task<ThreadResponse> ModifyThreadAsync(string threadId, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(new { metaData }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{threadId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ThreadResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);

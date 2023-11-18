@@ -1,8 +1,11 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using OpenAI.Threads;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace OpenAI.Tests
 {
@@ -19,6 +22,8 @@ namespace OpenAI.Tests
             }
         );
 
+        private static string testThreadId;
+
         [Test]
         public async Task Test_01_CreateThread()
         {
@@ -29,48 +34,50 @@ namespace OpenAI.Tests
             Assert.IsNotEmpty(thread.Metadata);
             Assert.Contains("text", thread.Metadata.Keys.ToList());
             Assert.AreEqual("test", thread.Metadata["text"]);
+            testThreadId = thread.Id;
+            Console.WriteLine($"Created thread {thread.Id} -> {thread.CreatedAt}");
         }
 
         [Test]
         public async Task Test_02_RetrieveThread()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
+            var thread = await OpenAIClient.ThreadsEndpoint.RetrieveThreadAsync(testThreadId);
             Assert.IsNotNull(thread);
-            var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveThreadAsync(thread);
-            Assert.IsNotNull(retrieved);
-            Assert.AreEqual(thread.Id, retrieved.Id);
-            Assert.IsNotNull(retrieved.Metadata);
-            Assert.Contains("text", retrieved.Metadata.Keys.ToList());
-            Assert.AreEqual("test", retrieved.Metadata["text"]);
+            Assert.AreEqual(testThreadId, thread.Id);
+            Assert.IsNotNull(thread.Metadata);
+            Assert.Contains("text", thread.Metadata.Keys.ToList());
+            Assert.AreEqual("test", thread.Metadata["text"]);
+            Console.WriteLine($"Retrieve thread {thread.Id} -> {thread.CreatedAt}");
         }
 
         [Test]
         public async Task Test_03_ModifyThread()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
-            Assert.IsNotNull(thread);
             var newMetadata = new Dictionary<string, string>
             {
                 ["text"] = "test2"
             };
-            var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadAsync(thread, newMetadata);
-            Assert.IsNotNull(modified);
-            Assert.AreEqual(thread.Id, modified.Id);
-            Assert.IsNotNull(modified.Metadata);
-            Assert.Contains("text", modified.Metadata.Keys.ToList());
-            Assert.AreEqual("test2", modified.Metadata["text"]);
+            var thread = await OpenAIClient.ThreadsEndpoint.ModifyThreadAsync(testThreadId, newMetadata);
+            Assert.IsNotNull(thread);
+            Assert.AreEqual(testThreadId, thread.Id);
+            Assert.IsNotNull(thread.Metadata);
+            Assert.Contains("text", thread.Metadata.Keys.ToList());
+            Assert.AreEqual("test2", thread.Metadata["text"]);
+            Console.WriteLine($"Modified thread {thread.Id} -> {thread.CreatedAt}");
         }
 
         [Test]
         public async Task Test_04_DeleteThread()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThread);
-            Assert.IsNotNull(thread);
-            var isDeleted = await OpenAIClient.ThreadsEndpoint.DeleteThreadAsync(thread);
+            var isDeleted = await OpenAIClient.ThreadsEndpoint.DeleteThreadAsync(testThreadId);
             Assert.IsTrue(isDeleted);
+            Console.WriteLine($"Deleted thread {testThreadId}");
         }
     }
 }
