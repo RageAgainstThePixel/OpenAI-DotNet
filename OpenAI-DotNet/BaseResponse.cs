@@ -6,6 +6,12 @@ namespace OpenAI
     public abstract class BaseResponse
     {
         /// <summary>
+        /// The <see cref="OpenAIClient"/> this response was generated from.
+        /// </summary>
+        [JsonIgnore]
+        public OpenAIClient Client { get; internal set; }
+
+        /// <summary>
         /// The server-side processing time as reported by the API.  This can be useful for debugging where a delay occurs.
         /// </summary>
         [JsonIgnore]
@@ -33,7 +39,7 @@ namespace OpenAI
         /// The maximum number of requests that are permitted before exhausting the rate limit.
         /// </summary>
 
-        [JsonIgnore] 
+        [JsonIgnore]
         public int? LimitRequests { get; internal set; }
 
         /// <summary>

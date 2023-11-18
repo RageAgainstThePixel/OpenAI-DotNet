@@ -66,7 +66,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.GetAsync(GetUrl("/jobs", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<FineTuneJob>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<FineTuneJob>>(responseAsString, Api);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace OpenAI.FineTuning
         {
             var response = await Api.Client.GetAsync(GetUrl($"/jobs/{jobId}/events", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<Event>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<Event>>(responseAsString, Api);
         }
     }
 }

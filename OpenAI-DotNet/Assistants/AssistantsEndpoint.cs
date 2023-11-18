@@ -24,7 +24,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<AssistantResponse>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<AssistantResponse>>(responseAsString, Api);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}/files"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantFile>(responseAsString, Api);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantFile>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<AssistantFile>(responseAsString, Api);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace OpenAI.Assistants
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<AssistantFile>>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ListResponse<AssistantFile>>(responseAsString, Api);
         }
     }
 }

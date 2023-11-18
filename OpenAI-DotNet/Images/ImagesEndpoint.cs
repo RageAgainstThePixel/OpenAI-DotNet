@@ -204,7 +204,7 @@ namespace OpenAI.Images
         private async Task<IReadOnlyList<ImageResult>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, OpenAIClient.JsonSerializationOptions);
+            var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, Api);
 
             if (imagesResponse?.Results is not { Count: not 0 })
             {

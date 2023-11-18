@@ -33,7 +33,7 @@ namespace OpenAI.Chat
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ChatResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<ChatResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, Api);
 
                 if (chatResponse == null)
                 {
@@ -85,7 +85,7 @@ namespace OpenAI.Chat
 
             if (chatResponse == null) { return null; }
 
-            chatResponse.SetResponseData(response.Headers);
+            chatResponse.SetResponseData(response.Headers, Api);
             resultHandler?.Invoke(chatResponse);
             return chatResponse;
         }
@@ -122,7 +122,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, OpenAIClient.JsonSerializationOptions);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, Api);
 
                 if (chatResponse == null)
                 {
@@ -140,7 +140,7 @@ namespace OpenAI.Chat
 
             if (chatResponse == null) { yield break; }
 
-            chatResponse.SetResponseData(response.Headers);
+            chatResponse.SetResponseData(response.Headers, Api);
             yield return chatResponse;
         }
     }

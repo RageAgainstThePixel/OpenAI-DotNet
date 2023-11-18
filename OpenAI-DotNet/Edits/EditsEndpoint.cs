@@ -64,7 +64,7 @@ namespace OpenAI.Edits
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<EditResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<EditResponse>(responseAsString, Api);
         }
     }
 }

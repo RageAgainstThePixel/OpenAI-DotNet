@@ -113,7 +113,7 @@ namespace OpenAI.Completions
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<CompletionResult>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<CompletionResult>(responseAsString, Api);
         }
 
         #endregion Non-Streaming
@@ -218,7 +218,7 @@ namespace OpenAI.Completions
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
 
-                    resultHandler(response.Deserialize<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions));
+                    resultHandler(response.Deserialize<CompletionResult>(eventData, Api));
                 }
                 else
                 {
@@ -326,7 +326,7 @@ namespace OpenAI.Completions
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    yield return response.Deserialize<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions);
+                    yield return response.Deserialize<CompletionResult>(eventData, Api);
                 }
                 else
                 {
