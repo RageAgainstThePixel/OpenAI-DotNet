@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class CreateThreadMessageRequest
+    public sealed class CreateMessageRequest
     {
-        public static implicit operator CreateThreadMessageRequest(string content)
-            => new CreateThreadMessageRequest(content);
+        public static implicit operator CreateMessageRequest(string content)
+            => new CreateMessageRequest(content);
 
         /// <summary>
         /// Constructor.
@@ -15,7 +15,7 @@ namespace OpenAI.Threads
         /// <param name="content"></param>
         /// <param name="fieldIds"></param>
         /// <param name="metadata"></param>
-        public CreateThreadMessageRequest(string content, IEnumerable<string> fieldIds = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateMessageRequest(string content, IEnumerable<string> fieldIds = null, IReadOnlyDictionary<string, string> metadata = null)
         {
             Role = Role.User;
             Content = content;

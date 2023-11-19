@@ -5,10 +5,10 @@ namespace OpenAI.Threads
 {
     public sealed class CreateThreadAndRunRequest
     {
-        public CreateThreadAndRunRequest(string assistantId, ThreadResponse thread, string model, string instructions, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateThreadAndRunRequest(CreateThreadRequest thread, string assistantId, string model, string instructions, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
+            Thread = thread;
             AssistantId = assistantId;
-            ThreadResponse = thread;
             Model = model;
             Instructions = instructions;
             Tools = tools;
@@ -25,7 +25,7 @@ namespace OpenAI.Threads
         /// Thread
         /// </summary>
         [JsonPropertyName("thread")]
-        public ThreadResponse ThreadResponse { get; }
+        public CreateThreadRequest Thread { get; }
 
         /// <summary>
         /// The ID of the Model to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used.

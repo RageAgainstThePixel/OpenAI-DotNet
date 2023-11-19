@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_15_TheadRuns : AbstractTestFixture
+    internal class TestFixture_13_Runs : AbstractTestFixture
     {
         private static CreateThreadRequest TestThreadRequest { get; } = new CreateThreadRequest(
             new List<Message>
@@ -28,17 +28,17 @@ namespace OpenAI.Tests
         private static AssistantRequest TestAssistantRequest { get; } = new AssistantRequest("gpt-3.5-turbo-1106");
 
         [Test]
-        public async Task Test_01_CreateThreadRun()
+        public async Task Test_01_CreateRun()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
 
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-            var request = new CreateThreadRunRequest(assistant, "Run test instructions", Model.GPT3_5_Turbo, null, new Dictionary<string, string>
+            var request = new CreateRunRequest(assistant, "Run test instructions", Model.GPT3_5_Turbo, null, new Dictionary<string, string>
             {
                 ["key"] = "value"
             });
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
 
             Assert.IsNotNull(run);
             Assert.AreEqual("gpt-3.5-turbo", run.Model);
@@ -53,8 +53,7 @@ namespace OpenAI.Tests
         public async Task Test_02_CreateThreadAndRun()
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new CreateThreadRequest(new List<Message> { "thread message text" }));
-            var request = new CreateThreadAndRunRequest(assistant.Id, thread, "Run Test Instructions", Model.GPT3_5_Turbo, null, new Dictionary<string, string> { ["test"] = "data" });
+            var request = new CreateThreadAndRunRequest(new CreateThreadRequest(new List<Message> { "thread message text" }), assistant, "Run Test Instructions", Model.GPT3_5_Turbo, null, new Dictionary<string, string> { ["test"] = "data" });
             var run = await OpenAIClient.ThreadsEndpoint.CreateThreadAndRunAsync(request);
 
             Assert.IsNotNull(run);
@@ -69,14 +68,14 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_03_ListThreadRuns()
+        public async Task Test_03_ListRuns()
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-            var request = new CreateThreadRunRequest(assistant);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var request = new CreateRunRequest(assistant);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
             Assert.IsNotNull(run);
-            var list = await OpenAIClient.ThreadsEndpoint.ListThreadRunsAsync(run.ThreadId);
+            var list = await OpenAIClient.ThreadsEndpoint.ListRunsAsync(run.ThreadId);
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Items);
 
@@ -90,20 +89,20 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_ModifyThreadRun()
+        public async Task Test_04_ModifyRun()
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             Assert.IsNotNull(assistant);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
             Assert.IsNotNull(thread);
-            var request = new CreateThreadRunRequest(assistant);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var request = new CreateRunRequest(assistant);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
             Assert.IsNotNull(run);
 
             // run in Queued and InProgress can't be modified
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
 
-            var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadRunAsync(
+            var modified = await OpenAIClient.ThreadsEndpoint.ModifyRunAsync(
                 thread.Id,
                 run.Id,
                 new Dictionary<string, string>
@@ -123,10 +122,10 @@ namespace OpenAI.Tests
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-            var request = new CreateThreadRunRequest(assistant);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var request = new CreateRunRequest(assistant);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
             Assert.IsNotNull(run);
-            run = await OpenAIClient.ThreadsEndpoint.CancelThreadRunAsync(thread.Id, run.Id);
+            run = await OpenAIClient.ThreadsEndpoint.CancelRunAsync(thread.Id, run.Id);
             Assert.IsNotNull(run);
             // waiting while run in Queued and InProgress
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Cancelling);
@@ -167,8 +166,8 @@ namespace OpenAI.Tests
                     ["required"] = new JsonArray { "location", "unit" }
                 });
 
-            var request = new CreateThreadRunRequest(assistant, tools: new Tool[] { function });
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var request = new CreateRunRequest(assistant, tools: new Tool[] { function });
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
@@ -204,8 +203,8 @@ namespace OpenAI.Tests
         {
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-            var request = new CreateThreadRunRequest(assistant);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadRunAsync(thread.Id, request);
+            var request = new CreateRunRequest(assistant);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
 
             // waiting while run in Queued and InProgress
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);

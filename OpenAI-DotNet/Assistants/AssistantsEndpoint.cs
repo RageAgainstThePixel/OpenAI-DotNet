@@ -44,7 +44,7 @@ namespace OpenAI.Assistants
         /// Modifies an assistant.
         /// </summary>
         /// <param name="assistantId">The ID of the assistant to modify.</param>
-        /// <param name="request"></param>
+        /// <param name="request"><see cref="AssistantRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public async Task<AssistantResponse> ModifyAssistantAsync(string assistantId, AssistantRequest request, CancellationToken cancellationToken = default)

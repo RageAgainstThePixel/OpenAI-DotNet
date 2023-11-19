@@ -1,15 +1,14 @@
-using OpenAI.Assistants;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class CreateThreadRunRequest
+    public sealed class CreateRunRequest
     {
-        public CreateThreadRunRequest(AssistantResponse assistant, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
-            AssistantId = assistant.Id;
+            AssistantId = assistantId;
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
             Instructions = instructions;
             Tools = tools?.ToList();

@@ -110,10 +110,7 @@ namespace OpenAI
         internal static readonly JsonSerializerOptions JsonSerializationOptions = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters =
-            {
-                new JsonStringEnumConverterFactory()
-            }
+            Converters = { new JsonStringEnumConverterFactory() }
         };
 
         /// <summary>
@@ -127,9 +124,13 @@ namespace OpenAI
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
         /// <summary>
-        /// Enables or disables debugging for the whole client.
+        /// Enables or disables debugging for all endpoints.
         /// </summary>
-        public bool EnableDebug { get; set; }
+        public bool EnableDebug
+        {
+            get => JsonSerializationOptions.WriteIndented;
+            set => JsonSerializationOptions.WriteIndented = value;
+        }
 
         /// <summary>
         /// List and describe the various models available in the API.
