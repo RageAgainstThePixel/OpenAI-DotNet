@@ -4,22 +4,26 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Edits
 {
+    [Obsolete("deprecated")]
     public sealed class EditResponse : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
 
-        /// <summary>
-        /// The time when the result was generated in unix epoch format
-        /// </summary>
         [JsonInclude]
         [JsonPropertyName("created")]
-        public int CreatedUnixTime { get; private set; }
+        public int CreatedAtUnixTimeSeconds { get; private set; }
 
-        /// The time when the result was generated
+        [Obsolete("use CreatedAtUnixTimeSeconds")]
+        public int CreatedUnixTime => CreatedAtUnixTimeSeconds;
+
         [JsonIgnore]
-        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        [Obsolete("use CreatedAt")]
+        public DateTime Created => CreatedAt;
+
+        [JsonIgnore]
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("choices")]
@@ -33,10 +37,8 @@ namespace OpenAI.Edits
         /// Gets the text of the first edit, representing the main result
         /// </summary>
         public override string ToString()
-        {
-            return Choices is { Count: > 0 }
+            => Choices is { Count: > 0 }
                 ? Choices[0]
                 : "Edit result has no valid output";
-        }
     }
 }
