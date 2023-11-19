@@ -1,12 +1,8 @@
 using NUnit.Framework;
 using OpenAI.Assistants;
-using OpenAI.Tests.Weather;
 using OpenAI.Threads;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests

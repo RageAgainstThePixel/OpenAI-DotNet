@@ -1,6 +1,5 @@
 using OpenAI.Extensions;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,14 +24,7 @@ namespace OpenAI.Threads
         /// <returns><see cref="ThreadResponse"/>.</returns>
         public async Task<ThreadResponse> CreateThreadAsync(CreateThreadRequest request = null, CancellationToken cancellationToken = default)
         {
-            StringContent jsonContent = null;
-
-            if (request != null)
-            {
-                jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            }
-
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await Api.Client.PostAsync(GetUrl(), request != null ? JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug) : null, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ThreadResponse>(responseAsString, Api);
         }
@@ -342,6 +334,55 @@ namespace OpenAI.Threads
         }
 
         /// <summary>
+        /// Returns a list of run steps belonging to a run.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/> to list run steps for.</param>
+        /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
+        public async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
+            => await ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken);
+
+        /// <summary>
+        /// Returns a list of run steps belonging to a run.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
+        /// <param name="runId">The id of the run to which the run step belongs.</param>
+        /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
+        public async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(string threadId, string runId, ListQuery query = null, CancellationToken cancellationToken = default)
+        {
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", query), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<ListResponse<RunStepResponse>>(responseAsString, Api);
+        }
+
+        /// <summary>
+        /// Retrieves a run step.
+        /// </summary>
+        /// <param name="runStep"><see cref="RunStepResponse"/> to retrieve.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunStepResponse"/>.</returns>
+        public async Task<RunStepResponse> RetrieveRunStepAsync(RunStepResponse runStep, CancellationToken cancellationToken = default)
+            => await RetrieveRunStepAsync(runStep.ThreadId, runStep.RunId, runStep.Id, cancellationToken);
+
+        /// <summary>
+        /// Retrieves a run step.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
+        /// <param name="runId">The id of the run to which the run step belongs.</param>
+        /// <param name="stepId">The id of the run step to retrieve.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunStepResponse"/>.</returns>
+        public async Task<RunStepResponse> RetrieveRunStepAsync(string threadId, string runId, string stepId, CancellationToken cancellationToken = default)
+        {
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps/{stepId}"), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<RunStepResponse>(responseAsString, Api);
+        }
+
+        /// <summary>
         /// Cancels a run that is in_progress.
         /// </summary>
         /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
@@ -363,40 +404,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, Api);
         }
-
-        #region RunSteps
-
-        /// <summary>
-        /// Retrieves a run step.
-        /// </summary>
-        /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
-        /// <param name="runId">The id of the run to which the run step belongs.</param>
-        /// <param name="stepId">The id of the run step to retrieve.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunStepResponse"/>.</returns>
-        public async Task<RunStepResponse> RetrieveRunStepAsync(string threadId, string runId, string stepId, CancellationToken cancellationToken = default)
-        {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps/{stepId}"), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<RunStepResponse>(responseAsString, Api);
-        }
-
-        /// <summary>
-        /// Retrieves a run step.
-        /// </summary>
-        /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
-        /// <param name="runId">The id of the run to which the run step belongs.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
-        public async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(string threadId, string runId, ListQuery query = null, CancellationToken cancellationToken = default)
-        {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs/{runId}/steps", query), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<RunStepResponse>>(responseAsString, Api);
-        }
-
-        #endregion RunSteps
 
         #endregion Runs
     }

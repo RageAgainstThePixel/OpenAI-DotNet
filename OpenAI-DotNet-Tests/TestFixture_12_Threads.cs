@@ -4,7 +4,6 @@ using OpenAI.Threads;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -134,7 +133,7 @@ namespace OpenAI.Tests
             {
                 var createRequest = new CreateMessageRequest("Test content with files", new[] { file1.Id, file2.Id });
                 var message = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, createRequest);
-                var list = await OpenAIClient.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id);
+                var list = await OpenAIClient.ThreadsEndpoint.ListFilesAsync(message);
 
                 Assert.IsNotNull(list);
                 Assert.AreEqual(2, list.Items.Count);
