@@ -6,9 +6,22 @@ namespace OpenAI.Files
     /// <summary>
     /// The File object represents a document that has been uploaded to OpenAI.
     /// </summary>
-    [Obsolete("use FileResponse")]
-    public sealed class FileData : BaseResponse
+    public sealed class FileResponse : BaseResponse
     {
+        public FileResponse() { }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        internal FileResponse(FileData file)
+        {
+            Id = file.Id;
+            Object = file.Object;
+            Size = file.Size;
+            CreatedAtUnixTimeSeconds = file.CreatedAtUnixTimeSeconds;
+            FileName = file.FileName;
+            Purpose = file.Purpose;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         /// <summary>
         /// The file identifier, which can be referenced in the API endpoints.
         /// </summary>
@@ -59,9 +72,7 @@ namespace OpenAI.Files
         [JsonPropertyName("purpose")]
         public string Purpose { get; private set; }
 
-        public static implicit operator string(FileData fileData) => fileData?.ToString();
-
-        public static implicit operator FileResponse(FileData fileData) => new FileResponse(fileData);
+        public static implicit operator string(FileResponse file) => file?.ToString();
 
         public override string ToString() => Id;
     }

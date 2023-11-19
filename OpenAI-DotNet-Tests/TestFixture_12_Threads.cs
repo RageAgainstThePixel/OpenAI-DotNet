@@ -161,7 +161,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"Deleted thread {testThreadId}");
         }
 
-        private async Task<FileData> CreateTestFileAsync(string filePath)
+        private async Task<FileResponse> CreateTestFileAsync(string filePath)
         {
             await File.WriteAllTextAsync(filePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(filePath));
@@ -171,7 +171,7 @@ namespace OpenAI.Tests
             return file;
         }
 
-        private async Task CleanupFileAsync(FileData file)
+        private async Task CleanupFileAsync(FileResponse file)
         {
             var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
             Assert.IsTrue(isDeleted);

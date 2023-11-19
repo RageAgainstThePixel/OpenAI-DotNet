@@ -13,7 +13,7 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_09_FineTuning : AbstractTestFixture
     {
-        private async Task<FileData> CreateTestTrainingDataAsync()
+        private async Task<FileResponse> CreateTestTrainingDataAsync()
         {
             var conersations = new List<Conversation>
             {

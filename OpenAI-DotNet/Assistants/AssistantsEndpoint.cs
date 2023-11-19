@@ -88,12 +88,12 @@ namespace OpenAI.Assistants
         /// <param name="assistantId">The ID of the assistant for which to create a File.
         /// </param>
         /// <param name="file">
-        /// A <see cref="FileData"/> (with purpose="assistants") that the assistant should use.
+        /// A <see cref="FileResponse"/> (with purpose="assistants") that the assistant should use.
         /// Useful for tools like retrieval and code_interpreter that can access files.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
-        public async Task<AssistantFileResponse> CreateAssistantFileAsync(string assistantId, FileData file, CancellationToken cancellationToken = default)
+        public async Task<AssistantFileResponse> CreateAssistantFileAsync(string assistantId, FileResponse file, CancellationToken cancellationToken = default)
         {
             if (file?.Purpose?.Equals("assistants") != true)
             {

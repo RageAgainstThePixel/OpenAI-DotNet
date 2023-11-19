@@ -12,7 +12,7 @@ namespace OpenAI.Tests
     {
         private static string testAssistantId;
 
-        private async Task<FileData> CreateTestFileAsync()
+        private async Task<FileResponse> CreateTestFileAsync()
         {
             const string testFilePath = "assistant_test.txt";
             await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
