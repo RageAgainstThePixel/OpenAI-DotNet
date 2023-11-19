@@ -5,10 +5,11 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Stephen Hodgson</Authors>
     <Product>OpenAI-DotNet</Product>
-    <Description>A simple C# .NET client library for OpenAI to use though their RESTful API. Independently developed, this is not an official library and I am not affiliated with OpenAI. An OpenAI API account is required.
+    <Description>A simple C# .NET client library for OpenAI to use though their RESTful API.
+Independently developed, this is not an official library and I am not affiliated with OpenAI.
+An OpenAI API account is required.
 
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
-
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
 </Description>
     <Copyright>2023</Copyright>
