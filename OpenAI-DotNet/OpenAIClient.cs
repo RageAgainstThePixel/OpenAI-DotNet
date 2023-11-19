@@ -1,4 +1,5 @@
-﻿using OpenAI.Audio;
+﻿using OpenAI.Assistants;
+using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
@@ -9,14 +10,13 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using OpenAI.Threads;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenAI.Assistants;
-using OpenAI.Threads;
 
 namespace OpenAI
 {
