@@ -63,6 +63,8 @@ namespace OpenAI.Tests
 
             foreach (var assistant in assistantsList.Items)
             {
+                var retrieved = OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistant);
+                Assert.IsNotNull(retrieved);
                 Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
             }
         }

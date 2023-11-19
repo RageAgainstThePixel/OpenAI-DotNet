@@ -19,8 +19,9 @@ namespace OpenAI.Assistants
         /// <param name="request"></param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantResponse"/>.</returns>
-        public async Task<AssistantResponse> CreateAssistantAsync(AssistantRequest request, CancellationToken cancellationToken = default)
+        public async Task<AssistantResponse> CreateAssistantAsync(AssistantRequest request = null, CancellationToken cancellationToken = default)
         {
+            request ??= new AssistantRequest();
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
@@ -94,7 +95,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantFile"/>.</returns>
         public async Task<AssistantFile> CreateAssistantFileAsync(string assistantId, FileData file, CancellationToken cancellationToken = default)
         {
-            if (!file.Purpose.Equals("assistants"))
+            if (file?.Purpose?.Equals("assistants") != true)
             {
                 throw new InvalidOperationException($"{nameof(file)}.{nameof(file.Purpose)} must be 'assistants'!");
             }
