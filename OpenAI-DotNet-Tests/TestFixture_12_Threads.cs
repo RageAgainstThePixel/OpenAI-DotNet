@@ -141,7 +141,7 @@ namespace OpenAI.Tests
 
                 foreach (var file in list.Items)
                 {
-                    var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveFileAsync(testThreadId, message, file);
+                    var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveFileAsync(message, file);
                     Assert.IsNotNull(retrieved);
                 }
             }

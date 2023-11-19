@@ -5,7 +5,7 @@ namespace OpenAI.Threads
 {
     public sealed class CreateThreadAndRunRequest
     {
-        public CreateThreadAndRunRequest(CreateThreadRequest thread, string assistantId, string model, string instructions, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateThreadAndRunRequest(string assistantId, string model = null, string instructions = null, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, CreateThreadRequest thread = null)
         {
             Thread = thread;
             AssistantId = assistantId;
