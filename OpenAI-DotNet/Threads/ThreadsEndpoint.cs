@@ -405,7 +405,7 @@ namespace OpenAI.Threads
         }
 
         /// <summary>
-        /// Cancels a run that is in_progress.
+        /// Cancels a run that is <see cref="RunStatus.InProgress"/>.
         /// </summary>
         /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
@@ -414,7 +414,7 @@ namespace OpenAI.Threads
             => await CancelRunAsync(run.ThreadId, run.Id, cancellationToken);
 
         /// <summary>
-        /// Cancels a run that is in_progress.
+        /// Cancels a run that is <see cref="RunStatus.InProgress"/>.
         /// </summary>
         /// <param name="threadId">The id of the thread to which this run belongs.</param>
         /// <param name="runId">The id of the run to cancel.</param>

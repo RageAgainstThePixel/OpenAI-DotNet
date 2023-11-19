@@ -209,26 +209,38 @@ namespace OpenAI.Threads
         public static async Task<RunResponse> UpdateAsync(this RunResponse run, CancellationToken cancellationToken = default)
             => await run.Client.ThreadsEndpoint.RetrieveRunAsync(run, cancellationToken);
 
-        private static RunStatus[] DefaultStatusChecks { get; } = { RunStatus.Queued, RunStatus.InProgress };
+        private static IEnumerable<RunStatus> DefaultStatusChecks { get; } = new[] { RunStatus.Queued, RunStatus.InProgress };
 
         /// <summary>
-        /// Waits for run status to change from the provided <see cref="statusChecks"/>.
+        /// Waits for <see cref="RunResponse.Status"/> to change from the provided <see cref="statusCheck"/>.
         /// </summary>
         /// <param name="run"></param>
-        /// <param name="statusChecks"><see cref="RunStatus"/> to wait for.</param>
+        /// <param name="statusCheck">Optional, <see cref="RunStatus"/> to wait for.<br/>Defaults to the current <see cref="RunResponse.Status"/>.</param>
         /// <param name="pollingInterval">Optional, time in milliseconds to wait before polling status.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> WaitForStatusAsync(this RunResponse run, RunStatus[] statusChecks = null, int? pollingInterval = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> WaitForStatusChangeAsync(this RunResponse run, RunStatus? statusCheck = null, int? pollingInterval = null, CancellationToken cancellationToken = default)
+            => await WaitForStatusChangeAsync(run, new[] { statusCheck ?? run.Status }, pollingInterval, cancellationToken);
+
+        /// <summary>
+        /// Waits for <see cref="RunResponse.Status"/> to longer be one of the provided <see cref="statusChecks"/>.
+        /// </summary>
+        /// <param name="run"></param>
+        /// <param name="statusChecks">Optional, collection of <see cref="RunStatus"/>s to wait for.<br/>Defaults to <see cref="RunStatus.Queued"/> and <see cref="RunStatus.InProgress"/>.</param>
+        /// <param name="pollingInterval">Optional, time in milliseconds to wait before polling status.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> WaitForStatusChangeAsync(this RunResponse run, IEnumerable<RunStatus> statusChecks, int? pollingInterval = null, CancellationToken cancellationToken = default)
         {
             statusChecks ??= DefaultStatusChecks;
+            var statuses = statusChecks?.ToList();
             pollingInterval ??= 500;
             RunResponse result;
             do
             {
-                await Task.Delay(pollingInterval.Value, cancellationToken).ConfigureAwait(false);
                 result = await run.UpdateAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-            } while (statusChecks.Contains(result.Status));
+                await Task.Delay(pollingInterval.Value, cancellationToken).ConfigureAwait(false);
+            } while (statuses!.Contains(result.Status));
             return result;
         }
 
@@ -246,6 +258,15 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> ModifyAsync(this RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
             => await run.Client.ThreadsEndpoint.ModifyRunAsync(run, metadata, cancellationToken);
+
+        /// <summary>
+        /// Cancels a run that is <see cref="RunStatus.InProgress"/>.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => await run.Client.ThreadsEndpoint.CancelRunAsync(run, cancellationToken);
 
         #endregion Runs
     }

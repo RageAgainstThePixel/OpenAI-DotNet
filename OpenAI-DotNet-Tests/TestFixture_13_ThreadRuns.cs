@@ -93,21 +93,19 @@ namespace OpenAI.Tests
             }
         }
 
-        //[Test]
-        //public async Task Test_05_CancelRun()
-        //{
-        //    var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
-        //    var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
-        //    var request = new CreateRunRequest(assistant);
-        //    var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
-        //    Assert.IsNotNull(run);
-        //    run = await OpenAIClient.ThreadsEndpoint.CancelRunAsync(thread.Id, run.Id);
-        //    Assert.IsNotNull(run);
-        //    // waiting while run in Queued and InProgress
-        //    run = await WaitOnRunAsync(thread.Id, run.Id, RunStatus.Cancelling);
-
-        //    Assert.AreEqual(RunStatus.Cancelled, run.Status);
-        //}
+        [Test]
+        public async Task Test_05_CancelRun()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var run = await testThread.CreateRunAsync(testAssistant);
+            Assert.IsNotNull(run);
+            run = await run.CancelAsync();
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Cancelling);
+            // waiting while run is cancelling
+            run = await run.WaitForStatusChangeAsync();
+            Assert.IsTrue(run.Status == RunStatus.Cancelled);
+        }
 
         //[Test]
         //public async Task Test_06_SubmitToolOutput()
