@@ -22,6 +22,13 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - Added AgentsEndpoint
 - Added ThreadsEndpoint
 - Updated ImagesEndpoint return types to ImageResult list
+- Refactored list responses with a more generic ListQuery and ListResponse&lt;TObject&gt; pattern
+  - EventList -&gt; ListResponse&lt;Event&gt;
+  - FineTuneJobList -&gt; ListResponse&lt;FineTuneJob&gt;
+- Standardized names for timestamps to have suffix: UnixTimeSeconds
+- Standardized response class names (existing classes depreciated)
+  - FileData -&gt; FileResponse
+  - CompletionResult -&gt; CompletonResponse
 Version 7.2.3
 - Added support for reading RateLimit information from the Headers
 Version 7.2.2
