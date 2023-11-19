@@ -72,7 +72,7 @@ namespace OpenAI.Tests
         {
             Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var file = await CreateFileForAssistant();
+            var file = await CreateFileForAssistantAsync();
 
             var request = new CreateMessageRequest("Test content",
                 new[] { file.Id },
@@ -143,8 +143,8 @@ namespace OpenAI.Tests
         public async Task Test_04_04_ListMessageFiles()
         {
             Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
-            var file1 = await CreateFileForAssistant();
-            var file2 = await CreateFileForAssistant();
+            var file1 = await CreateFileForAssistantAsync();
+            var file2 = await CreateFileForAssistantAsync();
             var createRequest = new CreateMessageRequest("Test content", new[] { file1.Id, file2.Id });
             var message = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, createRequest);
             var list = await OpenAIClient.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id);
@@ -172,7 +172,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"Deleted thread {testThreadId}");
         }
 
-        private async Task<FileData> CreateFileForAssistant()
+        private async Task<FileData> CreateFileForAssistantAsync()
         {
             var testData = "Some useful knowledge";
             var fileName = "test.txt";
@@ -180,6 +180,11 @@ namespace OpenAI.Tests
             Assert.IsTrue(File.Exists(fileName));
             var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(fileName, "assistants");
             return file;
+        }
+
+        private async Task CleanupFilesAsync()
+        {
+            Task.CompletedTask;
         }
     }
 }
