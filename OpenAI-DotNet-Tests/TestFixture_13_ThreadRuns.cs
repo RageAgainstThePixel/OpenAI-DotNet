@@ -62,7 +62,7 @@ namespace OpenAI.Tests
             Assert.NotNull(testRun);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             // run in Queued and InProgress can't be modified
-            var run = await testRun.WaitForStatusAsync();
+            var run = await testRun.WaitForStatusChangeAsync();
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Completed);
             var metadata = new Dictionary<string, string>
