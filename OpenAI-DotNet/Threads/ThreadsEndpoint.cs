@@ -198,6 +198,20 @@ namespace OpenAI.Threads
         }
 
         /// <summary>
+        /// Create a thread and run it in one request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request, CancellationToken cancellationToken = default)
+        {
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var response = await Api.Client.PostAsync(GetUrl("/runs"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<RunResponse>(responseAsString, Api);
+        }
+
+        /// <summary>
         /// Retrieves a run.
         /// </summary>
         /// <param name="threadId">The id of the thread that was run.</param>
@@ -215,7 +229,7 @@ namespace OpenAI.Threads
         /// Modifies a run.
         /// </summary>
         /// <remarks>
-        /// Only the <see RunResponsef="Run.Metadata"/> can be modified.
+        /// Only the <see cref="RunResponse.Metadata"/> can be modified.
         /// </remarks>
         /// <param name="threadId">The id of the thread that was run.</param>
         /// <param name="runId">The id of the <see cref="RunResponse"/> to modify.</param>
@@ -278,19 +292,7 @@ namespace OpenAI.Threads
             return response.Deserialize<RunResponse>(responseAsString, Api);
         }
 
-        /// <summary>
-        /// Create a thread and run it in one request.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request, CancellationToken cancellationToken = default)
-        {
-            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl("/runs"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<RunResponse>(responseAsString, Api);
-        }
+        #region RunSteps
 
         /// <summary>
         /// Retrieves a run step.
@@ -321,6 +323,8 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<RunStepResponse>>(responseAsString, Api);
         }
+
+        #endregion RunSteps
 
         #endregion Runs
     }
