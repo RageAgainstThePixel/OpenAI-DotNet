@@ -6,7 +6,7 @@ namespace OpenAI.Assistants
     /// <summary>
     /// File attached to an assistant.
     /// </summary>
-    public sealed class AssistantFile : BaseResponse
+    public sealed class AssistantFileResponse : BaseResponse
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
@@ -39,7 +39,7 @@ namespace OpenAI.Assistants
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; private set; }
 
-        public static implicit operator string(AssistantFile file) => file?.ToString();
+        public static implicit operator string(AssistantFileResponse file) => file?.ToString();
 
         public override string ToString() => Id;
     }

@@ -92,8 +92,8 @@ namespace OpenAI.Assistants
         /// Useful for tools like retrieval and code_interpreter that can access files.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="AssistantFile"/>.</returns>
-        public async Task<AssistantFile> CreateAssistantFileAsync(string assistantId, FileData file, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AssistantFileResponse"/>.</returns>
+        public async Task<AssistantFileResponse> CreateAssistantFileAsync(string assistantId, FileData file, CancellationToken cancellationToken = default)
         {
             if (file?.Purpose?.Equals("assistants") != true)
             {
@@ -103,7 +103,7 @@ namespace OpenAI.Assistants
             var jsonContent = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl($"/{assistantId}/files"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantFile>(responseAsString, Api);
+            return response.Deserialize<AssistantFileResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -112,12 +112,12 @@ namespace OpenAI.Assistants
         /// <param name="assistantId">The ID of the assistant who the file belongs to.</param>
         /// <param name="fileId">The ID of the file we're getting.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="AssistantFile"/>.</returns>
-        public async Task<AssistantFile> RetrieveAssistantFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AssistantFileResponse"/>.</returns>
+        public async Task<AssistantFileResponse> RetrieveAssistantFileAsync(string assistantId, string fileId, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<AssistantFile>(responseAsString, Api);
+            return response.Deserialize<AssistantFileResponse>(responseAsString, Api);
         }
 
         /// <summary>
@@ -128,10 +128,10 @@ namespace OpenAI.Assistants
         /// it simply removes the association between that File and the Assistant.
         /// To delete a File, use the File delete endpoint instead.
         /// </remarks>
-        /// <param name="file"><see cref="AssistantFile"/>.</param>
+        /// <param name="file"><see cref="AssistantFileResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
-        public async Task<bool> RemoveAssistantFileAsync(AssistantFile file, CancellationToken cancellationToken = default)
+        public async Task<bool> RemoveAssistantFileAsync(AssistantFileResponse file, CancellationToken cancellationToken = default)
             => await RemoveAssistantFileAsync(file.AssistantId, file.Id, cancellationToken);
 
         /// <summary>
@@ -160,11 +160,11 @@ namespace OpenAI.Assistants
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{AssistantFile}"/>.</returns>
-        public async Task<ListResponse<AssistantFile>> ListAssistantFilesAsync(string assistantId, ListQuery query = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<AssistantFileResponse>> ListAssistantFilesAsync(string assistantId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{assistantId}/files", query), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<AssistantFile>>(responseAsString, Api);
+            return response.Deserialize<ListResponse<AssistantFileResponse>>(responseAsString, Api);
         }
     }
 }
