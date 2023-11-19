@@ -34,5 +34,9 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("message_id")]
         public string MessageId { get; private set; }
+
+        public static implicit operator string(MessageFileResponse response) => response?.ToString();
+
+        public override string ToString() => Id;
     }
 }

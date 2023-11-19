@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using OpenAI.Assistants;
+using OpenAI.Files;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,16 +12,22 @@ namespace OpenAI.Tests
     {
         private static string testAssistantId;
 
-        [Test]
-        public async Task Test_01_CreateAssistant()
+        private async Task<FileData> CreateTestFileAsync()
         {
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
             const string testFilePath = "assistant_test.txt";
             await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(testFilePath));
             var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
+            return file;
+        }
+
+        [Test]
+        public async Task Test_01_CreateAssistant()
+        {
+            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
+            var file = await CreateTestFileAsync();
             var request = new AssistantRequest("gpt-3.5-turbo-1106",
                 name: "test-assistant",
                 description: "Used for unit testing.",

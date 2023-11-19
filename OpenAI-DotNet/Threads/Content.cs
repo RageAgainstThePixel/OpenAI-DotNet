@@ -1,3 +1,4 @@
+using System;
 using OpenAI.Extensions;
 using System.Text.Json.Serialization;
 
@@ -19,5 +20,13 @@ namespace OpenAI.Threads
         [JsonPropertyName("image_url")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageUrl ImageUrl { get; private set; }
+
+        public override string ToString()
+            => Type switch
+            {
+                ContentType.Text => Text.Value,
+                ContentType.ImageUrl => ImageUrl.Url,
+                _ => throw new ArgumentOutOfRangeException()
+            };
     }
 }
