@@ -8,9 +8,21 @@ namespace OpenAI.Completions
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.
     /// </summary>
-    [Obsolete("use CompletionResponse")]
-    public sealed class CompletionResult : BaseResponse
+    public sealed class CompletionResponse : BaseResponse
     {
+        public CompletionResponse() { }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        internal CompletionResponse(CompletionResult result)
+        {
+            Id = result.Id;
+            Object = result.Object;
+            CreatedUnixTimeSeconds = result.CreatedUnixTime;
+            Model = result.Model;
+            Completions = result.Completions;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         /// <summary>
         /// The identifier of the result, which may be used during troubleshooting
         /// </summary>
@@ -27,13 +39,13 @@ namespace OpenAI.Completions
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created")]
-        public int CreatedUnixTime { get; private set; }
+        public int CreatedUnixTimeSeconds { get; private set; }
 
         /// <summary>
         /// The time when the result was generated.
         /// </summary>
         [JsonIgnore]
-        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTime).DateTime;
+        public DateTime Created => DateTimeOffset.FromUnixTimeSeconds(CreatedUnixTimeSeconds).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("model")]
@@ -51,8 +63,6 @@ namespace OpenAI.Completions
 
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
-        public static implicit operator string(CompletionResult result) => result?.ToString();
-
-        public static implicit operator CompletionResponse(CompletionResult result) => new CompletionResponse(result);
+        public static implicit operator string(CompletionResponse response) => response?.ToString();
     }
 }
