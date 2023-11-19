@@ -7,6 +7,16 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class ToolOutput
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="toolCallId">
+        /// The ID of the tool call in the <see cref="RequiredAction"/> within the <see cref="RunResponse"/> the output is being submitted for.
+        /// </param>
+        /// <param name="output">
+        /// The output of the tool call to be submitted to continue the run.
+        /// </param>
+        [JsonConstructor]
         public ToolOutput(string toolCallId, string output)
         {
             ToolCallId = toolCallId;
@@ -14,7 +24,7 @@ namespace OpenAI.Threads
         }
 
         /// <summary>
-        /// The ID of the tool call in the required_action object within the run object the output is being submitted for.
+        /// The ID of the tool call in the <see cref="RequiredAction"/> within the <see cref="RunResponse"/> the output is being submitted for.
         /// </summary>
         [JsonPropertyName("tool_call_id")]
         public string ToolCallId { get; }

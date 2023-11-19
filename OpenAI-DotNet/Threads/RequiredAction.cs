@@ -2,11 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ThreadRunRequiredAction
+    public sealed class RequiredAction
     {
-        /// <summary>
-        /// For now, this is always 'submit_tool_outputs'.
-        /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
         public string Type { get; private set; }

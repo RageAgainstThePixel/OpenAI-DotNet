@@ -54,7 +54,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("required_action")]
-        public ThreadRunRequiredAction RequiredAction { get; private set; }
+        public RequiredAction RequiredAction { get; private set; }
 
         /// <summary>
         /// The Last error Associated with this run.
