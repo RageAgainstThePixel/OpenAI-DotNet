@@ -10,10 +10,10 @@ namespace OpenAI.Tests
     /// <summary>
     /// https://github.com/openai/openai-cookbook/blob/main/examples/Assistants_API_overview_python.ipynb
     /// </summary>
-    internal class TestFixture_13_Runs : AbstractTestFixture
+    internal class TestFixture_13_ThreadRuns : AbstractTestFixture
     {
-        private static string threadId;
         private static string assistantId;
+        private static string threadId;
         private static string runId;
 
         [Test]

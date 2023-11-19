@@ -1,0 +1,151 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace OpenAI.Threads
+{
+    public static class ThreadExtensions
+    {
+        /// <summary>
+        /// Updates this thread with the latest snapshot from OpenAI.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ThreadResponse"/>.</returns>
+        public static async Task<ThreadResponse> UpdateAsync(this ThreadResponse thread, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.RetrieveThreadAsync(thread, cancellationToken);
+
+        /// <summary>
+        /// Modify the thread.
+        /// </summary>
+        /// <remarks>
+        /// Only the <see cref="ThreadResponse.Metadata"/> can be modified.
+        /// </remarks>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="metadata">The metadata to set on the thread.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ThreadResponse"/>.</returns>
+        public static async Task<ThreadResponse> ModifyAsync(this ThreadResponse thread, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.ModifyThreadAsync(thread, metadata, cancellationToken);
+
+        /// <summary>
+        /// Deletes the thread.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>True, if the thread was successfully deleted.</returns>
+        public static async Task<bool> DeleteAsync(this ThreadResponse thread, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.DeleteThreadAsync(thread, cancellationToken);
+
+        #region Messages
+
+        /// <summary>
+        /// Create a new message for this thread.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="request"><see cref="CreateMessageRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public static async Task<MessageResponse> CreateMessageAsync(this ThreadResponse thread, CreateMessageRequest request, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.CreateMessageAsync(thread.Id, request, cancellationToken);
+
+        /// <summary>
+        /// List the messages associated to this thread.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{MessageResponse}"/></returns>
+        public static async Task<ListResponse<MessageResponse>> ListMessagesAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.ListMessagesAsync(thread.Id, query, cancellationToken);
+
+        /// <summary>
+        /// Retrieve a message.
+        /// </summary>
+        /// <param name="message"><see cref="MessageResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public static async Task<MessageResponse> RetrieveMessageAsync(this MessageResponse message, CancellationToken cancellationToken = default)
+            => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message, cancellationToken);
+
+        /// <summary>
+        /// Retrieve a message.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="messageId">The id of the message to get.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public static async Task<MessageResponse> RetrieveMessageAsync(this ThreadResponse thread, string messageId, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.RetrieveMessageAsync(thread.Id, messageId, cancellationToken);
+
+        /// <summary>
+        /// Modify a message.
+        /// </summary>
+        /// <remarks>
+        /// Only the <see cref="MessageResponse.Metadata"/> can be modified.
+        /// </remarks>
+        /// <param name="message"><see cref="MessageResponse"/>.</param>
+        /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
+        /// This can be useful for storing additional information about the object in a structured format.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
+        /// </param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public static async Task<MessageResponse> ModifyMessageAsync(this MessageResponse message, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => await message.Client.ThreadsEndpoint.ModifyMessageAsync(message, metadata, cancellationToken);
+
+        /// <summary>
+        /// Modifies a message.
+        /// </summary>
+        /// <remarks>
+        /// Only the <see cref="MessageResponse.Metadata"/> can be modified.
+        /// </remarks>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="messageId">The id of the message to modify.</param>
+        /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
+        /// This can be useful for storing additional information about the object in a structured format.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
+        /// </param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageResponse"/>.</returns>
+        public static async Task<MessageResponse> ModifyMessageAsync(this ThreadResponse thread, string messageId, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.ModifyMessageAsync(thread, messageId, metadata, cancellationToken);
+
+        #endregion Messages
+
+        #region Files
+
+        /// <summary>
+        /// Returns a list of message files.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="messageId">The id of the message that the files belongs to.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
+        public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this ThreadResponse thread, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.ListFilesAsync(thread.Id, messageId, query, cancellationToken);
+
+        /// <summary>
+        /// Returns a list of message files.
+        /// </summary>
+        /// <param name="message"><see cref="MessageFileResponse"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
+        public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this MessageResponse message, ListQuery query = null, CancellationToken cancellationToken = default)
+            => await message.Client.ThreadsEndpoint.ListFilesAsync(message, query, cancellationToken);
+
+        /// <summary>
+        /// Retrieve message file.
+        /// </summary>
+        /// <param name="message"><see cref="MessageResponse"/>.</param>
+        /// <param name="fileId">The id of the file being retrieved.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageFileResponse"/>.</returns>
+        public static async Task<MessageFileResponse> RetrieveFileAsync(this MessageResponse message, string fileId, CancellationToken cancellationToken = default)
+            => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message, fileId, cancellationToken);
+
+        #endregion Files
+    }
+}
