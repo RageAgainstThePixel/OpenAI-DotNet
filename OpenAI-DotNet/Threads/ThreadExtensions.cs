@@ -1,4 +1,6 @@
+using OpenAI.Assistants;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -65,7 +67,7 @@ namespace OpenAI.Threads
         /// <param name="message"><see cref="MessageResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> RetrieveMessageAsync(this MessageResponse message, CancellationToken cancellationToken = default)
+        public static async Task<MessageResponse> RetrieveAsync(this MessageResponse message, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message, cancellationToken);
 
         /// <summary>
@@ -91,7 +93,7 @@ namespace OpenAI.Threads
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> ModifyMessageAsync(this MessageResponse message, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+        public static async Task<MessageResponse> ModifyAsync(this MessageResponse message, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.ModifyMessageAsync(message, metadata, cancellationToken);
 
         /// <summary>
@@ -147,5 +149,104 @@ namespace OpenAI.Threads
             => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message, fileId, cancellationToken);
 
         #endregion Files
+
+        #region Runs
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, cancellationToken);
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="assistantId">Id of the assistant to use for the run.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, string assistantId, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, new CreateRunRequest(assistantId), cancellationToken);
+
+        /// <summary>
+        /// Create a thread and run it.
+        /// </summary>
+        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CancellationToken cancellationToken = default)
+            => await assistant.Client.ThreadsEndpoint.CreateThreadAndRunAsync(new CreateThreadAndRunRequest(assistant.Id), cancellationToken);
+
+        /// <summary>
+        /// Gets the thread associated to the <see cref="RunResponse"/>.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ThreadResponse"/>.</returns>
+        public static async Task<ThreadResponse> GetThreadAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => await run.Client.ThreadsEndpoint.RetrieveThreadAsync(run.ThreadId, cancellationToken);
+
+        /// <summary>
+        /// List all of the runs associated to a thread.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{RunResponse}"/></returns>
+        public static async Task<ListResponse<RunResponse>> ListRunsAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.ListRunsAsync(thread.Id, query, cancellationToken);
+
+        /// <summary>
+        /// Get the latest status of the <see cref="RunResponse"/>.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> UpdateAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => await run.Client.ThreadsEndpoint.RetrieveRunAsync(run, cancellationToken);
+
+        private static RunStatus[] DefaultStatusChecks { get; } = { RunStatus.Queued, RunStatus.InProgress };
+
+        /// <summary>
+        /// Waits for run status to change from the provided <see cref="statusChecks"/>.
+        /// </summary>
+        /// <param name="run"></param>
+        /// <param name="statusChecks"><see cref="RunStatus"/> to wait for.</param>
+        /// <param name="pollingInterval">Optional, time in milliseconds to wait before polling status.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> WaitForStatusAsync(this RunResponse run, RunStatus[] statusChecks = null, int? pollingInterval = null, CancellationToken cancellationToken = default)
+        {
+            statusChecks ??= DefaultStatusChecks;
+            pollingInterval ??= 500;
+            RunResponse result;
+            do
+            {
+                await Task.Delay(pollingInterval.Value, cancellationToken).ConfigureAwait(false);
+                result = await run.UpdateAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+            } while (statusChecks.Contains(result.Status));
+            return result;
+        }
+
+        /// <summary>
+        /// Modifies a run.
+        /// </summary>
+        /// <remarks>
+        /// Only the <see cref="RunResponse.Metadata"/> can be modified.
+        /// </remarks>
+        /// <param name="run"><see cref="RunResponse"/> to modify.</param>
+        /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
+        /// This can be useful for storing additional information about the object in a structured format.
+        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> ModifyAsync(this RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => await run.Client.ThreadsEndpoint.ModifyRunAsync(run, metadata, cancellationToken);
+
+        #endregion Runs
     }
 }

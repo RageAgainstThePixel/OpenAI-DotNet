@@ -12,9 +12,9 @@ namespace OpenAI.Tests
     /// </summary>
     internal class TestFixture_13_ThreadRuns : AbstractTestFixture
     {
-        private static string assistantId;
-        private static string threadId;
-        private static string runId;
+        private static AssistantResponse testAssistant;
+        private static ThreadResponse testThread;
+        private static RunResponse testRun;
 
         [Test]
         public async Task Test_01_CreateRun()
@@ -26,67 +26,69 @@ namespace OpenAI.Tests
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
                     model: "gpt-4-1106-preview"));
             Assert.NotNull(assistant);
-            assistantId = assistant.Id;
+            testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
             Assert.NotNull(thread);
-            threadId = thread.Id;
 
             try
             {
-                var message = OpenAIClient.ThreadsEndpoint.CreateMessageAsync(thread, "I need to solve the equation `3x + 11 = 14`. Can you help me?");
+                var message = thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
                 Assert.NotNull(message);
-                var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread, new CreateRunRequest(assistant));
+                var run = await thread.CreateRunAsync(assistant);
                 Assert.IsNotNull(run);
             }
             finally
             {
-                await OpenAIClient.ThreadsEndpoint.DeleteThreadAsync(thread);
+                await thread.DeleteAsync();
             }
         }
 
         [Test]
         public async Task Test_02_CreateThreadAndRun()
         {
-            var request = new CreateThreadAndRunRequest(assistantId);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateThreadAndRunAsync(request);
+            Assert.NotNull(testAssistant);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var run = await testAssistant.CreateThreadAndRunAsync();
             Assert.IsNotNull(run);
-            runId = run.Id;
-            Assert.IsFalse(string.IsNullOrWhiteSpace(run.ThreadId));
-            threadId = run.ThreadId;
+            testRun = run;
+            var thread = await run.GetThreadAsync();
+            Assert.NotNull(thread);
+            testThread = thread;
         }
 
         [Test]
         public async Task Test_04_ModifyRun()
         {
+            Assert.NotNull(testRun);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             // run in Queued and InProgress can't be modified
-            var run = await WaitOnRunAsync(threadId, runId, RunStatus.Queued, RunStatus.InProgress);
-
-            var modified = await OpenAIClient.ThreadsEndpoint.ModifyRunAsync(run,
-                new Dictionary<string, string>
-                {
-                    ["key"] = "value"
-                });
-
+            var run = await testRun.WaitForStatusAsync();
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Completed);
+            var metadata = new Dictionary<string, string>
+            {
+                ["test"] = nameof(Test_04_ModifyRun)
+            };
+            var modified = await run.ModifyAsync(metadata);
             Assert.IsNotNull(modified);
             Assert.AreEqual(run.Id, modified.Id);
             Assert.IsNotNull(modified.Metadata);
-            Assert.Contains("key", modified.Metadata.Keys.ToList());
-            Assert.AreEqual("value", modified.Metadata["key"]);
+            Assert.Contains("test", modified.Metadata.Keys.ToList());
+            Assert.AreEqual(nameof(Test_04_ModifyRun), modified.Metadata["test"]);
         }
 
         [Test]
         public async Task Test_03_ListRuns()
         {
-            var request = new CreateRunRequest(assistantId);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(threadId, request);
-            Assert.IsNotNull(run);
-            var list = await OpenAIClient.ThreadsEndpoint.ListRunsAsync(threadId);
+            Assert.NotNull(testThread);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var list = await testThread.ListRunsAsync();
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Items);
 
-            foreach (var threadRun in list.Items)
+            foreach (var run in list.Items)
             {
-                var retrievedRun = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadId, threadRun);
+                var retrievedRun = await run.UpdateAsync();
                 Assert.IsNotNull(retrievedRun);
             }
         }
@@ -197,24 +199,5 @@ namespace OpenAI.Tests
         //        Console.WriteLine($"[{retrieved.ThreadId}] -> {retrieved.Id}");
         //    }
         //}
-
-        private async Task<RunResponse> WaitOnRunAsync(string thread, string run, params RunStatus[] statuses)
-        {
-            var loopCounter = 0;
-            RunResponse runResponse;
-
-            do
-            {
-                if (++loopCounter > 10)
-                {
-                    Assert.Fail($"Spent too much in long in {string.Join(',', statuses)} statuses");
-                }
-
-                await Task.Delay(2000);
-                runResponse = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread, run);
-            } while (statuses.Contains(runResponse.Status));
-
-            return runResponse;
-        }
     }
 }

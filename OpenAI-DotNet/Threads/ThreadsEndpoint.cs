@@ -241,7 +241,7 @@ namespace OpenAI.Threads
         /// <summary>
         /// Create a thread and run it in one request.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request, CancellationToken cancellationToken = default)
@@ -281,7 +281,7 @@ namespace OpenAI.Threads
         /// <param name="threadId">The id of the thread the run belongs to.</param>
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>A list of run objects.</returns>
+        /// <returns><see cref="ListResponse{RunResponse}"/></returns>
         public async Task<ListResponse<RunResponse>> ListRunsAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", query), cancellationToken).ConfigureAwait(false);

@@ -117,7 +117,7 @@ namespace OpenAI.Tests
             {
                 ["test"] = "04_03"
             };
-            var modified = await testMessage.ModifyMessageAsync(metadata);
+            var modified = await testMessage.ModifyAsync(metadata);
             Assert.IsNotNull(modified);
             Assert.IsNotNull(modified.Metadata);
             Assert.IsTrue(modified.Metadata["test"].Equals("04_03"));
