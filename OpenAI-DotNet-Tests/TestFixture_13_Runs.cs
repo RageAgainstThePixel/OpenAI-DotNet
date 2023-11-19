@@ -73,18 +73,17 @@ namespace OpenAI.Tests
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(TestAssistantRequest);
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(TestThreadRequest);
             var request = new CreateRunRequest(assistant);
-            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread.Id, request);
+            var run = await OpenAIClient.ThreadsEndpoint.CreateRunAsync(thread, request);
             Assert.IsNotNull(run);
-            var list = await OpenAIClient.ThreadsEndpoint.ListRunsAsync(run.ThreadId);
+            var list = await OpenAIClient.ThreadsEndpoint.ListRunsAsync(thread);
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Items);
 
             foreach (var threadRun in list.Items)
             {
-                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(threadRun.ThreadId, threadRun.Id);
-
-                Assert.IsNotNull(retrieved);
-                Console.WriteLine($"[{retrieved.ThreadId}] -> {retrieved.Id}");
+                var retrievedRun = await OpenAIClient.ThreadsEndpoint.RetrieveRunAsync(thread, threadRun);
+                Assert.IsNotNull(retrievedRun);
+                Console.WriteLine($"[{retrievedRun.ThreadId}] -> {retrievedRun.Id}");
             }
         }
 
@@ -209,14 +208,14 @@ namespace OpenAI.Tests
             // waiting while run in Queued and InProgress
             run = await WaitRunPassThroughStatusAsync(thread.Id, run.Id, RunStatus.Queued, RunStatus.InProgress);
 
-            var list = await OpenAIClient.ThreadsEndpoint.ListTheadRunStepsAsync(thread.Id, run.Id);
+            var list = await OpenAIClient.ThreadsEndpoint.ListRunStepsAsync(thread.Id, run.Id);
 
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Items);
 
             foreach (var step in list.Items)
             {
-                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveTheadRunStepAsync(thread.Id, run.Id, step.Id);
+                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveRunStepAsync(thread.Id, run.Id, step.Id);
 
                 Assert.IsNotNull(retrieved);
 

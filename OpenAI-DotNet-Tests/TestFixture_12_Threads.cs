@@ -81,7 +81,7 @@ namespace OpenAI.Tests
                     ["test"] = "value"
                 });
 
-            var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(testThreadId, request);
+            var message = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, request);
 
             Assert.IsNotNull(message);
             Assert.AreEqual(Role.User, message.Role);
@@ -105,16 +105,16 @@ namespace OpenAI.Tests
         public async Task Test_04_02_ListMessages()
         {
             Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
-            var message1 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(testThreadId, new CreateMessageRequest("Test content"));
+            var message1 = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, new CreateMessageRequest("Test content"));
             Assert.IsNotNull(message1);
-            var message2 = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(testThreadId, new CreateMessageRequest("Test content 2"));
+            var message2 = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, new CreateMessageRequest("Test content 2"));
             Assert.IsNotNull(message2);
-            var list = await OpenAIClient.ThreadsEndpoint.ListThreadMessagesAsync(testThreadId);
+            var list = await OpenAIClient.ThreadsEndpoint.ListMessagesAsync(testThreadId);
             Assert.IsNotNull(list);
 
             foreach (var message in list.Items)
             {
-                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveThreadMessageAsync(testThreadId, message.Id);
+                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveMessageAsync(testThreadId, message.Id);
                 Assert.NotNull(retrieved);
                 Console.WriteLine($"[{retrieved.Id}] {retrieved.Content}");
             }
@@ -124,8 +124,8 @@ namespace OpenAI.Tests
         public async Task Test_04_03_ModifyMessage()
         {
             Assert.IsFalse(string.IsNullOrWhiteSpace(testThreadId));
-            var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(testThreadId, new CreateMessageRequest("Test content"));
-            var modified = await OpenAIClient.ThreadsEndpoint.ModifyThreadMessageAsync(
+            var message = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, new CreateMessageRequest("Test content"));
+            var modified = await OpenAIClient.ThreadsEndpoint.ModifyMessageAsync(
                 message.ThreadId,
                 message.Id,
                 new Dictionary<string, string>
@@ -146,15 +146,15 @@ namespace OpenAI.Tests
             var file1 = await CreateFileForAssistant();
             var file2 = await CreateFileForAssistant();
             var createRequest = new CreateMessageRequest("Test content", new[] { file1.Id, file2.Id });
-            var message = await OpenAIClient.ThreadsEndpoint.CreateThreadMessageAsync(testThreadId, createRequest);
-            var list = await OpenAIClient.ThreadsEndpoint.ListMessageFilesAsync(message.ThreadId, message.Id);
+            var message = await OpenAIClient.ThreadsEndpoint.CreateMessageAsync(testThreadId, createRequest);
+            var list = await OpenAIClient.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id);
 
             Assert.IsNotNull(list);
             Assert.AreEqual(2, list.Items.Count);
 
             foreach (var file in list.Items)
             {
-                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveMessageFileAsync(testThreadId, message.Id, file.Id);
+                var retrieved = await OpenAIClient.ThreadsEndpoint.RetrieveFileAsync(testThreadId, message.Id, file.Id);
 
                 Assert.IsNotNull(retrieved);
 
