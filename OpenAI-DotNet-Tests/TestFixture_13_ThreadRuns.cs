@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Threads;
@@ -21,7 +22,7 @@ namespace OpenAI.Tests
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
-                new AssistantRequest(
+                new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
                     model: "gpt-4-1106-preview"));
@@ -88,6 +89,7 @@ namespace OpenAI.Tests
 
             foreach (var run in list.Items)
             {
+                Assert.IsNotNull(run);
                 var retrievedRun = await run.UpdateAsync();
                 Assert.IsNotNull(retrievedRun);
             }
@@ -96,6 +98,8 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_05_CancelRun()
         {
+            Assert.IsNotNull(testThread);
+            Assert.IsNotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var run = await testThread.CreateRunAsync(testAssistant);
             Assert.IsNotNull(run);
@@ -105,6 +109,19 @@ namespace OpenAI.Tests
             // waiting while run is cancelling
             run = await run.WaitForStatusChangeAsync();
             Assert.IsTrue(run.Status == RunStatus.Cancelled);
+        }
+
+        public async Task Test_06_Cleanup()
+        {
+            if (testThread != null)
+            {
+                await testThread.DeleteAsync();
+            }
+
+            if (testAssistant != null)
+            {
+                await testAssistant.DeleteAsync();
+            }
         }
 
         //[Test]

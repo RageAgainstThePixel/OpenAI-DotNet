@@ -10,25 +10,20 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_11_Assistants : AbstractTestFixture
     {
-        private static string testAssistantId;
+        private static AssistantResponse testAssistant;
 
-        private async Task<FileResponse> CreateTestFileAsync()
-        {
-            const string testFilePath = "assistant_test.txt";
-            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
-            Assert.IsTrue(File.Exists(testFilePath));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
-            File.Delete(testFilePath);
-            Assert.IsFalse(File.Exists(testFilePath));
-            return file;
-        }
 
         [Test]
         public async Task Test_01_CreateAssistant()
         {
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var file = await CreateTestFileAsync();
-            var request = new AssistantRequest("gpt-3.5-turbo-1106",
+            const string testFilePath = "assistant_test_1.txt";
+            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
+            Assert.IsTrue(File.Exists(testFilePath));
+            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
+            File.Delete(testFilePath);
+            Assert.IsFalse(File.Exists(testFilePath));
+            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106",
                 name: "test-assistant",
                 description: "Used for unit testing.",
                 instructions: "You are test assistant",
@@ -41,7 +36,7 @@ namespace OpenAI.Tests
                 {
                     Tool.Retrieval
                 },
-                fileIds: new[] { file.Id });
+                files: new[] { file.Id });
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
             Assert.IsNotNull(assistant);
             Assert.AreEqual("test-assistant", assistant.Name);
@@ -49,7 +44,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("You are test assistant", assistant.Instructions);
             Assert.AreEqual("gpt-3.5-turbo-1106", assistant.Model);
             Assert.IsNotEmpty(assistant.Metadata);
-            testAssistantId = assistant.Id;
+            testAssistant = assistant;
             Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
         }
 
@@ -70,57 +65,16 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_03_ListAssistantFiles()
+        public async Task Test_03_ModifyAssistants()
         {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
+            Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
-            Assert.IsNotNull(filesList);
-            Assert.IsNotEmpty(filesList.Items);
-
-            foreach (var file in filesList.Items)
-            {
-                Assert.IsNotNull(file);
-                var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantFileAsync(file.AssistantId, file.Id);
-                Assert.IsNotNull(retrieved);
-                Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
-            }
-        }
-
-        [Test]
-        public async Task Test_04_DeleteAssistantFile()
-        {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
-            Assert.IsNotNull(filesList);
-            Assert.IsNotEmpty(filesList.Items);
-
-            foreach (var file in filesList.Items)
-            {
-                Assert.IsNotNull(file);
-                var isRemoved = await OpenAIClient.AssistantsEndpoint.RemoveAssistantFileAsync(file);
-                Assert.IsTrue(isRemoved);
-                var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
-                Assert.IsTrue(isDeleted);
-            }
-
-            filesList = await OpenAIClient.AssistantsEndpoint.ListAssistantFilesAsync(testAssistantId);
-            Assert.IsNotNull(filesList);
-            Assert.IsEmpty(filesList.Items);
-        }
-
-        [Test]
-        public async Task Test_05_ModifyAssistants()
-        {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var request = new AssistantRequest(
+            var request = new CreateAssistantRequest(
                 model: "gpt-4-1106-preview",
                 name: "Test modified",
                 description: "Modified description",
                 instructions: "You are modified test assistant");
-            var assistant = await OpenAIClient.AssistantsEndpoint.ModifyAssistantAsync(testAssistantId, request);
+            var assistant = await testAssistant.ModifyAsync(request);
             Assert.IsNotNull(assistant);
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
@@ -131,13 +85,66 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_06_DeleteAssistant()
+        public async Task Test_04_01_UploadAssistantFile()
         {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(testAssistantId));
+            Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var result = await OpenAIClient.AssistantsEndpoint.DeleteAssistantAsync(testAssistantId);
+            const string testFilePath = "assistant_test_2.txt";
+            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
+            Assert.IsTrue(File.Exists(testFilePath));
+            var file = testAssistant.UploadFileAsync(testFilePath);
+            Assert.IsNotNull(file);
+        }
+
+        [Test]
+        public async Task Test_04_02_ListAssistantFiles()
+        {
+            Assert.IsNotNull(testAssistant);
+            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
+            var filesList = await testAssistant.ListFilesAsync();
+            Assert.IsNotNull(filesList);
+            Assert.IsNotEmpty(filesList.Items);
+
+            foreach (var file in filesList.Items)
+            {
+                Assert.IsNotNull(file);
+                var retrieved = await testAssistant.RetrieveFileAsync(file.Id);
+                Assert.IsNotNull(retrieved);
+                Assert.IsTrue(retrieved.Id == file.Id);
+                Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
+            }
+        }
+
+        [Test]
+        public async Task Test_04_03_DeleteAssistantFiles()
+        {
+            Assert.IsNotNull(testAssistant);
+            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
+            var filesList = await testAssistant.ListFilesAsync();
+            Assert.IsNotNull(filesList);
+            Assert.IsNotEmpty(filesList.Items);
+
+            foreach (var file in filesList.Items)
+            {
+                Assert.IsNotNull(file);
+                var isDeleted = await testAssistant.DeleteFileAsync(file);
+                Assert.IsTrue(isDeleted);
+                Console.WriteLine($"Deleted {file.Id}");
+            }
+
+            filesList = await testAssistant.ListFilesAsync();
+            Assert.IsNotNull(filesList);
+            Assert.IsEmpty(filesList.Items);
+        }
+
+        [Test]
+        public async Task Test_05_DeleteAssistant()
+        {
+            Assert.IsNotNull(testAssistant);
+            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
+            var result = await testAssistant.DeleteAsync();
             Assert.IsTrue(result);
-            Console.WriteLine($"{testAssistantId} -> deleted");
+            Console.WriteLine($"{testAssistant.Id} -> deleted");
         }
     }
 }
