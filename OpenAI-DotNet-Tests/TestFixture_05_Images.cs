@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using OpenAI.Images;
+using OpenAI.Models;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_2);
             var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(results);
@@ -31,7 +32,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2, responseFormat: ResponseFormat.B64_Json);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_2, responseFormat: ResponseFormat.B64_Json);
             var results = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(results);
