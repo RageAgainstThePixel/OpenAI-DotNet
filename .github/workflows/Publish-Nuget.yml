@@ -42,15 +42,13 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: dotnet restore
-      run: dotnet restore
+    - run: dotnet restore
 
-    - name: dotnet build
-      run: dotnet build --configuration Release --no-restore
+    - run: dotnet build --configuration Release --no-restore
       
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
-      run: dotnet test --configuration Release --logger "xunit;LogFilePath=test-results/results.xml" --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+      run: dotnet test --configuration Release --collect:"XPlat Code Coverage" --logger "xunit;LogFilePath=test-results/results.xml" --no-build --no-restore --results-directory ./coverage
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
