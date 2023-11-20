@@ -42,7 +42,6 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - uses: microsoft/setup-msbuild@v1
 
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
