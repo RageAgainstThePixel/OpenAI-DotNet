@@ -50,7 +50,7 @@ jobs:
       
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
-      run: dotnet test --configuration Release --no-build --verbosity normal --logger "xunit;LogFilePath=test-results/results.xml" --collect:"XPlat Code Coverage" --results-directory ./coverage
+      run: dotnet test --configuration Release --logger "xunit;LogFilePath=test-results/results.xml" --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
