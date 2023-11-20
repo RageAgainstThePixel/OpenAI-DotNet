@@ -30,7 +30,7 @@ namespace OpenAI.Tests
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new CreateThreadRequest(
                 new List<Message>
                 {
-                    new Message("Test message")
+                   "Test message"
                 },
                 new Dictionary<string, string>
                 {

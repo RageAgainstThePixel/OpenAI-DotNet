@@ -435,16 +435,24 @@ Create an assistant file by attaching a File to an assistant.
 
 ```csharp
 var api = new OpenAIClient();
+var filePath = "assistant_test_2.txt";
+await File.WriteAllTextAsync(filePath, "Knowledge is power!");
+var fileUploadRequest = new FileUploadRequest(filePath, "assistant");
+var file = await api.FilesEndpoint.UploadFileAsync(fileUploadRequest);
+var assistantFile = api.AssistantsEndpoint.AttachFileAsync(assistant.Id, file.Id);
 ```
 
 #### [Upload File to Assistant](#upload-file)
 
-Uploads and attaches a file to an assistant.
+Uploads ***and*** attaches a file to an assistant.
 
 > Assistant extension method, for extra convenience!
 
 ```csharp
 var api = new OpenAIClient();
+var filePath = "assistant_test_2.txt";
+await File.WriteAllTextAsync(filePath, "Knowledge is power!");
+var assistantFile = assistant.UploadFileAsync(filePath);
 ```
 
 #### [Retrieve File from Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistantFile)
@@ -453,6 +461,10 @@ Retrieves an AssistantFile.
 
 ```csharp
 var api = new OpenAIClient();
+var assistantFile = api.AssistantsEndpoint(assistant.Id, fileId);
+// OR AssistantExtension for easier use!
+var assistantFile = await assistant.RetrieveFileAsync(fileId);
+Console.WriteLine($"{assistantFile.AssistantId}'s file -> {assistantFile.Id}");
 ```
 
 #### [Remove File from Assistant](https://platform.openai.com/docs/api-reference/assistants/deleteAssistantFile)
@@ -463,6 +475,8 @@ Remove a file from an assistant.
 
 ```csharp
 var api = new OpenAIClient();
+var isRemoved = await api.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId);
+Assert.IsTrue(isRemoved);
 ```
 
 #### [Delete File from Assistant](#delete-file)
@@ -473,6 +487,8 @@ Removes a file from the assistant and then deletes the file from the organizatio
 
 ```csharp
 var api = new OpenAIClient();
+var isDeleted = await assistant.DeleteFileAsync(fileId);
+Assert.IsTrue(isDeleted);
 ```
 
 ### [Threads](https://platform.openai.com/docs/api-reference/threads)

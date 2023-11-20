@@ -66,7 +66,7 @@ namespace OpenAI.Tests
         public async Task Test_04_DeleteFiles()
         {
             Assert.IsNotNull(OpenAIClient.FilesEndpoint);
-            var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync("fine-tune");
+            var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
             Assert.IsNotNull(fileList);
             Assert.IsNotEmpty(fileList);
 

@@ -87,16 +87,17 @@ namespace OpenAI.Assistants
         public static async Task<AssistantFileResponse> RetrieveFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.RetrieveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
 
-        /// <summary>
-        /// Downloads the <see cref="assistantFile"/> to the specified <see cref="directory"/>.
-        /// </summary>
-        /// <param name="assistantFile"><see cref="AssistantFileResponse"/>.</param>
-        /// <param name="directory">The directory to download the file into.</param>
-        /// <param name="deleteCachedFile">Optional, delete the cached file. Defaults to false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>The full path of the downloaded file.</returns>
-        public static async Task<string> DownloadFileAsync(this AssistantFileResponse assistantFile, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-            => await assistantFile.Client.FilesEndpoint.DownloadFileAsync(assistantFile.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
+        // TODO 400 bad request errors. Likely OpenAI bug downloading assistant file content.
+        ///// <summary>
+        ///// Downloads the <see cref="assistantFile"/> to the specified <see cref="directory"/>.
+        ///// </summary>
+        ///// <param name="assistantFile"><see cref="AssistantFileResponse"/>.</param>
+        ///// <param name="directory">The directory to download the file into.</param>
+        ///// <param name="deleteCachedFile">Optional, delete the cached file. Defaults to false.</param>
+        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        ///// <returns>The full path of the downloaded file.</returns>
+        //public static async Task<string> DownloadFileAsync(this AssistantFileResponse assistantFile, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
+        //    => await assistantFile.Client.FilesEndpoint.DownloadFileAsync(assistantFile.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Remove AssistantFile.

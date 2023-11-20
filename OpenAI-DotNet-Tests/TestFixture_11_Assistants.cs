@@ -106,10 +106,16 @@ namespace OpenAI.Tests
             foreach (var file in filesList.Items)
             {
                 Assert.IsNotNull(file);
-                var retrieved = await testAssistant.RetrieveFileAsync(file.Id);
+                var retrieved = await testAssistant.RetrieveFileAsync(file);
                 Assert.IsNotNull(retrieved);
                 Assert.IsTrue(retrieved.Id == file.Id);
                 Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
+                // TODO 400 Bad Request error when attempting to download assistant files. Likely OpenAI bug.
+                //var downloadPath = await retrieved.DownloadFileAsync(Directory.GetCurrentDirectory(), true);
+                //Console.WriteLine($"downloaded {retrieved} -> {downloadPath}");
+                //Assert.IsTrue(File.Exists(downloadPath));
+                //File.Delete(downloadPath);
+                //Assert.IsFalse(File.Exists(downloadPath));
             }
         }
 
