@@ -1,17 +1,27 @@
 ﻿using NUnit.Framework;
+using OpenAI.Assistants;
 using OpenAI.Files;
+using OpenAI.Tests.Weather;
 using OpenAI.Threads;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
+    /// <summary>
+    /// https://github.com/openai/openai-cookbook/blob/main/examples/Assistants_API_overview_python.ipynb
+    /// </summary>
     internal class TestFixture_12_Threads : AbstractTestFixture
     {
+        private static RunResponse testRun;
         private static ThreadResponse testThread;
         private static MessageResponse testMessage;
+        private static AssistantResponse testAssistant;
 
         [Test]
         public async Task Test_01_CreateThread()
@@ -24,7 +34,7 @@ namespace OpenAI.Tests
                 },
                 new Dictionary<string, string>
                 {
-                    ["test"] = "01"
+                    ["test"] = nameof(Test_01_CreateThread)
                 }));
             Assert.IsNotNull(thread);
             Assert.IsNotNull(thread.Metadata);
@@ -52,7 +62,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
             var newMetadata = new Dictionary<string, string>
             {
-                ["test"] = "03"
+                ["test"] = nameof(Test_03_ModifyThread)
             };
             var thread = await testThread.ModifyAsync(newMetadata);
             Assert.IsNotNull(thread);
@@ -66,12 +76,18 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var file = await CreateTestFileAsync("test.txt");
+            const string testFilePath = "assistant_test_1.txt";
+            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
+            Assert.IsTrue(File.Exists(testFilePath));
+            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
+            Assert.NotNull(file);
+            File.Delete(testFilePath);
+            Assert.IsFalse(File.Exists(testFilePath));
             var request = new CreateMessageRequest("Test create message",
                 new[] { file.Id },
                 new Dictionary<string, string>
                 {
-                    ["test"] = "04_01"
+                    ["test"] = nameof(Test_04_01_CreateMessage)
                 });
             MessageResponse message;
             try
@@ -115,16 +131,16 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
             var metadata = new Dictionary<string, string>
             {
-                ["test"] = "04_03"
+                ["test"] = nameof(Test_04_03_ModifyMessage)
             };
             var modified = await testMessage.ModifyAsync(metadata);
             Assert.IsNotNull(modified);
             Assert.IsNotNull(modified.Metadata);
-            Assert.IsTrue(modified.Metadata["test"].Equals("04_03"));
+            Assert.IsTrue(modified.Metadata["test"].Equals(nameof(Test_04_03_ModifyMessage)));
         }
 
         [Test]
-        public async Task Test_04_04_ListMessageFiles()
+        public async Task Test_04_04_ListAndDownloadMessageFiles()
         {
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
@@ -160,6 +176,209 @@ namespace OpenAI.Tests
             var isDeleted = await testThread.DeleteAsync();
             Assert.IsTrue(isDeleted);
             Console.WriteLine($"Deleted thread {testThread.Id}");
+        }
+
+
+
+        [Test]
+        public async Task Test_06_01_CreateRun()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
+                    model: "gpt-4-1106-preview"));
+            Assert.NotNull(assistant);
+            testAssistant = assistant;
+            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
+            Assert.NotNull(thread);
+
+            try
+            {
+                var message = thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
+                Assert.NotNull(message);
+                var run = await thread.CreateRunAsync(assistant);
+                Assert.IsNotNull(run);
+            }
+            finally
+            {
+                await thread.DeleteAsync();
+            }
+        }
+
+        [Test]
+        public async Task Test_06_02_CreateThreadAndRun()
+        {
+            Assert.NotNull(testAssistant);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var run = await testAssistant.CreateThreadAndRunAsync();
+            Assert.IsNotNull(run);
+            testRun = run;
+            var thread = await run.GetThreadAsync();
+            Assert.NotNull(thread);
+            testThread = thread;
+        }
+
+        [Test]
+        public async Task Test_06_03_ModifyRun()
+        {
+            Assert.NotNull(testRun);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            // run in Queued and InProgress can't be modified
+            var run = await testRun.WaitForStatusChangeAsync();
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Completed);
+            var metadata = new Dictionary<string, string>
+            {
+                ["test"] = nameof(Test_06_03_ModifyRun)
+            };
+            var modified = await run.ModifyAsync(metadata);
+            Assert.IsNotNull(modified);
+            Assert.AreEqual(run.Id, modified.Id);
+            Assert.IsNotNull(modified.Metadata);
+            Assert.Contains("test", modified.Metadata.Keys.ToList());
+            Assert.AreEqual(nameof(Test_06_03_ModifyRun), modified.Metadata["test"]);
+        }
+
+        [Test]
+        public async Task Test_06_04_ListRunsAndSteps()
+        {
+            Assert.NotNull(testThread);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var list = await testThread.ListRunsAsync();
+            Assert.IsNotNull(list);
+            Assert.IsNotEmpty(list.Items);
+
+            foreach (var run in list.Items)
+            {
+                Assert.IsNotNull(run);
+                Assert.IsNotNull(run.Client);
+                var retrievedRun = await run.UpdateAsync();
+                Assert.IsNotNull(retrievedRun);
+                Assert.IsTrue(retrievedRun.Status == RunStatus.Completed);
+
+                var runStepList = await retrievedRun.ListRunStepsAsync();
+                Assert.IsNotNull(runStepList);
+                Assert.IsNotEmpty(runStepList.Items);
+
+                foreach (var runStep in runStepList.Items)
+                {
+                    Assert.IsNotNull(runStep);
+                    Assert.IsNotNull(runStep.Client);
+                }
+            }
+        }
+
+        [Test]
+        public async Task Test_06_05_CancelRun()
+        {
+            Assert.IsNotNull(testThread);
+            Assert.IsNotNull(testAssistant);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var run = await testThread.CreateRunAsync(testAssistant);
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Queued);
+            run = await run.CancelAsync();
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Cancelling);
+            // waiting while run is cancelling
+            run = await run.WaitForStatusChangeAsync();
+            Assert.IsTrue(run.Status == RunStatus.Cancelled);
+        }
+
+        [Test]
+        public async Task Test_06_06_TestCleanup()
+        {
+            if (testAssistant != null)
+            {
+                var isDeleted = await testAssistant.DeleteAsync();
+                Assert.IsTrue(isDeleted);
+            }
+
+            if (testThread != null)
+            {
+                var isDeleted = await testThread.DeleteAsync();
+                Assert.IsTrue(isDeleted);
+            }
+        }
+
+        [Test]
+        public async Task Test_07_01_SubmitToolOutput()
+        {
+            var function = new Function(
+                nameof(WeatherService.GetCurrentWeather),
+                "Get the current weather in a given location",
+                new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["location"] = new JsonObject
+                        {
+                            ["type"] = "string",
+                            ["description"] = "The city and state, e.g. San Francisco, CA"
+                        },
+                        ["unit"] = new JsonObject
+                        {
+                            ["type"] = "string",
+                            ["enum"] = new JsonArray { "celsius", "fahrenheit" }
+                        }
+                    },
+                    ["required"] = new JsonArray { "location", "unit" }
+                });
+            testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(new CreateAssistantRequest(tools: new Tool[] { function }));
+            var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature in celsius now?");
+            testThread = await run.GetThreadAsync();
+            // waiting while run is Queued and InProgress
+            run = await run.WaitForStatusChangeAsync();
+            Assert.IsNotNull(run);
+            Assert.AreEqual(RunStatus.RequiresAction, run.Status);
+            Assert.IsNotNull(run.RequiredAction);
+            Assert.IsNotNull(run.RequiredAction.SubmitToolOutputs);
+            Assert.IsNotEmpty(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+            var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
+            Assert.AreEqual("function", toolCall.Type);
+            Assert.IsNotNull(toolCall.FunctionCall);
+            Assert.AreEqual(nameof(WeatherService.GetCurrentWeather), toolCall.FunctionCall.Name);
+            Assert.IsNotNull(toolCall.FunctionCall.Arguments);
+            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
+            var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+            var toolOutput = new ToolOutput(toolCall.Id, functionResult);
+            run = await run.SubmitToolOutputsAsync(toolOutput);
+            // waiting while run in Queued and InProgress
+            run = await run.WaitForStatusChangeAsync();
+            Assert.AreEqual(RunStatus.Completed, run.Status);
+            var messages = await run.ListMessagesAsync();
+            Assert.IsNotNull(messages);
+            Assert.IsNotEmpty(messages.Items);
+
+            foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
+            {
+                Assert.IsNotNull(message);
+                Assert.IsNotEmpty(message.Content);
+
+                foreach (var content in message.Content)
+                {
+                    Console.WriteLine($"{message.Role}: {content}");
+                }
+            }
+        }
+
+        [Test]
+        public async Task Test_07_02_TestCleanup()
+        {
+            if (testAssistant != null)
+            {
+                var isDeleted = await testAssistant.DeleteAsync();
+                Assert.IsTrue(isDeleted);
+            }
+
+            if (testThread != null)
+            {
+                var isDeleted = await testThread.DeleteAsync();
+                Assert.IsTrue(isDeleted);
+            }
         }
 
         private async Task<FileResponse> CreateTestFileAsync(string filePath)

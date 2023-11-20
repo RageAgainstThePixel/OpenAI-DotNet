@@ -8,7 +8,6 @@ namespace OpenAI.Tests
     [Obsolete]
     internal class TestFixture_04_Edits : AbstractTestFixture
     {
-        [Test]
         public async Task Test_1_GetBasicEdit()
         {
             Assert.IsNotNull(OpenAIClient.EditsEndpoint);
@@ -18,7 +17,7 @@ namespace OpenAI.Tests
             Assert.NotNull(result.Choices);
             Assert.NotZero(result.Choices.Count);
             Console.WriteLine(result);
-            Assert.IsTrue(result.ToString().Contains("week"));
+            Assert.IsTrue(result.ToString()?.Contains("week"));
         }
     }
 }

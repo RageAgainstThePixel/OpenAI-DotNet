@@ -1,6 +1,7 @@
+using OpenAI.Files;
+using OpenAI.Threads;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAI.Files;
 
 namespace OpenAI.Assistants
 {
@@ -27,6 +28,16 @@ namespace OpenAI.Assistants
         /// <returns>True, if the <see cref="assistant"/> was successfully deleted.</returns>
         public static async Task<bool> DeleteAsync(this AssistantResponse assistant, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Create a thread and run it.
+        /// </summary>
+        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="request">Optional, <see cref="CreateThreadRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CreateThreadRequest request = null, CancellationToken cancellationToken = default)
+            => await assistant.Client.ThreadsEndpoint.CreateThreadAndRunAsync(new CreateThreadAndRunRequest(assistant.Id, createThreadRequest: request), cancellationToken).ConfigureAwait(false);
 
         #region Files
 

@@ -41,7 +41,7 @@ namespace OpenAI.Threads
         public string AssistantId { get; private set; }
 
         /// <summary>
-        /// The status of the run, which can be either queued, in_progress, requires_action, cancelling, cancelled, failed, completed, or expired.
+        /// The status of the run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]

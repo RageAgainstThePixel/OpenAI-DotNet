@@ -36,5 +36,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; }
+
+        public static implicit operator CreateThreadRequest(string message) => new CreateThreadRequest(new[] { new Message(message) });
     }
 }

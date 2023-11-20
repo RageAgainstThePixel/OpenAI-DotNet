@@ -110,6 +110,8 @@ namespace OpenAI.Tests
 
             foreach (var job in list.Items.OrderByDescending(job => job.CreatedAt))
             {
+                Assert.IsNotNull(job);
+                Assert.IsNotNull(job.Client);
                 Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
             }
         }
@@ -149,6 +151,8 @@ namespace OpenAI.Tests
 
                 foreach (var @event in eventList.Items.OrderByDescending(@event => @event.CreatedAt))
                 {
+                    Assert.IsNotNull(@event);
+                    Assert.IsNotNull(@event.Client);
                     Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message}");
                 }
 

@@ -5,6 +5,11 @@ namespace OpenAI.Threads
 {
     public sealed class CreateThreadAndRunRequest
     {
+        public CreateThreadAndRunRequest(string assistantId, CreateThreadAndRunRequest request)
+            : this(assistantId, request?.Model, request?.Instructions, request?.Tools, request?.Metadata)
+        {
+        }
+
         /// <summary>
         /// Constructor.
         /// </summary>

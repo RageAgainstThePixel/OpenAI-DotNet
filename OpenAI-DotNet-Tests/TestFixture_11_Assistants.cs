@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using OpenAI.Assistants;
-using OpenAI.Files;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +10,6 @@ namespace OpenAI.Tests
     internal class TestFixture_11_Assistants : AbstractTestFixture
     {
         private static AssistantResponse testAssistant;
-
 
         [Test]
         public async Task Test_01_CreateAssistant()

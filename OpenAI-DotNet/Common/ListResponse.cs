@@ -3,7 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class ListResponse<TObject> : BaseResponse
+    public sealed class ListResponse<TObject> : BaseResponse, IListResponse<TObject>
+        where TObject : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("object")]

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Assistants
 {
-    public class AssistantsEndpoint : BaseEndPoint
+    public sealed class AssistantsEndpoint : BaseEndPoint
     {
         internal AssistantsEndpoint(OpenAIClient api) : base(api) { }
 
@@ -147,7 +147,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
         public async Task<bool> RemoveAssistantFileAsync(AssistantFileResponse file, CancellationToken cancellationToken = default)
-            => await RemoveAssistantFileAsync(file.AssistantId, file.Id, cancellationToken);
+            => await RemoveAssistantFileAsync(file.AssistantId, file.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Remove an assistant file.

@@ -6,6 +6,11 @@ namespace OpenAI.Threads
 {
     public sealed class CreateRunRequest
     {
+        public CreateRunRequest(string assistantId, CreateRunRequest request)
+            : this(assistantId, request?.Model, request?.Instructions, request?.Tools, request?.Metadata)
+        {
+        }
+
         public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
             AssistantId = assistantId;

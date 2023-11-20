@@ -3,9 +3,20 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    [Obsolete("use EventResponse")]
-    public sealed class Event : BaseResponse
+    public sealed class EventResponse : BaseResponse
     {
+        public EventResponse() { }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        internal EventResponse(Event @event)
+        {
+            Object = @event.Object;
+            CreatedAtUnixTimeSeconds = @event.CreatedAtUnixTimeSeconds;
+            Level = @event.Level;
+            Message = @event.Message;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
@@ -13,9 +24,6 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
-
-        [Obsolete("use CreatedAtUnixTimeSeconds")]
-        public int CreatedAtUnixTime => CreatedAtUnixTimeSeconds;
 
         [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
@@ -27,7 +35,5 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("message")]
         public string Message { get; private set; }
-
-        public static implicit operator EventResponse(Event @event) => new EventResponse(@event);
     }
 }

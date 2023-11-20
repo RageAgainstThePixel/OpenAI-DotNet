@@ -1,12 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    [Obsolete("use FileTuneJobResponse")]
-    public sealed class FineTuneJob : BaseResponse
+    public sealed class FineTuneJobResponse : BaseResponse
     {
+        public FineTuneJobResponse() { }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        internal FineTuneJobResponse(FineTuneJob job)
+        {
+            Object = job.Object;
+            Id = job.Id;
+            Model = job.Model;
+            CreateAtUnixTimeSeconds = job.CreateAtUnixTimeSeconds;
+            FinishedAtUnixTimeSeconds = job.FinishedAtUnixTimeSeconds;
+            FineTunedModel = job.FineTunedModel;
+            OrganizationId = job.OrganizationId;
+            ResultFiles = job.ResultFiles;
+            Status = job.Status;
+            ValidationFile = job.ValidationFile;
+            TrainingFile = job.TrainingFile;
+            HyperParameters = job.HyperParameters;
+            TrainedTokens = job.TrainedTokens;
+            events = new List<EventResponse>(job.Events.Count);
+
+            foreach (var jobEvent in job.Events)
+            {
+                jobEvent.Client = Client;
+                events.Add(jobEvent);
+            }
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
@@ -24,10 +52,6 @@ namespace OpenAI.FineTuning
         public int? CreateAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        [Obsolete("Use CreateAtUnixTimeSeconds")]
-        public int? CreatedAtUnixTime => CreateAtUnixTimeSeconds;
-
-        [JsonIgnore]
         public DateTime? CreatedAt
             => CreateAtUnixTimeSeconds.HasValue
                 ? DateTimeOffset.FromUnixTimeSeconds(CreateAtUnixTimeSeconds.Value).DateTime
@@ -36,10 +60,6 @@ namespace OpenAI.FineTuning
         [JsonInclude]
         [JsonPropertyName("finished_at")]
         public int? FinishedAtUnixTimeSeconds { get; private set; }
-
-        [JsonIgnore]
-        [Obsolete("Use FinishedAtUnixTimeSeconds")]
-        public int? FinishedAtUnixTime => CreateAtUnixTimeSeconds;
 
         [JsonIgnore]
         public DateTime? FinishedAt
@@ -79,12 +99,24 @@ namespace OpenAI.FineTuning
         [JsonPropertyName("trained_tokens")]
         public int? TrainedTokens { get; private set; }
 
+        private List<EventResponse> events = new List<EventResponse>();
+
         [JsonIgnore]
-        public IReadOnlyList<Event> Events { get; internal set; } = new List<Event>();
+        public IReadOnlyList<EventResponse> Events
+        {
+            get => events;
+            internal set
+            {
+                events = value?.ToList() ?? new List<EventResponse>();
 
-        public static implicit operator FineTuneJobResponse(FineTuneJob job) => new FineTuneJobResponse(job);
+                foreach (var @event in events)
+                {
+                    @event.Client = Client;
+                }
+            }
+        }
 
-        public static implicit operator string(FineTuneJob job) => job?.ToString();
+        public static implicit operator string(FineTuneJobResponse job) => job?.ToString();
 
         public override string ToString() => Id;
     }
