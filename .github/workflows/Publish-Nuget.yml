@@ -42,9 +42,15 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
+    - name: dotnet restore
+      run: dotnet restore --configuration Release
+
+    - name: dotnet build
+      run: dotnet build --configuration Release --no-restore
+      
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
-      run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
@@ -53,7 +59,7 @@ jobs:
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: 'coverage/*/coverage.cobertura.xml'
+        filename: coverage/**/coverage.cobertura.xml
         badge: true
         format: 'markdown'
         output: 'both'
@@ -62,13 +68,10 @@ jobs:
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
       run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
-    - name: Build Pack and Publish NuGet Package
+    - name: Pack and Publish NuGet Package
       run: |
         $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
         $proxyProjectPath = "${{ github.workspace }}\OpenAI-DotNet-Proxy"
-
-        # build all
-        dotnet build --configuration Release
 
         # pack OpenAI-DotNet
         dotnet pack $projectPath --configuration Release --include-symbols
