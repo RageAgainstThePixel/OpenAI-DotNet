@@ -23,6 +23,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - Added AgentsEndpoint
 - Added ThreadsEndpoint
 - Updated ImagesEndpoint return types to ImageResult list
+- Updated FilesEndpoint.ListFilesAsync with optional purpose filter query parameter.
 - Refactored list responses with a more generic ListQuery and ListResponse&lt;TObject&gt; pattern
   - EventList -&gt; ListResponse&lt;Event&gt;
   - FineTuneJobList -&gt; ListResponse&lt;FineTuneJob&gt;
