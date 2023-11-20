@@ -47,49 +47,76 @@ Install-Package OpenAI-DotNet
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
 - [Assistants](#assistants) :new:
-  - [List Assistants](#list-assistants)
+  - [List Assistants](#list-assistants) :new:
   - [Create Assistant](#create-assistant) :new:
   - [Retrieve Assistant](#retrieve-assistant) :new:
-  - [Modify Assistant](#modify=assistant) :new:
-  - [Delete Assistant](#delete-assitant) :new:
-  - [Attach File to Assistant](#attach-file-to-assistant)
-  - [Remove File from Assistant](#remove=file-from-assistant)
-  - [Delete File from Assistant](#delete-file-fromassistant)
-- [Completions](#completions)
-  - [Streaming](#completion-streaming)
+  - [Modify Assistant](#modify-assistant) :new:
+  - [Delete Assistant](#delete-assistant) :new:
+  - [List Assistant Files](#list-assistant-files) :new:
+  - [Attach File to Assistant](#attach-file-to-assistant) :new:
+  - [Upload File to Assistant](#upload-file-to-assistant) :new:
+  - [Retrieve File from Assistant](#retrieve-file-from-assistant) :new:
+  - [Remove File from Assistant](#remove-file-from-assistant) :new:
+  - [Delete File from Assistant](#delete-file-from-assistant) :new:
+- [Threads](#threads) :new:
+  - [Create Thread](#create-thread) :new:
+  - [Create Thread and Run](#create-thread-and-run) :new:
+  - [Retrieve Thread](#retrieve-thread) :new:
+  - [Modify Thread](#modify-thread) :new:
+  - [Delete Thread](#delete-thread) :new:
+  - [Thread Messages](#thread-messages) :new:
+    - [List Messages](#list-thread-messages) :new:
+    - [Create Message](#create-thread-message) :new:
+    - [Modify Message](#modify-thread-message) :new:
+    - [Retrieve Message](#retrieve-thread-message) :new:
+    - [Thread Message Files](#thread-message-files) :new:
+      - [List Message Files](#list-thread-message-files) :new:
+      - [Retrieve Message File](#retrieve-thread-message-file) :new:
+      - [Download Message File](#download-thread-message-file) :new:
+  - [Thread Runs](#thread-runs) :new:
+    - [List Runs](#list-thread-runs) :new:
+    - [Create Run](#create-thread-run) :new:
+    - [Retrieve Run](#retrieve-thread-run) :new:
+    - [Modify Run](#modify-thread-run) :new:
+    - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run) :new:
+    - [List Run Steps](#list-thread-run-steps) :new:
+    - [Retrieve Run Step](#retrieve-thread-run-step) :new:
+    - [Cancel Run](#cancel-thread-run) :new:
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools) :new:
   - [Vision](#chat-vision) :new:
-- [Edits](#edits)
-  - [Create Edit](#create-edit)
-- [Embeddings](#embeddings)
-  - [Create Embedding](#create-embeddings)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images)
-  - [Create Image](#create-image)
-  - [Edit Image](#edit-image)
-  - [Create Image Variation](#create-image-variation)
-- [Files](#files)
-  - [List Files](#list-files)
+- [Images](#images) :construction:
+  - [Create Image](#create-image) :construction:
+  - [Edit Image](#edit-image) :construction:
+  - [Create Image Variation](#create-image-variation) :construction:
+- [Files](#files) :construction:
+  - [List Files](#list-files) :construction:
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
-  - [Retrieve File Info](#retrieve-file-info)
+  - [Retrieve File](#retrieve-file-info) :construction:
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning)
-  - [Create Fine Tune Job](#create-fine-tune-job)
-  - [List Fine Tune Jobs](#list-fine-tune-jobs)
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
+- [Fine Tuning](#fine-tuning) :construction:
+  - [Create Fine Tune Job](#create-fine-tune-job) :construction:
+  - [List Fine Tune Jobs](#list-fine-tune-jobs) :construction:
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :construction:
   - [Cancel Fine Tune Job](#cancel-fine-tune-job)
-  - [List Fine Tune Job Events](#list-fine-tune-job-events)
+  - [List Fine Tune Job Events](#list-fine-tune-job-events) :construction:
+- [Embeddings](#embeddings)
+  - [Create Embedding](#create-embeddings)
+- [Completions](#completions)
+  - [Streaming](#completion-streaming)
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
+- ~~[Edits](#edits)~~ :warning: Deprecated
+  - ~~[Create Edit](#create-edit)~~  :warning: Deprecated
 
-### Authentication
+### [Authentication](https://platform.openai.com/docs/api-reference/authentication)
 
 There are 3 ways to provide your API keys, in order of precedence:
 
@@ -162,7 +189,7 @@ Use your system's environment variables specify an api key and organization to u
 var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
 ```
 
-### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)
+### [Azure OpenAI](https://learn.microsoft.com/en-us/azure/cognitive-services/openai)
 
 You can also choose to use Microsoft's Azure OpenAI deployments as well.
 
@@ -316,44 +343,291 @@ var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-
 Assert.IsTrue(result);
 ```
 
-### [Completions](https://platform.openai.com/docs/api-reference/completions)
+### [Assistants](https://platform.openai.com/docs/api-reference/assistants)
 
-Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
+Build assistants that can call models and use tools to perform tasks.
 
-The Completions API is accessed via `OpenAIClient.CompletionsEndpoint`
+- [Assistants Guide](https://platform.openai.com/docs/assistants)
+- [OpenAI Assistants Cookbook](https://github.com/openai/openai-cookbook/blob/main/examples/Assistants_API_overview_python.ipynb)
+
+The Assistants API is accessed via `OpenAIClient.AssistantsEndpoint`
+
+#### [List Assistants](https://platform.openai.com/docs/api-reference/assistants/listAssistants)
+
+Returns a list of assistants.
 
 ```csharp
-var api = new OpenAIClient();
-var result = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
-Console.WriteLine(result);
+// TODO
 ```
 
-> To get the `CompletionResult` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
+#### [Create Assistant](https://platform.openai.com/docs/api-reference/assistants/createAssistant)
 
-#### Completion Streaming
-
-Streaming allows you to get results are they are generated, which can help your application feel more responsive, especially on slow models like Davinci.
+Create an assistant with a model and instructions.
 
 ```csharp
-var api = new OpenAIClient();
-
-await api.CompletionsEndpoint.StreamCompletionAsync(result =>
-{
-    foreach (var choice in result.Completions)
-    {
-        Console.WriteLine(choice);
-    }
-}, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
+// TODO
 ```
 
-Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
+#### [Retrieve Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistant)
+
+Retrieves an assistant.
 
 ```csharp
-var api = new OpenAIClient();
-await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
-{
-  Console.WriteLine(token);
-}
+// TODO
+```
+
+#### [Modify Assistant](https://platform.openai.com/docs/api-reference/assistants/modifyAssistant)
+
+Modifies an assistant.
+
+```csharp
+// TODO
+```
+
+#### [Delete Assistant](https://platform.openai.com/docs/api-reference/assistants/deleteAssistant)
+
+Delete an assistant.
+
+```csharp
+// TODO
+```
+
+#### [List Assistant Files](https://platform.openai.com/docs/api-reference/assistants/listAssistantFiles)
+
+Returns a list of assistant files.
+
+```csharp
+// TODO
+```
+
+#### [Attach File to Assistant](https://platform.openai.com/docs/api-reference/assistants/createAssistantFile)
+
+Create an assistant file by attaching a File to an assistant.
+
+```csharp
+// TODO
+```
+
+#### [Upload File to Assistant](#upload-file)
+
+Uploads and attaches a file to an assistant.
+
+> Assistant extension method, for extra convenience!
+
+```csharp
+// TODO
+```
+
+#### [Retrieve File from Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistantFile)
+
+Retrieves an AssistantFile.
+
+```csharp
+// TODO
+```
+
+#### [Remove File from Assistant](https://platform.openai.com/docs/api-reference/assistants/deleteAssistantFile)
+
+Remove a file from an assistant.
+
+> Note: The file will remain in your organization until [deleted with FileEndpoint](#delete-file).
+
+```csharp
+// TODO
+```
+
+#### [Delete File from Assistant](#delete-file)
+
+Removes a file from the assistant and then deletes the file from the organization.
+
+> Assistant extension method, for extra convenience!
+
+```csharp
+// TODO
+```
+
+### [Threads](https://platform.openai.com/docs/api-reference/threads)
+
+Create Threads that [Assistants](#assistants) can interact with.
+
+The Threads API is accessed via `OpenAIClient.ThreadsEndpoint`
+
+#### [Create Thread](https://platform.openai.com/docs/api-reference/threads/createThread)
+
+Create a thread.
+
+```csharp
+// TODO
+```
+
+#### [Create Thread and Run](https://platform.openai.com/docs/api-reference/runs/createThreadAndRun)
+
+Create a thread and run it in one request.
+
+```csharp
+// TODO
+```
+
+#### [Retrieve Thread](https://platform.openai.com/docs/api-reference/threads/getThread)
+
+Retrieves a thread.
+
+```csharp
+// TODO
+```
+
+#### [Modify Thread](https://platform.openai.com/docs/api-reference/threads/modifyThread)
+
+Modifies a thread.
+
+> Note: Only the metadata can be modified.
+
+```csharp
+// TODO
+```
+
+#### [Delete Thread](https://platform.openai.com/docs/api-reference/threads/deleteThread)
+
+Delete a thread.
+
+```csharp
+// TODO
+```
+
+#### [Thread Messages](https://platform.openai.com/docs/api-reference/messages)
+
+Create messages within threads.
+
+##### [List Thread Messages](https://platform.openai.com/docs/api-reference/messages/listMessages)
+
+Returns a list of messages for a given thread.
+
+```csharp
+// TODO
+```
+
+##### [Create Thread Message](https://platform.openai.com/docs/api-reference/messages/createMessage)
+
+Create a message.
+
+```csharp
+// TODO
+```
+
+##### [Modify Thread Message](https://platform.openai.com/docs/api-reference/messages/modifyMessage)
+
+Modify a message.
+
+> Note: Only the message metadata can be modified.
+
+```csharp
+// TODO
+```
+
+##### [Retrieve Thread Message](https://platform.openai.com/docs/api-reference/messages/getMessage)
+
+Retrieve a message.
+
+```csharp
+// TODO
+```
+
+##### Thread Message Files
+
+###### [List Thread Message Files](https://platform.openai.com/docs/api-reference/messages/listMessageFiles)
+
+Returns a list of message files.
+
+```csharp
+// TODO
+```
+
+###### [Retrieve Thread Message File](https://platform.openai.com/docs/api-reference/messages/getMessageFile)
+
+Retrieves a message file.
+
+```csharp
+// TODO
+```
+
+###### [Download Thread Message File](#download-file-content)
+
+Downloads a message file to the specified directory.
+
+> Thread extension method, for extra convenience!
+
+```csharp
+// TODO
+```
+
+#### [Thread Runs](https://platform.openai.com/docs/api-reference/runs)
+
+Represents an execution run on a thread.
+
+##### [List Thread Runs](https://platform.openai.com/docs/api-reference/runs/listRuns)
+
+Returns a list of runs belonging to a thread.
+
+```csharp
+// TODO
+```
+
+##### [Create Thread Run](https://platform.openai.com/docs/api-reference/runs/createRun)
+
+Create a run.
+
+```csharp
+// TODO
+```
+
+##### [Retrieve Thread Run](https://platform.openai.com/docs/api-reference/runs/getRun)
+
+Retrieves a run.
+
+```csharp
+// TODO
+```
+
+##### [Modify Thread Run](https://platform.openai.com/docs/api-reference/runs/modifyRun)
+
+Modifies a run.
+
+> Note: Only the metadata can be modified.
+
+```csharp
+// TODO
+```
+
+##### [Thread Submit Tool Outputs to Run](https://platform.openai.com/docs/api-reference/runs/submitToolOutputs)
+
+When a run has the status: `requires_action` and required_`action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
+
+```csharp
+// TODO
+```
+
+##### [List Thread Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps)
+
+Returns a list of run steps belonging to a run.
+
+```csharp
+// TODO
+```
+
+##### [Retrieve Thread Run Step](https://platform.openai.com/docs/api-reference/runs/getRunStep)
+
+Retrieves a run step.
+
+```csharp
+// TODO
+```
+
+##### [Cancel Thread Run](https://platform.openai.com/docs/api-reference/runs/cancelRun)
+
+Cancels a run that is `in_progress`.
+
+```csharp
+// TODO
 ```
 
 ### [Chat](https://platform.openai.com/docs/api-reference/chat)
@@ -537,43 +811,6 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
 var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
-```
-
-### [Edits](https://platform.openai.com/docs/api-reference/edits)
-
-> Deprecated, and soon to be removed.
-
-Given a prompt and an instruction, the model will return an edited version of the prompt.
-
-The Edits API is accessed via `OpenAIClient.EditsEndpoint`
-
-#### [Create Edit](https://platform.openai.com/docs/api-reference/edits/create)
-
-Creates a new edit for the provided input, instruction, and parameters using the provided input and instruction.
-
-```csharp
-var api = new OpenAIClient();
-var request = new EditRequest("What day of the wek is it?", "Fix the spelling mistakes");
-var result = await api.EditsEndpoint.CreateEditAsync(request);
-Console.WriteLine(result);
-```
-
-### [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
-
-Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
-
-Related guide: [Embeddings](https://platform.openai.com/docs/guides/embeddings)
-
-The Edits API is accessed via `OpenAIClient.EmbeddingsEndpoint`
-
-#### [Create Embeddings](https://platform.openai.com/docs/api-reference/embeddings/create)
-
-Creates an embedding vector representing the input text.
-
-```csharp
-var api = new OpenAIClient();
-var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
-Console.WriteLine(result);
 ```
 
 ### [Audio](https://platform.openai.com/docs/api-reference/audio)
@@ -807,6 +1044,64 @@ foreach (var @event in eventList.Events.OrderByDescending(@event => @event.Creat
 }
 ```
 
+### [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
+
+Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
+
+Related guide: [Embeddings](https://platform.openai.com/docs/guides/embeddings)
+
+The Edits API is accessed via `OpenAIClient.EmbeddingsEndpoint`
+
+#### [Create Embeddings](https://platform.openai.com/docs/api-reference/embeddings/create)
+
+Creates an embedding vector representing the input text.
+
+```csharp
+var api = new OpenAIClient();
+var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
+Console.WriteLine(result);
+```
+
+### [Completions](https://platform.openai.com/docs/api-reference/completions)
+
+Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
+
+The Completions API is accessed via `OpenAIClient.CompletionsEndpoint`
+
+```csharp
+var api = new OpenAIClient();
+var result = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
+Console.WriteLine(result);
+```
+
+> To get the `CompletionResult` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
+
+#### Completion Streaming
+
+Streaming allows you to get results are they are generated, which can help your application feel more responsive, especially on slow models like Davinci.
+
+```csharp
+var api = new OpenAIClient();
+
+await api.CompletionsEndpoint.StreamCompletionAsync(result =>
+{
+    foreach (var choice in result.Completions)
+    {
+        Console.WriteLine(choice);
+    }
+}, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
+```
+
+Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
+
+```csharp
+var api = new OpenAIClient();
+await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
+{
+  Console.WriteLine(token);
+}
+```
+
 ### [Moderations](https://platform.openai.com/docs/api-reference/moderations)
 
 Given a input text, outputs if the model classifies it as violating OpenAI's content policy.
@@ -826,6 +1121,25 @@ Assert.IsTrue(response);
 ```
 
 ---
+
+### [Edits](https://platform.openai.com/docs/api-reference/edits)
+
+> Deprecated, and soon to be removed.
+
+Given a prompt and an instruction, the model will return an edited version of the prompt.
+
+The Edits API is accessed via `OpenAIClient.EditsEndpoint`
+
+#### [Create Edit](https://platform.openai.com/docs/api-reference/edits/create)
+
+Creates a new edit for the provided input, instruction, and parameters using the provided input and instruction.
+
+```csharp
+var api = new OpenAIClient();
+var request = new EditRequest("What day of the wek is it?", "Fix the spelling mistakes");
+var result = await api.EditsEndpoint.CreateEditAsync(request);
+Console.WriteLine(result);
+```
 
 ## License
 

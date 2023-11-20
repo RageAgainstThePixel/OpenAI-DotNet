@@ -224,6 +224,20 @@ namespace OpenAI.Threads
         #region Runs
 
         /// <summary>
+        /// Returns a list of runs belonging to a thread.
+        /// </summary>
+        /// <param name="threadId">The id of the thread the run belongs to.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{RunResponse}"/></returns>
+        public async Task<ListResponse<RunResponse>> ListRunsAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
+        {
+            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", query), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<ListResponse<RunResponse>>(responseAsString, Api);
+        }
+
+        /// <summary>
         /// Create a run.
         /// </summary>
         /// <param name="threadId">The id of the thread to run.</param>
@@ -286,21 +300,7 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// Returns a list of runs belonging to a thread.
-        /// </summary>
-        /// <param name="threadId">The id of the thread the run belongs to.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{RunResponse}"/></returns>
-        public async Task<ListResponse<RunResponse>> ListRunsAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
-        {
-            var response = await Api.Client.GetAsync(GetUrl($"/{threadId}/runs", query), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<RunResponse>>(responseAsString, Api);
-        }
-
+        
         /// <summary>
         /// Modifies a run.
         /// </summary>

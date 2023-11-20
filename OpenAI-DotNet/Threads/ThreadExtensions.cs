@@ -147,6 +147,29 @@ namespace OpenAI.Threads
         public static async Task<MessageFileResponse> RetrieveFileAsync(this MessageResponse message, string fileId, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message, fileId, cancellationToken).ConfigureAwait(false);
 
+        /// <summary>
+        /// Downloads a message file content to local disk.
+        /// </summary>
+        /// <param name="message"><see cref="MessageResponse"/>.</param>
+        /// <param name="fileId">The id of the file being retrieved.</param>
+        /// <param name="directory">Directory to save the file content.</param>
+        /// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>Path to the downloaded file content.</returns>
+        public static async Task<string> DownloadFileContentAsync(this MessageResponse message, string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
+            => await message.Client.FilesEndpoint.DownloadFileAsync(fileId, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Downloads a message file content to local disk.
+        /// </summary>
+        /// <param name="file"><see cref="MessageFileResponse"/>.</param>
+        /// <param name="directory">Directory to save the file content.</param>
+        /// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>Path to the downloaded file content.</returns>
+        public static async Task<string> DownloadContentAsync(this MessageFileResponse file, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
+            => await file.Client.FilesEndpoint.DownloadFileAsync(file.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
+
         #endregion Files
 
         #region Runs
