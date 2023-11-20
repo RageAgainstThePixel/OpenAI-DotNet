@@ -47,9 +47,14 @@ Install-Package OpenAI-DotNet
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
 - [Assistants](#assistants) :new:
+  - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant) :new:
+  - [Retrieve Assistant](#retrieve-assistant) :new:
   - [Modify Assistant](#modify=assistant) :new:
   - [Delete Assistant](#delete-assitant) :new:
+  - [Attach File to Assistant](#attach-file-to-assistant)
+  - [Remove File from Assistant](#remove=file-from-assistant)
+  - [Delete File from Assistant](#delete-file-fromassistant)
 - [Completions](#completions)
   - [Streaming](#completion-streaming)
 - [Chat](#chat)

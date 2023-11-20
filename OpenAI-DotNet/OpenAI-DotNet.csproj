@@ -25,8 +25,8 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - Updated ImagesEndpoint return types to ImageResult list
 - Updated FilesEndpoint.ListFilesAsync with optional purpose filter query parameter.
 - Refactored list responses with a more generic ListQuery and ListResponse&lt;TObject&gt; pattern
-  - EventList -&gt; ListResponse&lt;Event&gt;
-  - FineTuneJobList -&gt; ListResponse&lt;FineTuneJob&gt;
+  - EventList -&gt; ListResponse&lt;EventResponse&gt;
+  - FineTuneJobList -&gt; ListResponse&lt;FineTuneJobResponse&gt;
 - Standardized names for timestamps to have suffix: UnixTimeSeconds
 - Standardized response class names (existing classes depreciated)
   - FileData -&gt; FileResponse

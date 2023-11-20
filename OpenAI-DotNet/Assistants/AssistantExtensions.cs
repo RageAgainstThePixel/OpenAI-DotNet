@@ -49,7 +49,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{AssistantFile}"/>.</returns>
         public static async Task<ListResponse<AssistantFileResponse>> ListFilesAsync(this AssistantResponse assistant, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await assistant.Client.AssistantsEndpoint.ListAssistantFilesAsync(assistant.Id, query, cancellationToken).ConfigureAwait(false);
+            => await assistant.Client.AssistantsEndpoint.ListFilesAsync(assistant.Id, query, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Attach a file to the  <see cref="assistant"/>.
@@ -62,7 +62,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
         public static async Task<AssistantFileResponse> AttachFileAsync(this AssistantResponse assistant, FileResponse file, CancellationToken cancellationToken = default)
-            => await assistant.Client.AssistantsEndpoint.AttachAssistantFileAsync(assistant.Id, file, cancellationToken).ConfigureAwait(false);
+            => await assistant.Client.AssistantsEndpoint.AttachFileAsync(assistant.Id, file, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Uploads a new file at the specified <see cref="filePath"/> and attaches it to the <see cref="assistant"/>.
@@ -85,7 +85,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
         public static async Task<AssistantFileResponse> RetrieveFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
-            => await assistant.Client.AssistantsEndpoint.RetrieveAssistantFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
+            => await assistant.Client.AssistantsEndpoint.RetrieveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Downloads the <see cref="assistantFile"/> to the specified <see cref="directory"/>.
@@ -99,19 +99,45 @@ namespace OpenAI.Assistants
             => await assistantFile.Client.FilesEndpoint.DownloadFileAsync(assistantFile.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
-        /// Remove <see cref="assistant"/> file.
+        /// Remove AssistantFile.
         /// </summary>
         /// <remarks>
         /// Note that removing an AssistantFile does not delete the original File object,
         /// it simply removes the association between that File and the Assistant.
-        /// To delete a File, use <see cref="DeleteFileAsync"/>.
+        /// To delete a File, use <see cref="DeleteFileAsync(AssistantFileResponse,CancellationToken)"/>.
+        /// </remarks>
+        /// <param name="file"><see cref="AssistantResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>True, if file was removed.</returns>
+        public static async Task<bool> RemoveFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
+            => await file.Client.AssistantsEndpoint.RemoveFileAsync(file, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Remove AssistantFile.
+        /// </summary>
+        /// <remarks>
+        /// Note that removing an AssistantFile does not delete the original File object,
+        /// it simply removes the association between that File and the Assistant.
+        /// To delete a File, use <see cref="DeleteFileAsync(AssistantFileResponse,CancellationToken)"/>.
         /// </remarks>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
-        /// <param name="fileId">The ID of the file to delete.</param>
+        /// <param name="fileId">The ID of the file to remove.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
         public static async Task<bool> RemoveFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
-            => await assistant.Client.AssistantsEndpoint.RemoveAssistantFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
+            => await assistant.Client.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Removes and Deletes a file from the assistant.
+        /// </summary>
+        /// <param name="file"><see cref="AssistantResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>True, if the file was successfully removed from the assistant and deleted.</returns>
+        public static async Task<bool> DeleteFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
+        {
+            var isRemoved = await file.Client.AssistantsEndpoint.RemoveFileAsync(file, cancellationToken).ConfigureAwait(false);
+            return isRemoved && await file.Client.FilesEndpoint.DeleteFileAsync(file.Id, cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Removes and Deletes a file from the <see cref="assistant"/>.
@@ -122,7 +148,7 @@ namespace OpenAI.Assistants
         /// <returns>True, if the file was successfully removed from the assistant and deleted.</returns>
         public static async Task<bool> DeleteFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
         {
-            var isRemoved = await assistant.RemoveFileAsync(fileId, cancellationToken).ConfigureAwait(false);
+            var isRemoved = await assistant.Client.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
             return isRemoved && await assistant.Client.FilesEndpoint.DeleteFileAsync(fileId, cancellationToken).ConfigureAwait(false);
         }
 
