@@ -107,7 +107,9 @@ namespace OpenAI
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
         /// </summary>
-        internal static readonly JsonSerializerOptions JsonSerializationOptions = new JsonSerializerOptions
+        internal static JsonSerializerOptions JsonSerializationOptions { get; private set; } = DefaultJsonSerializerOptions;
+
+        internal static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverterFactory() }
@@ -123,13 +125,27 @@ namespace OpenAI
         /// </summary>
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
+        private bool enableDebug;
+
         /// <summary>
         /// Enables or disables debugging for all endpoints.
         /// </summary>
         public bool EnableDebug
         {
-            get => JsonSerializationOptions.WriteIndented;
-            set => JsonSerializationOptions.WriteIndented = value;
+            get => enableDebug;
+            set
+            {
+                enableDebug = value;
+
+                JsonSerializationOptions = enableDebug
+                    ? DefaultJsonSerializerOptions
+                    : new JsonSerializerOptions
+                    {
+                        WriteIndented = enableDebug,
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                        Converters = { new JsonStringEnumConverterFactory() }
+                    };
+            }
         }
 
         /// <summary>

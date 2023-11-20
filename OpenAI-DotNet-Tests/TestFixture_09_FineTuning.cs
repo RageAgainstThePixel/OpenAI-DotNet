@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -80,7 +81,7 @@ namespace OpenAI.Tests
             };
 
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
-            await File.WriteAllLinesAsync(localTrainingDataPath, conersations.Select(conversation => conversation.ToString()));
+            await File.WriteAllLinesAsync(localTrainingDataPath, conersations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.DefaultJsonSerializerOptions)));
 
             var fileData = await OpenAIClient.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);

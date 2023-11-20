@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using System;
 using System.Net.Http;
 
 namespace OpenAI.Tests

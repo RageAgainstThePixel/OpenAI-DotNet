@@ -46,6 +46,10 @@ Install-Package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
+- [Assistants](#assistants) :new:
+  - [Create Assistant](#create-assistant) :new:
+  - [Modify Assistant](#modify=assistant) :new:
+  - [Delete Assistant](#delete-assitant) :new:
 - [Completions](#completions)
   - [Streaming](#completion-streaming)
 - [Chat](#chat)
@@ -624,13 +628,13 @@ Creates an image given a prompt.
 
 ```csharp
 var api = new OpenAIClient();
-var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_2);
+var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_3);
 var results = await api.ImagesEndPoint.GenerateImageAsync(request);
 
 foreach (var result in results)
 {
     Console.WriteLine(result);
-    // result == file://path/to/image.png or b64_string
+    // result == url or b64_string
 }
 ```
 
@@ -646,7 +650,7 @@ var results = await api.ImagesEndPoint.CreateImageEditAsync(request);
 foreach (var result in results)
 {
     Console.WriteLine(result);
-    // result == file://path/to/image.png or b64_string
+    // result == url or b64_string
 }
 ```
 
@@ -659,10 +663,10 @@ var api = new OpenAIClient();
 var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
 var results = await api.ImagesEndPoint.CreateImageVariationAsync(request);
 
-foreach (var result in results)
+foreach (var imageResult in results)
 {
-    Console.WriteLine(result);
-    // result == file://path/to/image.png or b64_string
+    Console.WriteLine(imageResult);
+    // imageResult == url or b64_string
 }
 ```
 

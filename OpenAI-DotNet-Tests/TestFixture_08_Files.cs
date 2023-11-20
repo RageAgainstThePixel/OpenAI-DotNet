@@ -3,6 +3,7 @@ using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -14,14 +15,12 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.FilesEndpoint);
             var testData = new Conversation(new List<Message> { new Message(Role.Assistant, "I'm a learning language model") });
-            await File.WriteAllTextAsync("test.jsonl", testData);
+            await File.WriteAllTextAsync("test.jsonl", JsonSerializer.Serialize(testData, OpenAIClient.DefaultJsonSerializerOptions));
             Assert.IsTrue(File.Exists("test.jsonl"));
             var result = await OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune");
-
             Assert.IsNotNull(result);
             Assert.IsTrue(result.FileName == "test.jsonl");
             Console.WriteLine($"{result.Id} -> {result.Object}");
-
             File.Delete("test.jsonl");
             Assert.IsFalse(File.Exists("test.jsonl"));
         }
