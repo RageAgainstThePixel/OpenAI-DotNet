@@ -43,7 +43,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: dotnet restore
-      run: dotnet restore --configuration Release
+      run: dotnet restore
 
     - name: dotnet build
       run: dotnet build --configuration Release --no-restore
