@@ -30,6 +30,8 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 - Standardized response class names (existing classes depreciated)
   - FileData -&gt; FileResponse
   - CompletionResult -&gt; CompletonResponse
+  - Event -&gt; EventResponse
+  - FineTuneJob -&gt; FineTuneJobResponse
 Version 7.2.3
 - Added support for reading RateLimit information from the Headers
 Version 7.2.2

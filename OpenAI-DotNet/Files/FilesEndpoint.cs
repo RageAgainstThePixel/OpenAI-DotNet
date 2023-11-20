@@ -31,11 +31,19 @@ namespace OpenAI.Files
         /// <summary>
         /// Returns a list of files that belong to the user's organization.
         /// </summary>
+        /// <param name="purpose">List files with a specific purpose.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of <see cref="FileResponse"/>.</returns>
-        public async Task<IReadOnlyList<FileResponse>> ListFilesAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<FileResponse>> ListFilesAsync(string purpose = null, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
+            Dictionary<string, string> query = null;
+
+            if (!string.IsNullOrWhiteSpace(purpose))
+            {
+                query = new Dictionary<string, string> { { nameof(purpose), purpose } };
+            }
+
+            var response = await Api.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Files;
         }

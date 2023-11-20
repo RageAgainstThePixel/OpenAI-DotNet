@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    [Obsolete("Use ListResponse<Event>")]
+    [Obsolete("Use ListResponse<EventResponse>")]
     public sealed class EventList
     {
         [JsonInclude]
