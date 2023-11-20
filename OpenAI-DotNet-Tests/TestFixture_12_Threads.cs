@@ -353,6 +353,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(toolCall.FunctionCall);
             Assert.AreEqual(nameof(WeatherService.GetCurrentWeather), toolCall.FunctionCall.Name);
             Assert.IsNotNull(toolCall.FunctionCall.Arguments);
+            Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
             var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
             var functionResult = WeatherService.GetCurrentWeather(functionArgs);
             var toolOutput = new ToolOutput(toolCall.Id, functionResult);

@@ -16,7 +16,7 @@ namespace OpenAI.Tests
     {
         private async Task<FileResponse> CreateTestTrainingDataAsync()
         {
-            var conersations = new List<Conversation>
+            var conversations = new List<Conversation>
             {
                 new Conversation(new List<Message>
                 {
@@ -79,10 +79,8 @@ namespace OpenAI.Tests
                     new Message(Role.Assistant, "Around 384,400 kilometers. Give or take a few, like that really matters.")
                 })
             };
-
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
-            await File.WriteAllLinesAsync(localTrainingDataPath, conersations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.DefaultJsonSerializerOptions)));
-
+            await File.WriteAllLinesAsync(localTrainingDataPath, conversations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.DefaultJsonSerializerOptions)));
             var fileData = await OpenAIClient.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);
             Assert.IsFalse(File.Exists(localTrainingDataPath));
@@ -121,15 +119,15 @@ namespace OpenAI.Tests
         public async Task Test_03_RetrieveFineTuneJobInfo()
         {
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
-            var list = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
-            Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Items);
+            var jobList = await OpenAIClient.FineTuningEndpoint.ListJobsAsync();
+            Assert.IsNotNull(jobList);
+            Assert.IsNotEmpty(jobList.Items);
 
-            foreach (var job in list.Items.OrderByDescending(job => job.CreatedAt))
+            foreach (var job in jobList.Items.OrderByDescending(job => job.CreatedAt))
             {
-                var request = await OpenAIClient.FineTuningEndpoint.GetJobInfoAsync(job);
-                Assert.IsNotNull(request);
-                Console.WriteLine($"{request.Id} -> {request.Status}");
+                var response = await OpenAIClient.FineTuningEndpoint.GetJobInfoAsync(job);
+                Assert.IsNotNull(response);
+                Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
             }
         }
 

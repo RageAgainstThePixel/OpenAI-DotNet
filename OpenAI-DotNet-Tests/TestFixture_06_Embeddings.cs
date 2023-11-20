@@ -9,9 +9,9 @@ namespace OpenAI.Tests
         public async Task Test_1_CreateEmbedding()
         {
             Assert.IsNotNull(OpenAIClient.EmbeddingsEndpoint);
-            var result = await OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...");
-            Assert.IsNotNull(result);
-            Assert.IsNotEmpty(result.Data);
+            var embedding = await OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...");
+            Assert.IsNotNull(embedding);
+            Assert.IsNotEmpty(embedding.Data);
         }
 
         [Test]
@@ -23,9 +23,9 @@ namespace OpenAI.Tests
                 "The food was delicious and the waiter...",
                 "The food was terrible and the waiter..."
             };
-            var result = await OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync(embeddings);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(result.Data.Count, 2);
+            var embedding = await OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync(embeddings);
+            Assert.IsNotNull(embedding);
+            Assert.AreEqual(embedding.Data.Count, 2);
         }
     }
 }

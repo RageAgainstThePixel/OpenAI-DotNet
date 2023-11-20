@@ -12,8 +12,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ModerationsEndpoint);
 
-            var violationResponse = await OpenAIClient.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
-            Assert.IsTrue(violationResponse);
+            var isViolation = await OpenAIClient.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
+            Assert.IsTrue(isViolation);
 
             var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
             Assert.IsNotNull(response);

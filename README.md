@@ -109,8 +109,8 @@ Install-Package OpenAI-DotNet
   - [List Fine Tune Job Events](#list-fine-tune-job-events) :construction:
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
-- [Completions](#completions)
-  - [Streaming](#completion-streaming)
+- [Completions](#completions) :construction:
+  - [Streaming](#completion-streaming) :construction:
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
 - ~~[Edits](#edits)~~ :warning: Deprecated
@@ -339,11 +339,13 @@ Delete a fine-tuned model. You must have the Owner role in your organization.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
-Assert.IsTrue(result);
+var isDeleted = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
+Assert.IsTrue(isDeleted);
 ```
 
 ### [Assistants](https://platform.openai.com/docs/api-reference/assistants)
+
+> :warning: Beta Feature
 
 Build assistants that can call models and use tools to perform tasks.
 
@@ -357,7 +359,12 @@ The Assistants API is accessed via `OpenAIClient.AssistantsEndpoint`
 Returns a list of assistants.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+foreach (var assistant in assistantsList.Items)
+{
+    Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
+}
 ```
 
 #### [Create Assistant](https://platform.openai.com/docs/api-reference/assistants/createAssistant)
@@ -365,7 +372,9 @@ Returns a list of assistants.
 Create an assistant with a model and instructions.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var request = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
 #### [Retrieve Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistant)
@@ -373,7 +382,9 @@ Create an assistant with a model and instructions.
 Retrieves an assistant.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var assistant = OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistantId);
+Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
 ```
 
 #### [Modify Assistant](https://platform.openai.com/docs/api-reference/assistants/modifyAssistant)
@@ -381,7 +392,13 @@ Retrieves an assistant.
 Modifies an assistant.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var createRequest = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
+var modifyRequest = new CreateAssistantRequest("gpt-4-1106-preview");
+var modifiedAssistant = await api.AssistantsEndpoint(assistant, modifyRequest);
+// OR AssistantExtension for easier use!
+var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
 ```
 
 #### [Delete Assistant](https://platform.openai.com/docs/api-reference/assistants/deleteAssistant)
@@ -389,7 +406,11 @@ Modifies an assistant.
 Delete an assistant.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var isDeleted = await api.AssistantsEndpoint.DeleteAssistantAsync(assistant);
+// OR AssistantExtension for easier use!
+var isDeleted = await assistant.DeleteAsync();
+Assert.IsTrue(isDeleted);
 ```
 
 #### [List Assistant Files](https://platform.openai.com/docs/api-reference/assistants/listAssistantFiles)
@@ -397,7 +418,15 @@ Delete an assistant.
 Returns a list of assistant files.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
+var filesList = await api.AssistantsEndpoint.ListFilesAsync(assistant);
+// OR AssistantExtension for easier use!
+var filesList = await assistant.ListFilesAsync();
+
+foreach (var file in filesList.Items)
+{
+    Console.WriteLine($"{file.AssistantId}'s file -> {file.Id}");
+}
 ```
 
 #### [Attach File to Assistant](https://platform.openai.com/docs/api-reference/assistants/createAssistantFile)
@@ -405,7 +434,7 @@ Returns a list of assistant files.
 Create an assistant file by attaching a File to an assistant.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Upload File to Assistant](#upload-file)
@@ -415,7 +444,7 @@ Uploads and attaches a file to an assistant.
 > Assistant extension method, for extra convenience!
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Retrieve File from Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistantFile)
@@ -423,7 +452,7 @@ Uploads and attaches a file to an assistant.
 Retrieves an AssistantFile.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Remove File from Assistant](https://platform.openai.com/docs/api-reference/assistants/deleteAssistantFile)
@@ -433,7 +462,7 @@ Remove a file from an assistant.
 > Note: The file will remain in your organization until [deleted with FileEndpoint](#delete-file).
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Delete File from Assistant](#delete-file)
@@ -443,10 +472,12 @@ Removes a file from the assistant and then deletes the file from the organizatio
 > Assistant extension method, for extra convenience!
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ### [Threads](https://platform.openai.com/docs/api-reference/threads)
+
+> :warning: Beta Feature
 
 Create Threads that [Assistants](#assistants) can interact with.
 
@@ -457,7 +488,7 @@ The Threads API is accessed via `OpenAIClient.ThreadsEndpoint`
 Create a thread.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Create Thread and Run](https://platform.openai.com/docs/api-reference/runs/createThreadAndRun)
@@ -465,7 +496,7 @@ Create a thread.
 Create a thread and run it in one request.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Retrieve Thread](https://platform.openai.com/docs/api-reference/threads/getThread)
@@ -473,7 +504,7 @@ Create a thread and run it in one request.
 Retrieves a thread.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Modify Thread](https://platform.openai.com/docs/api-reference/threads/modifyThread)
@@ -483,7 +514,7 @@ Modifies a thread.
 > Note: Only the metadata can be modified.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Delete Thread](https://platform.openai.com/docs/api-reference/threads/deleteThread)
@@ -491,7 +522,7 @@ Modifies a thread.
 Delete a thread.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Thread Messages](https://platform.openai.com/docs/api-reference/messages)
@@ -503,7 +534,7 @@ Create messages within threads.
 Returns a list of messages for a given thread.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Create Thread Message](https://platform.openai.com/docs/api-reference/messages/createMessage)
@@ -511,7 +542,7 @@ Returns a list of messages for a given thread.
 Create a message.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Modify Thread Message](https://platform.openai.com/docs/api-reference/messages/modifyMessage)
@@ -521,7 +552,7 @@ Modify a message.
 > Note: Only the message metadata can be modified.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Retrieve Thread Message](https://platform.openai.com/docs/api-reference/messages/getMessage)
@@ -529,7 +560,7 @@ Modify a message.
 Retrieve a message.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### Thread Message Files
@@ -539,7 +570,7 @@ Retrieve a message.
 Returns a list of message files.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ###### [Retrieve Thread Message File](https://platform.openai.com/docs/api-reference/messages/getMessageFile)
@@ -547,7 +578,7 @@ Returns a list of message files.
 Retrieves a message file.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ###### [Download Thread Message File](#download-file-content)
@@ -557,7 +588,7 @@ Downloads a message file to the specified directory.
 > Thread extension method, for extra convenience!
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 #### [Thread Runs](https://platform.openai.com/docs/api-reference/runs)
@@ -569,7 +600,7 @@ Represents an execution run on a thread.
 Returns a list of runs belonging to a thread.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Create Thread Run](https://platform.openai.com/docs/api-reference/runs/createRun)
@@ -577,7 +608,7 @@ Returns a list of runs belonging to a thread.
 Create a run.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Retrieve Thread Run](https://platform.openai.com/docs/api-reference/runs/getRun)
@@ -585,7 +616,7 @@ Create a run.
 Retrieves a run.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Modify Thread Run](https://platform.openai.com/docs/api-reference/runs/modifyRun)
@@ -595,7 +626,7 @@ Modifies a run.
 > Note: Only the metadata can be modified.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Thread Submit Tool Outputs to Run](https://platform.openai.com/docs/api-reference/runs/submitToolOutputs)
@@ -603,7 +634,7 @@ Modifies a run.
 When a run has the status: `requires_action` and required_`action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [List Thread Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps)
@@ -611,7 +642,7 @@ When a run has the status: `requires_action` and required_`action.type` is `subm
 Returns a list of run steps belonging to a run.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Retrieve Thread Run Step](https://platform.openai.com/docs/api-reference/runs/getRunStep)
@@ -619,7 +650,7 @@ Returns a list of run steps belonging to a run.
 Retrieves a run step.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ##### [Cancel Thread Run](https://platform.openai.com/docs/api-reference/runs/cancelRun)
@@ -627,7 +658,7 @@ Retrieves a run step.
 Cancels a run that is `in_progress`.
 
 ```csharp
-// TODO
+var api = new OpenAIClient();
 ```
 
 ### [Chat](https://platform.openai.com/docs/api-reference/chat)
@@ -649,12 +680,12 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo);
-var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
-Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content}");
+var chatRequest = new ChatRequest(messages, Model.GPT4);
+var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content}");
 ```
 
-##### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
+#### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
 
 ```csharp
 var api = new OpenAIClient();
@@ -665,21 +696,16 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo, number: 2);
-await api.ChatEndpoint.StreamCompletionAsync(chatRequest, result =>
+var chatRequest = new ChatRequest(messages);
+var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
 {
-    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Delta?.Content)))
+    foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
     {
-        // Partial response content
-        Console.WriteLine(choice.Delta.Content);
-    }
-
-    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Message?.Content)))
-    {
-        // Completed response content
-        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
+        Console.Write(choice.Delta.Content);
     }
 });
+var choice = response.FirstChoice;
+Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
 ```
 
 Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
@@ -693,24 +719,20 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4); // gpt4 access required
-await foreach (var result in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
+var cumulativeDelta = string.Empty;
+var chatRequest = new ChatRequest(messages);
+await foreach (var partialResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
-    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Delta?.Content)))
+    foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
     {
-        // Partial response content
-        Console.WriteLine(choice.Delta.Content);
-    }
-
-    foreach (var choice in result.Choices.Where(choice => !string.IsNullOrEmpty(choice.Message?.Content)))
-    {
-        // Completed response content
-        Console.WriteLine($"{choice.Message.Role}: {choice.Message.Content}");
+        cumulativeDelta += choice.Delta.Content;
     }
 }
+
+Console.WriteLine(cumulativeDelta);
 ```
 
-##### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
+#### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
 
 ```csharp
 var api = new OpenAIClient();
@@ -752,32 +774,32 @@ var tools = new List<Tool>
 };
 
 var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
-messages.Add(result.FirstChoice.Message);
+var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+messages.Add(response.FirstChoice.Message);
 
-Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
 
 var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
 messages.Add(locationMessage);
 Console.WriteLine($"{locationMessage.Role}: {locationMessage.Content}");
 chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
-messages.Add(result.FirstChoice.Message);
+messages.Add(response.FirstChoice.Message);
 
-if (!string.IsNullOrEmpty(result.FirstChoice.Message.Content))
+if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
 {
-    Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishReason}");
+    Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
 
     var unitMessage = new Message(Role.User, "celsius");
     messages.Add(unitMessage);
     Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
     chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
-    result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+    response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 }
 
-var usedTool = result.FirstChoice.Message.ToolCalls[0];
-Console.WriteLine($"{result.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {result.FirstChoice.FinishReason}");
+var usedTool = response.FirstChoice.Message.ToolCalls[0];
+Console.WriteLine($"{response.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {response.FirstChoice.FinishReason}");
 Console.WriteLine($"{usedTool.Function.Arguments}");
 var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
 var functionResult = WeatherService.GetCurrentWeather(functionArgs);
@@ -795,7 +817,9 @@ Console.WriteLine($"{Role.Tool}: {functionResult}");
 // Tool: The current weather in Glasgow, Scotland is 20 celsius
 ```
 
-##### [Chat Vision](https://platform.openai.com/docs/guides/vision)
+#### [Chat Vision](https://platform.openai.com/docs/guides/vision)
+
+> :warning: Beta Feature
 
 ```csharp
 var api = new OpenAIClient();
@@ -809,8 +833,8 @@ var messages = new List<Message>
     })
 };
 var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
-var result = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
-Console.WriteLine($"{result.FirstChoice.Message.Role}: {result.FirstChoice.Message.Content} | Finish Reason: {result.FirstChoice.FinishDetails}");
+var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
+Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
 ```
 
 ### [Audio](https://platform.openai.com/docs/api-reference/audio)
@@ -832,8 +856,8 @@ async Task ChunkCallback(ReadOnlyMemory<byte> chunkCallback)
     await Task.CompletedTask;
 }
 
-var result = await api.AudioEndpoint.CreateSpeechAsync(request, ChunkCallback);
-await File.WriteAllBytesAsync(@"..\..\..\Assets\HelloWorld.mp3", result.ToArray());
+var response = await api.AudioEndpoint.CreateSpeechAsync(request, ChunkCallback);
+await File.WriteAllBytesAsync("../../../Assets/HelloWorld.mp3", response.ToArray());
 ```
 
 #### [Create Transcription](https://platform.openai.com/docs/api-reference/audio/createTranscription)
@@ -843,8 +867,8 @@ Transcribes audio into the input language.
 ```csharp
 var api = new OpenAIClient();
 var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
-var result = await api.AudioEndpoint.CreateTranscriptionAsync(request);
-Console.WriteLine(result);
+var response = await api.AudioEndpoint.CreateTranscriptionAsync(request);
+Console.WriteLine(response);
 ```
 
 #### [Create Translation](https://platform.openai.com/docs/api-reference/audio/create)
@@ -854,8 +878,8 @@ Translates audio into into English.
 ```csharp
 var api = new OpenAIClient();
 var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
-var result = await api.AudioEndpoint.CreateTranslationAsync(request);
-Console.WriteLine(result);
+var response = await api.AudioEndpoint.CreateTranslationAsync(request);
+Console.WriteLine(response);
 ```
 
 ### [Images](https://platform.openai.com/docs/api-reference/images)
@@ -871,12 +895,12 @@ Creates an image given a prompt.
 ```csharp
 var api = new OpenAIClient();
 var request = new ImageGenerationRequest("A house riding a velociraptor", Models.Model.DallE_3);
-var results = await api.ImagesEndPoint.GenerateImageAsync(request);
+var imageResults = await api.ImagesEndPoint.GenerateImageAsync(request);
 
-foreach (var result in results)
+foreach (var image in imageResults)
 {
-    Console.WriteLine(result);
-    // result == url or b64_string
+    Console.WriteLine(image);
+    // image == url or b64_string
 }
 ```
 
@@ -887,12 +911,12 @@ Creates an edited or extended image given an original image and a prompt.
 ```csharp
 var api = new OpenAIClient();
 var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
-var results = await api.ImagesEndPoint.CreateImageEditAsync(request);
+var imageResults = await api.ImagesEndPoint.CreateImageEditAsync(request);
 
-foreach (var result in results)
+foreach (var image in imageResults)
 {
-    Console.WriteLine(result);
-    // result == url or b64_string
+    Console.WriteLine(image);
+    // image == url or b64_string
 }
 ```
 
@@ -903,12 +927,12 @@ Creates a variation of a given image.
 ```csharp
 var api = new OpenAIClient();
 var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
-var results = await api.ImagesEndPoint.CreateImageVariationAsync(request);
+var imageResults = await api.ImagesEndPoint.CreateImageVariationAsync(request);
 
-foreach (var imageResult in results)
+foreach (var image in imageResults)
 {
-    Console.WriteLine(imageResult);
-    // imageResult == url or b64_string
+    Console.WriteLine(image);
+    // image == url or b64_string
 }
 ```
 
@@ -924,22 +948,24 @@ Returns a list of files that belong to the user's organization.
 
 ```csharp
 var api = new OpenAIClient();
-var files = await api.FilesEndpoint.ListFilesAsync();
+var fileList = await api.FilesEndpoint.ListFilesAsync();
 
-foreach (var file in files)
+foreach (var file in fileList)
 {
     Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 }
 ```
 
-#### [Upload File](https://platform.openai.com/docs/api-reference/files/upload)
+#### [Upload File](https://platform.openai.com/docs/api-reference/files/create)
 
-Upload a file that contains document(s) to be used across various endpoints/features. Currently, the size of all the files uploaded by one organization can be up to 1 GB. Please contact us if you need to increase the storage limit.
+Upload a file that can be used across various endpoints. The size of all the files uploaded by one organization can be up to 100 GB.
+
+The size of individual files can be a maximum of 512 MB. See the Assistants Tools guide to learn more about the types of files supported. The Fine-tuning API only supports .jsonl files.
 
 ```csharp
 var api = new OpenAIClient();
-var fileData = await api.FilesEndpoint.UploadFileAsync("path/to/your/file.jsonl", "fine-tune");
-Console.WriteLine(fileData.Id);
+var file = await api.FilesEndpoint.UploadFileAsync("path/to/your/file.jsonl", "fine-tune");
+Console.WriteLine(file.Id);
 ```
 
 #### [Delete File](https://platform.openai.com/docs/api-reference/files/delete)
@@ -948,8 +974,8 @@ Delete a file.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.FilesEndpoint.DeleteFileAsync(fileData);
-Assert.IsTrue(result);
+var isDeleted = await api.FilesEndpoint.DeleteFileAsync(fileId);
+Assert.IsTrue(isDeleted);
 ```
 
 #### [Retrieve File Info](https://platform.openai.com/docs/api-reference/files/retrieve)
@@ -958,13 +984,13 @@ Returns information about a specific file.
 
 ```csharp
 var api = new OpenAIClient();
-var fileData = await GetFileInfoAsync(fileId);
-Console.WriteLine($"{fileData.Id} -> {fileData.Object}: {fileData.FileName} | {fileData.Size} bytes");
+var file = await GetFileInfoAsync(fileId);
+Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 ```
 
 #### [Download File Content](https://platform.openai.com/docs/api-reference/files/retrieve-content)
 
-Downloads the specified file.
+Downloads the file content to the specified directory.
 
 ```csharp
 var api = new OpenAIClient();
@@ -1001,11 +1027,11 @@ List your organization's fine-tuning jobs.
 
 ```csharp
 var api = new OpenAIClient();
-var list = await api.FineTuningEndpoint.ListJobsAsync();
+var jobList = await api.FineTuningEndpoint.ListJobsAsync();
 
-foreach (var job in list.Jobs)
+foreach (var job in jobList.Items.OrderByDescending(job => job.CreatedAt)))
 {
-    Console.WriteLine($"{job.Id} -> {job.Status}");
+    Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
 }
 ```
 
@@ -1016,7 +1042,7 @@ Gets info about the fine-tune job.
 ```csharp
 var api = new OpenAIClient();
 var job = await api.FineTuningEndpoint.GetJobInfoAsync(fineTuneJob);
-Console.WriteLine($"{job.Id} -> {job.Status}");
+Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
 ```
 
 #### [Cancel Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tunes/cancel)
@@ -1025,8 +1051,8 @@ Immediately cancel a fine-tune job.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.FineTuningEndpoint.CancelFineTuneJobAsync(fineTuneJob);
-Assert.IsTrue(result);
+var isCancelled = await api.FineTuningEndpoint.CancelFineTuneJobAsync(fineTuneJob);
+Assert.IsTrue(isCancelled);
 ```
 
 #### [List Fine Tune Job Events](https://platform.openai.com/docs/api-reference/fine-tuning/list-events)
@@ -1038,9 +1064,9 @@ var api = new OpenAIClient();
 var eventList = await api.FineTuningEndpoint.ListJobEventsAsync(fineTuneJob);
 Console.WriteLine($"{fineTuneJob.Id} -> status: {fineTuneJob.Status} | event count: {eventList.Events.Count}");
 
-foreach (var @event in eventList.Events.OrderByDescending(@event => @event.CreatedAt))
+foreach (var @event in eventList.Items.OrderByDescending(@event => @event.CreatedAt))
 {
-    Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message.Replace("\n", " ")}");
+    Console.WriteLine($"  {@event.CreatedAt} [{@event.Level}] {@event.Message}");
 }
 ```
 
@@ -1058,8 +1084,8 @@ Creates an embedding vector representing the input text.
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
-Console.WriteLine(result);
+var response = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...", Models.Embedding_Ada_002);
+Console.WriteLine(response);
 ```
 
 ### [Completions](https://platform.openai.com/docs/api-reference/completions)
@@ -1070,11 +1096,11 @@ The Completions API is accessed via `OpenAIClient.CompletionsEndpoint`
 
 ```csharp
 var api = new OpenAIClient();
-var result = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
-Console.WriteLine(result);
+var response = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
+Console.WriteLine(response);
 ```
 
-> To get the `CompletionResult` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
+> To get the `CompletionResponse` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
 
 #### Completion Streaming
 
@@ -1083,9 +1109,9 @@ Streaming allows you to get results are they are generated, which can help your 
 ```csharp
 var api = new OpenAIClient();
 
-await api.CompletionsEndpoint.StreamCompletionAsync(result =>
+await api.CompletionsEndpoint.StreamCompletionAsync(response =>
 {
-    foreach (var choice in result.Completions)
+    foreach (var choice in response.Completions)
     {
         Console.WriteLine(choice);
     }
@@ -1096,9 +1122,9 @@ Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/
 
 ```csharp
 var api = new OpenAIClient();
-await foreach (var token in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
+await foreach (var partialResponse in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
 {
-  Console.WriteLine(token);
+  Console.WriteLine(partialResponse);
 }
 ```
 
@@ -1116,8 +1142,16 @@ Classifies if text violates OpenAI's Content Policy.
 
 ```csharp
 var api = new OpenAIClient();
-var response = await api.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
-Assert.IsTrue(response);
+var isViolation = await api.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
+Assert.IsTrue(isViolation);
+```
+
+Additionally you can also get the scores of a given input.
+
+```csharp
+var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
+Assert.IsNotNull(response);
+Console.WriteLine(response.Results?[0]?.Scores?.ToString());
 ```
 
 ---
@@ -1137,8 +1171,8 @@ Creates a new edit for the provided input, instruction, and parameters using the
 ```csharp
 var api = new OpenAIClient();
 var request = new EditRequest("What day of the wek is it?", "Fix the spelling mistakes");
-var result = await api.EditsEndpoint.CreateEditAsync(request);
-Console.WriteLine(result);
+var response = await api.EditsEndpoint.CreateEditAsync(request);
+Console.WriteLine(response);
 ```
 
 ## License
