@@ -249,27 +249,13 @@ namespace OpenAI.Threads
         {
             using var cts = timeout is null or < 0 ? new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30)) : new CancellationTokenSource();
             using var chainedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
-            try
+            RunResponse result;
+            do
             {
-                RunResponse result;
-                do
-                {
-                    result = await run.UpdateAsync(cancellationToken: chainedCts.Token).ConfigureAwait(false);
-                    await Task.Delay(pollingInterval ?? 500, chainedCts.Token).ConfigureAwait(false);
-                } while (result.Status is RunStatus.Queued or RunStatus.InProgress or RunStatus.Cancelling);
-                return result;
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case TaskCanceledException:
-                    case OperationCanceledException:
-                        return await run.UpdateAsync(CancellationToken.None).ConfigureAwait(false);
-                    default:
-                        throw;
-                }
-            }
+                result = await run.UpdateAsync(cancellationToken: chainedCts.Token).ConfigureAwait(false);
+                await Task.Delay(pollingInterval ?? 500, chainedCts.Token).ConfigureAwait(false);
+            } while (result.Status is RunStatus.Queued or RunStatus.InProgress or RunStatus.Cancelling);
+            return result;
         }
 
         /// <summary>
