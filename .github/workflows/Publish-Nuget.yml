@@ -57,7 +57,9 @@ jobs:
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        files: test-results/**/*.xml
+        files: |
+          test-results/**/*.xml
+          !coverage.cobertura.xml
         comment_mode: off
         report_individual_runs: true
         compare_to_earlier_commit: false
