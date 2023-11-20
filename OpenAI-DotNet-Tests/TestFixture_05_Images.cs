@@ -50,8 +50,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
-            var maskAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_mask.png");
+            var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
+            var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
 
             var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
             var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
@@ -71,8 +71,8 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
-            var maskAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_mask.png");
+            var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
+            var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
 
             var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
             var results = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
@@ -92,7 +92,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
             var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
@@ -111,7 +111,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var imageAssetPath = Path.GetFullPath(@"..\..\..\Assets\image_edit_original.png");
+            var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
             var results = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
