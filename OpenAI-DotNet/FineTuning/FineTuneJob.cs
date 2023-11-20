@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    [Obsolete("use FileTuneJobResponse")]
+    [Obsolete("use FineTuneJobResponse")]
     public sealed class FineTuneJob : BaseResponse
     {
         [JsonInclude]
