@@ -48,7 +48,7 @@ jobs:
       
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
-      run: dotnet test --configuration Release --collect:"XPlat Code Coverage" --no-build --no-restore --results-directory ./test-results
+      run: dotnet test --configuration Release --collect:"XPlat Code Coverage" --logger:trx --no-build --no-restore --results-directory ./test-results
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_ORGANIZATION_ID: ${{ secrets.OPENAI_ORGANIZATION_ID }}
@@ -57,9 +57,7 @@ jobs:
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        files: |
-          test-results/**/*.xml
-          !coverage.cobertura.xml
+        files: test-results/**/*.trx
         comment_mode: off
         report_individual_runs: true
         compare_to_earlier_commit: false
