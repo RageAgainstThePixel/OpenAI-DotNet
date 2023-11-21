@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
-    public sealed class FineTuneJob
+    [Obsolete("use FineTuneJobResponse")]
+    public sealed class FineTuneJob : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("object")]
@@ -20,17 +21,31 @@ namespace OpenAI.FineTuning
 
         [JsonInclude]
         [JsonPropertyName("created_at")]
-        public int? CreatedAtUnixTime { get; private set; }
+        public int? CreateAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime ?? 0).DateTime;
+        [Obsolete("Use CreateAtUnixTimeSeconds")]
+        public int? CreatedAtUnixTime => CreateAtUnixTimeSeconds;
+
+        [JsonIgnore]
+        public DateTime? CreatedAt
+            => CreateAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CreateAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         [JsonInclude]
         [JsonPropertyName("finished_at")]
-        public int? FinishedAtUnixTime { get; private set; }
+        public int? FinishedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime FinishedAt => DateTimeOffset.FromUnixTimeSeconds(FinishedAtUnixTime ?? 0).DateTime;
+        [Obsolete("Use FinishedAtUnixTimeSeconds")]
+        public int? FinishedAtUnixTime => CreateAtUnixTimeSeconds;
+
+        [JsonIgnore]
+        public DateTime? FinishedAt
+            => FinishedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(FinishedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         [JsonInclude]
         [JsonPropertyName("fine_tuned_model")]
@@ -67,6 +82,10 @@ namespace OpenAI.FineTuning
         [JsonIgnore]
         public IReadOnlyList<Event> Events { get; internal set; } = new List<Event>();
 
-        public static implicit operator string(FineTuneJob job) => job.Id;
+        public static implicit operator FineTuneJobResponse(FineTuneJob job) => new FineTuneJobResponse(job);
+
+        public static implicit operator string(FineTuneJob job) => job?.ToString();
+
+        public override string ToString() => Id;
     }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
 {
-    internal class ImagesResponse : BaseResponse
+    internal sealed class ImagesResponse : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("created")]

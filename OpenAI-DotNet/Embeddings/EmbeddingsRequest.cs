@@ -18,7 +18,7 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <param name="model">
         /// ID of the model to use.<br/>
-        /// Defaults to: <see cref="Model.Embedding_Ada_002"/>
+        /// Defaults to: <see cref="Models.Model.Embedding_Ada_002"/>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.

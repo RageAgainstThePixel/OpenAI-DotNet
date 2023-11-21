@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public sealed class Tool
     {
@@ -13,6 +13,12 @@ namespace OpenAI.Chat
             Function = function;
             Type = nameof(function);
         }
+
+        public static implicit operator Tool(Function function) => new Tool(function);
+
+        public static Tool Retrieval { get; } = new Tool { Type = "retrieval" };
+
+        public static Tool CodeInterpreter { get; } = new Tool { Type = "code_interpreter" };
 
         [JsonInclude]
         [JsonPropertyName("id")]
@@ -29,9 +35,8 @@ namespace OpenAI.Chat
 
         [JsonInclude]
         [JsonPropertyName("function")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Function Function { get; private set; }
-
-        public static implicit operator Tool(Function function) => new Tool(function);
 
         internal void CopyFrom(Tool other)
         {

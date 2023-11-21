@@ -8,6 +8,7 @@ namespace OpenAI.Completions
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.
     /// </summary>
+    [Obsolete("use CompletionResponse")]
     public sealed class CompletionResult : BaseResponse
     {
         /// <summary>
@@ -50,6 +51,8 @@ namespace OpenAI.Completions
 
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
-        public static implicit operator string(CompletionResult response) => response.ToString();
+        public static implicit operator string(CompletionResult result) => result?.ToString();
+
+        public static implicit operator CompletionResponse(CompletionResult result) => new CompletionResponse(result);
     }
 }

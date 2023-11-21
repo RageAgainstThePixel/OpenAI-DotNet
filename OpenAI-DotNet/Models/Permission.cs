@@ -15,10 +15,13 @@ namespace OpenAI.Models
 
         [JsonInclude]
         [JsonPropertyName("created")]
-        public int CreatedAtUnixTime { get; private set; }
+        public int CreatedAtUnitTimeSeconds { get; private set; }
+
+        [Obsolete("use CreatedAtUnitTimeSeconds")]
+        public int CreatedAtUnixTime => CreatedAtUnitTimeSeconds;
 
         [JsonIgnore]
-        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTime).DateTime;
+        public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnitTimeSeconds).DateTime;
 
         [JsonInclude]
         [JsonPropertyName("allow_create_engine")]

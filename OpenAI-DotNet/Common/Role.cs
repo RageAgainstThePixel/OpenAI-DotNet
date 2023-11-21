@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public enum Role
     {

@@ -50,7 +50,7 @@ namespace OpenAI.Completions
         /// <param name="frequencyPenalty">The scale of the penalty for how often a token is used.
         /// Should generally be between 0 and 1, although negative numbers are allowed to encourage token reuse.</param>
         /// <param name="logProbabilities">Include the log probabilities on the logprobs most likely tokens, which can be found
-        /// in <see cref="CompletionResult.Completions"/> -> <see cref="Choice.LogProbabilities"/>. So for example, if logprobs is 10,
+        /// in <see cref="CompletionResponse.Completions"/> -> <see cref="Choice.LogProbabilities"/>. So for example, if logprobs is 10,
         /// the API will return a list of the 10 most likely tokens. If logprobs is supplied, the API will always return the logprob
         /// of the sampled token, so there may be up to logprobs+1 elements in the response.</param>
         /// <param name="echo">Echo back the prompt in addition to the completion.</param>
@@ -59,9 +59,11 @@ namespace OpenAI.Completions
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
         /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Asynchronously returns the completion result.
-        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
-        public async Task<CompletionResult> CreateCompletionAsync(
+        /// <returns>
+        /// Asynchronously returns the completion result.
+        /// Look in its <see cref="CompletionResponse.Completions"/> property for the completions.
+        /// </returns>
+        public async Task<CompletionResponse> CreateCompletionAsync(
             string prompt = null,
             IEnumerable<string> prompts = null,
             string suffix = null,
@@ -101,16 +103,17 @@ namespace OpenAI.Completions
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Asynchronously returns the completion result.
-        /// Look in its <see cref="CompletionResult.Completions"/> property for the completions.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async Task<CompletionResult> CreateCompletionAsync(CompletionRequest completionRequest, CancellationToken cancellationToken = default)
+        /// <returns>
+        /// Asynchronously returns the completion result.
+        /// Look in its <see cref="CompletionResponse.Completions"/> property for the completions.
+        /// </returns>
+        public async Task<CompletionResponse> CreateCompletionAsync(CompletionRequest completionRequest, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = false;
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<CompletionResult>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<CompletionResponse>(responseAsString, Api);
         }
 
         #endregion Non-Streaming
@@ -139,7 +142,7 @@ namespace OpenAI.Completions
         /// <param name="frequencyPenalty">The scale of the penalty for how often a token is used.
         /// Should generally be between 0 and 1, although negative numbers are allowed to encourage token reuse.</param>
         /// <param name="logProbabilities">Include the log probabilities on the logProbabilities most likely tokens,
-        /// which can be found in <see cref="CompletionResult.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
+        /// which can be found in <see cref="CompletionResponse.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
         /// So for example, if logProbabilities is 10, the API will return a list of the 10 most likely tokens.
         /// If logProbabilities is supplied, the API will always return the logProbabilities of the sampled token,
         /// so there may be up to logProbabilities+1 elements in the response.</param>
@@ -149,11 +152,13 @@ namespace OpenAI.Completions
         /// <param name="model">Optional, <see cref="Model"/> to use when calling the API.
         /// Defaults to <see cref="Model.Davinci"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>An async enumerable with each of the results as they come in.
+        /// <returns>
+        /// An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
-        /// for more details on how to consume an async enumerable.</returns>
+        /// for more details on how to consume an async enumerable.
+        /// </returns>
         public async Task StreamCompletionAsync(
-            Action<CompletionResult> resultHandler,
+            Action<CompletionResponse> resultHandler,
             string prompt = null,
             IEnumerable<string> prompts = null,
             string suffix = null,
@@ -194,8 +199,7 @@ namespace OpenAI.Completions
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResult> resultHandler, CancellationToken cancellationToken = default)
+        public async Task StreamCompletionAsync(CompletionRequest completionRequest, Action<CompletionResponse> resultHandler, CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
@@ -214,7 +218,7 @@ namespace OpenAI.Completions
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
 
-                    resultHandler(response.DeserializeResponse<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions));
+                    resultHandler(response.Deserialize<CompletionResponse>(eventData, Api));
                 }
                 else
                 {
@@ -226,7 +230,7 @@ namespace OpenAI.Completions
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, CancellationToken)"/> instead.
+        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResponse}, CancellationToken)"/> instead.
         /// </summary>
         /// <param name="prompt">The prompt to generate from</param>
         /// <param name="prompts">The prompts to generate from</param>
@@ -245,7 +249,7 @@ namespace OpenAI.Completions
         /// <param name="frequencyPenalty">The scale of the penalty for how often a token is used.
         /// Should generally be between 0 and 1, although negative numbers are allowed to encourage token reuse.</param>
         /// <param name="logProbabilities">Include the log probabilities on the logProbabilities most likely tokens,
-        /// which can be found in <see cref="CompletionResult.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
+        /// which can be found in <see cref="CompletionResponse.Completions"/> -> <see cref="Choice.LogProbabilities"/>.
         /// So for example, if logProbabilities is 10, the API will return a list of the 10 most likely tokens.
         /// If logProbabilities is supplied, the API will always return the logProbabilities of the sampled token,
         /// so there may be up to logProbabilities+1 elements in the response.</param>
@@ -258,7 +262,7 @@ namespace OpenAI.Completions
         /// <returns>An async enumerable with each of the results as they come in.
         /// See <see href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams">the C# docs</see>
         /// for more details on how to consume an async enumerable.</returns>
-        public IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(
+        public IAsyncEnumerable<CompletionResponse> StreamCompletionEnumerableAsync(
             string prompt = null,
             IEnumerable<string> prompts = null,
             string suffix = null,
@@ -295,15 +299,16 @@ namespace OpenAI.Completions
         /// <summary>
         /// Ask the API to complete the prompt(s) using the specified request, and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResult}, CancellationToken)"/> instead.
+        /// you may need to use <see cref="StreamCompletionAsync(CompletionRequest, Action{CompletionResponse}, CancellationToken)"/> instead.
         /// </summary>
         /// <param name="completionRequest">The request to send to the API.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>An async enumerable with each of the results as they come in.
+        /// <returns>
+        /// An async enumerable with each of the results as they come in.
         /// See <seealso href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams"/>
-        /// for more details on how to consume an async enumerable.</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
-        public async IAsyncEnumerable<CompletionResult> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        /// for more details on how to consume an async enumerable.
+        /// </returns>
+        public async IAsyncEnumerable<CompletionResponse> StreamCompletionEnumerableAsync(CompletionRequest completionRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             completionRequest.Stream = true;
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
@@ -321,7 +326,7 @@ namespace OpenAI.Completions
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    yield return response.DeserializeResponse<CompletionResult>(eventData, OpenAIClient.JsonSerializationOptions);
+                    yield return response.Deserialize<CompletionResponse>(eventData, Api);
                 }
                 else
                 {

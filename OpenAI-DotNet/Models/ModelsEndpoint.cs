@@ -1,7 +1,6 @@
 ﻿using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -23,21 +22,6 @@ namespace OpenAI.Models
             public List<Model> Models { get; private set; }
         }
 
-        private sealed class DeleteModelResponse
-        {
-            [JsonInclude]
-            [JsonPropertyName("id")]
-            public string Id { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("object")]
-            public string Object { get; private set; }
-
-            [JsonInclude]
-            [JsonPropertyName("deleted")]
-            public bool Deleted { get; private set; }
-        }
-
         /// <inheritdoc />
         public ModelsEndpoint(OpenAIClient api) : base(api) { }
 
@@ -49,7 +33,6 @@ namespace OpenAI.Models
         /// </summary>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>Asynchronously returns the list of all <see cref="Model"/>s</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<IReadOnlyList<Model>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
@@ -63,7 +46,6 @@ namespace OpenAI.Models
         /// <param name="id">The id/name of the model to get more details about</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>Asynchronously returns the <see cref="Model"/> with all available properties</returns>
-        /// <exception cref="HttpRequestException">Raised when the HTTP request fails</exception>
         public async Task<Model> GetModelDetailsAsync(string id, CancellationToken cancellationToken = default)
         {
             var response = await Api.Client.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
@@ -77,7 +59,6 @@ namespace OpenAI.Models
         /// <param name="modelId">The <see cref="Model"/> to delete.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
         /// <returns>True, if fine-tuned model was successfully deleted.</returns>
-        /// <exception cref="HttpRequestException"></exception>
         public async Task<bool> DeleteFineTuneModelAsync(string modelId, CancellationToken cancellationToken = default)
         {
             var model = await GetModelDetailsAsync(modelId, cancellationToken).ConfigureAwait(false);
@@ -93,7 +74,7 @@ namespace OpenAI.Models
             {
                 var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeleteModelResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
             catch (Exception e)
             {

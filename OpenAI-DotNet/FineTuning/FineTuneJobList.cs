@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.FineTuning
 {
+    [Obsolete("Use ListResponse<FineTuneJobResponse>")]
     public sealed class FineTuneJobList
     {
         [JsonInclude]

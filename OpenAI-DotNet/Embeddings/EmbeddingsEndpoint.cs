@@ -68,7 +68,7 @@ namespace OpenAI.Embeddings
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<EmbeddingsResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<EmbeddingsResponse>(responseAsString, Api);
         }
     }
 }

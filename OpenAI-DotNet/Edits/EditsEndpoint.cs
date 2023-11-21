@@ -1,5 +1,5 @@
-﻿using System;
-using OpenAI.Extensions;
+﻿using OpenAI.Extensions;
+using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace OpenAI.Edits
     /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
     /// </summary>
-    [Obsolete]
+    [Obsolete("Deprecated")]
     public sealed class EditsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
@@ -64,7 +64,7 @@ namespace OpenAI.Edits
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.DeserializeResponse<EditResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<EditResponse>(responseAsString, Api);
         }
     }
 }

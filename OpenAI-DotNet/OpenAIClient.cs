@@ -1,4 +1,5 @@
-﻿using OpenAI.Audio;
+﻿using OpenAI.Assistants;
+using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;
 using OpenAI.Edits;
@@ -9,6 +10,7 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using OpenAI.Threads;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -50,15 +52,17 @@ namespace OpenAI
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
             ChatEndpoint = new ChatEndpoint(this);
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
             EditsEndpoint = new EditsEndpoint(this);
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             ImagesEndPoint = new ImagesEndpoint(this);
             EmbeddingsEndpoint = new EmbeddingsEndpoint(this);
             AudioEndpoint = new AudioEndpoint(this);
             FilesEndpoint = new FilesEndpoint(this);
             FineTuningEndpoint = new FineTuningEndpoint(this);
             ModerationsEndpoint = new ModerationsEndpoint(this);
+            ThreadsEndpoint = new ThreadsEndpoint(this);
+            AssistantsEndpoint = new AssistantsEndpoint(this);
         }
 
         private HttpClient SetupClient(HttpClient client = null)
@@ -68,6 +72,7 @@ namespace OpenAI
                 PooledConnectionLifetime = TimeSpan.FromMinutes(15)
             });
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
+            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
 
             if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
@@ -102,13 +107,12 @@ namespace OpenAI
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
         /// </summary>
-        internal static readonly JsonSerializerOptions JsonSerializationOptions = new JsonSerializerOptions
+        internal static JsonSerializerOptions JsonSerializationOptions { get; private set; } = DefaultJsonSerializerOptions;
+
+        internal static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters =
-            {
-                new JsonStringEnumConverterFactory()
-            }
+            Converters = { new JsonStringEnumConverterFactory() }
         };
 
         /// <summary>
@@ -121,10 +125,28 @@ namespace OpenAI
         /// </summary>
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
+        private bool enableDebug;
+
         /// <summary>
-        /// Enables or disables debugging for the whole client.
+        /// Enables or disables debugging for all endpoints.
         /// </summary>
-        public bool EnableDebug { get; set; }
+        public bool EnableDebug
+        {
+            get => enableDebug;
+            set
+            {
+                enableDebug = value;
+
+                JsonSerializationOptions = enableDebug
+                    ? DefaultJsonSerializerOptions
+                    : new JsonSerializerOptions
+                    {
+                        WriteIndented = enableDebug,
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                        Converters = { new JsonStringEnumConverterFactory() }
+                    };
+            }
+        }
 
         /// <summary>
         /// List and describe the various models available in the API.
@@ -153,7 +175,7 @@ namespace OpenAI
         /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
         /// </summary>
-        [Obsolete]
+        [Obsolete("Deprecated")]
         public EditsEndpoint EditsEndpoint { get; }
 
         /// <summary>
@@ -182,7 +204,8 @@ namespace OpenAI
 
         /// <summary>
         /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
-        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
+        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/><br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/fine-tuning"/>
         /// </summary>
         public FineTuningEndpoint FineTuningEndpoint { get; }
 
@@ -192,5 +215,17 @@ namespace OpenAI
         /// <see href="https://platform.openai.com/docs/api-reference/moderations"/>
         /// </summary>
         public ModerationsEndpoint ModerationsEndpoint { get; }
+
+        /// <summary>
+        /// Build assistants that can call models and use tools to perform tasks.<br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
+        /// </summary>
+        public AssistantsEndpoint AssistantsEndpoint { get; }
+
+        /// <summary>
+        /// Create threads that assistants can interact with.<br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
+        /// </summary>
+        public ThreadsEndpoint ThreadsEndpoint { get; }
     }
 }

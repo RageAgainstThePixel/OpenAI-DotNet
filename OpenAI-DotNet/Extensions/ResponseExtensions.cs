@@ -29,8 +29,18 @@ namespace OpenAI.Extensions
             NumberDecimalSeparator = "."
         };
 
-        internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers)
+        internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers, OpenAIClient client)
         {
+            if (response is IListResponse<BaseResponse> listResponse)
+            {
+                foreach (var item in listResponse.Items)
+                {
+                    SetResponseData(item, headers, client);
+                }
+            }
+
+            response.Client = client;
+
             if (headers == null) { return; }
 
             if (headers.TryGetValues(RequestId, out var requestId))
@@ -116,10 +126,10 @@ namespace OpenAI.Extensions
             }
         }
 
-        internal static T DeserializeResponse<T>(this HttpResponseMessage response, string json, JsonSerializerOptions settings) where T : BaseResponse
+        internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client) where T : BaseResponse
         {
-            var result = JsonSerializer.Deserialize<T>(json, settings);
-            result.SetResponseData(response.Headers);
+            var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
+            result.SetResponseData(response.Headers, client);
             return result;
         }
     }

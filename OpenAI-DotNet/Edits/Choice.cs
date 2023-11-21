@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Edits
 {
+    [Obsolete("Deprecated")]
     public sealed class Choice
     {
         [JsonInclude]
