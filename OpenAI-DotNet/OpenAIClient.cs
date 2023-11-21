@@ -48,6 +48,7 @@ namespace OpenAI
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
+            JsonSerializationOptions = DefaultJsonSerializerOptions;
             Client = SetupClient(client);
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
@@ -107,10 +108,18 @@ namespace OpenAI
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
         /// </summary>
-        internal static JsonSerializerOptions JsonSerializationOptions { get; private set; } = DefaultJsonSerializerOptions;
+        internal static JsonSerializerOptions JsonSerializationOptions { get; private set; }
 
         internal static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new JsonSerializerOptions
         {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters = { new JsonStringEnumConverterFactory() }
+        };
+
+        private static JsonSerializerOptions DebugJsonSerializerOptions { get; } = new JsonSerializerOptions
+        {
+            WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverterFactory() }
         };
@@ -136,15 +145,9 @@ namespace OpenAI
             set
             {
                 enableDebug = value;
-
                 JsonSerializationOptions = enableDebug
                     ? DefaultJsonSerializerOptions
-                    : new JsonSerializerOptions
-                    {
-                        WriteIndented = enableDebug,
-                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                        Converters = { new JsonStringEnumConverterFactory() }
-                    };
+                    : DebugJsonSerializerOptions;
             }
         }
 
