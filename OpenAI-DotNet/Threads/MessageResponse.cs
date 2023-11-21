@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -91,5 +92,12 @@ namespace OpenAI.Threads
         public static implicit operator string(MessageResponse message) => message?.ToString();
 
         public override string ToString() => Id;
+
+        /// <summary>
+        /// Formats all of the <see cref="Content"/> items into a single string,
+        /// putting each item on a new line.
+        /// </summary>
+        /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
+        public string PrintContent() => string.Join("\n", Content.Select(content => content.ToString()));
     }
 }

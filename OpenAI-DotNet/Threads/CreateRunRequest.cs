@@ -14,7 +14,7 @@ namespace OpenAI.Threads
         public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
         {
             AssistantId = assistantId;
-            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
+            Model = model;
             Instructions = instructions;
             Tools = tools?.ToList();
             Metadata = metadata;

@@ -66,7 +66,7 @@ namespace OpenAI.Threads
         /// <param name="message"><see cref="MessageResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> RetrieveAsync(this MessageResponse message, CancellationToken cancellationToken = default)
+        public static async Task<MessageResponse> UpdateAsync(this MessageResponse message, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message, cancellationToken).ConfigureAwait(false);
 
         /// <summary>

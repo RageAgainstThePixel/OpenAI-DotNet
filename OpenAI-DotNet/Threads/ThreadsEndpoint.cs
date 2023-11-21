@@ -133,6 +133,9 @@ namespace OpenAI.Threads
         /// <summary>
         /// Modifies a message.
         /// </summary>
+        /// <remarks>
+        /// Only the <see cref="MessageResponse.Metadata"/> can be modified.
+        /// </remarks>
         /// <param name="message"><see cref="MessageResponse"/> to modify.</param>
         /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format.

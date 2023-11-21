@@ -68,7 +68,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(thread);
             Assert.AreEqual(testThread.Id, thread.Id);
             Assert.IsNotNull(thread.Metadata);
-            Console.WriteLine($"Modify thread {thread.Id} -> {thread.CreatedAt}");
+            Console.WriteLine($"Modify thread {thread.Id} -> {thread.Metadata["test"]}");
         }
 
         [Test]
@@ -83,6 +83,7 @@ namespace OpenAI.Tests
             Assert.NotNull(file);
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
+            await testThread.CreateMessageAsync("hello world!");
             var request = new CreateMessageRequest("Test create message",
                 new[] { file.Id },
                 new Dictionary<string, string>
@@ -119,8 +120,12 @@ namespace OpenAI.Tests
 
             foreach (var message in list.Items)
             {
-                var retrieved = await testThread.RetrieveMessageAsync(message);
-                Assert.NotNull(retrieved);
+                Assert.NotNull(message);
+                var threadMessage = await testThread.RetrieveMessageAsync(message);
+                Assert.NotNull(threadMessage);
+                Console.WriteLine($"[{threadMessage.Id}] {threadMessage.Role}: {threadMessage.PrintContent()}");
+                var updated = await message.UpdateAsync();
+                Assert.IsNotNull(updated);
             }
         }
 
@@ -137,10 +142,16 @@ namespace OpenAI.Tests
             Assert.IsNotNull(modified);
             Assert.IsNotNull(modified.Metadata);
             Assert.IsTrue(modified.Metadata["test"].Equals(nameof(Test_04_03_ModifyMessage)));
+            Console.WriteLine($"Modify message metadata: {modified.Id} -> {modified.Metadata["test"]}");
+            metadata.Add("test2", nameof(Test_04_03_ModifyMessage));
+            var modifiedThreadMessage = await testThread.ModifyMessageAsync(modified, metadata);
+            Assert.IsNotNull(modifiedThreadMessage);
+            Assert.IsNotNull(modifiedThreadMessage.Metadata);
+            Console.WriteLine($"Modify message metadata: {modifiedThreadMessage.Id} -> {string.Join("\n", modifiedThreadMessage.Metadata.Select(meta => $"[{meta.Key}] {meta.Value}"))}");
         }
 
         [Test]
-        public async Task Test_04_04_ListAndDownloadMessageFiles()
+        public async Task Test_04_04_UploadAndDownloadMessageFiles()
         {
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
@@ -151,7 +162,6 @@ namespace OpenAI.Tests
                 var createRequest = new CreateMessageRequest("Test content with files", new[] { file1.Id, file2.Id });
                 var message = await testThread.CreateMessageAsync(createRequest);
                 var list = await message.ListFilesAsync();
-
                 Assert.IsNotNull(list);
                 Assert.AreEqual(2, list.Items.Count);
 
@@ -160,6 +170,10 @@ namespace OpenAI.Tests
                     var retrieved = await message.RetrieveFileAsync(file);
                     Assert.IsNotNull(retrieved);
                 }
+
+                var threadList = await testThread.ListFilesAsync(message);
+                Assert.IsNotNull(threadList);
+                Assert.IsNotEmpty(threadList.Items);
             }
             finally
             {
@@ -212,8 +226,11 @@ namespace OpenAI.Tests
         {
             Assert.NotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var run = await testAssistant.CreateThreadAndRunAsync();
+            var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
+            var threadRequest = new CreateThreadRequest(messages);
+            var run = await testAssistant.CreateThreadAndRunAsync(threadRequest);
             Assert.IsNotNull(run);
+            Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
             testRun = run;
             var thread = await run.GetThreadAsync();
             Assert.NotNull(thread);
@@ -221,28 +238,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_06_03_ModifyRun()
-        {
-            Assert.NotNull(testRun);
-            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            // run in Queued and InProgress can't be modified
-            var run = await testRun.WaitForStatusChangeAsync();
-            Assert.IsNotNull(run);
-            Assert.IsTrue(run.Status == RunStatus.Completed);
-            var metadata = new Dictionary<string, string>
-            {
-                ["test"] = nameof(Test_06_03_ModifyRun)
-            };
-            var modified = await run.ModifyAsync(metadata);
-            Assert.IsNotNull(modified);
-            Assert.AreEqual(run.Id, modified.Id);
-            Assert.IsNotNull(modified.Metadata);
-            Assert.Contains("test", modified.Metadata.Keys.ToList());
-            Assert.AreEqual(nameof(Test_06_03_ModifyRun), modified.Metadata["test"]);
-        }
-
-        [Test]
-        public async Task Test_06_04_ListRunsAndSteps()
+        public async Task Test_06_03_ListRunsAndSteps()
         {
             Assert.NotNull(testThread);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
@@ -268,6 +264,27 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(runStep.Client);
                 }
             }
+        }
+
+        [Test]
+        public async Task Test_06_04_ModifyRun()
+        {
+            Assert.NotNull(testRun);
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            // run in Queued and InProgress can't be modified
+            var run = await testRun.WaitForStatusChangeAsync();
+            Assert.IsNotNull(run);
+            Assert.IsTrue(run.Status == RunStatus.Completed);
+            var metadata = new Dictionary<string, string>
+            {
+                ["test"] = nameof(Test_06_04_ModifyRun)
+            };
+            var modified = await run.ModifyAsync(metadata);
+            Assert.IsNotNull(modified);
+            Assert.AreEqual(run.Id, modified.Id);
+            Assert.IsNotNull(modified.Metadata);
+            Assert.Contains("test", modified.Metadata.Keys.ToList());
+            Assert.AreEqual(nameof(Test_06_04_ModifyRun), modified.Metadata["test"]);
         }
 
         [Test]

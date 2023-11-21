@@ -67,8 +67,8 @@ Install-Package OpenAI-DotNet
   - [Thread Messages](#thread-messages) :new:
     - [List Messages](#list-thread-messages) :new:
     - [Create Message](#create-thread-message) :new:
-    - [Modify Message](#modify-thread-message) :new:
     - [Retrieve Message](#retrieve-thread-message) :new:
+    - [Modify Message](#modify-thread-message) :new:
     - [Thread Message Files](#thread-message-files) :new:
       - [List Message Files](#list-thread-message-files) :new:
       - [Retrieve Message File](#retrieve-thread-message-file) :new:
@@ -505,14 +505,27 @@ Create a thread.
 
 ```csharp
 var api = new OpenAIClient();
+var thread = await api.ThreadsEndpoint.CreateThreadAsync();
+Console.WriteLine($"Create thread {thread.Id} -> {thread.CreatedAt}");
 ```
 
 #### [Create Thread and Run](https://platform.openai.com/docs/api-reference/runs/createThreadAndRun)
 
 Create a thread and run it in one request.
 
+> See also: [Thread Runs](#thread-runs)
+
 ```csharp
 var api = new OpenAIClient();
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
+    new CreateAssistantRequest(
+        name: "Math Tutor",
+        instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
+        model: "gpt-4-1106-preview"));
+var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
+var threadRequest = new CreateThreadRequest(messages);
+var run = await assistant.CreateThreadAndRunAsync(threadRequest);
+Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
 ```
 
 #### [Retrieve Thread](https://platform.openai.com/docs/api-reference/threads/getThread)
@@ -521,6 +534,10 @@ Retrieves a thread.
 
 ```csharp
 var api = new OpenAIClient();
+var thread = await api.ThreadsEndpoint.RetrieveThreadAsync("thread-id");
+// OR if you simply wish to get the latest state of a thread
+thread = thread.UpdateAsync();
+Console.WriteLine($"Retrieve thread {thread.Id} -> {thread.CreatedAt}");
 ```
 
 #### [Modify Thread](https://platform.openai.com/docs/api-reference/threads/modifyThread)
@@ -531,6 +548,15 @@ Modifies a thread.
 
 ```csharp
 var api = new OpenAIClient();
+var thread = await api.ThreadsEndpoint.CreateThreadAsync();
+var metadata = new Dictionary<string, string>
+{
+    { "key", "custom thread metadata" }
+}
+thread = await api.ThreadsEndpoint.ModifyThreadAsync(thread.Id, metadata);
+// OR use extension method for convenience!
+thread =  thread.ModifyAsync(metadata);
+Console.WriteLine($"Modify thread {thread.Id} -> {thread.Metadata["key"]}");
 ```
 
 #### [Delete Thread](https://platform.openai.com/docs/api-reference/threads/deleteThread)
@@ -539,6 +565,10 @@ Delete a thread.
 
 ```csharp
 var api = new OpenAIClient();
+var isDeleted = await api.ThreadsEndpoint.DeleteThreadAsync("thread-id");
+// OR use extension method for convenience!
+var isDeleted = await thread.DeleteAsync();
+Assert.IsTrue(isDeleted);
 ```
 
 #### [Thread Messages](https://platform.openai.com/docs/api-reference/messages)
@@ -551,6 +581,14 @@ Returns a list of messages for a given thread.
 
 ```csharp
 var api = new OpenAIClient();
+var messageList = await api.ThreadsEndpoint.ListMessagesAsync("thread-id");
+// OR use extension method for convenience!
+var messageList = await thread.ListMessagesAsync();
+
+foreach (var message in messageList.Items)
+{
+    Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
+}
 ```
 
 ##### [Create Thread Message](https://platform.openai.com/docs/api-reference/messages/createMessage)
@@ -559,6 +597,25 @@ Create a message.
 
 ```csharp
 var api = new OpenAIClient();
+var thread = await api.ThreadsEndpoint.CreateThreadAsync();
+var request = new CreateMessageRequest("Hello world!");
+var message = await api.ThreadsEndpoint.CreateMessageAsync(thread.Id, request);
+// OR use extension method for convenience!
+var message = await thread.CreateMessageAsync("Hello World!");
+Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
+```
+
+##### [Retrieve Thread Message](https://platform.openai.com/docs/api-reference/messages/getMessage)
+
+Retrieve a message.
+
+```csharp
+var api = new OpenAIClient();
+var message = await api.ThreadsEndpoint.RetrieveMessageAsync("thread-id", "message-id");
+// OR use extension methods for convenience!
+var message = thread.RetrieveMessageAsync("message-id");
+var message = message.UpdateAsync();
+Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
 ```
 
 ##### [Modify Thread Message](https://platform.openai.com/docs/api-reference/messages/modifyMessage)
@@ -569,14 +626,14 @@ Modify a message.
 
 ```csharp
 var api = new OpenAIClient();
-```
-
-##### [Retrieve Thread Message](https://platform.openai.com/docs/api-reference/messages/getMessage)
-
-Retrieve a message.
-
-```csharp
-var api = new OpenAIClient();
+var metadata = new Dictionary<string, string>
+{
+    { "key", "custom message metadata" }
+};
+var message = await api.ThreadsEndpoint.ModifyMessageAsync("thread-id", "message-id", metadata);
+// OR use extension method for convenience!
+var message = await message.ModifyAsync(metadata);
+Console.WriteLine($"Modify message metadata: {message.Id} -> {message.Metadata["key"]}");
 ```
 
 ##### Thread Message Files
