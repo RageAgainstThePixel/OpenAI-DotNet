@@ -80,7 +80,7 @@ namespace OpenAI.Tests
                 })
             };
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
-            await File.WriteAllLinesAsync(localTrainingDataPath, conversations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.DefaultJsonSerializerOptions)));
+            await File.WriteAllLinesAsync(localTrainingDataPath, conversations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.JsonSerializationOptions)));
             var fileData = await OpenAIClient.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);
             Assert.IsFalse(File.Exists(localTrainingDataPath));

@@ -48,7 +48,6 @@ namespace OpenAI
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
-            JsonSerializationOptions = DefaultJsonSerializerOptions;
             Client = SetupClient(client);
             ModelsEndpoint = new ModelsEndpoint(this);
             CompletionsEndpoint = new CompletionsEndpoint(this);
@@ -108,18 +107,8 @@ namespace OpenAI
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
         /// </summary>
-        internal static JsonSerializerOptions JsonSerializationOptions { get; private set; }
-
-        internal static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new JsonSerializerOptions
+        internal static JsonSerializerOptions JsonSerializationOptions { get; } = new JsonSerializerOptions
         {
-            WriteIndented = false,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters = { new JsonStringEnumConverterFactory() }
-        };
-
-        private static JsonSerializerOptions DebugJsonSerializerOptions { get; } = new JsonSerializerOptions
-        {
-            WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverterFactory() }
         };
@@ -134,22 +123,10 @@ namespace OpenAI
         /// </summary>
         internal OpenAIClientSettings OpenAIClientSettings { get; }
 
-        private bool enableDebug;
-
         /// <summary>
         /// Enables or disables debugging for all endpoints.
         /// </summary>
-        public bool EnableDebug
-        {
-            get => enableDebug;
-            set
-            {
-                enableDebug = value;
-                JsonSerializationOptions = enableDebug
-                    ? DefaultJsonSerializerOptions
-                    : DebugJsonSerializerOptions;
-            }
-        }
+        public bool EnableDebug { get; set; }
 
         /// <summary>
         /// List and describe the various models available in the API.
