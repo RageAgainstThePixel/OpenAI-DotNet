@@ -373,16 +373,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// Returns a list of run steps belonging to a run.
         /// </summary>
-        /// <param name="run"><see cref="RunResponse"/> to list run steps for.</param>
-        /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
-        public async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Returns a list of run steps belonging to a run.
-        /// </summary>
         /// <param name="threadId">The id of the thread to which the run and run step belongs.</param>
         /// <param name="runId">The id of the run to which the run step belongs.</param>
         /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
@@ -394,16 +384,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<RunStepResponse>>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// Retrieves a run step.
-        /// </summary>
-        /// <param name="runStep"><see cref="RunStepResponse"/> to retrieve.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunStepResponse"/>.</returns>
-        public async Task<RunStepResponse> RetrieveRunStepAsync(RunStepResponse runStep, CancellationToken cancellationToken = default)
-            => await RetrieveRunStepAsync(runStep.ThreadId, runStep.RunId, runStep.Id, cancellationToken).ConfigureAwait(false);
-
         /// <summary>
         /// Retrieves a run step.
         /// </summary>

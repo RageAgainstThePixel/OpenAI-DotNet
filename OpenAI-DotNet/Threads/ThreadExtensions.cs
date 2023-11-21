@@ -278,7 +278,16 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
         public static async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.ListRunStepsAsync(run, query, cancellationToken);
+            => await run.Client.ThreadsEndpoint.ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken);
+
+        /// <summary>
+        /// Retrieves a run step.
+        /// </summary>
+        /// <param name="runStep"><see cref="RunStepResponse"/> to retrieve.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunStepResponse"/>.</returns>
+        public static async Task<RunStepResponse> UpdateAsync(this RunStepResponse runStep, CancellationToken cancellationToken = default)
+            => await runStep.Client.ThreadsEndpoint.RetrieveRunStepAsync(runStep.ThreadId, runStep.RunId, runStep.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Cancels a run that is <see cref="RunStatus.InProgress"/>.

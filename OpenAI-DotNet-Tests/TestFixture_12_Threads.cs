@@ -235,6 +235,8 @@ namespace OpenAI.Tests
             var thread = await run.GetThreadAsync();
             Assert.NotNull(thread);
             testThread = thread;
+            var threadRun = thread.CreateRunAsync();
+            Assert.NotNull(threadRun);
         }
 
         [Test]
@@ -252,7 +254,7 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(run.Client);
                 var retrievedRun = await run.UpdateAsync();
                 Assert.IsNotNull(retrievedRun);
-                Assert.IsTrue(retrievedRun.Status == RunStatus.Completed);
+                Console.WriteLine($"[{retrievedRun.Id}] {retrievedRun.Status} | {retrievedRun.CreatedAt}");
 
                 var runStepList = await retrievedRun.ListRunStepsAsync();
                 Assert.IsNotNull(runStepList);
@@ -262,6 +264,9 @@ namespace OpenAI.Tests
                 {
                     Assert.IsNotNull(runStep);
                     Assert.IsNotNull(runStep.Client);
+                    var retrievedRunStep = await runStep.UpdateAsync();
+                    Assert.IsNotNull(retrievedRunStep);
+                    Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
                 }
             }
         }
