@@ -110,15 +110,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// Retrieve a message.
         /// </summary>
-        /// <param name="message"><see cref="MessageResponse"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="MessageResponse"/>.</returns>
-        public async Task<MessageResponse> RetrieveMessageAsync(MessageResponse message, CancellationToken cancellationToken = default)
-            => await RetrieveMessageAsync(message.ThreadId, message.Id, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Retrieve a message.
-        /// </summary>
         /// <param name="threadId">The id of the thread to which this message belongs.</param>
         /// <param name="messageId">The id of the message to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
@@ -175,16 +166,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// Returns a list of message files.
         /// </summary>
-        /// <param name="message"><see cref="MessageResponse"/> to get files for.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        public async Task<ListResponse<MessageFileResponse>> ListFilesAsync(MessageResponse message, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await ListFilesAsync(message.ThreadId, message.Id, query, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Returns a list of message files.
-        /// </summary>
         /// <param name="threadId">The id of the thread that the message and files belong to.</param>
         /// <param name="messageId">The id of the message that the files belongs to.</param>
         /// <param name="query"><see cref="ListQuery"/>.</param>
@@ -196,16 +177,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<MessageFileResponse>>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// Retrieve message file.
-        /// </summary>
-        /// <param name="message"><see cref="MessageResponse"/> the file belongs to.</param>
-        /// <param name="fileId">The id of the file being retrieved.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="MessageFileResponse"/>.</returns>
-        public async Task<MessageFileResponse> RetrieveFileAsync(MessageResponse message, string fileId, CancellationToken cancellationToken = default)
-            => await RetrieveFileAsync(message.ThreadId, message.Id, fileId, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Retrieve message file.
@@ -284,15 +255,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// Retrieves a run.
         /// </summary>
-        /// <param name="run"><see cref="RunResponse"/> to retrieve.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> RetrieveRunAsync(RunResponse run, CancellationToken cancellationToken = default)
-            => await RetrieveRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Retrieves a run.
-        /// </summary>
         /// <param name="threadId">The id of the thread that was run.</param>
         /// <param name="runId">The id of the run to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
@@ -303,21 +265,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, Api);
         }
-        
-        /// <summary>
-        /// Modifies a run.
-        /// </summary>
-        /// <remarks>
-        /// Only the <see cref="RunResponse.Metadata"/> can be modified.
-        /// </remarks>
-        /// <param name="run"><see cref="RunResponse"/> to modify.</param>
-        /// <param name="metadata">Set of 16 key-value pairs that can be attached to an object.
-        /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> ModifyRunAsync(RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await ModifyRunAsync(run.ThreadId, run.Id, metadata, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Modifies a run.
@@ -339,18 +286,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
-        /// this endpoint can be used to submit the outputs from the tool calls once they're all completed.
-        /// All outputs must be submitted in a single request.
-        /// </summary>
-        /// <param name="run"><see cref="RunResponse"/> to submit outputs for.</param>
-        /// <param name="request"><see cref="SubmitToolOutputsRequest"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> SubmitToolOutputsAsync(RunResponse run, SubmitToolOutputsRequest request, CancellationToken cancellationToken = default)
-            => await SubmitToolOutputsAsync(run.ThreadId, run.Id, request, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
@@ -384,6 +319,7 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<RunStepResponse>>(responseAsString, Api);
         }
+
         /// <summary>
         /// Retrieves a run step.
         /// </summary>
@@ -398,15 +334,6 @@ namespace OpenAI.Threads
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunStepResponse>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// Cancels a run that is <see cref="RunStatus.InProgress"/>.
-        /// </summary>
-        /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> CancelRunAsync(RunResponse run, CancellationToken cancellationToken = default)
-            => await CancelRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Cancels a run that is <see cref="RunStatus.InProgress"/>.

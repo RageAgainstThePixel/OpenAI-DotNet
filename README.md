@@ -72,7 +72,6 @@ Install-Package OpenAI-DotNet
     - [Thread Message Files](#thread-message-files) :new:
       - [List Message Files](#list-thread-message-files) :new:
       - [Retrieve Message File](#retrieve-thread-message-file) :new:
-      - [Download Message File](#download-thread-message-file) :new:
   - [Thread Runs](#thread-runs) :new:
     - [List Runs](#list-thread-runs) :new:
     - [Create Run](#create-thread-run) :new:
@@ -361,6 +360,7 @@ Returns a list of assistants.
 ```csharp
 var api = new OpenAIClient();
 var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+
 foreach (var assistant in assistantsList.Items)
 {
     Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
@@ -383,7 +383,7 @@ Retrieves an assistant.
 
 ```csharp
 var api = new OpenAIClient();
-var assistant = OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistantId);
+var assistant = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync("assistant-id");
 Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
 ```
 
@@ -396,7 +396,7 @@ var api = new OpenAIClient();
 var createRequest = new CreateAssistantRequest("gpt-3.5-turbo-1106");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
 var modifyRequest = new CreateAssistantRequest("gpt-4-1106-preview");
-var modifiedAssistant = await api.AssistantsEndpoint(assistant, modifyRequest);
+var modifiedAssistant = await api.AssistantsEndpoint.ModifyAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
 ```
@@ -407,7 +407,7 @@ Delete an assistant.
 
 ```csharp
 var api = new OpenAIClient();
-var isDeleted = await api.AssistantsEndpoint.DeleteAssistantAsync(assistant);
+var isDeleted = await api.AssistantsEndpoint.DeleteAssistantAsync("assistant-id");
 // OR AssistantExtension for easier use!
 var isDeleted = await assistant.DeleteAsync();
 Assert.IsTrue(isDeleted);
@@ -419,7 +419,7 @@ Returns a list of assistant files.
 
 ```csharp
 var api = new OpenAIClient();
-var filesList = await api.AssistantsEndpoint.ListFilesAsync(assistant);
+var filesList = await api.AssistantsEndpoint.ListFilesAsync("assistant-id");
 // OR AssistantExtension for easier use!
 var filesList = await assistant.ListFilesAsync();
 
@@ -439,7 +439,9 @@ var filePath = "assistant_test_2.txt";
 await File.WriteAllTextAsync(filePath, "Knowledge is power!");
 var fileUploadRequest = new FileUploadRequest(filePath, "assistant");
 var file = await api.FilesEndpoint.UploadFileAsync(fileUploadRequest);
-var assistantFile = api.AssistantsEndpoint.AttachFileAsync(assistant.Id, file.Id);
+var assistantFile = await api.AssistantsEndpoint.AttachFileAsync("assistant-id", file.Id);
+// OR use extension method for convenience!
+var assistantFIle = await assistant.AttachFileAsync(file);
 ```
 
 #### [Upload File to Assistant](#upload-file)
@@ -452,7 +454,7 @@ Uploads ***and*** attaches a file to an assistant.
 var api = new OpenAIClient();
 var filePath = "assistant_test_2.txt";
 await File.WriteAllTextAsync(filePath, "Knowledge is power!");
-var assistantFile = assistant.UploadFileAsync(filePath);
+var assistantFile = await assistant.UploadFileAsync(filePath);
 ```
 
 #### [Retrieve File from Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistantFile)
@@ -461,7 +463,7 @@ Retrieves an AssistantFile.
 
 ```csharp
 var api = new OpenAIClient();
-var assistantFile = api.AssistantsEndpoint(assistant.Id, fileId);
+var assistantFile = await api.AssistantsEndpoint.RetrieveFileAsync("assistant-id", "file-id");
 // OR AssistantExtension for easier use!
 var assistantFile = await assistant.RetrieveFileAsync(fileId);
 Console.WriteLine($"{assistantFile.AssistantId}'s file -> {assistantFile.Id}");
@@ -475,7 +477,9 @@ Remove a file from an assistant.
 
 ```csharp
 var api = new OpenAIClient();
-var isRemoved = await api.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId);
+var isRemoved = await api.AssistantsEndpoint.RemoveFileAsync("assistant-id", "file-id");
+// OR use extension method for convenience!
+var isRemoved = await assistant.RemoveFileAsync("file-id");
 Assert.IsTrue(isRemoved);
 ```
 
@@ -487,7 +491,7 @@ Removes a file from the assistant and then deletes the file from the organizatio
 
 ```csharp
 var api = new OpenAIClient();
-var isDeleted = await assistant.DeleteFileAsync(fileId);
+var isDeleted = await assistant.DeleteFileAsync("file-id");
 Assert.IsTrue(isDeleted);
 ```
 
@@ -536,7 +540,7 @@ Retrieves a thread.
 var api = new OpenAIClient();
 var thread = await api.ThreadsEndpoint.RetrieveThreadAsync("thread-id");
 // OR if you simply wish to get the latest state of a thread
-thread = thread.UpdateAsync();
+thread = await thread.UpdateAsync();
 Console.WriteLine($"Retrieve thread {thread.Id} -> {thread.CreatedAt}");
 ```
 
@@ -555,7 +559,7 @@ var metadata = new Dictionary<string, string>
 }
 thread = await api.ThreadsEndpoint.ModifyThreadAsync(thread.Id, metadata);
 // OR use extension method for convenience!
-thread =  thread.ModifyAsync(metadata);
+thread = await thread.ModifyAsync(metadata);
 Console.WriteLine($"Modify thread {thread.Id} -> {thread.Metadata["key"]}");
 ```
 
@@ -613,8 +617,8 @@ Retrieve a message.
 var api = new OpenAIClient();
 var message = await api.ThreadsEndpoint.RetrieveMessageAsync("thread-id", "message-id");
 // OR use extension methods for convenience!
-var message = thread.RetrieveMessageAsync("message-id");
-var message = message.UpdateAsync();
+var message = await thread.RetrieveMessageAsync("message-id");
+var message = await message.UpdateAsync();
 Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
 ```
 
@@ -644,6 +648,15 @@ Returns a list of message files.
 
 ```csharp
 var api = new OpenAIClient();
+var fileList = await api.ThreadsEndpoint.ListFilesAsync("thread-id", "message-Id");
+// OR use extension method for convenience!
+var fileList = await thread.ListFilesAsync("message-id");
+var fileList = await message.ListFilesAsync();
+
+foreach (var file in fileList.Items)
+{
+    Console.WriteLine(file.Id);
+}
 ```
 
 ###### [Retrieve Thread Message File](https://platform.openai.com/docs/api-reference/messages/getMessageFile)
@@ -652,16 +665,10 @@ Retrieves a message file.
 
 ```csharp
 var api = new OpenAIClient();
-```
-
-###### [Download Thread Message File](#download-file-content)
-
-Downloads a message file to the specified directory.
-
-> Thread extension method, for extra convenience!
-
-```csharp
-var api = new OpenAIClient();
+var file = await api.ThreadsEndpoint.RetrieveFileAsync("thread-id", "message-id", "file-id");
+// OR use extension method for convenience!
+var file = await message.RetrieveFileAsync();
+Console.WriteLine(file.Id);
 ```
 
 #### [Thread Runs](https://platform.openai.com/docs/api-reference/runs)
@@ -674,6 +681,14 @@ Returns a list of runs belonging to a thread.
 
 ```csharp
 var api = new OpenAIClient();
+var runList = await api.ThreadsEndpoint.ListRunsAsync("thread-id");
+// OR use extension method for convenience!
+var runList = await thread.ListRunsAsync();
+
+foreach (var run in runList.Items)
+{
+    Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
+}
 ```
 
 ##### [Create Thread Run](https://platform.openai.com/docs/api-reference/runs/createRun)
@@ -682,6 +697,15 @@ Create a run.
 
 ```csharp
 var api = new OpenAIClient();
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
+    new CreateAssistantRequest(
+        name: "Math Tutor",
+        instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
+        model: "gpt-4-1106-preview"));
+var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
+var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
+var run = await thread.CreateRunAsync(assistant);
+Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
 ```
 
 ##### [Retrieve Thread Run](https://platform.openai.com/docs/api-reference/runs/getRun)
@@ -690,6 +714,11 @@ Retrieves a run.
 
 ```csharp
 var api = new OpenAIClient();
+var run = await api.ThreadsEndpoint.RetrieveRunAsync("thread-id", "run-id");
+// OR use extension method for convenience!
+var run = await thread.RetrieveRunAsync("run-id");
+var run = await run.UpdateAsync();
+Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
 ```
 
 ##### [Modify Thread Run](https://platform.openai.com/docs/api-reference/runs/modifyRun)
@@ -700,14 +729,61 @@ Modifies a run.
 
 ```csharp
 var api = new OpenAIClient();
+var metadata = new Dictionary<string, string>
+{
+    { "key", "custom run metadata" }
+};
+var run = await api.ThreadsEndpoint.ModifyRunAsync("thread-id", "run-id", metadata);
+// OR use extension method for convenience!
+var run = await run.ModifyAsync(metadata);
+Console.WriteLine($"Modify run {run.Id} -> {run.Metadata["key"]}");
 ```
 
 ##### [Thread Submit Tool Outputs to Run](https://platform.openai.com/docs/api-reference/runs/submitToolOutputs)
 
-When a run has the status: `requires_action` and required_`action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
+When a run has the status: `requires_action` and `required_action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
 
 ```csharp
 var api = new OpenAIClient();
+var function = new Function(
+    nameof(WeatherService.GetCurrentWeather),
+    "Get the current weather in a given location",
+    new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["location"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["description"] = "The city and state, e.g. San Francisco, CA"
+            },
+            ["unit"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["enum"] = new JsonArray { "celsius", "fahrenheit" }
+            }
+        },
+        ["required"] = new JsonArray { "location", "unit" }
+    });
+testAssistant = await api.AssistantsEndpoint.CreateAssistantAsync(new CreateAssistantRequest(tools: new Tool[] { function }));
+var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature in celsius now?");
+// waiting while run is Queued and InProgress
+run = await run.WaitForStatusChangeAsync();
+var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
+Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
+var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
+var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+var toolOutput = new ToolOutput(toolCall.Id, functionResult);
+run = await run.SubmitToolOutputsAsync(toolOutput);
+// waiting while run in Queued and InProgress
+run = await run.WaitForStatusChangeAsync();
+var messages = await run.ListMessagesAsync();
+
+foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
+{
+    Console.WriteLine($"{message.Role}: {message.PrintContent()}");
+}
 ```
 
 ##### [List Thread Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps)
@@ -716,6 +792,14 @@ Returns a list of run steps belonging to a run.
 
 ```csharp
 var api = new OpenAIClient();
+var runStepList = await api.ThreadsEndpoint.ListRunStepsAsync("thread-id", "run-id");
+// OR use extension method for convenience!
+var runStepList = await run.ListRunStepsAsync();
+
+foreach (var runStep in runStepList.Items)
+{
+    Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
+}
 ```
 
 ##### [Retrieve Thread Run Step](https://platform.openai.com/docs/api-reference/runs/getRunStep)
@@ -724,6 +808,11 @@ Retrieves a run step.
 
 ```csharp
 var api = new OpenAIClient();
+var runStep = await api.ThreadsEndpoint.RetrieveRunStepAsync("thread-id", "run-id", "step-id");
+// OR use extension method for convenience!
+var runStep = await run.RetrieveRunStepAsync("step-id");
+var runStep = await runStep.UpdateAsync();
+Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
 ```
 
 ##### [Cancel Thread Run](https://platform.openai.com/docs/api-reference/runs/cancelRun)
@@ -732,6 +821,10 @@ Cancels a run that is `in_progress`.
 
 ```csharp
 var api = new OpenAIClient();
+var isCancelled = await api.ThreadsEndpoint.CancelRunAsync("thread-id", "run-id");
+// OR use extension method for convenience!
+var isCancelled = await run.CancelAsync();
+Assert.IsTrue(isCancelled);
 ```
 
 ### [Chat](https://platform.openai.com/docs/api-reference/chat)

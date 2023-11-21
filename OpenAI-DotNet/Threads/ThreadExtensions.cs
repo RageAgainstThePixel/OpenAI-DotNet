@@ -67,7 +67,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
         public static async Task<MessageResponse> UpdateAsync(this MessageResponse message, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message, cancellationToken).ConfigureAwait(false);
+            => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message.ThreadId, message.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Retrieve a message.
@@ -135,7 +135,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
         public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this MessageResponse message, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.ListFilesAsync(message, query, cancellationToken).ConfigureAwait(false);
+            => await message.Client.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id, query, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Retrieve message file.
@@ -145,30 +145,32 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageFileResponse"/>.</returns>
         public static async Task<MessageFileResponse> RetrieveFileAsync(this MessageResponse message, string fileId, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message, fileId, cancellationToken).ConfigureAwait(false);
+            => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message.ThreadId, message.Id, fileId, cancellationToken).ConfigureAwait(false);
 
-        /// <summary>
-        /// Downloads a message file content to local disk.
-        /// </summary>
-        /// <param name="message"><see cref="MessageResponse"/>.</param>
-        /// <param name="fileId">The id of the file being retrieved.</param>
-        /// <param name="directory">Directory to save the file content.</param>
-        /// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Path to the downloaded file content.</returns>
-        public static async Task<string> DownloadFileContentAsync(this MessageResponse message, string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-            => await message.Client.FilesEndpoint.DownloadFileAsync(fileId, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
+        // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
+        ///// <summary>
+        ///// Downloads a message file content to local disk.
+        ///// </summary>
+        ///// <param name="message"><see cref="MessageResponse"/>.</param>
+        ///// <param name="fileId">The id of the file being retrieved.</param>
+        ///// <param name="directory">Directory to save the file content.</param>
+        ///// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
+        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        ///// <returns>Path to the downloaded file content.</returns>
+        //public static async Task<string> DownloadFileContentAsync(this MessageResponse message, string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
+        //    => await message.Client.FilesEndpoint.DownloadFileAsync(fileId, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
 
-        /// <summary>
-        /// Downloads a message file content to local disk.
-        /// </summary>
-        /// <param name="file"><see cref="MessageFileResponse"/>.</param>
-        /// <param name="directory">Directory to save the file content.</param>
-        /// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Path to the downloaded file content.</returns>
-        public static async Task<string> DownloadContentAsync(this MessageFileResponse file, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-            => await file.Client.FilesEndpoint.DownloadFileAsync(file.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
+        // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
+        ///// <summary>
+        ///// Downloads a message file content to local disk.
+        ///// </summary>
+        ///// <param name="file"><see cref="MessageFileResponse"/>.</param>
+        ///// <param name="directory">Directory to save the file content.</param>
+        ///// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
+        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        ///// <returns>Path to the downloaded file content.</returns>
+        //public static async Task<string> DownloadContentAsync(this MessageFileResponse file, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
+        //    => await file.Client.FilesEndpoint.DownloadFileAsync(file.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
 
         #endregion Files
 
@@ -220,7 +222,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> UpdateAsync(this RunResponse run, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.RetrieveRunAsync(run, cancellationToken).ConfigureAwait(false);
+            => await run.Client.ThreadsEndpoint.RetrieveRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Modifies a run.
@@ -235,7 +237,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> ModifyAsync(this RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.ModifyRunAsync(run, metadata, cancellationToken).ConfigureAwait(false);
+            => await run.Client.ThreadsEndpoint.ModifyRunAsync(run.ThreadId, run.Id, metadata, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Waits for <see cref="RunResponse.Status"/> to change.
@@ -268,7 +270,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run, request, cancellationToken);
+            => await run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run.ThreadId, run.Id, request, cancellationToken);
 
         /// <summary>
         /// Returns a list of run steps belonging to a run.
@@ -279,6 +281,16 @@ namespace OpenAI.Threads
         /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
         public static async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
             => await run.Client.ThreadsEndpoint.ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken);
+
+        /// <summary>
+        /// Retrieves a run step.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/> to retrieve step for.</param>
+        /// <param name="runStepId">Id of the run step.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunStepResponse"/>.</returns>
+        public static async Task<RunStepResponse> RetrieveRunStepAsync(this RunResponse run, string runStepId, CancellationToken cancellationToken = default)
+            => await run.Client.ThreadsEndpoint.RetrieveRunStepAsync(run.ThreadId, run.Id, runStepId, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Retrieves a run step.
@@ -296,7 +308,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.CancelRunAsync(run, cancellationToken).ConfigureAwait(false);
+            => await run.Client.ThreadsEndpoint.CancelRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Returns a list of messages for a given thread that the run belongs to.

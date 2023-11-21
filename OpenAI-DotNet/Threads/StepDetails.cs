@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -15,10 +16,11 @@ namespace OpenAI.Threads
         public RunStepMessageCreation MessageCreation { get; private set; }
 
         /// <summary>
-        /// Details of the tool call.
+        /// An array of tool calls the run step was involved in.
+        /// These can be associated with one of three types of tools: 'code_interpreter', 'retrieval', or 'function'.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_calls")]
-        public RunStepToolCalls ToolCalls { get; private set; }
+        public IReadOnlyList<ToolCall> ToolCalls { get; private set; }
     }
 }

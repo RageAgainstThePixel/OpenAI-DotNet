@@ -122,15 +122,6 @@ namespace OpenAI.Assistants
         }
 
         /// <summary>
-        /// Retrieves the latest version of the AssistantFile.
-        /// </summary>
-        /// <param name="file"><see cref="AssistantFileResponse"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="AssistantFileResponse"/>.</returns>
-        public async Task<AssistantFileResponse> RetrieveFileAsync(AssistantFileResponse file, CancellationToken cancellationToken = default)
-            => await RetrieveFileAsync(file.AssistantId, file.Id, cancellationToken);
-
-        /// <summary>
         /// Retrieves an AssistantFile.
         /// </summary>
         /// <param name="assistantId">The ID of the assistant who the file belongs to.</param>
@@ -143,20 +134,6 @@ namespace OpenAI.Assistants
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantFileResponse>(responseAsString, Api);
         }
-
-        /// <summary>
-        /// Remove an assistant file.
-        /// </summary>
-        /// <remarks>
-        /// Note that removing an AssistantFile does not delete the original File object,
-        /// it simply removes the association between that File and the Assistant.
-        /// To delete a File, use the File delete endpoint instead.
-        /// </remarks>
-        /// <param name="file"><see cref="AssistantFileResponse"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>True, if file was removed.</returns>
-        public async Task<bool> RemoveFileAsync(AssistantFileResponse file, CancellationToken cancellationToken = default)
-            => await RemoveFileAsync(file.AssistantId, file.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Remove an assistant file.

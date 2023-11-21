@@ -111,7 +111,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
         public static async Task<bool> RemoveFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
-            => await file.Client.AssistantsEndpoint.RemoveFileAsync(file, cancellationToken).ConfigureAwait(false);
+            => await file.Client.AssistantsEndpoint.RemoveFileAsync(file.AssistantId, file.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Remove AssistantFile.
@@ -136,7 +136,7 @@ namespace OpenAI.Assistants
         /// <returns>True, if the file was successfully removed from the assistant and deleted.</returns>
         public static async Task<bool> DeleteFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
         {
-            var isRemoved = await file.Client.AssistantsEndpoint.RemoveFileAsync(file, cancellationToken).ConfigureAwait(false);
+            var isRemoved = await file.RemoveFileAsync(cancellationToken).ConfigureAwait(false);
             return isRemoved && await file.Client.FilesEndpoint.DeleteFileAsync(file.Id, cancellationToken).ConfigureAwait(false);
         }
 

@@ -161,19 +161,34 @@ namespace OpenAI.Tests
             {
                 var createRequest = new CreateMessageRequest("Test content with files", new[] { file1.Id, file2.Id });
                 var message = await testThread.CreateMessageAsync(createRequest);
-                var list = await message.ListFilesAsync();
-                Assert.IsNotNull(list);
-                Assert.AreEqual(2, list.Items.Count);
+                var fileList = await message.ListFilesAsync();
+                Assert.IsNotNull(fileList);
+                Assert.AreEqual(2, fileList.Items.Count);
 
-                foreach (var file in list.Items)
+                foreach (var file in fileList.Items)
                 {
                     var retrieved = await message.RetrieveFileAsync(file);
                     Assert.IsNotNull(retrieved);
+                    Console.WriteLine(file.Id);
+                    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
+                    //var filePath = await message.DownloadFileContentAsync(file, Directory.GetCurrentDirectory(), true);
+                    //Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
+                    //Assert.IsTrue(File.Exists(filePath));
+                    //File.Delete(filePath);
                 }
 
                 var threadList = await testThread.ListFilesAsync(message);
                 Assert.IsNotNull(threadList);
                 Assert.IsNotEmpty(threadList.Items);
+
+                //foreach (var file in threadList.Items)
+                //{
+                //    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
+                //    var filePath = await file.DownloadContentAsync(Directory.GetCurrentDirectory(), true);
+                //    Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
+                //    Assert.IsTrue(File.Exists(filePath));
+                //    File.Delete(filePath);
+                //}
             }
             finally
             {
@@ -214,6 +229,8 @@ namespace OpenAI.Tests
                 Assert.NotNull(message);
                 var run = await thread.CreateRunAsync(assistant);
                 Assert.IsNotNull(run);
+                var threadRun = thread.CreateRunAsync();
+                Assert.NotNull(threadRun);
             }
             finally
             {
@@ -235,8 +252,6 @@ namespace OpenAI.Tests
             var thread = await run.GetThreadAsync();
             Assert.NotNull(thread);
             testThread = thread;
-            var threadRun = thread.CreateRunAsync();
-            Assert.NotNull(threadRun);
         }
 
         [Test]
@@ -244,30 +259,17 @@ namespace OpenAI.Tests
         {
             Assert.NotNull(testThread);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var list = await testThread.ListRunsAsync();
-            Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Items);
+            var runList = await testThread.ListRunsAsync();
+            Assert.IsNotNull(runList);
+            Assert.IsNotEmpty(runList.Items);
 
-            foreach (var run in list.Items)
+            foreach (var run in runList.Items)
             {
                 Assert.IsNotNull(run);
                 Assert.IsNotNull(run.Client);
                 var retrievedRun = await run.UpdateAsync();
                 Assert.IsNotNull(retrievedRun);
                 Console.WriteLine($"[{retrievedRun.Id}] {retrievedRun.Status} | {retrievedRun.CreatedAt}");
-
-                var runStepList = await retrievedRun.ListRunStepsAsync();
-                Assert.IsNotNull(runStepList);
-                Assert.IsNotEmpty(runStepList.Items);
-
-                foreach (var runStep in runStepList.Items)
-                {
-                    Assert.IsNotNull(runStep);
-                    Assert.IsNotNull(runStep.Client);
-                    var retrievedRunStep = await runStep.UpdateAsync();
-                    Assert.IsNotNull(retrievedRunStep);
-                    Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
-                }
             }
         }
 
@@ -370,6 +372,22 @@ namespace OpenAI.Tests
             Assert.IsNotNull(run.RequiredAction);
             Assert.IsNotNull(run.RequiredAction.SubmitToolOutputs);
             Assert.IsNotEmpty(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+
+            var runStepList = await run.ListRunStepsAsync();
+            Assert.IsNotNull(runStepList);
+            Assert.IsNotEmpty(runStepList.Items);
+
+            foreach (var runStep in runStepList.Items)
+            {
+                Assert.IsNotNull(runStep);
+                Assert.IsNotNull(runStep.Client);
+                var retrievedRunStep = await runStep.UpdateAsync();
+                Assert.IsNotNull(retrievedRunStep);
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
+                var retrieveStepRunStep = await run.RetrieveRunStepAsync(runStep.Id);
+                Assert.IsNotNull(retrieveStepRunStep);
+            }
+
             var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
             Assert.AreEqual("function", toolCall.Type);
             Assert.IsNotNull(toolCall.FunctionCall);
@@ -391,11 +409,7 @@ namespace OpenAI.Tests
             {
                 Assert.IsNotNull(message);
                 Assert.IsNotEmpty(message.Content);
-
-                foreach (var content in message.Content)
-                {
-                    Console.WriteLine($"{message.Role}: {content}");
-                }
+                Console.WriteLine($"{message.Role}: {message.PrintContent()}");
             }
         }
 
