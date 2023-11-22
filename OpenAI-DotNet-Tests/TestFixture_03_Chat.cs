@@ -32,7 +32,7 @@ namespace OpenAI.Tests
 
             foreach (var choice in response.Choices)
             {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
             }
 
             response.GetUsage();
@@ -65,8 +65,10 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
             var choice = response.FirstChoice;
-            Assert.IsFalse(string.IsNullOrEmpty(choice?.Message?.Content));
-            Console.WriteLine($"[{choice!.Index}] {choice.Message!.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
+            Assert.IsNotNull(choice);
+            Assert.IsNotNull(choice.Message);
+            Assert.IsFalse(string.IsNullOrEmpty(choice.Message.Content));
+            Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
             Assert.IsTrue(choice.Message.Role == Role.Assistant);
             Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
             Console.WriteLine(response.ToString());
@@ -149,7 +151,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
@@ -164,7 +166,7 @@ namespace OpenAI.Tests
 
             if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
             {
-                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
@@ -259,7 +261,7 @@ namespace OpenAI.Tests
 
             if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
             {
-                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
@@ -336,7 +338,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
@@ -411,7 +413,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
@@ -424,9 +426,9 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
+            if (!string.IsNullOrEmpty(response.FirstChoice))
             {
-                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
@@ -521,7 +523,7 @@ namespace OpenAI.Tests
 
             if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
             {
-                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+                Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
                 var unitMessage = new Message(Role.User, "celsius");
                 messages.Add(unitMessage);
@@ -598,7 +600,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
             var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
             messages.Add(locationMessage);
@@ -637,14 +639,14 @@ namespace OpenAI.Tests
                 new Message(Role.User, new List<Content>
                 {
                     new Content(ContentType.Text, "What's in this image?"),
-                    new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+                    new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
             var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
             response.GetUsage();
         }
 
@@ -658,7 +660,7 @@ namespace OpenAI.Tests
                 new Message(Role.User, new List<Content>
                 {
                     new Content(ContentType.Text, "What's in this image?"),
-                    new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+                    new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
             var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
@@ -670,7 +672,30 @@ namespace OpenAI.Tests
             });
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
-            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
+            response.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_12_JsonMode()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant designed to output JSON."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+            };
+            var chatRequest = new ChatRequest(messages, "gpt-4-1106-preview", responseFormat: ChatResponseFormat.Json);
+            var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+
+            foreach (var choice in response.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+            }
+
             response.GetUsage();
         }
     }

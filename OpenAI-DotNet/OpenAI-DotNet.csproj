@@ -18,8 +18,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.3.1</Version>
-    <PackageReleaseNotes>Version 7.3.1
+    <Version>7.3.2</Version>
+    <PackageReleaseNotes>Version 7.3.2
+- Added detail parameter to ImageURL
+Version 7.3.1
 - Fixed json serialization settings when EnableDebug is disabled
 Version 7.3.0
 - Added AgentsEndpoint

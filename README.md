@@ -86,6 +86,7 @@ Install-Package OpenAI-DotNet
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools) :new:
   - [Vision](#chat-vision) :new:
+  - [Json Mode](#chat-json-mode) :new:
 - [Audio](#audio)
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
@@ -848,7 +849,8 @@ var messages = new List<Message>
 };
 var chatRequest = new ChatRequest(messages, Model.GPT4);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
-Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content}");
+var choice = response.FirstChoice;
+Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
 ```
 
 #### [Chat Streaming](https://platform.openai.com/docs/api-reference/chat/create#chat/create-stream)
@@ -871,7 +873,7 @@ var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, partial
     }
 });
 var choice = response.FirstChoice;
-Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message.Content} | Finish Reason: {choice.FinishReason}");
+Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
 ```
 
 Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
@@ -943,7 +945,7 @@ var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(response.FirstChoice.Message);
 
-Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
 var locationMessage = new Message(Role.User, "I'm in Glasgow, Scotland");
 messages.Add(locationMessage);
@@ -953,9 +955,9 @@ response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(response.FirstChoice.Message);
 
-if (!string.IsNullOrEmpty(response.FirstChoice.Message.Content))
+if (!string.IsNullOrEmpty(response.FirstChoice))
 {
-    Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishReason}");
+    Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
     var unitMessage = new Message(Role.User, "celsius");
     messages.Add(unitMessage);
@@ -995,12 +997,39 @@ var messages = new List<Message>
     new Message(Role.User, new List<Content>
     {
         new Content(ContentType.Text, "What's in this image?"),
-        new Content(ContentType.ImageUrl, "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg")
+        new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
     })
 };
 var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
+```
+
+#### [Chat Json Mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
+
+> :warning: Beta Feature
+
+Important notes:
+
+- When using JSON mode, always instruct the model to produce JSON via some message in the conversation, for example via your system message. If you don't include an explicit instruction to generate JSON, the model may generate an unending stream of whitespace and the request may run continually until it reaches the token limit. To help ensure you don't forget, the API will throw an error if the string "JSON" does not appear somewhere in the context.
+- The JSON in the message the model returns may be partial (i.e. cut off) if `finish_reason` is length, which indicates the generation exceeded max_tokens or the conversation exceeded the token limit. To guard against this, check `finish_reason` before parsing the response.
+- JSON mode will not guarantee the output matches any specific schema, only that it is valid and parses without errors.
+
+```csharp
+var messages = new List<Message>
+{
+    new Message(Role.System, "You are a helpful assistant designed to output JSON."),
+    new Message(Role.User, "Who won the world series in 2020?"),
+};
+var chatRequest = new ChatRequest(messages, "gpt-4-1106-preview", responseFormat: ChatResponseFormat.Json);
+var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+
+foreach (var choice in response.Choices)
+{
+    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+}
+
+response.GetUsage();
 ```
 
 ### [Audio](https://platform.openai.com/docs/api-reference/audio)
