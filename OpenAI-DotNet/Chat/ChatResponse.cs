@@ -71,7 +71,7 @@ namespace OpenAI.Chat
 
         public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
 
-        public static implicit operator string(ChatResponse response) => response.ToString();
+        public static implicit operator string(ChatResponse response) => response?.ToString();
 
         internal void CopyFrom(ChatResponse other)
         {

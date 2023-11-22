@@ -125,7 +125,7 @@ namespace OpenAI.Chat
 
         public override string ToString() => Content?.ToString() ?? string.Empty;
 
-        public static implicit operator string(Message message) => message.ToString();
+        public static implicit operator string(Message message) => message?.ToString();
 
         internal void CopyFrom(Delta other)
         {

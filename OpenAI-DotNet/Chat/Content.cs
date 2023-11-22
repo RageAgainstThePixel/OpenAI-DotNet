@@ -22,6 +22,12 @@ namespace OpenAI.Chat
             }
         }
 
+        public Content(ImageUrl imageUrl)
+        {
+            Type = ContentType.ImageUrl;
+            ImageUrl = imageUrl;
+        }
+
         [JsonInclude]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter<ContentType>))]
@@ -36,5 +42,7 @@ namespace OpenAI.Chat
         [JsonPropertyName("image_url")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageUrl ImageUrl { get; private set; }
+
+        public static implicit operator Content(ImageUrl imageUrl) => new Content(imageUrl);
     }
 }
