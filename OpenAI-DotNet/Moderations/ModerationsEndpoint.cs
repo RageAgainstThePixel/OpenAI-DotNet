@@ -67,6 +67,7 @@ namespace OpenAI.Moderations
             for (int i = 0; i < input.Length; i += chunkSize - overlap)
             {
                 var result = await GetModerationAsync(input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))], model, cancellationToken);
+
                 if (result)
                 {
                     return true;
