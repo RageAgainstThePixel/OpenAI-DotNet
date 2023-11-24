@@ -15,6 +15,9 @@ namespace OpenAI.Tests
             var isViolation = await OpenAIClient.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
             Assert.IsTrue(isViolation);
 
+            var isChunkedViolation = await OpenAIClient.ModerationsEndpoint.GetModerationChunkedAsync("I want to kill them.");
+            Assert.IsTrue(isChunkedViolation);
+            
             var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
             Assert.IsNotNull(response);
             Console.WriteLine(response.Results?[0]?.Scores?.ToString());
