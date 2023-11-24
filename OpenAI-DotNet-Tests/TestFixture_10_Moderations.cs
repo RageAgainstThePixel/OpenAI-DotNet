@@ -22,5 +22,17 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response);
             Console.WriteLine(response.Results?[0]?.Scores?.ToString());
         }
+
+        [Test]
+        public async Task Test_2_ModerationChunked()
+        {
+            Assert.IsNotNull(OpenAIClient.ModerationsEndpoint);
+
+            var isChunkedViolation = await OpenAIClient.ModerationsEndpoint.GetModerationChunkedAsync(
+                "I don't want to kill them. I want to kill them. I want to kill them.", chunkSize: "I don't want to kill them.".Length,
+                chunkOverlap: 4);
+
+            Assert.IsTrue(isChunkedViolation);
+        }
     }
 }

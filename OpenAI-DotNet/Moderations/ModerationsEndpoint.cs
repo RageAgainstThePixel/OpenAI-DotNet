@@ -37,7 +37,7 @@ namespace OpenAI.Moderations
         /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
         /// </param>
         /// <param name="chunkSize">Maximum size each chunk can be.</param>
-        /// <param name="overlap">How many characters a chunk should contain from the previous chunk.</param>
+        /// <param name="chunkOverlap">How many characters a chunk should contain from the previous chunk.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>
         /// True, if the text has been flagged by the model as violating OpenAI's content policy.
@@ -46,7 +46,7 @@ namespace OpenAI.Moderations
             string input,
             string model = null,
             int chunkSize = 1000,
-            int overlap = 100,
+            int chunkOverlap = 100,
             CancellationToken cancellationToken = default)
         {
             if (chunkSize <= 0)
@@ -54,17 +54,17 @@ namespace OpenAI.Moderations
                 throw new ArgumentException($"{nameof(chunkSize)} must be greater than 0");
             }
 
-            if (overlap <= 0)
+            if (chunkOverlap <= 0)
             {
-                throw new ArgumentException($"{nameof(overlap)} must be greater than 0");
+                throw new ArgumentException($"{nameof(chunkOverlap)} must be greater than 0");
             }
 
-            if (overlap >= chunkSize)
+            if (chunkOverlap >= chunkSize)
             {
-                throw new ArgumentException($"{nameof(overlap)} must be smaller than {nameof(chunkSize)}");
+                throw new ArgumentException($"{nameof(chunkOverlap)} must be smaller than {nameof(chunkSize)}");
             }
             
-            for (int i = 0; i < input.Length; i += chunkSize - overlap)
+            for (int i = 0; i < input.Length; i += chunkSize - chunkOverlap)
             {
                 var result = await GetModerationAsync(input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))], model, cancellationToken);
 
