@@ -36,8 +36,33 @@ namespace OpenAI.Moderations
         /// </returns>
         public async Task<bool> GetModerationAsync(string input, string model = null, CancellationToken cancellationToken = default)
         {
-            var result = await CreateModerationAsync(new ModerationsRequest(input, model), cancellationToken).ConfigureAwait(false);
-            return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
+            const int chunkSize = 1000;
+            const int overlap = chunkSize / 10;
+        
+            ModerationsResponse result;
+            if (input.Length / chunkSize <= 2)
+            {
+                result = await CreateModerationAsync(new ModerationsRequest(input, model), cancellationToken).ConfigureAwait(false);
+                return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
+            }
+        
+            for (int i = 0; i < input.Length; i += chunkSize - overlap)
+            {
+                var jsonContent = JsonSerializer.Serialize(
+                    new ModerationsRequest(input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))], model),
+                    OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+        
+                var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+                var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+        
+                result = response.Deserialize<ModerationsResponse>(responseAsString, Api);
+                if (result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged))
+                {
+                    return true;
+                }
+            }
+        
+            return false;
         }
 
         /// <summary>
