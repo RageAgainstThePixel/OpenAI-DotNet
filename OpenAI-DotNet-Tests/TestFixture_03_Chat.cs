@@ -552,6 +552,15 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
+
+            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            {
+                Assert.IsNotNull(partialResponse);
+                Assert.NotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
+            });
+            Assert.IsNotNull(response);
         }
 
         [Test]
