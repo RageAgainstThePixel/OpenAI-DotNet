@@ -19,8 +19,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI API</Title>
     <Version>7.3.4</Version>
-    <PackageReleaseNotes>Version 7.3.4
+    <PackageReleaseNotes>Version 7.3.5
 - Added GetModerationChunkedAsync method in ModerationsEndpoint
+Version 7.3.4
+- Fixed AudioTranslationRequest.Temperature type. int? -&gt; float?
 Version 7.3.3
 - Fixed Threads.FileCitation json property name
 Version 7.3.2
