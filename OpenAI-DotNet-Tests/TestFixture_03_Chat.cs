@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using OpenAI.Chat;
 using OpenAI.Models;
 using OpenAI.Tests.Weather;
@@ -683,6 +683,67 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response.Choices);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
             response.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_ChatCompletion_Multiple_Tools_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful weather assistant."),
+                new Message(Role.User, "What's the weather like today in San Diego and LA?"),
+            };
+
+            var tools = new List<Tool>
+            {
+                new Function(
+                    nameof(WeatherService.GetCurrentWeather),
+                    "Get the current weather in a given location",
+                    new JsonObject
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new JsonObject
+                        {
+                            ["location"] = new JsonObject
+                            {
+                                ["type"] = "string",
+                                ["description"] = "The city and state, e.g. San Francisco, CA"
+                            },
+                            ["unit"] = new JsonObject
+                            {
+                                ["type"] = "string",
+                                ["enum"] = new JsonArray { "celsius", "fahrenheit" }
+                            }
+                        },
+                        ["required"] = new JsonArray { "location", "unit" }
+                    })
+            };
+
+            var chatRequest = new ChatRequest(messages, model: "gpt-4-1106-preview", tools: tools, toolChoice: "auto");
+            var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            {
+                Assert.IsNotNull(partialResponse);
+                Assert.NotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
+            });
+            
+            messages.Add(response.FirstChoice.Message);
+
+            var toolCalls = response.FirstChoice.Message.ToolCalls;
+
+            Assert.NotNull(toolCalls);
+            Assert.AreEqual(2, toolCalls.Count);
+
+            foreach (var toolCall in toolCalls)
+            {
+                messages.Add(new Message(toolCall, "Sunny!"));
+            }
+
+            chatRequest = new ChatRequest(messages, model: "gpt-4-1106-preview", tools: tools, toolChoice: "auto");
+            response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+
+            Assert.IsNotNull(response);
         }
 
         [Test]
