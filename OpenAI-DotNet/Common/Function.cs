@@ -93,7 +93,7 @@ namespace OpenAI
                 if (arguments == null &&
                     !string.IsNullOrWhiteSpace(argumentsString))
                 {
-                    arguments = JsonNode.Parse(argumentsString);
+                    arguments = JsonValue.Create(argumentsString);
                 }
 
                 return arguments;
