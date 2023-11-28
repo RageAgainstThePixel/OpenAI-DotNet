@@ -72,8 +72,8 @@ namespace OpenAI.Tests
 
             foreach (var file in fileList)
             {
-                var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
-                Assert.IsTrue(result);
+                var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
+                Assert.IsTrue(isDeleted);
                 Console.WriteLine($"{file.Id} -> deleted");
             }
 

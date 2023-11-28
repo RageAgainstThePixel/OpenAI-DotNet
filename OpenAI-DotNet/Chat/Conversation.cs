@@ -25,6 +25,6 @@ namespace OpenAI.Chat
 
         public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
 
-        public static implicit operator string(Conversation conversation) => conversation.ToString();
+        public static implicit operator string(Conversation conversation) => conversation?.ToString();
     }
 }

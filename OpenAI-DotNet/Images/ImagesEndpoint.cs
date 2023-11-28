@@ -16,7 +16,7 @@ namespace OpenAI.Images
     public sealed class ImagesEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal ImagesEndpoint(OpenAIClient api) : base(api) { }
+        internal ImagesEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "images";
@@ -63,7 +63,7 @@ namespace OpenAI.Images
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
@@ -139,7 +139,7 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-            var response = await Api.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
@@ -197,14 +197,14 @@ namespace OpenAI.Images
             }
 
             request.Dispose();
-            var response = await Api.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<IReadOnlyList<ImageResult>> DeserializeResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, Api);
+            var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, client);
 
             if (imagesResponse?.Results is not { Count: not 0 })
             {

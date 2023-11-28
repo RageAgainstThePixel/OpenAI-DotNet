@@ -15,10 +15,44 @@ namespace OpenAI.Moderations
     public sealed class ModerationsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        public ModerationsEndpoint(OpenAIClient api) : base(api) { }
+        public ModerationsEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "moderations";
+
+        /// <summary>
+        /// Classifies if text violates OpenAI's Content Policy.
+        /// </summary>
+        /// <param name="input">
+        /// The input text to classify.
+        /// </param>
+        /// <param name="model">The default is text-moderation-latest which will be automatically upgraded over time.
+        /// This ensures you are always using our most accurate model.
+        /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
+        /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
+        /// </param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>
+        /// True, if the text has been flagged by the model as violating OpenAI's content policy.
+        /// </returns>
+        public async Task<bool> GetModerationAsync(string input, string model = null, CancellationToken cancellationToken = default)
+        {
+            var result = await CreateModerationAsync(new ModerationsRequest(input, model), cancellationToken).ConfigureAwait(false);
+            return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
+        }
+
+        /// <summary>
+        /// Classifies if text violates OpenAI's Content Policy
+        /// </summary>
+        /// <param name="request"><see cref="ModerationsRequest"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
+        {
+            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
+            var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<ModerationsResponse>(responseAsString, client);
+        }
 
         /// <summary>
         /// Classifies if text violates OpenAI's Content Policy.
@@ -63,7 +97,7 @@ namespace OpenAI.Moderations
             {
                 throw new ArgumentException($"{nameof(chunkOverlap)} must be smaller than {nameof(chunkSize)}");
             }
-            
+
             for (int i = 0; i < input.Length; i += chunkSize - chunkOverlap)
             {
                 var result = await GetModerationAsync(input[i..(i + chunkSize > input.Length ? ^1 : (i + chunkSize))], model, cancellationToken);
@@ -75,40 +109,6 @@ namespace OpenAI.Moderations
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Classifies if text violates OpenAI's Content Policy.
-        /// </summary>
-        /// <param name="input">
-        /// The input text to classify.
-        /// </param>
-        /// <param name="model">The default is text-moderation-latest which will be automatically upgraded over time.
-        /// This ensures you are always using our most accurate model.
-        /// If you use text-moderation-stable, we will provide advanced notice before updating the model.
-        /// Accuracy of text-moderation-stable may be slightly lower than for text-moderation-latest.
-        /// </param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>
-        /// True, if the text has been flagged by the model as violating OpenAI's content policy.
-        /// </returns>
-        public async Task<bool> GetModerationAsync(string input, string model = null, CancellationToken cancellationToken = default)
-        {
-            var result = await CreateModerationAsync(new ModerationsRequest(input, model), cancellationToken).ConfigureAwait(false);
-            return result?.Results is { Count: not 0 } && result.Results.Any(moderationResult => moderationResult.Flagged);
-        }
-
-        /// <summary>
-        /// Classifies if text violates OpenAI's Content Policy
-        /// </summary>
-        /// <param name="request"><see cref="ModerationsRequest"/></param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
-        {
-            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ModerationsResponse>(responseAsString, Api);
         }
     }
 }

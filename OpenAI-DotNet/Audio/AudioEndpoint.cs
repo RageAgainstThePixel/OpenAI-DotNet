@@ -27,7 +27,7 @@ namespace OpenAI.Audio
         }
 
         /// <inheritdoc />
-        public AudioEndpoint(OpenAIClient api) : base(api) { }
+        public AudioEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "audio";
@@ -42,7 +42,7 @@ namespace OpenAI.Audio
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
@@ -106,7 +106,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json
@@ -143,7 +143,7 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await Api.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json

@@ -14,7 +14,7 @@ namespace OpenAI.Edits
     public sealed class EditsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        public EditsEndpoint(OpenAIClient api) : base(api) { }
+        public EditsEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "edits";
@@ -62,9 +62,9 @@ namespace OpenAI.Edits
         public async Task<EditResponse> CreateEditAsync(EditRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<EditResponse>(responseAsString, Api);
+            return response.Deserialize<EditResponse>(responseAsString, client);
         }
     }
 }

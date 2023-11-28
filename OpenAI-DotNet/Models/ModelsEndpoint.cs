@@ -23,7 +23,7 @@ namespace OpenAI.Models
         }
 
         /// <inheritdoc />
-        public ModelsEndpoint(OpenAIClient api) : base(api) { }
+        public ModelsEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "models";
@@ -35,7 +35,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the list of all <see cref="Model"/>s</returns>
         public async Task<IReadOnlyList<Model>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<ModelsList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Models;
         }
@@ -48,7 +48,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the <see cref="Model"/> with all available properties</returns>
         public async Task<Model> GetModelDetailsAsync(string id, CancellationToken cancellationToken = default)
         {
-            var response = await Api.Client.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<Model>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
@@ -72,7 +72,7 @@ namespace OpenAI.Models
 
             try
             {
-                var response = await Api.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
+                var response = await client.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
                 return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }

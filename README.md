@@ -867,10 +867,7 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages);
 var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
 {
-    foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
-    {
-        Console.Write(choice.Delta.Content);
-    }
+    Console.Write(choice.Delta.ToString());
 });
 var choice = response.FirstChoice;
 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
@@ -902,6 +899,8 @@ Console.WriteLine(cumulativeDelta);
 
 #### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
 
+> Only available with the latest 0613 model series!
+
 ```csharp
 var api = new OpenAIClient();
 var messages = new List<Message>
@@ -912,7 +911,7 @@ var messages = new List<Message>
 
 foreach (var message in messages)
 {
-    Console.WriteLine($"{message.Role}: {message.Content}");
+    Console.WriteLine($"{message.Role}: {message}");
 }
 
 // Define the tools that the assistant is able to use:
@@ -955,7 +954,7 @@ response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(response.FirstChoice.Message);
 
-if (!string.IsNullOrEmpty(response.FirstChoice))
+if (!string.IsNullOrEmpty(response.ToString()))
 {
     Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
@@ -988,6 +987,7 @@ Console.WriteLine($"{Role.Tool}: {functionResult}");
 #### [Chat Vision](https://platform.openai.com/docs/guides/vision)
 
 > :warning: Beta Feature
+> Currently, GPT-4 with vision does not support the `message.name` parameter, functions/tools, nor the `response_format` parameter.
 
 ```csharp
 var api = new OpenAIClient();
@@ -996,7 +996,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant."),
     new Message(Role.User, new List<Content>
     {
-        new Content(ContentType.Text, "What's in this image?"),
+        "What's in this image?",
         new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
     })
 };
@@ -1066,7 +1066,7 @@ var response = await api.AudioEndpoint.CreateTranscriptionAsync(request);
 Console.WriteLine(response);
 ```
 
-#### [Create Translation](https://platform.openai.com/docs/api-reference/audio/create)
+#### [Create Translation](https://platform.openai.com/docs/api-reference/audio/createTranslation)
 
 Translates audio into into English.
 
@@ -1230,7 +1230,7 @@ foreach (var job in jobList.Items.OrderByDescending(job => job.CreatedAt)))
 }
 ```
 
-#### [Retrieve Fine Tune Job Info](https://platform.openai.com/docs/api-reference/fine-tunes/retrieve)
+#### [Retrieve Fine Tune Job Info](https://platform.openai.com/docs/api-reference/fine-tuning/retrieve)
 
 Gets info about the fine-tune job.
 
@@ -1240,7 +1240,7 @@ var job = await api.FineTuningEndpoint.GetJobInfoAsync(fineTuneJob);
 Console.WriteLine($"{job.Id} -> {job.CreatedAt} | {job.Status}");
 ```
 
-#### [Cancel Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tunes/cancel)
+#### [Cancel Fine Tune Job](https://platform.openai.com/docs/api-reference/fine-tuning/cancel)
 
 Immediately cancel a fine-tune job.
 

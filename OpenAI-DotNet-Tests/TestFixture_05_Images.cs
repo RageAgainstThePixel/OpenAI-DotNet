@@ -13,8 +13,7 @@ namespace OpenAI.Tests
         public async Task Test_1_GenerateImages()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
-
-            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_2);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_3);
             var imageResults = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(imageResults);

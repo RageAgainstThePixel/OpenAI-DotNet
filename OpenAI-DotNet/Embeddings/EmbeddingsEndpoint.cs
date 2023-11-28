@@ -13,7 +13,7 @@ namespace OpenAI.Embeddings
     public sealed class EmbeddingsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        public EmbeddingsEndpoint(OpenAIClient api) : base(api) { }
+        public EmbeddingsEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "embeddings";
@@ -66,9 +66,9 @@ namespace OpenAI.Embeddings
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<EmbeddingsResponse>(responseAsString, Api);
+            return response.Deserialize<EmbeddingsResponse>(responseAsString, client);
         }
     }
 }
