@@ -155,18 +155,12 @@ namespace OpenAI.Chat
 
                     if (otherToolCall.Index.HasValue)
                     {
-                        if (toolCalls.Count == 0)
-                        {
-                            toolCalls.Insert(otherToolCall.Index.Value, new Tool(otherToolCall));
-                        }
-                        else if (otherToolCall.Index + 1 > toolCalls.Count)
+                        if (otherToolCall.Index + 1 > toolCalls.Count)
                         {
                             toolCalls.Insert(otherToolCall.Index.Value, otherToolCall);
                         }
-                        else
-                        {
-                            toolCalls[otherToolCall.Index.Value].CopyFrom(otherToolCall);
-                        }
+                        
+                        toolCalls[otherToolCall.Index.Value].CopyFrom(otherToolCall);
                     }
                     else
                     {
