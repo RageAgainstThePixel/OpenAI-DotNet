@@ -18,8 +18,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI API</Title>
-    <Version>7.3.5</Version>
-    <PackageReleaseNotes>Version 7.3.5
+    <Version>7.3.6</Version>
+    <PackageReleaseNotes>Version 7.3.6
+- Fixed ArgumentOutOfRangeException when streaming chat completion response contains more than one tool
+Version 7.3.5
 - Added GetModerationChunkedAsync method in ModerationsEndpoint
 - Fixed streaming function tool serialization
 Version 7.3.4
