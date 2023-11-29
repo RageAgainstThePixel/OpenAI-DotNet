@@ -17,9 +17,15 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
-    <Title>OpenAI API</Title>
-    <Version>7.3.7</Version>
-    <PackageReleaseNotes>Version 7.3.7
+    <Title>OpenAI-DotNet</Title>
+    <Version>7.3.8</Version>
+    <PackageReleaseNotes>Version 7.3.8
+- Added Chat.Content.ctr overloads and implicit casting for easier usage
+- Internal refactoring of FilesEndpoint.DeleteFileAsync (better status checking)
+- Internal refactoring of FineTuningEndpoint to ensure we're properly setting response data
+- Updated unit tests
+- Updated docs
+Version 7.3.7
 - Fixes streaming with tools not being property copied over
 Version 7.3.6
 - Fixed ArgumentOutOfRangeException when streaming chat completion response contains more than one tool

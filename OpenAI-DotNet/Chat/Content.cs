@@ -7,6 +7,18 @@ namespace OpenAI.Chat
     {
         public Content() { }
 
+        public Content(ImageUrl imageUrl)
+        {
+            Type = ContentType.ImageUrl;
+            ImageUrl = imageUrl;
+        }
+
+        public Content(string input)
+        {
+            Type = ContentType.Text;
+            Text = input;
+        }
+
         public Content(ContentType type, string input)
         {
             Type = type;
@@ -20,12 +32,6 @@ namespace OpenAI.Chat
                     ImageUrl = new ImageUrl(input);
                     break;
             }
-        }
-
-        public Content(ImageUrl imageUrl)
-        {
-            Type = ContentType.ImageUrl;
-            ImageUrl = imageUrl;
         }
 
         [JsonInclude]
@@ -42,6 +48,8 @@ namespace OpenAI.Chat
         [JsonPropertyName("image_url")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageUrl ImageUrl { get; private set; }
+
+        public static implicit operator Content(string input) => new Content(ContentType.Text, input);
 
         public static implicit operator Content(ImageUrl imageUrl) => new Content(imageUrl);
     }

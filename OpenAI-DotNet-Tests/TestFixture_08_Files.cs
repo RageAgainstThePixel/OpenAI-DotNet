@@ -15,7 +15,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.FilesEndpoint);
             var testData = new Conversation(new List<Message> { new Message(Role.Assistant, "I'm a learning language model") });
-            await File.WriteAllTextAsync("test.jsonl", JsonSerializer.Serialize(testData, OpenAIClient.JsonSerializationOptions));
+            await File.WriteAllTextAsync("test.jsonl", testData);
             Assert.IsTrue(File.Exists("test.jsonl"));
             var result = await OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune");
             Assert.IsNotNull(result);
@@ -72,8 +72,8 @@ namespace OpenAI.Tests
 
             foreach (var file in fileList)
             {
-                var result = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
-                Assert.IsTrue(result);
+                var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
+                Assert.IsTrue(isDeleted);
                 Console.WriteLine($"{file.Id} -> deleted");
             }
 

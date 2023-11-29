@@ -5,9 +5,10 @@ namespace OpenAI
 {
     public abstract class BaseEndPoint
     {
-        protected BaseEndPoint(OpenAIClient api) => Api = api;
+        protected BaseEndPoint(OpenAIClient client) => this.client = client;
 
-        protected readonly OpenAIClient Api;
+        // ReSharper disable once InconsistentNaming
+        protected readonly OpenAIClient client;
 
         /// <summary>
         /// The root endpoint address.
@@ -21,9 +22,9 @@ namespace OpenAI
         /// <param name="queryParameters">Optional, parameters to add to the endpoint.</param>
         protected string GetUrl(string endpoint = "", Dictionary<string, string> queryParameters = null)
         {
-            var result = string.Format(Api.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{endpoint}");
+            var result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{endpoint}");
 
-            foreach (var defaultQueryParameter in Api.OpenAIClientSettings.DefaultQueryParameters)
+            foreach (var defaultQueryParameter in client.OpenAIClientSettings.DefaultQueryParameters)
             {
                 queryParameters ??= new Dictionary<string, string>();
                 queryParameters.Add(defaultQueryParameter.Key, defaultQueryParameter.Value);
@@ -45,7 +46,7 @@ namespace OpenAI
         /// </summary>
         public bool EnableDebug
         {
-            get => enableDebug || Api.EnableDebug;
+            get => enableDebug || client.EnableDebug;
             set => enableDebug = value;
         }
     }

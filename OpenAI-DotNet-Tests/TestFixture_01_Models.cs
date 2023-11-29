@@ -10,6 +10,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_1_GetModels()
         {
+            Assert.IsNotNull(OpenAIClient.ModelsEndpoint);
             var results = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Assert.IsNotNull(results);
             Assert.NotZero(results.Count);
@@ -18,7 +19,9 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_2_RetrieveModelDetails()
         {
+            Assert.IsNotNull(OpenAIClient.ModelsEndpoint);
             var models = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
+            Assert.IsNotEmpty(models);
             Console.WriteLine($"Found {models.Count} models!");
 
             foreach (var model in models.OrderBy(model => model.Id))

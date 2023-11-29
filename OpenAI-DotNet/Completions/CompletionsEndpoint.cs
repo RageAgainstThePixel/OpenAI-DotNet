@@ -22,7 +22,7 @@ namespace OpenAI.Completions
     public sealed class CompletionsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        internal CompletionsEndpoint(OpenAIClient api) : base(api) { }
+        internal CompletionsEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "completions";
@@ -111,9 +111,9 @@ namespace OpenAI.Completions
         {
             completionRequest.Stream = false;
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<CompletionResponse>(responseAsString, Api);
+            return response.Deserialize<CompletionResponse>(responseAsString, client);
         }
 
         #endregion Non-Streaming
@@ -205,7 +205,7 @@ namespace OpenAI.Completions
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
             request.Content = jsonContent;
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -218,7 +218,7 @@ namespace OpenAI.Completions
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
 
-                    resultHandler(response.Deserialize<CompletionResponse>(eventData, Api));
+                    resultHandler(response.Deserialize<CompletionResponse>(eventData, client));
                 }
                 else
                 {
@@ -314,7 +314,7 @@ namespace OpenAI.Completions
             var jsonContent = JsonSerializer.Serialize(completionRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
             request.Content = jsonContent;
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -326,7 +326,7 @@ namespace OpenAI.Completions
                 if (streamData.TryGetEventStreamData(out var eventData))
                 {
                     if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-                    yield return response.Deserialize<CompletionResponse>(eventData, Api);
+                    yield return response.Deserialize<CompletionResponse>(eventData, client);
                 }
                 else
                 {

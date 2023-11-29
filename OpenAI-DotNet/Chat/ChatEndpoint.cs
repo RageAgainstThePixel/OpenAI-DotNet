@@ -17,7 +17,7 @@ namespace OpenAI.Chat
     public sealed class ChatEndpoint : BaseEndPoint
     {
         /// <inheritdoc />
-        public ChatEndpoint(OpenAIClient api) : base(api) { }
+        public ChatEndpoint(OpenAIClient client) : base(client) { }
 
         /// <inheritdoc />
         protected override string Root => "chat";
@@ -31,9 +31,9 @@ namespace OpenAI.Chat
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await Api.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ChatResponse>(responseAsString, Api);
+            return response.Deserialize<ChatResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace OpenAI.Chat
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = jsonContent;
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -67,7 +67,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, Api);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, client);
 
                 if (chatResponse == null)
                 {
@@ -85,7 +85,7 @@ namespace OpenAI.Chat
 
             if (chatResponse == null) { return null; }
 
-            chatResponse.SetResponseData(response.Headers, Api);
+            chatResponse.SetResponseData(response.Headers, client);
             resultHandler?.Invoke(chatResponse);
             return chatResponse;
         }
@@ -104,7 +104,7 @@ namespace OpenAI.Chat
             var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = jsonContent;
-            var response = await Api.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
@@ -122,7 +122,7 @@ namespace OpenAI.Chat
                     Console.WriteLine(eventData);
                 }
 
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, Api);
+                var partialResponse = response.Deserialize<ChatResponse>(eventData, client);
 
                 if (chatResponse == null)
                 {
@@ -140,7 +140,7 @@ namespace OpenAI.Chat
 
             if (chatResponse == null) { yield break; }
 
-            chatResponse.SetResponseData(response.Headers, Api);
+            chatResponse.SetResponseData(response.Headers, client);
             yield return chatResponse;
         }
     }
