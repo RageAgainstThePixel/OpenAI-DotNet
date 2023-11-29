@@ -20,7 +20,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Title>OpenAI-DotNet</Title>
     <Version>7.3.8</Version>
     <PackageReleaseNotes>Version 7.3.8
-- Added Chat.Content.ctr overloads and implicit casting for easier useage
+- Added Chat.Content.ctr overloads and implicit casting for easier usage
 - Internal refactoring of FilesEndpoint.DeleteFileAsync (better status checking)
 - Internal refactoring of FineTuningEndpoint to ensure we're properly setting response data
 - Updated unit tests
