@@ -18,7 +18,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_02_Moderate_Scores()
         {
-
+            Assert.IsNotNull(OpenAIClient.ModerationsEndpoint);
             var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
             Assert.IsNotNull(response);
             Console.WriteLine(response.Results?[0]?.Scores?.ToString());

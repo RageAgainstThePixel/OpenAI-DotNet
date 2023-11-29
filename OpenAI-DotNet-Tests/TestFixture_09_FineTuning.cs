@@ -80,7 +80,7 @@ namespace OpenAI.Tests
                 })
             };
             const string localTrainingDataPath = "fineTunesTestTrainingData.jsonl";
-            await File.WriteAllLinesAsync(localTrainingDataPath, conversations.Select(conversation => JsonSerializer.Serialize(conversation, OpenAIClient.JsonSerializationOptions)));
+            await File.WriteAllLinesAsync(localTrainingDataPath, conversations.Select(conversation => conversation.ToString()));
 
             var fileData = await OpenAIClient.FilesEndpoint.UploadFileAsync(localTrainingDataPath, "fine-tune");
             File.Delete(localTrainingDataPath);
@@ -188,7 +188,6 @@ namespace OpenAI.Tests
         public async Task Test_06_DeleteFineTunedModel()
         {
             Assert.IsNotNull(OpenAIClient.ModelsEndpoint);
-
             var models = await OpenAIClient.ModelsEndpoint.GetModelsAsync();
             Assert.IsNotNull(models);
             Assert.IsNotEmpty(models);

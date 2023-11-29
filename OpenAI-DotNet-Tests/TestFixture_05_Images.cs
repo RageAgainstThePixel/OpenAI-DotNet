@@ -10,7 +10,7 @@ namespace OpenAI.Tests
     internal class TestFixture_05_Images : AbstractTestFixture
     {
         [Test]
-        public async Task Test_1_GenerateImages()
+        public async Task Test_01_01_GenerateImages()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
             var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_3);
@@ -27,7 +27,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_2_GenerateImages_B64_Json()
+        public async Task Test_01_02_GenerateImages_B64_Json()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
@@ -45,7 +45,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_3_GenerateImageEdits()
+        public async Task Test_02_01_CreateImageEdit()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
@@ -66,7 +66,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_4_GenerateImageEdits_B64_Json()
+        public async Task Test_02_02_CreateImageEdit_B64_Json()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
@@ -87,7 +87,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_5_GenerateImageVariations()
+        public async Task Test_03_01_CreateImageVariation()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
@@ -106,7 +106,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_6_GenerateImageVariations_B64_Json()
+        public async Task Test_03_02_CreateImageVariation_B64_Json()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
