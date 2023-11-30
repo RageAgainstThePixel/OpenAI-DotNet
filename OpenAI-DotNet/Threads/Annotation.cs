@@ -1,8 +1,7 @@
 using OpenAI.Extensions;
-using OpenAI.Threads;
 using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Threads
 {
     public sealed class Annotation
     {

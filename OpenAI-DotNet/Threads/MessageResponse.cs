@@ -98,6 +98,6 @@ namespace OpenAI.Threads
         /// putting each item on a new line.
         /// </summary>
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
-        public string PrintContent() => string.Join("\n", Content.Select(content => content.ToString()));
+        public string PrintContent() => string.Join("\n", Content.Select(content => content?.ToString()));
     }
 }

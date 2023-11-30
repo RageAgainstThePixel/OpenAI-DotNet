@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI
+namespace OpenAI.Threads
 {
     public sealed class ContentText
     {
@@ -15,7 +15,7 @@ namespace OpenAI
         public string Value { get; private set; }
 
         /// <summary>
-        /// Annotations
+        /// Annotations.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("annotations")]

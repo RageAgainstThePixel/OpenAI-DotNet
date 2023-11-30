@@ -45,7 +45,7 @@ jobs:
     - run: dotnet restore
 
     - run: dotnet build --configuration Release --no-restore
-      
+
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
       run: dotnet test --configuration Release --collect:"XPlat Code Coverage" --logger:trx --no-build --no-restore --results-directory ./test-results
