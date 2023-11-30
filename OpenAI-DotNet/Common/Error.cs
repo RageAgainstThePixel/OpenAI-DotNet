@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Threads
+namespace OpenAI
 {
-    public sealed class RunLastError
+    public sealed class Error
     {
         /// <summary>
         /// One of server_error or rate_limit_exceeded.

@@ -26,6 +26,7 @@ namespace OpenAI.Threads
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
 
+        [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
 
         /// <summary>

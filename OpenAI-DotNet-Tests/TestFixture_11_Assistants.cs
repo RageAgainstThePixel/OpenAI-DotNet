@@ -9,7 +9,7 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_11_Assistants : AbstractTestFixture
     {
-        private static AssistantResponse testAssistant;
+        private AssistantResponse testAssistant;
 
         [Test]
         public async Task Test_01_CreateAssistant()
