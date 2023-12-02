@@ -43,7 +43,7 @@ namespace OpenAI.Audio
         {
             var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
             var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
+            await response.ThrowApiExceptionIfUnsuccessfulAsync(cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
             int bytesRead;

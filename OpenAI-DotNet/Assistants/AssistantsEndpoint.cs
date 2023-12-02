@@ -1,6 +1,7 @@
 using OpenAI.Extensions;
 using OpenAI.Files;
 using System;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="ListResponse{Assistant}"/></returns>
         public async Task<ListResponse<AssistantResponse>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            var response = await client.Client.GetResponseAsync(GetUrl(queryParameters: query), HttpMethod.Get, cancellationToken: cancellationToken);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<AssistantResponse>>(responseAsString, client);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -16,12 +17,6 @@ namespace OpenAI.Extensions
         private const string Organization = "Openai-Organization";
         private const string ProcessingTime = "Openai-Processing-Ms";
         private const string OpenAIVersion = "openai-version";
-        private const string XRateLimitLimitRequests = "x-ratelimit-limit-requests";
-        private const string XRateLimitLimitTokens = "x-ratelimit-limit-tokens";
-        private const string XRateLimitRemainingRequests = "x-ratelimit-remaining-requests";
-        private const string XRateLimitRemainingTokens = "x-ratelimit-remaining-tokens";
-        private const string XRateLimitResetRequests = "x-ratelimit-reset-requests";
-        private const string XRateLimitResetTokens = "x-ratelimit-reset-tokens";
 
         private static readonly NumberFormatInfo numberFormatInfo = new NumberFormatInfo
         {
@@ -63,51 +58,13 @@ namespace OpenAI.Extensions
             {
                 response.OpenAIVersion = version.First();
             }
-
-            if (headers.TryGetValues(XRateLimitLimitRequests, out var limitRequests) &&
-                int.TryParse(limitRequests.FirstOrDefault(), out var limitRequestsValue)
-               )
-            {
-                response.LimitRequests = limitRequestsValue;
-            }
-
-            if (headers.TryGetValues(XRateLimitLimitTokens, out var limitTokens) &&
-                int.TryParse(limitTokens.FirstOrDefault(), out var limitTokensValue))
-            {
-                response.LimitTokens = limitTokensValue;
-            }
-
-            if (headers.TryGetValues(XRateLimitRemainingRequests, out var remainingRequests) &&
-                int.TryParse(remainingRequests.FirstOrDefault(), out var remainingRequestsValue))
-            {
-                response.RemainingRequests = remainingRequestsValue;
-            }
-
-            if (headers.TryGetValues(XRateLimitRemainingTokens, out var remainingTokens) &&
-                int.TryParse(remainingTokens.FirstOrDefault(), out var remainingTokensValue))
-            {
-                response.RemainingTokens = remainingTokensValue;
-            }
-
-            if (headers.TryGetValues(XRateLimitResetRequests, out var resetRequests))
-            {
-                response.ResetRequests = resetRequests.FirstOrDefault();
-            }
-
-            if (headers.TryGetValues(XRateLimitResetTokens, out var resetTokens))
-            {
-                response.ResetTokens = resetTokens.FirstOrDefault();
-            }
         }
 
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse = false, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
         {
-            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            await ThrowApiExceptionIfUnsuccessfulAsync(response, cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
-            }
+            var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             if (debugResponse)
             {
@@ -117,12 +74,51 @@ namespace OpenAI.Extensions
             return responseAsString;
         }
 
-        internal static async Task CheckResponseAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
+        internal static async Task ThrowApiExceptionIfUnsuccessfulAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             if (!response.IsSuccessStatusCode)
             {
                 var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
+                var contentType = response.Content.Headers.ContentType;
+
+                var errorResponse = contentType is not null && contentType.MediaType == "application/json"
+                    ? JsonSerializer.Deserialize<ApiErrorResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)
+                    : null;
+
+                var errorMessage = errorResponse is null
+                    ? string.IsNullOrWhiteSpace(responseAsString)
+                        ? $"Error code: {response.StatusCode}"
+                        : responseAsString
+                    : $"Error code: {response.StatusCode} - {responseAsString}";
+
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.BadRequest:
+                        throw new OpenAIBadRequestException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.Unauthorized:
+                        throw new OpenAIAuthenticationException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.Forbidden:
+                        throw new OpenAIPermissionDeniedException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.NotFound:
+                        throw new OpenAINotFoundException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.Conflict:
+                        throw new ConflictException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.UnprocessableEntity:
+                        throw new UnprocessableEntityException(responseAsString, errorResponse?.Error, errorMessage);
+                    case HttpStatusCode.TooManyRequests:
+                        throw new RateLimitException(response.Headers, responseAsString, errorResponse?.Error);
+                    default:
+                        int statusCode = (int)response.StatusCode;
+                        if (statusCode>= 500)
+                        {
+                            // Not sure if it makes sense to handle ApIError here, as it most definitely might be null.
+                            // It'd be surprised if they're handling 5XX with user-friendly payloads.
+                            // For sake of not assuming anything, I'm writing this like so for now.
+                            throw new InternalServerException(statusCode, responseAsString, errorResponse?.Error);
+                        }
+
+                        throw new OpenAIStatusException(errorMessage, statusCode, responseAsString, errorResponse?.Error);
+                }
             }
         }
 

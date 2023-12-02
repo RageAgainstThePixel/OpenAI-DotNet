@@ -206,7 +206,7 @@ namespace OpenAI.Completions
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
             request.Content = jsonContent;
             var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
+            await response.ThrowApiExceptionIfUnsuccessfulAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
@@ -315,7 +315,7 @@ namespace OpenAI.Completions
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl());
             request.Content = jsonContent;
             var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
+            await response.ThrowApiExceptionIfUnsuccessfulAsync(cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
