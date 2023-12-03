@@ -18,8 +18,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI-DotNet</Title>
-    <Version>7.4.0</Version>
-    <PackageReleaseNotes>Version 7.4.0
+    <Version>7.4.1</Version>
+    <PackageReleaseNotes>
+Version 7.4.1
+- Fixed AssistantExtension.UploadFileAsync spelling error with file purpose.
+Version 7.4.0
 - Refactored OpenAI.Threads.LastRunError -&gt; OpenAI.Error for more generic use in future.
 - Fixed OpenAI.Threads.Annotations namespace
 - Fixed OpenAI.Threads.ContextText namespace
