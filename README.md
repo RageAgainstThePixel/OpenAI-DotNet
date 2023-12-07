@@ -91,22 +91,22 @@ Install-Package OpenAI-DotNet
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images) :construction:
-  - [Create Image](#create-image) :construction:
-  - [Edit Image](#edit-image) :construction:
-  - [Create Image Variation](#create-image-variation) :construction:
-- [Files](#files) :construction:
-  - [List Files](#list-files) :construction:
+- [Images](#images)
+  - [Create Image](#create-image)
+  - [Edit Image](#edit-image)
+  - [Create Image Variation](#create-image-variation)
+- [Files](#files)
+  - [List Files](#list-files)
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
-  - [Retrieve File](#retrieve-file-info) :construction:
+  - [Retrieve File](#retrieve-file-info)
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning) :construction:
-  - [Create Fine Tune Job](#create-fine-tune-job) :construction:
-  - [List Fine Tune Jobs](#list-fine-tune-jobs) :construction:
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :construction:
+- [Fine Tuning](#fine-tuning)
+  - [Create Fine Tune Job](#create-fine-tune-job)
+  - [List Fine Tune Jobs](#list-fine-tune-jobs)
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
   - [Cancel Fine Tune Job](#cancel-fine-tune-job)
-  - [List Fine Tune Job Events](#list-fine-tune-job-events) :construction:
+  - [List Fine Tune Job Events](#list-fine-tune-job-events)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
 - [Moderations](#moderations)

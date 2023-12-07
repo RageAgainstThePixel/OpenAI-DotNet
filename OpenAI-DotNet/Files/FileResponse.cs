@@ -41,7 +41,7 @@ namespace OpenAI.Files
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("bytes")]
-        public int Size { get; private set; }
+        public int? Size { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the file was created.
