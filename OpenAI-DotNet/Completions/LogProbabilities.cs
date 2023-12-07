@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Completions
@@ -6,6 +7,7 @@ namespace OpenAI.Completions
     /// <summary>
     /// Object belonging to a <see cref="Choice"/>
     /// </summary>
+    [Obsolete("Deprecated")]
     public sealed class LogProbabilities
     {
         [JsonInclude]

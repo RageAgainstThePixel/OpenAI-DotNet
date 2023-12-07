@@ -17,11 +17,6 @@ namespace OpenAI.Threads
         public TextContent Text { get; private set; }
 
         [JsonInclude]
-        [JsonPropertyName("image_url")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ImageUrl ImageUrl { get; private set; }
-
-        [JsonInclude]
         [JsonPropertyName("image_file")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageFile ImageFile { get; private set; }
@@ -30,7 +25,6 @@ namespace OpenAI.Threads
             => Type switch
             {
                 ContentType.Text => Text.Value,
-                ContentType.ImageUrl => ImageUrl.Url,
                 ContentType.ImageFile => ImageFile.FileId,
                 _ => throw new ArgumentOutOfRangeException()
             };

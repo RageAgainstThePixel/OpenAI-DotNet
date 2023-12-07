@@ -8,6 +8,7 @@ namespace OpenAI.Completions
     /// <summary>
     /// Represents a result from calling the <see cref="CompletionsEndpoint"/>.
     /// </summary>
+    [Obsolete("Deprecated")]
     public sealed class CompletionResponse : BaseResponse
     {
         public CompletionResponse() { }
