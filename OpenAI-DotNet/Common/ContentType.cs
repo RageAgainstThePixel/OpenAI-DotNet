@@ -7,6 +7,8 @@ namespace OpenAI
         [EnumMember(Value = "text")]
         Text,
         [EnumMember(Value = "image_url")]
-        ImageUrl
+        ImageUrl,
+        [EnumMember(Value = "image_file")]
+        ImageFile
     }
 }
