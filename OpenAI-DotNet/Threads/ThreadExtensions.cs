@@ -232,7 +232,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> RetrieveRunAsync(this ThreadResponse thread, string runId, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.RetrieveRunAsync(thread.Id, runId, cancellationToken);
+            => await thread.Client.ThreadsEndpoint.RetrieveRunAsync(thread.Id, runId, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Modifies a run.
