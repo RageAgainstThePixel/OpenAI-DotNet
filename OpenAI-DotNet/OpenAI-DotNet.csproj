@@ -18,8 +18,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI-DotNet</Title>
-    <Version>7.4.3</Version>
+    <Version>7.4.4</Version>
     <PackageReleaseNotes>
+Version 7.4.4
+- Updated Docs
 Version 7.4.3
 - Updated FileResponse.Size int -&gt; int?
 Version 7.4.2
