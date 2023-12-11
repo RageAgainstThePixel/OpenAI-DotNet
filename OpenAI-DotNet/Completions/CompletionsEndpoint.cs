@@ -19,6 +19,7 @@ namespace OpenAI.Completions
     /// (see the prompt library for inspiration).<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/completions"/>
     /// </summary>
+    [Obsolete("Deprecated")]
     public sealed class CompletionsEndpoint : BaseEndPoint
     {
         /// <inheritdoc />

@@ -1,10 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Completions
 {
     /// <summary>
     /// Represents a completion choice returned by the <see cref="CompletionsEndpoint"/>.
     /// </summary>
+    [Obsolete("Deprecated")]
     public sealed class Choice
     {
         /// <summary>

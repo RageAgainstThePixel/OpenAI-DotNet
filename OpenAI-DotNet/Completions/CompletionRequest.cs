@@ -10,6 +10,7 @@ namespace OpenAI.Completions
     /// <see href="https://platform.openai.com/docs/api-reference/completions">the OpenAI docs</see>,
     /// although some have been renames or expanded into single/multiple properties for ease of use.
     /// </summary>
+    [Obsolete("Deprecated")]
     public sealed class CompletionRequest
     {
         [JsonPropertyName("model")]

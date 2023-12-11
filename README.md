@@ -91,28 +91,28 @@ Install-Package OpenAI-DotNet
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images) :construction:
-  - [Create Image](#create-image) :construction:
-  - [Edit Image](#edit-image) :construction:
-  - [Create Image Variation](#create-image-variation) :construction:
-- [Files](#files) :construction:
-  - [List Files](#list-files) :construction:
+- [Images](#images)
+  - [Create Image](#create-image)
+  - [Edit Image](#edit-image)
+  - [Create Image Variation](#create-image-variation)
+- [Files](#files)
+  - [List Files](#list-files)
   - [Upload File](#upload-file)
   - [Delete File](#delete-file)
-  - [Retrieve File](#retrieve-file-info) :construction:
+  - [Retrieve File](#retrieve-file-info)
   - [Download File Content](#download-file-content)
-- [Fine Tuning](#fine-tuning) :construction:
-  - [Create Fine Tune Job](#create-fine-tune-job) :construction:
-  - [List Fine Tune Jobs](#list-fine-tune-jobs) :construction:
-  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info) :construction:
+- [Fine Tuning](#fine-tuning)
+  - [Create Fine Tune Job](#create-fine-tune-job)
+  - [List Fine Tune Jobs](#list-fine-tune-jobs)
+  - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
   - [Cancel Fine Tune Job](#cancel-fine-tune-job)
-  - [List Fine Tune Job Events](#list-fine-tune-job-events) :construction:
+  - [List Fine Tune Job Events](#list-fine-tune-job-events)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
-- [Completions](#completions) :construction:
-  - [Streaming](#completion-streaming) :construction:
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
+- ~~[Completions](#completions)~~ :warning: Deprecated
+  - ~~[Streaming](#completion-streaming)~~ :warning: Deprecated
 - ~~[Edits](#edits)~~ :warning: Deprecated
   - ~~[Create Edit](#create-edit)~~  :warning: Deprecated
 
@@ -360,7 +360,7 @@ Returns a list of assistants.
 
 ```csharp
 var api = new OpenAIClient();
-var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+var assistantsList = await api.AssistantsEndpoint.ListAssistantsAsync();
 
 foreach (var assistant in assistantsList.Items)
 {
@@ -375,7 +375,7 @@ Create an assistant with a model and instructions.
 ```csharp
 var api = new OpenAIClient();
 var request = new CreateAssistantRequest("gpt-3.5-turbo-1106");
-var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
 #### [Retrieve Assistant](https://platform.openai.com/docs/api-reference/assistants/getAssistant)
@@ -384,7 +384,7 @@ Retrieves an assistant.
 
 ```csharp
 var api = new OpenAIClient();
-var assistant = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync("assistant-id");
+var assistant = await api.AssistantsEndpoint.RetrieveAssistantAsync("assistant-id");
 Console.WriteLine($"{assistant} -> {assistant.CreatedAt}");
 ```
 
@@ -703,7 +703,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
         model: "gpt-4-1106-preview"));
-var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
+var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
 var run = await thread.CreateRunAsync(assistant);
 Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
@@ -867,7 +867,7 @@ var messages = new List<Message>
 var chatRequest = new ChatRequest(messages);
 var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
 {
-    Console.Write(choice.Delta.ToString());
+    Console.Write(partialResponse.FirstChoice.Delta.ToString());
 });
 var choice = response.FirstChoice;
 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
@@ -1022,7 +1022,7 @@ var messages = new List<Message>
     new Message(Role.User, "Who won the world series in 2020?"),
 };
 var chatRequest = new ChatRequest(messages, "gpt-4-1106-preview", responseFormat: ChatResponseFormat.Json);
-var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)
 {
@@ -1283,7 +1283,38 @@ var response = await api.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was d
 Console.WriteLine(response);
 ```
 
+### [Moderations](https://platform.openai.com/docs/api-reference/moderations)
+
+Given a input text, outputs if the model classifies it as violating OpenAI's content policy.
+
+Related guide: [Moderations](https://platform.openai.com/docs/guides/moderation)
+
+The Moderations API can be accessed via `OpenAIClient.ModerationsEndpoint`
+
+#### [Create Moderation](https://platform.openai.com/docs/api-reference/moderations/create)
+
+Classifies if text violates OpenAI's Content Policy.
+
+```csharp
+var api = new OpenAIClient();
+var isViolation = await api.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
+Assert.IsTrue(isViolation);
+```
+
+Additionally you can also get the scores of a given input.
+
+```csharp
+var api = new OpenAIClient();
+var response = await api.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
+Assert.IsNotNull(response);
+Console.WriteLine(response.Results?[0]?.Scores?.ToString());
+```
+
+---
+
 ### [Completions](https://platform.openai.com/docs/api-reference/completions)
+
+> :warning: Deprecated, and soon to be removed.
 
 Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
 
@@ -1298,6 +1329,8 @@ Console.WriteLine(response);
 > To get the `CompletionResponse` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
 
 #### Completion Streaming
+
+> :warning: Deprecated, and soon to be removed.
 
 Streaming allows you to get results are they are generated, which can help your application feel more responsive, especially on slow models like Davinci.
 
@@ -1323,37 +1356,9 @@ await foreach (var partialResponse in api.CompletionsEndpoint.StreamCompletionEn
 }
 ```
 
-### [Moderations](https://platform.openai.com/docs/api-reference/moderations)
-
-Given a input text, outputs if the model classifies it as violating OpenAI's content policy.
-
-Related guide: [Moderations](https://platform.openai.com/docs/guides/moderation)
-
-The Moderations API can be accessed via `OpenAIClient.ModerationsEndpoint`
-
-#### [Create Moderation](https://platform.openai.com/docs/api-reference/moderations/create)
-
-Classifies if text violates OpenAI's Content Policy.
-
-```csharp
-var api = new OpenAIClient();
-var isViolation = await api.ModerationsEndpoint.GetModerationAsync("I want to kill them.");
-Assert.IsTrue(isViolation);
-```
-
-Additionally you can also get the scores of a given input.
-
-```csharp
-var response = await OpenAIClient.ModerationsEndpoint.CreateModerationAsync(new ModerationsRequest("I love you"));
-Assert.IsNotNull(response);
-Console.WriteLine(response.Results?[0]?.Scores?.ToString());
-```
-
----
-
 ### [Edits](https://platform.openai.com/docs/api-reference/edits)
 
-> Deprecated, and soon to be removed.
+> :warning: Deprecated, and soon to be removed.
 
 Given a prompt and an instruction, the model will return an edited version of the prompt.
 

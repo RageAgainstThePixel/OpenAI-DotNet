@@ -73,7 +73,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
         public static async Task<AssistantFileResponse> UploadFileAsync(this AssistantResponse assistant, string filePath, CancellationToken cancellationToken = default)
         {
-            var file = await assistant.Client.FilesEndpoint.UploadFileAsync(new FileUploadRequest(filePath, "assistant"), cancellationToken).ConfigureAwait(false);
+            var file = await assistant.Client.FilesEndpoint.UploadFileAsync(new FileUploadRequest(filePath, "assistants"), cancellationToken).ConfigureAwait(false);
             return await assistant.AttachFileAsync(file, cancellationToken).ConfigureAwait(false);
         }
 
@@ -150,7 +150,8 @@ namespace OpenAI.Assistants
         public static async Task<bool> DeleteFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
         {
             var isRemoved = await assistant.Client.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
-            return isRemoved && await assistant.Client.FilesEndpoint.DeleteFileAsync(fileId, cancellationToken).ConfigureAwait(false);
+            if (!isRemoved) { return false; }
+            return await assistant.Client.FilesEndpoint.DeleteFileAsync(fileId, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion Files
