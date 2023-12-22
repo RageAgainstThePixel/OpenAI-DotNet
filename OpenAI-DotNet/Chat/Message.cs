@@ -135,7 +135,7 @@ namespace OpenAI.Chat
                 Role = other.Role;
             }
 
-            if (!string.IsNullOrEmpty(other?.Content))
+            if (other?.Content != null)
             {
                 Content += other.Content;
             }
@@ -159,7 +159,7 @@ namespace OpenAI.Chat
                         {
                             toolCalls.Insert(otherToolCall.Index.Value, new Tool(otherToolCall));
                         }
-                        
+
                         toolCalls[otherToolCall.Index.Value].CopyFrom(otherToolCall);
                     }
                     else

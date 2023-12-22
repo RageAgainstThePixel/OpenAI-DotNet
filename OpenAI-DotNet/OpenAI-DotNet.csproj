@@ -18,8 +18,13 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
     <Title>OpenAI-DotNet</Title>
-    <Version>7.4.4</Version>
+    <Version>7.5.0</Version>
     <PackageReleaseNotes>
+Version 7.5.0
+- Changed OpenAIClient to implement IDisposable.
+  - Disposing OpenAICLient is now required if you're not passing a custom HttpClient.
+  - If passing an custom HttpClient, it will need to be expressly disposed after use.
+- Updated Chat.Message.CopyFrom Content check from string.IsNullOrEmpty to null check.
 Version 7.4.4
 - Updated Docs
 Version 7.4.3

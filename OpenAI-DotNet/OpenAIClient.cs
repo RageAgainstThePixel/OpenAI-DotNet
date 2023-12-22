@@ -23,14 +23,14 @@ namespace OpenAI
     /// <summary>
     /// Entry point to the OpenAI API, handling auth and allowing access to the various API endpoints
     /// </summary>
-    public sealed class OpenAIClient
+    public sealed class OpenAIClient : IDisposable
     {
         /// <summary>
         /// Creates a new entry point to the OpenAPI API, handling auth and allowing access to the various API endpoints
         /// </summary>
         /// <param name="openAIAuthentication">
         /// The API authentication information to use for API calls,
-        /// or <see langword="null"/> to attempt to use the <see cref="OpenAI.OpenAIAuthentication.Default"/>,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIAuthentication.Default"/>,
         /// potentially loading from environment vars or from a config file.
         /// </param>
         /// <param name="clientSettings">
@@ -65,44 +65,42 @@ namespace OpenAI
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        private HttpClient SetupClient(HttpClient client = null)
+        ~OpenAIClient()
         {
-            client ??= new HttpClient(new SocketsHttpHandler
-            {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-            });
-            client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
-
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
-                (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
-                 (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
-                  !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
-            {
-                throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
-            }
-
-            if (OpenAIClientSettings.UseOAuthAuthentication)
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
-            }
-            else
-            {
-                client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
-            }
-
-            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
-            {
-                client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
-            }
-
-            return client;
+            Dispose(false);
         }
+
+        #region IDisposable
+
+        private bool isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!isDisposed && disposing)
+            {
+                if (!isCustomClient)
+                {
+                    Client?.Dispose();
+                }
+
+                isDisposed = true;
+            }
+        }
+
+        #endregion IDisposable
+
+        private bool isCustomClient;
 
         /// <summary>
         /// <see cref="HttpClient"/> to use when making calls to the API.
         /// </summary>
-        internal HttpClient Client { get; private set; }
+        internal HttpClient Client { get; }
 
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
@@ -127,6 +125,8 @@ namespace OpenAI
         /// Enables or disables debugging for all endpoints.
         /// </summary>
         public bool EnableDebug { get; set; }
+
+        #region Endpoints
 
         /// <summary>
         /// List and describe the various models available in the API.
@@ -208,5 +208,49 @@ namespace OpenAI
         /// </summary>
         [Obsolete("Deprecated")]
         public EditsEndpoint EditsEndpoint { get; }
+
+        #endregion Endpoints
+
+        private HttpClient SetupClient(HttpClient client = null)
+        {
+            if (client == null)
+            {
+                client = new HttpClient(new SocketsHttpHandler
+                {
+                    PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+                });
+            }
+            else
+            {
+                isCustomClient = true;
+            }
+
+            client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
+            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
+
+            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
+                (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
+                 (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
+                  !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
+            {
+                throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
+            }
+
+            if (OpenAIClientSettings.UseOAuthAuthentication)
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
+            }
+            else
+            {
+                client.DefaultRequestHeaders.Add("api-key", OpenAIAuthentication.ApiKey);
+            }
+
+            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.OrganizationId))
+            {
+                client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
+            }
+
+            return client;
+        }
     }
 }
