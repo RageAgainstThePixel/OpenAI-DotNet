@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Error
+    public sealed class RunError
     {
         /// <summary>
         /// One of server_error or rate_limit_exceeded.

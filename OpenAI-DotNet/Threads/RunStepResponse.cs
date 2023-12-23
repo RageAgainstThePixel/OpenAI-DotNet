@@ -71,7 +71,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("last_error")]
-        public Error LastError { get; private set; }
+        public RunError LastError { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was created.

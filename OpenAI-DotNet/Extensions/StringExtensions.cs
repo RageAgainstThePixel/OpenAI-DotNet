@@ -17,6 +17,8 @@ namespace OpenAI.Extensions
         public static bool TryGetEventStreamData(this string streamData, out string eventData)
         {
             const string dataTag = "data: ";
+            const string doneTag = "[DONE]";
+
             eventData = string.Empty;
 
             if (streamData.StartsWith(dataTag))
@@ -24,7 +26,6 @@ namespace OpenAI.Extensions
                 eventData = streamData[dataTag.Length..].Trim();
             }
 
-            const string doneTag = "[DONE]";
             return eventData != doneTag;
         }
 

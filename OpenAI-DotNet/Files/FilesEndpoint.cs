@@ -118,7 +118,7 @@ namespace OpenAI.Files
                     }
                 }
 
-                await response.CheckResponseAsync(cancellationToken);
+                await response.ThrowApiExceptionIfUnsuccessfulAsync(cancellationToken);
                 return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
         }
