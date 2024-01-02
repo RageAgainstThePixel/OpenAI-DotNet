@@ -1,4 +1,6 @@
-﻿using OpenAI.Assistants;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using OpenAI.Assistants;
 using OpenAI.Audio;
 using OpenAI.Chat;
 using OpenAI.Completions;

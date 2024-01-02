@@ -1,4 +1,6 @@
-﻿using System.Security.Authentication;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System.Security.Authentication;
 using Microsoft.AspNetCore.Http;
 
 namespace OpenAI.Proxy

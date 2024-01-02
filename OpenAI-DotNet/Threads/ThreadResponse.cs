@@ -1,3 +1,5 @@
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -6,7 +8,7 @@ namespace OpenAI.Threads
 {
     /// <summary>
     /// A conversation session between an Assistant and a user.
-    /// Threads store Messages and automatically handle truncation to fit content into a model’s context.
+    /// Threads store Messages and automatically handle truncation to fit content into a model's context.
     /// </summary>
     public sealed class ThreadResponse : BaseResponse
     {
