@@ -506,5 +506,67 @@ namespace OpenAI.Tests
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
             response.GetUsage();
         }
+
+        [Test]
+        public async Task Test_04_01_GetChatLogProbs()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+                new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+                new Message(Role.User, "Where was it played?"),
+            };
+            var chatRequest = new ChatRequest(messages, Model.GPT3_5_Turbo, topLogProbs: 1);
+            var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+
+            foreach (var choice in response.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+            }
+
+            response.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_04_02_GetChatLogProbsSteaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, "You are a helpful assistant."),
+                new Message(Role.User, "Who won the world series in 2020?"),
+                new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
+                new Message(Role.User, "Where was it played?"),
+            };
+            var chatRequest = new ChatRequest(messages, topLogProbs: 1);
+            var cumulativeDelta = string.Empty;
+            var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            {
+                Assert.IsNotNull(partialResponse);
+                Assert.NotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
+
+                foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
+                {
+                    cumulativeDelta += choice.Delta.Content;
+                }
+            });
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            var choice = response.FirstChoice;
+            Assert.IsNotNull(choice);
+            Assert.IsNotNull(choice.Message);
+            Assert.IsFalse(string.IsNullOrEmpty(choice.ToString()));
+            Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+            Assert.IsTrue(choice.Message.Role == Role.Assistant);
+            Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
+            Console.WriteLine(response.ToString());
+            response.GetUsage();
+        }
     }
 }

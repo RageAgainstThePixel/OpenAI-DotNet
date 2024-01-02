@@ -1,4 +1,4 @@
-name: Nuget Publish
+name: Build and Publish
 
 on:
   push:
@@ -23,6 +23,15 @@ on:
         description: ".NET version to use"
         required: false
         default: "6.0.x"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
@@ -125,3 +134,33 @@ jobs:
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.symbols.nupkg
         if-no-files-found: ignore
+
+  docs:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: build docfx
+      run: |
+        dotnet tool update -g docfx
+        docfx .docs/docfx.json
+
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: '_site'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

@@ -34,10 +34,18 @@ namespace OpenAI
         /// potentially loading from environment vars or from a config file.
         /// </param>
         /// <param name="clientSettings">
-        /// Optional, <see cref="OpenAIClientSettings"/> for specifying OpenAI deployments to Azure or proxy domain.
+        /// The API client settings for specifying OpenAI deployments to Azure, a proxy domain,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIClientSettings.Default"/>,
+        /// potentially loading from environment vars or from a config file.
         /// </param>
         /// <param name="client">A <see cref="HttpClient"/>.</param>
         /// <exception cref="AuthenticationException">Raised when authentication details are missing or invalid.</exception>
+        /// <remarks>
+        /// <see cref="OpenAIClient"/> implements <see cref="IDisposable"/> to manage the lifecycle of the resources it uses, including <see cref="HttpClient"/>.
+        /// When you initialize <see cref="OpenAIClient"/>, it will create an internal <see cref="HttpClient"/> instance if one is not provided.
+        /// This internal HttpClient is disposed of when OpenAIClient is disposed of.
+        /// If you provide an external HttpClient instance to OpenAIClient, you are responsible for managing its disposal.
+        /// </remarks>
         public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null, HttpClient client = null)
         {
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
