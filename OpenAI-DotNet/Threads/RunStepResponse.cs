@@ -1,3 +1,5 @@
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
@@ -7,8 +9,8 @@ namespace OpenAI.Threads
 {
     /// <summary>
     /// A detailed list of steps the Assistant took as part of a Run.
-    /// An Assistant can call tools or create Messages during it’s run.
-    /// Examining Run Steps allows you to introspect how the Assistant is getting to it’s final results.
+    /// An Assistant can call tools or create Messages during it's run.
+    /// Examining Run Steps allows you to introspect how the Assistant is getting to it's final results.
     /// </summary>
     public sealed class RunStepResponse : BaseResponse
     {

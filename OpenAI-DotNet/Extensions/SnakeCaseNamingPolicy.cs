@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System.Text.Json;
 
 namespace OpenAI.Extensions
 {

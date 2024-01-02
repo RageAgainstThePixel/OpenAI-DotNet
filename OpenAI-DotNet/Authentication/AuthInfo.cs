@@ -1,4 +1,6 @@
-﻿using System.Security.Authentication;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System.Security.Authentication;
 using System.Text.Json.Serialization;
 
 namespace OpenAI

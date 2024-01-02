@@ -1,0 +1,65 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../OpenAI-DotNet/",
+          "files": [
+            "**.csproj"
+          ],
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**"
+          ]
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ]
+      },
+      {
+        "src": "../OpenAI-DotNet-Proxy/",
+        "files": [
+          "/*.{md,yml}"
+        ],
+        "dest": "OpenAI-DotNet-Proxy"
+      },
+      {
+        "src": "../",
+        "files": [
+          "/*.{md,yml}"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "src": "../OpenAI-DotNet/Assets",
+        "files": [
+          "*.png",
+          "*.svg",
+          "*.ico"
+        ],
+        "dest" : "assets"
+      }
+    ],
+    "output": "../_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "OpenAI-DotNet",
+      "_appTitle": "OpenAI-DotNet",
+      "_appLogoPath": "assets/OpenAI-DotNet-Icon@x1.png",
+      "_appFaviconPath": "assets/OpenAI-DotNet-Icon@x1.png",
+      "_enableSearch": true,
+      "pdf": false
+    }
+  }
+}

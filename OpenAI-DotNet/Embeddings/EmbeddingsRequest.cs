@@ -1,4 +1,6 @@
-﻿using OpenAI.Models;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using OpenAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +25,12 @@ namespace OpenAI.Embeddings
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(string input, string model = null, string user = null)
             : this(new List<string> { input }, model, user)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                throw new ArgumentNullException(nameof(input));
+                throw new ArgumentNullException(nameof(input), $"Missing required {nameof(input)} parameter");
             }
         }
 
@@ -48,7 +49,6 @@ namespace OpenAI.Embeddings
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
-        /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(IEnumerable<string> input, string model = null, string user = null)
         {
             Input = input?.ToList();

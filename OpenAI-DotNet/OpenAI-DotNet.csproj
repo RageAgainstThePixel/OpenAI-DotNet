@@ -2,9 +2,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Authors>Stephen Hodgson</Authors>
     <Product>OpenAI-DotNet</Product>
+    <Title>OpenAI-DotNet</Title>
+    <PackageId>OpenAI-DotNet</PackageId>
+    <Company>RageAgainstThePixel</Company>
+    <Authors>Stephen Hodgson, Roger Pincombe</Authors>
+    <Copyright>2024</Copyright>
     <Description>A simple C# .NET client library for OpenAI to use though their RESTful API.
 Independently developed, this is not an official library and I am not affiliated with OpenAI.
 An OpenAI API account is required.
@@ -12,14 +15,26 @@ An OpenAI API account is required.
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
 </Description>
-    <Copyright>2023</Copyright>
-    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
     <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
-    <Title>OpenAI-DotNet</Title>
-    <Version>7.5.0</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
+    <DelaySign>true</DelaySign>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Version>7.6.0</Version>
     <PackageReleaseNotes>
+Version 7.6.0
+- Changed License to MIT
+- Added OpenAI.Chat logprob parameters
+- Added SourceLink references for debugging
+- Added Docfx build workflow
 Version 7.5.0
 - Changed OpenAIClient to implement IDisposable.
   - Disposing OpenAICLient is now required if you're not passing a custom HttpClient.
@@ -243,19 +258,16 @@ Version 4.4.0
 - Updated CompletionRequest to accept IEnumerable&lt;string&gt; values for prompts and stopSequences
 - Refactored all endpoints to use new response validation extension
 - Added CancellationToken to most endpoints that had long running operations
-</PackageReleaseNotes>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
-    <DelaySign>true</DelaySign>
-    <PackageId>OpenAI-DotNet</PackageId>
-    <Company>RageAgainstThePixel</Company>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>Assets\OpenAI-DotNet-Icon.png</PackageIcon>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <IncludeSymbols>True</IncludeSymbols>
+    </PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -265,5 +277,11 @@ Version 4.4.0
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

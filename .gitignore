@@ -338,5 +338,12 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# Visual Studio Code
 .vscode
+
+# Docfx
+_site
+
+# Unit Test Ouputs
 OpenAI-DotNet-Tests/Assets/HelloWorld.mp3
