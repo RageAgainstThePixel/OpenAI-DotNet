@@ -19,5 +19,12 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("arguments")]
         public string Arguments { get; private set; }
+
+        /// <summary>
+        /// The output of the function. This will be null if the outputs have not been submitted yet.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("output")]
+        public string Output { get; private set; }
     }
 }
