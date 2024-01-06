@@ -28,8 +28,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.6.0</Version>
+    <Version>7.6.1</Version>
     <PackageReleaseNotes>
+Version 7.6.1
+- Include Output in Threads.FunctionCall
 Version 7.6.0
 - Changed License to MIT
 - Added OpenAI.Chat logprob parameters

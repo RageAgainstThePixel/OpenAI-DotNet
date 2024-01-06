@@ -403,6 +403,23 @@ namespace OpenAI.Tests
             // waiting while run in Queued and InProgress
             run = await run.WaitForStatusChangeAsync();
             Assert.AreEqual(RunStatus.Completed, run.Status);
+            runStepList = await run.ListRunStepsAsync();
+
+            foreach (var runStep in runStepList.Items)
+            {
+                Assert.IsNotNull(runStep);
+                Assert.IsNotNull(runStep.Client);
+                var retrievedRunStep = await runStep.UpdateAsync();
+                Assert.IsNotNull(retrievedRunStep);
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {(runStep.ExpiresAtUnixTimeSeconds.HasValue ? runStep.ExpiresAt : runStep.CompletedAt)}");
+                if (runStep.StepDetails.ToolCalls == null) { continue; }
+
+                foreach (var runStepToolCall in runStep.StepDetails.ToolCalls)
+                {
+                    Console.WriteLine($"[{runStep.Id}][{runStepToolCall.Type}][{runStepToolCall.Id}] {runStepToolCall.FunctionCall.Name}: {runStepToolCall.FunctionCall.Output}");
+                }
+            }
+
             var messages = await run.ListMessagesAsync();
             Assert.IsNotNull(messages);
             Assert.IsNotEmpty(messages.Items);
