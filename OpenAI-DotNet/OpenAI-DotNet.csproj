@@ -28,8 +28,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.6.1</Version>
+    <Version>7.6.2</Version>
     <PackageReleaseNotes>
+Version 7.6.2
+- Fixed parameter name in Threads.CreateMessageRequest
+- Added Stream overload to Threads.FileUploadRequest
 Version 7.6.1
 - Include Output in Threads.FunctionCall
 Version 7.6.0
