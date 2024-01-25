@@ -130,6 +130,10 @@ namespace OpenAI.Models
         /// The default model for <see cref="Embeddings.EmbeddingsEndpoint"/>.
         /// </summary>
         public static Model Embedding_Ada_002 { get; } = new("text-embedding-ada-002", "openai");
+        
+        public static Model Embedding_3_Small { get; } = new("text-embedding-3-small", "openai");
+        
+        public static Model Embedding_3_Large { get; } = new("text-embedding-3-large", "openai");
 
         /// <summary>
         /// The default model for <see cref="Audio.AudioEndpoint"/>.
