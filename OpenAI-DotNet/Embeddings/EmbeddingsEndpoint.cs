@@ -66,7 +66,7 @@ namespace OpenAI.Embeddings
         /// <returns><see cref="EmbeddingsResponse"/></returns>
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, string model = null, string user = null, int? dimensions = null, CancellationToken cancellationToken = default)
             => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user, dimensions), cancellationToken).ConfigureAwait(false);
-        
+
         /// <summary>
         /// Creates an embedding vector representing the input text.
         /// </summary>

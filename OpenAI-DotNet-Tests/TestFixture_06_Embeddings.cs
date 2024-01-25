@@ -16,7 +16,7 @@ namespace OpenAI.Tests
         }
         
         [Test]
-        public async Task Test_1_CreateEmbeddingWithDimensions()
+        public async Task Test_2_CreateEmbeddingWithDimensions()
         {
             Assert.IsNotNull(OpenAIClient.EmbeddingsEndpoint);
             var embedding = await OpenAIClient.EmbeddingsEndpoint.CreateEmbeddingAsync("The food was delicious and the waiter...",
@@ -27,7 +27,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_2_CreateEmbeddingsWithMultipleInputs()
+        public async Task Test_3_CreateEmbeddingsWithMultipleInputs()
         {
             Assert.IsNotNull(OpenAIClient.EmbeddingsEndpoint);
             var embeddings = new[]

@@ -131,8 +131,14 @@ namespace OpenAI.Models
         /// </summary>
         public static Model Embedding_Ada_002 { get; } = new("text-embedding-ada-002", "openai");
         
+        /// <summary>
+        /// A highly efficient model which provides a significant upgrade over its predecessor, the text-embedding-ada-002 model.
+        /// </summary>
         public static Model Embedding_3_Small { get; } = new("text-embedding-3-small", "openai");
         
+        /// <summary>
+        /// A next generation larger model with embeddings of up to 3072 dimensions.
+        /// </summary>
         public static Model Embedding_3_Large { get; } = new("text-embedding-3-large", "openai");
 
         /// <summary>
