@@ -32,6 +32,9 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 7.6.3
 - Added RetrieveFileStreamAsync method to Files.FilesEndpoint
+- Added new Embedding Models
+  - Added Model.Dimensions property
+- Added Threads.Run and Threads.RunStep Usage properties
 Version 7.6.2
 - Fixed parameter name in Threads.CreateMessageRequest
 - Added Stream overload to Threads.FileUploadRequest

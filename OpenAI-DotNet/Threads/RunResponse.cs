@@ -178,6 +178,13 @@ namespace OpenAI.Threads
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
+        /// <summary>
+        /// Usage statistics related to the run. This value will be `null` if the run is not in a terminal state (i.e. `in_progress`, `queued`, etc.).
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("usage")]
+        public Usage Usage { get; private set; }
+
         public static implicit operator string(RunResponse run) => run?.ToString();
 
         public override string ToString() => Id;
