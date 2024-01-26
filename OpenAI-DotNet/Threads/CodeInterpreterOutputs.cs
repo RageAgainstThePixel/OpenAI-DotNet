@@ -8,7 +8,7 @@ namespace OpenAI.Threads
     public sealed class CodeInterpreterOutputs
     {
         /// <summary>
-        /// Output type
+        /// Output type. Can be either 'logs' or 'image'.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -16,17 +16,17 @@ namespace OpenAI.Threads
         public CodeInterpreterOutputType Type { get; private set; }
 
         /// <summary>
-        /// The text output from the Code Interpreter tool call.
+        /// Text output from the Code Interpreter tool call as part of a run step.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("logs")]
         public string Logs { get; private set; }
 
         /// <summary>
-        /// Code interpreter image output
+        /// Code interpreter image output.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("image")]
-        public CodeInterpreterImageOutput Image { get; private set; }
+        public ImageFile Image { get; private set; }
     }
 }

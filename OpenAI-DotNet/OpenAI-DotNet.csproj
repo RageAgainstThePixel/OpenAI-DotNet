@@ -35,6 +35,8 @@ Version 7.6.3
 - Added new Embedding Models
   - Added Model.Dimensions property
 - Added Threads.Run and Threads.RunStep Usage properties
+- Added CodeInterpreter Outputs to RunStepDetails.ToolCalls
+- Added Retrieval Outputs to RunStepDetails.ToolCalls
 Version 7.6.2
 - Fixed parameter name in Threads.CreateMessageRequest
 - Added Stream overload to Threads.FileUploadRequest
