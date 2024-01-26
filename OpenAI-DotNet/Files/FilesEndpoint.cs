@@ -186,10 +186,21 @@ namespace OpenAI.Files
                 }
             }
 
-            await using var response = await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
+            await using var response = await RetrieveFileStreamAsync(fileData, cancellationToken).ConfigureAwait(false);
             await using var fileStream = new FileStream(filePath, FileMode.CreateNew);
             await response.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
             return filePath;
+        }
+        
+        /// <summary>
+        /// Gets the specified file as stream
+        /// </summary>
+        /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <returns>The file as a stream in an asynchronous operation.</returns>
+        public async Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
+        {
+            return await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
         }
     }
 }
