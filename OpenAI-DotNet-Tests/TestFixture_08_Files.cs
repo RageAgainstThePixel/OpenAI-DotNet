@@ -80,5 +80,21 @@ namespace OpenAI.Tests
             Assert.IsNotNull(fileList);
             Assert.IsEmpty(fileList);
         }
+        
+        [Test]
+        public async Task Test_05_RetrieveFileStreamAsync()
+        {
+            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
+            var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+
+            Assert.IsNotNull(fileList);
+            Assert.IsNotEmpty(fileList);
+
+            var testFileData = fileList[0];
+            var result = await OpenAIClient.FilesEndpoint.RetrieveFileStreamAsync(testFileData);
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.CanRead);
+        }
     }
 }
