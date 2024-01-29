@@ -133,6 +133,7 @@ namespace OpenAI.Tests
         public async Task Test_04_03_ModifyMessage()
         {
             Assert.IsNotNull(testThread);
+            Assert.IsNotNull(testMessage);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
             var metadata = new Dictionary<string, string>
             {

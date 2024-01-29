@@ -62,7 +62,23 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_DeleteFiles()
+        public async Task Test_04_RetrieveFileStreamAsync()
+        {
+            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
+            var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
+
+            Assert.IsNotNull(fileList);
+            Assert.IsNotEmpty(fileList);
+
+            var testFileData = fileList[0];
+            var result = await OpenAIClient.FilesEndpoint.RetrieveFileStreamAsync(testFileData);
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.CanRead);
+        }
+
+        [Test]
+        public async Task Test_05_DeleteFiles()
         {
             Assert.IsNotNull(OpenAIClient.FilesEndpoint);
             var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
@@ -79,22 +95,6 @@ namespace OpenAI.Tests
             fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
             Assert.IsNotNull(fileList);
             Assert.IsEmpty(fileList);
-        }
-        
-        [Test]
-        public async Task Test_05_RetrieveFileStreamAsync()
-        {
-            Assert.IsNotNull(OpenAIClient.FilesEndpoint);
-            var fileList = await OpenAIClient.FilesEndpoint.ListFilesAsync();
-
-            Assert.IsNotNull(fileList);
-            Assert.IsNotEmpty(fileList);
-
-            var testFileData = fileList[0];
-            var result = await OpenAIClient.FilesEndpoint.RetrieveFileStreamAsync(testFileData);
-
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.CanRead);
         }
     }
 }
