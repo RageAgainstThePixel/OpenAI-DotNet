@@ -34,7 +34,11 @@ Install-Package OpenAI-DotNet
 >
 >[![openupm](https://img.shields.io/npm/v/com.openai.unity?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.openai.unity/)
 
-## Documentation
+## [Documentation](https://rageagainstthepixel.github.io/OpenAI-DotNet)
+
+> Check out our new api docs!
+
+https://rageagainstthepixel.github.io/OpenAI-DotNet :new:
 
 ### Table of Contents
 
@@ -47,47 +51,47 @@ Install-Package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Assistants](#assistants) :new:
-  - [List Assistants](#list-assistants) :new:
-  - [Create Assistant](#create-assistant) :new:
-  - [Retrieve Assistant](#retrieve-assistant) :new:
-  - [Modify Assistant](#modify-assistant) :new:
-  - [Delete Assistant](#delete-assistant) :new:
-  - [List Assistant Files](#list-assistant-files) :new:
-  - [Attach File to Assistant](#attach-file-to-assistant) :new:
-  - [Upload File to Assistant](#upload-file-to-assistant) :new:
-  - [Retrieve File from Assistant](#retrieve-file-from-assistant) :new:
-  - [Remove File from Assistant](#remove-file-from-assistant) :new:
-  - [Delete File from Assistant](#delete-file-from-assistant) :new:
-- [Threads](#threads) :new:
-  - [Create Thread](#create-thread) :new:
-  - [Create Thread and Run](#create-thread-and-run) :new:
-  - [Retrieve Thread](#retrieve-thread) :new:
-  - [Modify Thread](#modify-thread) :new:
-  - [Delete Thread](#delete-thread) :new:
-  - [Thread Messages](#thread-messages) :new:
-    - [List Messages](#list-thread-messages) :new:
-    - [Create Message](#create-thread-message) :new:
-    - [Retrieve Message](#retrieve-thread-message) :new:
-    - [Modify Message](#modify-thread-message) :new:
-    - [Thread Message Files](#thread-message-files) :new:
-      - [List Message Files](#list-thread-message-files) :new:
-      - [Retrieve Message File](#retrieve-thread-message-file) :new:
-  - [Thread Runs](#thread-runs) :new:
-    - [List Runs](#list-thread-runs) :new:
-    - [Create Run](#create-thread-run) :new:
-    - [Retrieve Run](#retrieve-thread-run) :new:
-    - [Modify Run](#modify-thread-run) :new:
-    - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run) :new:
-    - [List Run Steps](#list-thread-run-steps) :new:
-    - [Retrieve Run Step](#retrieve-thread-run-step) :new:
-    - [Cancel Run](#cancel-thread-run) :new:
+- [Assistants](#assistants)
+  - [List Assistants](#list-assistants)
+  - [Create Assistant](#create-assistant)
+  - [Retrieve Assistant](#retrieve-assistant)
+  - [Modify Assistant](#modify-assistant)
+  - [Delete Assistant](#delete-assistant)
+  - [List Assistant Files](#list-assistant-files)
+  - [Attach File to Assistant](#attach-file-to-assistant)
+  - [Upload File to Assistant](#upload-file-to-assistant)
+  - [Retrieve File from Assistant](#retrieve-file-from-assistant)
+  - [Remove File from Assistant](#remove-file-from-assistant)
+  - [Delete File from Assistant](#delete-file-from-assistant)
+- [Threads](#threads)
+  - [Create Thread](#create-thread)
+  - [Create Thread and Run](#create-thread-and-run)
+  - [Retrieve Thread](#retrieve-thread)
+  - [Modify Thread](#modify-thread)
+  - [Delete Thread](#delete-thread)
+  - [Thread Messages](#thread-messages)
+    - [List Messages](#list-thread-messages)
+    - [Create Message](#create-thread-message)
+    - [Retrieve Message](#retrieve-thread-message)
+    - [Modify Message](#modify-thread-message)
+    - [Thread Message Files](#thread-message-files)
+      - [List Message Files](#list-thread-message-files)
+      - [Retrieve Message File](#retrieve-thread-message-file)
+  - [Thread Runs](#thread-runs)
+    - [List Runs](#list-thread-runs)
+    - [Create Run](#create-thread-run)
+    - [Retrieve Run](#retrieve-thread-run)
+    - [Modify Run](#modify-thread-run)
+    - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run)
+    - [List Run Steps](#list-thread-run-steps)
+    - [Retrieve Run Step](#retrieve-thread-run-step)
+    - [Cancel Run](#cancel-thread-run)
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
-  - [Tools](#chat-tools) :new:
-  - [Vision](#chat-vision) :new:
-  - [Json Mode](#chat-json-mode) :new:
+  - [Tools](#chat-tools)
+  - [Vision](#chat-vision)
+  - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
@@ -112,10 +116,6 @@ Install-Package OpenAI-DotNet
   - [Create Embedding](#create-embeddings)
 - [Moderations](#moderations)
   - [Create Moderation](#create-moderation)
-- ~~[Completions](#completions)~~ :warning: Deprecated
-  - ~~[Streaming](#completion-streaming)~~ :warning: Deprecated
-- ~~[Edits](#edits)~~ :warning: Deprecated
-  - ~~[Create Edit](#create-edit)~~  :warning: Deprecated
 
 ### [Authentication](https://platform.openai.com/docs/api-reference/authentication)
 
@@ -1335,66 +1335,3 @@ Console.WriteLine(response.Results?[0]?.Scores?.ToString());
 ```
 
 ---
-
-### [Completions](https://platform.openai.com/docs/api-reference/completions)
-
-> :warning: Deprecated, and soon to be removed.
-
-Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
-
-The Completions API is accessed via `OpenAIClient.CompletionsEndpoint`
-
-```csharp
-using var api = new OpenAIClient();
-var response = await api.CompletionsEndpoint.CreateCompletionAsync("One Two Three One Two", temperature: 0.1, model: Model.Davinci);
-Console.WriteLine(response);
-```
-
-> To get the `CompletionResponse` (which is mostly metadata), use its implicit string operator to get the text if all you want is the completion choice.
-
-#### Completion Streaming
-
-> :warning: Deprecated, and soon to be removed.
-
-Streaming allows you to get results are they are generated, which can help your application feel more responsive, especially on slow models like Davinci.
-
-```csharp
-using var api = new OpenAIClient();
-
-await api.CompletionsEndpoint.StreamCompletionAsync(response =>
-{
-    foreach (var choice in response.Completions)
-    {
-        Console.WriteLine(choice);
-    }
-}, "My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci);
-```
-
-Or if using [`IAsyncEnumerable{T}`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1?view=net-5.0) ([C# 8.0+](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8))
-
-```csharp
-using var api = new OpenAIClient();
-await foreach (var partialResponse in api.CompletionsEndpoint.StreamCompletionEnumerableAsync("My name is Roger and I am a principal software engineer at Salesforce.  This is my resume:", maxTokens: 200, temperature: 0.5, presencePenalty: 0.1, frequencyPenalty: 0.1, model: Model.Davinci))
-{
-  Console.WriteLine(partialResponse);
-}
-```
-
-### [Edits](https://platform.openai.com/docs/api-reference/edits)
-
-> :warning: Deprecated, and soon to be removed.
-
-Given a prompt and an instruction, the model will return an edited version of the prompt.
-
-The Edits API is accessed via `OpenAIClient.EditsEndpoint`
-
-#### [Create Edit](https://platform.openai.com/docs/api-reference/edits/create)
-
-Creates a new edit for the provided input, instruction, and parameters using the provided input and instruction.
-
-```csharp
-using var api = new OpenAIClient();
-var request = new EditRequest("What day of the wek is it?", "Fix the spelling mistakes");
-var response = await api.EditsEndpoint.CreateEditAsync(request);
-Console.WriteLine(response);
-```

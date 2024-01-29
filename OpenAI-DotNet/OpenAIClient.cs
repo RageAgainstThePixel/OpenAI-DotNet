@@ -3,8 +3,6 @@
 using OpenAI.Assistants;
 using OpenAI.Audio;
 using OpenAI.Chat;
-using OpenAI.Completions;
-using OpenAI.Edits;
 using OpenAI.Embeddings;
 using OpenAI.Extensions;
 using OpenAI.Files;
@@ -69,10 +67,6 @@ namespace OpenAI
             ModerationsEndpoint = new ModerationsEndpoint(this);
             ThreadsEndpoint = new ThreadsEndpoint(this);
             AssistantsEndpoint = new AssistantsEndpoint(this);
-#pragma warning disable CS0618 // Type or member is obsolete
-            CompletionsEndpoint = new CompletionsEndpoint(this);
-            EditsEndpoint = new EditsEndpoint(this);
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         ~OpenAIClient()
@@ -200,24 +194,6 @@ namespace OpenAI
         /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
         /// </summary>
         public ThreadsEndpoint ThreadsEndpoint { get; }
-
-        /// <summary>
-        /// Text generation is the core function of the API. You give the API a prompt, and it generates a completion.
-        /// The way you “program” the API to do a task is by simply describing the task in plain english or providing
-        /// a few written examples. This simple approach works for a wide range of use cases, including summarization,
-        /// translation, grammar correction, question answering, chatbots, composing emails, and much more
-        /// (see the prompt library for inspiration).<br/>
-        /// <see href="https://platform.openai.com/docs/api-reference/completions"/>
-        /// </summary>
-        [Obsolete("Deprecated")]
-        public CompletionsEndpoint CompletionsEndpoint { get; }
-
-        /// <summary>
-        /// Given a prompt and an instruction, the model will return an edited version of the prompt.<br/>
-        /// <see href="https://platform.openai.com/docs/api-reference/edits"/>
-        /// </summary>
-        [Obsolete("Deprecated")]
-        public EditsEndpoint EditsEndpoint { get; }
 
         #endregion Endpoints
 
