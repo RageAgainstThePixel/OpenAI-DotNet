@@ -28,8 +28,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.6.3</Version>
+    <Version>7.6.4</Version>
     <PackageReleaseNotes>
+Version 7.6.4
+- Removed obsolete completions and edit endpoints
 Version 7.6.3
 - Added RetrieveFileStreamAsync method to Files.FilesEndpoint
 - Added new Embedding Models
