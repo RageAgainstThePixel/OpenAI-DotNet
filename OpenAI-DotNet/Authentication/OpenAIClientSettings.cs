@@ -30,6 +30,21 @@ namespace OpenAI
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
+        /// Must specify a full base url such as "https://api.openai.com/v1/".
+        /// </summary>
+        /// <param name="baseUrl">A custom base url.</param>
+        public OpenAIClientSettings(string baseUrl)
+        {
+            ResourceName = string.Empty;
+            ApiVersion = string.Empty;
+            DeploymentId = string.Empty;
+            BaseRequest = string.Empty;
+            BaseRequestUrlFormat = $"{baseUrl}{{0}}";
+            UseOAuthAuthentication = true;
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
         /// </summary>
         /// <param name="domain">Base api domain.</param>
         /// <param name="apiVersion">The version of the OpenAI api you want to use.</param>
