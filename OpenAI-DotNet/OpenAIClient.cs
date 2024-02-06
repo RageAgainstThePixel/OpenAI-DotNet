@@ -214,7 +214,7 @@ namespace OpenAI
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
             client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
 
-            if (!OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.AzureOpenAIDomain) &&
+            if (OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
                  (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
                   !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
