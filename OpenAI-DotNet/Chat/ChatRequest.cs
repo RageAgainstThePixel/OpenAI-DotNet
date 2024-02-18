@@ -27,8 +27,9 @@ namespace OpenAI.Chat
             double? temperature = null,
             double? topP = null,
             int? topLogProbs = null,
-            string user = null)
-            : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty, responseFormat, number, stops, temperature, topP, topLogProbs, user)
+            string user = null,
+            int? seed = null)
+            : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty, responseFormat, seed, stops, temperature, topP, topLogProbs, user)
         {
             var tooList = tools?.ToList();
 
