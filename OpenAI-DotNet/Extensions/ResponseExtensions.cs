@@ -25,7 +25,7 @@ namespace OpenAI.Extensions
         private const string XRateLimitResetRequests = "x-ratelimit-reset-requests";
         private const string XRateLimitResetTokens = "x-ratelimit-reset-tokens";
 
-        private static readonly NumberFormatInfo numberFormatInfo = new NumberFormatInfo
+        private static readonly NumberFormatInfo numberFormatInfo = new()
         {
             NumberGroupSeparator = ",",
             NumberDecimalSeparator = "."

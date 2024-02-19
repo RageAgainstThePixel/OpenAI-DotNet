@@ -30,6 +30,6 @@ namespace OpenAI
         [JsonPropertyName("message")]
         public string Message { get; private set; }
 
-        public static implicit operator EventResponse(Event @event) => new EventResponse(@event);
+        public static implicit operator EventResponse(Event @event) => new(@event);
     }
 }

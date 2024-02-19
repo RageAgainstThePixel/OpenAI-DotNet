@@ -63,7 +63,7 @@ namespace OpenAI.Files
 
         public static implicit operator string(FileData fileData) => fileData?.ToString();
 
-        public static implicit operator FileResponse(FileData fileData) => new FileResponse(fileData);
+        public static implicit operator FileResponse(FileData fileData) => new(fileData);
 
         public override string ToString() => Id;
     }

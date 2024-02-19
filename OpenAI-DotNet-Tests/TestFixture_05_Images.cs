@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using NUnit.Framework;
 using OpenAI.Images;
 using OpenAI.Models;
 using System;

@@ -36,7 +36,7 @@ namespace OpenAI
         /// Allows implicit casting from a string, so that a simple string API key can be provided in place of an instance of <see cref="OpenAIAuthentication"/>.
         /// </summary>
         /// <param name="key">The API key to convert into a <see cref="OpenAIAuthentication"/>.</param>
-        public static implicit operator OpenAIAuthentication(string key) => new OpenAIAuthentication(key);
+        public static implicit operator OpenAIAuthentication(string key) => new(key);
 
         private OpenAIAuthentication(AuthInfo authInfo) => this.authInfo = authInfo;
 

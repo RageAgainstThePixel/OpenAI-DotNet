@@ -420,7 +420,7 @@ Modifies an assistant.
 using var api = new OpenAIClient();
 var createRequest = new CreateAssistantRequest("gpt-3.5-turbo-1106");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
-var modifyRequest = new CreateAssistantRequest("gpt-4-1106-preview");
+var modifyRequest = new CreateAssistantRequest("gpt-4-turbo-preview");
 var modifiedAssistant = await api.AssistantsEndpoint.ModifyAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
@@ -550,7 +550,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-1106-preview"));
+        model: "gpt-4-turbo-preview"));
 var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
 var threadRequest = new CreateThreadRequest(messages);
 var run = await assistant.CreateThreadAndRunAsync(threadRequest);
@@ -726,7 +726,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-1106-preview"));
+        model: "gpt-4-turbo-preview"));
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
 var run = await thread.CreateRunAsync(assistant);
@@ -1045,7 +1045,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant designed to output JSON."),
     new Message(Role.User, "Who won the world series in 2020?"),
 };
-var chatRequest = new ChatRequest(messages, "gpt-4-1106-preview", responseFormat: ChatResponseFormat.Json);
+var chatRequest = new ChatRequest(messages, "gpt-4-turbo-preview", responseFormat: ChatResponseFormat.Json);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)

@@ -51,8 +51,8 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageUrl ImageUrl { get; private set; }
 
-        public static implicit operator Content(string input) => new Content(ContentType.Text, input);
+        public static implicit operator Content(string input) => new(ContentType.Text, input);
 
-        public static implicit operator Content(ImageUrl imageUrl) => new Content(imageUrl);
+        public static implicit operator Content(ImageUrl imageUrl) => new(imageUrl);
     }
 }

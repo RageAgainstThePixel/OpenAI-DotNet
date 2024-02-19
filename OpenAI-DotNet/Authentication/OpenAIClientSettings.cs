@@ -116,10 +116,10 @@ namespace OpenAI
 
         internal bool IsAzureDeployment => BaseRequestUrlFormat.Contains(AzureOpenAIDomain);
 
-        private readonly Dictionary<string, string> defaultQueryParameters = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> defaultQueryParameters = new();
 
         internal IReadOnlyDictionary<string, string> DefaultQueryParameters => defaultQueryParameters;
 
-        public static OpenAIClientSettings Default { get; } = new OpenAIClientSettings();
+        public static OpenAIClientSettings Default { get; } = new();
     }
 }

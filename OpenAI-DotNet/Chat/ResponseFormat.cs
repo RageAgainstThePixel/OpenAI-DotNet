@@ -18,6 +18,6 @@ namespace OpenAI.Chat
 
         public static implicit operator ChatResponseFormat(ResponseFormat format) => format.Type;
 
-        public static implicit operator ResponseFormat(ChatResponseFormat format) => new ResponseFormat(format);
+        public static implicit operator ResponseFormat(ChatResponseFormat format) => new(format);
     }
 }

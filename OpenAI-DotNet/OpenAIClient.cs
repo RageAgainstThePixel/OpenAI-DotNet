@@ -109,7 +109,7 @@ namespace OpenAI
         /// <summary>
         /// The <see cref="JsonSerializationOptions"/> to use when making calls to the API.
         /// </summary>
-        internal static JsonSerializerOptions JsonSerializationOptions { get; } = new JsonSerializerOptions
+        internal static JsonSerializerOptions JsonSerializationOptions { get; } = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverterFactory() }
