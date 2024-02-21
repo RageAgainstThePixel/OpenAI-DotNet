@@ -398,7 +398,7 @@ Create an assistant with a model and instructions.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var request = new CreateAssistantRequest("gpt-3.5-turbo");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
@@ -418,10 +418,10 @@ Modifies an assistant.
 
 ```csharp
 using var api = new OpenAIClient();
-var createRequest = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var createRequest = new CreateAssistantRequest("gpt-3.5-turbo");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
 var modifyRequest = new CreateAssistantRequest("gpt-4-turbo-preview");
-var modifiedAssistant = await api.AssistantsEndpoint.ModifyAsync(assistant.Id, modifyRequest);
+var modifiedAssistant = await api.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
 ```

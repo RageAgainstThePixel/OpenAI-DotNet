@@ -23,7 +23,7 @@ namespace OpenAI.Tests
             var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
-            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106",
+            var request = new CreateAssistantRequest("gpt-3.5-turbo",
                 name: "test-assistant",
                 description: "Used for unit testing.",
                 instructions: "You are test assistant",
@@ -42,7 +42,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("test-assistant", assistant.Name);
             Assert.AreEqual("Used for unit testing.", assistant.Description);
             Assert.AreEqual("You are test assistant", assistant.Instructions);
-            Assert.AreEqual("gpt-3.5-turbo-1106", assistant.Model);
+            Assert.AreEqual("gpt-3.5-turbo", assistant.Model);
             Assert.IsNotEmpty(assistant.Metadata);
             testAssistant = assistant;
             Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
