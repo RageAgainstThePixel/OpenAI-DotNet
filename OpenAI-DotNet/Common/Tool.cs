@@ -115,7 +115,7 @@ namespace OpenAI
                     into function
                     select new Tool(function));
 
-                foreach (var newTool in tools.Where(knownTool => toolCache.All(tool => tool.Type == "function" && tool.Function.Name != knownTool.Function.Name)))
+                foreach (var newTool in tools.Where(knownTool => !toolCache.Any(tool => tool.Type == "function" && tool.Function.Name == knownTool.Function.Name)))
                 {
                     toolCache.Add(newTool);
                 }
