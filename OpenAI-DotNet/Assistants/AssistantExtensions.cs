@@ -247,7 +247,7 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
         public static async Task<IReadOnlyList<ToolOutput>> GetToolOutputsAsync(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls, CancellationToken cancellationToken = default)
-            => await Task.WhenAll(toolCalls.Select(async toolCall => await assistant.GetToolOutputAsync(toolCall, cancellationToken: cancellationToken).ConfigureAwait(false))).ConfigureAwait(false);
+            => await Task.WhenAll(toolCalls.Select(async toolCall => await assistant.GetToolOutputAsync(toolCall, cancellationToken).ConfigureAwait(false))).ConfigureAwait(false);
 
         #endregion Tools
     }
