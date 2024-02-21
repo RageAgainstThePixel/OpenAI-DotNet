@@ -285,6 +285,18 @@ namespace OpenAI.Threads
             => await run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run.ThreadId, run.Id, request, cancellationToken);
 
         /// <summary>
+        /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
+        /// this endpoint can be used to submit the outputs from the tool calls once they're all completed.
+        /// All outputs must be submitted in a single request.
+        /// </summary>
+        /// <param name="run"><see cref="RunResponse"/> to submit outputs for.</param>
+        /// <param name="outputs"><see cref="ToolOutput"/>s</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, CancellationToken cancellationToken = default)
+            => await run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), cancellationToken);
+
+        /// <summary>
         /// Returns a list of run steps belonging to a run.
         /// </summary>
         /// <param name="run"><see cref="RunResponse"/> to list run steps for.</param>

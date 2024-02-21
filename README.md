@@ -770,37 +770,28 @@ When a run has the status: `requires_action` and `required_action.type` is `subm
 
 ```csharp
 using var api = new OpenAIClient();
-var function = new Function(
-    nameof(WeatherService.GetCurrentWeather),
-    "Get the current weather in a given location",
-    new JsonObject
-    {
-        ["type"] = "object",
-        ["properties"] = new JsonObject
-        {
-            ["location"] = new JsonObject
-            {
-                ["type"] = "string",
-                ["description"] = "The city and state, e.g. San Francisco, CA"
-            },
-            ["unit"] = new JsonObject
-            {
-                ["type"] = "string",
-                ["enum"] = new JsonArray { "celsius", "fahrenheit" }
-            }
-        },
-        ["required"] = new JsonArray { "location", "unit" }
-    });
-testAssistant = await api.AssistantsEndpoint.CreateAssistantAsync(new CreateAssistantRequest(tools: new Tool[] { function }));
-var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature in celsius now?");
+var tools = new List<Tool>
+{
+    // Use a predefined tool
+    Tool.Retrieval,
+    // Or create a tool from a type and the name of the method you want to use for function calling
+    Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+};
+var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?");
+testThread = await run.GetThreadAsync();
 // waiting while run is Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
-var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
-Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
-var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
-var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-var toolOutput = new ToolOutput(toolCall.Id, functionResult);
-run = await run.SubmitToolOutputsAsync(toolOutput);
+// Invoke all of the tool call functions and return the tool outputs.
+var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+
+foreach (var toolOutput in toolOutputs)
+{
+    Console.WriteLine($"tool call output: {toolOutput.Output}");
+}
+// submit the tool outputs
+run = await run.SubmitToolOutputsAsync(toolOutputs);
 // waiting while run in Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
 var messages = await run.ListMessagesAsync();
@@ -939,31 +930,7 @@ foreach (var message in messages)
 }
 
 // Define the tools that the assistant is able to use:
-var tools = new List<Tool>
-{
-    new Function(
-        nameof(WeatherService.GetCurrentWeather),
-        "Get the current weather in a given location",
-            new JsonObject
-            {
-                ["type"] = "object",
-                ["properties"] = new JsonObject
-                {
-                    ["location"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["description"] = "The city and state, e.g. San Francisco, CA"
-                    },
-                    ["unit"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["enum"] = new JsonArray {"celsius", "fahrenheit"}
-                    }
-                },
-                ["required"] = new JsonArray { "location", "unit" }
-            })
-};
-
+var tools = Tool.GetAllAvailableTools(includeDefaults: false);
 var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(response.FirstChoice.Message);
@@ -992,8 +959,8 @@ if (!string.IsNullOrEmpty(response.ToString()))
 var usedTool = response.FirstChoice.Message.ToolCalls[0];
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {response.FirstChoice.FinishReason}");
 Console.WriteLine($"{usedTool.Function.Arguments}");
-var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
-var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+// Invoke the used tool to get the function result!
+var functionResult = await usedTool.InvokeFunctionAsync();
 messages.Add(new Message(usedTool, functionResult));
 Console.WriteLine($"{Role.Tool}: {functionResult}");
 // System: You are a helpful weather assistant.

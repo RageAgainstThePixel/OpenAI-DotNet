@@ -218,6 +218,15 @@ namespace OpenAI.Assistants
             => new(toolCall.Id, assistant.InvokeToolCall(toolCall));
 
         /// <summary>
+        /// Calls each tool's function, with the provided arguments from the toolCalls and returns the outputs.
+        /// </summary>
+        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="toolCalls">A collection of <see cref="ToolCall"/>s.</param>
+        /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
+        public static IReadOnlyList<ToolOutput> GetToolOutputs(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls)
+            => toolCalls.Select(assistant.GetToolOutput).ToList();
+
+        /// <summary>
         /// Calls the tool's function, with the provided arguments from the toolCall and returns the output.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
@@ -235,18 +244,10 @@ namespace OpenAI.Assistants
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCalls">A collection of <see cref="ToolCall"/>s.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
-        public static IReadOnlyList<ToolOutput> GetToolOutputs(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls)
-            => toolCalls.Select(assistant.GetToolOutput).ToList();
-
-        /// <summary>
-        /// Calls each tool's function, with the provided arguments from the toolCalls and returns the outputs.
-        /// </summary>
-        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
-        /// <param name="toolCalls">A collection of <see cref="ToolCall"/>s.</param>
-        /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
-        public static async Task<IReadOnlyList<ToolOutput>> GetToolOutputsAsync(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls)
-            => await Task.WhenAll(toolCalls.Select(async toolCall => await assistant.GetToolOutputAsync(toolCall).ConfigureAwait(false))).ConfigureAwait(false);
+        public static async Task<IReadOnlyList<ToolOutput>> GetToolOutputsAsync(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls, CancellationToken cancellationToken = default)
+            => await Task.WhenAll(toolCalls.Select(async toolCall => await assistant.GetToolOutputAsync(toolCall, cancellationToken: cancellationToken).ConfigureAwait(false))).ConfigureAwait(false);
 
         #endregion Tools
     }
