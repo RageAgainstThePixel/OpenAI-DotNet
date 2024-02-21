@@ -778,9 +778,8 @@ var tools = new List<Tool>
     Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
 };
 var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
-testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+var testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
 var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?");
-testThread = await run.GetThreadAsync();
 // waiting while run is Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
 // Invoke all of the tool call functions and return the tool outputs.
