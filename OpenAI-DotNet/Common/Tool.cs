@@ -86,7 +86,12 @@ namespace OpenAI
 
         public static IReadOnlyList<Tool> GetAllAvailableTools(bool includeDefaults = true)
         {
-            if (toolCache != null) { return toolCache; }
+            if (toolCache != null)
+            {
+                return !includeDefaults
+                    ? toolCache.Where(tool => tool.Type == "function").ToList()
+                    : toolCache;
+            }
 
             var tools = new List<Tool>();
 

@@ -152,7 +152,7 @@ namespace OpenAI
             }
         }
 
-        #region Function Inoking Utilities
+        #region Function Invoking Utilities
 
         private static readonly Dictionary<string, MethodInfo> functionCache = new();
 
@@ -198,24 +198,12 @@ namespace OpenAI
                     throw new InvalidOperationException($"Failed to lookup and invoke function \"{Name}\"");
                 }
 
-                var type = Type.GetType(Name[..Name.LastIndexOf('_')].Replace('_', '.'));
-
-                if (type == null)
-                {
-                    throw new InvalidOperationException($"Failed to find a valid type for {Name}");
-                }
-
-                method = type.GetMethod(Name[(Name.LastIndexOf('_') + 1)..].Replace('_', '.'));
-
-                if (method == null)
-                {
-                    throw new InvalidOperationException($"Failed to find a valid method for {Name}");
-                }
-
+                var type = Type.GetType(Name[..Name.LastIndexOf('_')].Replace('_', '.')) ?? throw new InvalidOperationException($"Failed to find a valid type for {Name}");
+                method = type.GetMethod(Name[(Name.LastIndexOf('_') + 1)..].Replace('_', '.')) ?? throw new InvalidOperationException($"Failed to find a valid method for {Name}");
                 functionCache[Name] = method;
             }
 
-            var requestedArgs = JsonSerializer.Deserialize<Dictionary<string, object>>(Arguments.ToString());
+            var requestedArgs = JsonSerializer.Deserialize<Dictionary<string, object>>(Arguments.ToString(), OpenAIClient.JsonSerializationOptions);
             var methodParams = method.GetParameters();
             var invokeArgs = new object[methodParams.Length];
 
@@ -256,6 +244,6 @@ namespace OpenAI
             return (method, invokeArgs);
         }
 
-        #endregion Function Inoking Utilities
+        #endregion Function Invoking Utilities
     }
 }
