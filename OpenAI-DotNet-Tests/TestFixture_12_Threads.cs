@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.Tests.Weather;
@@ -7,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -216,7 +216,7 @@ namespace OpenAI.Tests
                 new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: "gpt-4-1106-preview"));
+                    model: "gpt-4-turbo-preview"));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
@@ -344,29 +344,13 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_07_01_SubmitToolOutput()
         {
-            var function = new Function(
-                nameof(WeatherService.GetCurrentWeather),
-                "Get the current weather in a given location",
-                new JsonObject
-                {
-                    ["type"] = "object",
-                    ["properties"] = new JsonObject
-                    {
-                        ["location"] = new JsonObject
-                        {
-                            ["type"] = "string",
-                            ["description"] = "The city and state, e.g. San Francisco, CA"
-                        },
-                        ["unit"] = new JsonObject
-                        {
-                            ["type"] = "string",
-                            ["enum"] = new JsonArray { "celsius", "fahrenheit" }
-                        }
-                    },
-                    ["required"] = new JsonArray { "location", "unit" }
-                });
-            testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(new CreateAssistantRequest(tools: new Tool[] { function }));
-            var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature in celsius now?");
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+            };
+            var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+            testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+            var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?");
             testThread = await run.GetThreadAsync();
             // waiting while run is Queued and InProgress
             run = await run.WaitForStatusChangeAsync();
@@ -394,13 +378,17 @@ namespace OpenAI.Tests
             var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
             Assert.AreEqual("function", toolCall.Type);
             Assert.IsNotNull(toolCall.FunctionCall);
-            Assert.AreEqual(nameof(WeatherService.GetCurrentWeather), toolCall.FunctionCall.Name);
+            Assert.IsTrue(toolCall.FunctionCall.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
             Assert.IsNotNull(toolCall.FunctionCall.Arguments);
             Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
-            var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
-            var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-            var toolOutput = new ToolOutput(toolCall.Id, functionResult);
-            run = await run.SubmitToolOutputsAsync(toolOutput);
+            var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+
+            foreach (var toolOutput in toolOutputs)
+            {
+                Console.WriteLine($"tool call output: {toolOutput.Output}");
+            }
+
+            run = await run.SubmitToolOutputsAsync(toolOutputs);
             // waiting while run in Queued and InProgress
             run = await run.WaitForStatusChangeAsync();
             Assert.AreEqual(RunStatus.Completed, run.Status);

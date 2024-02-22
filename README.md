@@ -398,7 +398,7 @@ Create an assistant with a model and instructions.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var request = new CreateAssistantRequest("gpt-3.5-turbo");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
@@ -418,10 +418,10 @@ Modifies an assistant.
 
 ```csharp
 using var api = new OpenAIClient();
-var createRequest = new CreateAssistantRequest("gpt-3.5-turbo-1106");
+var createRequest = new CreateAssistantRequest("gpt-3.5-turbo");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
-var modifyRequest = new CreateAssistantRequest("gpt-4-1106-preview");
-var modifiedAssistant = await api.AssistantsEndpoint.ModifyAsync(assistant.Id, modifyRequest);
+var modifyRequest = new CreateAssistantRequest("gpt-4-turbo-preview");
+var modifiedAssistant = await api.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
 ```
@@ -550,7 +550,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-1106-preview"));
+        model: "gpt-4-turbo-preview"));
 var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
 var threadRequest = new CreateThreadRequest(messages);
 var run = await assistant.CreateThreadAndRunAsync(threadRequest);
@@ -726,7 +726,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-1106-preview"));
+        model: "gpt-4-turbo-preview"));
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
 var run = await thread.CreateRunAsync(assistant);
@@ -770,37 +770,27 @@ When a run has the status: `requires_action` and `required_action.type` is `subm
 
 ```csharp
 using var api = new OpenAIClient();
-var function = new Function(
-    nameof(WeatherService.GetCurrentWeather),
-    "Get the current weather in a given location",
-    new JsonObject
-    {
-        ["type"] = "object",
-        ["properties"] = new JsonObject
-        {
-            ["location"] = new JsonObject
-            {
-                ["type"] = "string",
-                ["description"] = "The city and state, e.g. San Francisco, CA"
-            },
-            ["unit"] = new JsonObject
-            {
-                ["type"] = "string",
-                ["enum"] = new JsonArray { "celsius", "fahrenheit" }
-            }
-        },
-        ["required"] = new JsonArray { "location", "unit" }
-    });
-testAssistant = await api.AssistantsEndpoint.CreateAssistantAsync(new CreateAssistantRequest(tools: new Tool[] { function }));
-var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature in celsius now?");
+var tools = new List<Tool>
+{
+    // Use a predefined tool
+    Tool.Retrieval,
+    // Or create a tool from a type and the name of the method you want to use for function calling
+    Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+};
+var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+var testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?");
 // waiting while run is Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
-var toolCall = run.RequiredAction.SubmitToolOutputs.ToolCalls[0];
-Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
-var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(toolCall.FunctionCall.Arguments);
-var functionResult = WeatherService.GetCurrentWeather(functionArgs);
-var toolOutput = new ToolOutput(toolCall.Id, functionResult);
-run = await run.SubmitToolOutputsAsync(toolOutput);
+// Invoke all of the tool call functions and return the tool outputs.
+var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+
+foreach (var toolOutput in toolOutputs)
+{
+    Console.WriteLine($"tool call output: {toolOutput.Output}");
+}
+// submit the tool outputs
+run = await run.SubmitToolOutputsAsync(toolOutputs);
 // waiting while run in Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
 var messages = await run.ListMessagesAsync();
@@ -939,31 +929,7 @@ foreach (var message in messages)
 }
 
 // Define the tools that the assistant is able to use:
-var tools = new List<Tool>
-{
-    new Function(
-        nameof(WeatherService.GetCurrentWeather),
-        "Get the current weather in a given location",
-            new JsonObject
-            {
-                ["type"] = "object",
-                ["properties"] = new JsonObject
-                {
-                    ["location"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["description"] = "The city and state, e.g. San Francisco, CA"
-                    },
-                    ["unit"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["enum"] = new JsonArray {"celsius", "fahrenheit"}
-                    }
-                },
-                ["required"] = new JsonArray { "location", "unit" }
-            })
-};
-
+var tools = Tool.GetAllAvailableTools(includeDefaults: false);
 var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(response.FirstChoice.Message);
@@ -992,8 +958,8 @@ if (!string.IsNullOrEmpty(response.ToString()))
 var usedTool = response.FirstChoice.Message.ToolCalls[0];
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {response.FirstChoice.FinishReason}");
 Console.WriteLine($"{usedTool.Function.Arguments}");
-var functionArgs = JsonSerializer.Deserialize<WeatherArgs>(usedTool.Function.Arguments.ToString());
-var functionResult = WeatherService.GetCurrentWeather(functionArgs);
+// Invoke the used tool to get the function result!
+var functionResult = await usedTool.InvokeFunctionAsync();
 messages.Add(new Message(usedTool, functionResult));
 Console.WriteLine($"{Role.Tool}: {functionResult}");
 // System: You are a helpful weather assistant.
@@ -1045,7 +1011,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant designed to output JSON."),
     new Message(Role.User, "Who won the world series in 2020?"),
 };
-var chatRequest = new ChatRequest(messages, "gpt-4-1106-preview", responseFormat: ChatResponseFormat.Json);
+var chatRequest = new ChatRequest(messages, "gpt-4-turbo-preview", responseFormat: ChatResponseFormat.Json);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)

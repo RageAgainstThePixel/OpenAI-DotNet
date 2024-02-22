@@ -1,8 +1,32 @@
-﻿namespace OpenAI.Tests.Weather
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System;
+using System.Threading.Tasks;
+
+namespace OpenAI.Tests.Weather
 {
-    internal class WeatherService
+    internal static class WeatherService
     {
-        public static string GetCurrentWeather(WeatherArgs weatherArgs)
-            => $"The current weather in {weatherArgs.Location} is 20 {weatherArgs.Unit}";
+        internal enum WeatherUnit
+        {
+            Celsius,
+            Fahrenheit
+        }
+
+        [Function("Get the current weather in a given location")]
+        public static async Task<string> GetCurrentWeatherAsync(string location, WeatherUnit unit)
+        {
+            var temp = new Random().Next(-10, 40);
+
+            temp = unit switch
+            {
+                WeatherUnit.Fahrenheit => CelsiusToFahrenheit(temp),
+                _ => temp
+            };
+
+            return await Task.FromResult($"The current weather in {location} is {temp}\u00b0 {unit}");
+        }
+
+        public static int CelsiusToFahrenheit(int celsius) => (celsius * 9 / 5) + 32;
     }
 }

@@ -20,7 +20,7 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <param name="model">
         /// ID of the model to use.<br/>
-        /// Defaults to: <see cref="Models.Model.Embedding_Ada_002"/>
+        /// Defaults to: <see cref="Model.Embedding_Ada_002"/>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
@@ -57,8 +57,7 @@ namespace OpenAI.Embeddings
         /// The number of dimensions the resulting output embeddings should have.
         /// Only supported in text-embedding-3 and later models
         /// </param>
-        public EmbeddingsRequest(IEnumerable<string> input, string model = null, string user = null,
-            int? dimensions = null)
+        public EmbeddingsRequest(IEnumerable<string> input, string model = null, string user = null, int? dimensions = null)
         {
             Input = input?.ToList();
 
@@ -77,7 +76,7 @@ namespace OpenAI.Embeddings
 
         [JsonPropertyName("model")]
         public string Model { get; }
-        
+
         [JsonPropertyName("dimensions")]
         public int? Dimensions { get; }
 

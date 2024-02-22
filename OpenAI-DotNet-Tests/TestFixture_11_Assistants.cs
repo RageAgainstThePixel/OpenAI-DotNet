@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using NUnit.Framework;
 using OpenAI.Assistants;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace OpenAI.Tests
             var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
-            var request = new CreateAssistantRequest("gpt-3.5-turbo-1106",
+            var request = new CreateAssistantRequest("gpt-3.5-turbo",
                 name: "test-assistant",
                 description: "Used for unit testing.",
                 instructions: "You are test assistant",
@@ -40,7 +42,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("test-assistant", assistant.Name);
             Assert.AreEqual("Used for unit testing.", assistant.Description);
             Assert.AreEqual("You are test assistant", assistant.Instructions);
-            Assert.AreEqual("gpt-3.5-turbo-1106", assistant.Model);
+            Assert.AreEqual("gpt-3.5-turbo", assistant.Model);
             Assert.IsNotEmpty(assistant.Metadata);
             testAssistant = assistant;
             Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
@@ -68,7 +70,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
             var request = new CreateAssistantRequest(
-                model: "gpt-4-1106-preview",
+                model: "gpt-4-turbo-preview",
                 name: "Test modified",
                 description: "Modified description",
                 instructions: "You are modified test assistant");
@@ -77,7 +79,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
             Assert.AreEqual("You are modified test assistant", assistant.Instructions);
-            Assert.AreEqual("gpt-4-1106-preview", assistant.Model);
+            Assert.AreEqual("gpt-4-turbo-preview", assistant.Model);
             Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
             Console.WriteLine($"{assistant.Id} -> modified");
         }

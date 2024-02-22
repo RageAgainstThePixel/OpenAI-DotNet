@@ -49,7 +49,7 @@ namespace OpenAI
         public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
 
         public static Usage operator +(Usage a, Usage b)
-            => new Usage(
+            => new(
                 (a.PromptTokens ?? 0) + (b.PromptTokens ?? 0),
                 (a.CompletionTokens ?? 0) + (b.CompletionTokens ?? 0),
                 (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0));

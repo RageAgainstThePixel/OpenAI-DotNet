@@ -8,7 +8,7 @@ namespace OpenAI.Threads
 {
     public sealed class Message
     {
-        public static implicit operator Message(string content) => new Message(content);
+        public static implicit operator Message(string content) => new(content);
 
         /// <summary>
         /// Constructor.

@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using NUnit.Framework;
 using System.Threading.Tasks;
 using OpenAI.Models;
 
@@ -14,7 +16,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(embedding);
             Assert.IsNotEmpty(embedding.Data);
         }
-        
+
         [Test]
         public async Task Test_2_CreateEmbeddingWithDimensions()
         {

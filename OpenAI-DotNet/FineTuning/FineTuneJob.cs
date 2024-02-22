@@ -84,7 +84,7 @@ namespace OpenAI.FineTuning
         [JsonIgnore]
         public IReadOnlyList<Event> Events { get; internal set; } = new List<Event>();
 
-        public static implicit operator FineTuneJobResponse(FineTuneJob job) => new FineTuneJobResponse(job);
+        public static implicit operator FineTuneJobResponse(FineTuneJob job) => new(job);
 
         public static implicit operator string(FineTuneJob job) => job?.ToString();
 

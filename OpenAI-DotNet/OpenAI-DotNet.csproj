@@ -28,8 +28,15 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.6.5</Version>
+    <Version>7.7.0</Version>
     <PackageReleaseNotes>
+Version 7.7.0
+- Added Tool call and Function call Utilities and helper methods
+  - Added FunctionAttribute to decorate methods to be used in function calling
+  - Chat.Message.ToolCalls can be directly invoked using Function.Invoke() or Function.InvokeAsync(CancellationToken)
+  - Assistant tool call outputs can be easily generated using assistnat.GetToolOutputAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls)
+  - Check updated docs for more details and examples
+- Fixed ChatRequest seed parameter not being set correctly
 Version 7.6.5
 - Updated api key prefix checks to only be enforced for OpenAI domain
 Version 7.6.4
