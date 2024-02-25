@@ -25,7 +25,7 @@ namespace OpenAI.Chat
         protected override string Root => "chat";
 
         /// <summary>
-        /// Creates a completion for the chat message
+        /// Creates a completion for the chat message.
         /// </summary>
         /// <param name="chatRequest">The chat request which contains the message content.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>

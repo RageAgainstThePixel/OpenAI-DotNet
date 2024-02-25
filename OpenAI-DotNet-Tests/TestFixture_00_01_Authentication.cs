@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_00_00_Authentication
+    internal class TestFixture_00_01_Authentication
     {
         [SetUp]
         public void Setup()
@@ -187,6 +187,8 @@ namespace OpenAI.Tests
             }
 
             Assert.IsFalse(File.Exists(".openai"));
+            
+            OpenAIAuthentication.Default = null;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace OpenAI.Models
 {
     /// <summary>
     /// List and describe the various models available in the API.
-    /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
+    /// You can refer to the Models documentation to understand which models are available for certain endpoints: <see href="https://platform.openai.com/docs/models/model-endpoint-compatibility"/>.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/models"/>
     /// </summary>
     public sealed class ModelsEndpoint : BaseEndPoint
@@ -33,7 +33,7 @@ namespace OpenAI.Models
         /// <summary>
         /// List all models via the API
         /// </summary>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>Asynchronously returns the list of all <see cref="Model"/>s</returns>
         public async Task<IReadOnlyList<Model>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
@@ -46,7 +46,7 @@ namespace OpenAI.Models
         /// Get the details about a particular Model from the API
         /// </summary>
         /// <param name="id">The id/name of the model to get more details about</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>Asynchronously returns the <see cref="Model"/> with all available properties</returns>
         public async Task<Model> GetModelDetailsAsync(string id, CancellationToken cancellationToken = default)
         {
@@ -59,13 +59,14 @@ namespace OpenAI.Models
         /// Delete a fine-tuned model. You must have the Owner role in your organization.
         /// </summary>
         /// <param name="modelId">The <see cref="Model"/> to delete.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if fine-tuned model was successfully deleted.</returns>
         public async Task<bool> DeleteFineTuneModelAsync(string modelId, CancellationToken cancellationToken = default)
         {
             var model = await GetModelDetailsAsync(modelId, cancellationToken).ConfigureAwait(false);
 
-            if (model == null)
+            if (model == null ||
+                string.IsNullOrWhiteSpace(model))
             {
                 throw new Exception($"Failed to get {modelId} info!");
             }

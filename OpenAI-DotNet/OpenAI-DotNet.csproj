@@ -28,8 +28,17 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.0</Version>
+    <Version>7.7.1</Version>
     <PackageReleaseNotes>
+Version 7.7.1
+- More Function utilities and invoking methods
+  - Added FunctionPropertyAttribute to help better inform the feature how to format the Function json
+  - Added FromFunc-&gt;,-&lt; overloads for convenance
+  - Fixed invoke args sometimes being casting to wrong type
+  - Added additional protections for static and instanced function calls
+  - Added additional tool utilities:
+    - Tool.ClearRegisteredTools
+    - Tool.IsToolRegistered(Tool) - Tool.TryRegisterTool(Tool)
 Version 7.7.0
 - Added Tool call and Function call Utilities and helper methods
   - Added FunctionAttribute to decorate methods to be used in function calling

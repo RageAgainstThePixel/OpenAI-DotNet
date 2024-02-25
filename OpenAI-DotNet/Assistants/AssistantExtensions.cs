@@ -31,7 +31,7 @@ namespace OpenAI.Assistants
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>True, if the assistant was successfully deleted.</returns>
+        /// <returns>True, if the <see cref="assistant"/> was successfully deleted.</returns>
         public static async Task<bool> DeleteAsync(this AssistantResponse assistant, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id, cancellationToken).ConfigureAwait(false);
 
@@ -58,7 +58,7 @@ namespace OpenAI.Assistants
             => await assistant.Client.AssistantsEndpoint.ListFilesAsync(assistant.Id, query, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
-        /// Attach a file to the assistant.
+        /// Attach a file to the  <see cref="assistant"/>.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="file">
@@ -71,7 +71,7 @@ namespace OpenAI.Assistants
             => await assistant.Client.AssistantsEndpoint.AttachFileAsync(assistant.Id, file, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
-        /// Uploads a new file at the specified path and attaches it to the assistant.
+        /// Uploads a new file at the specified <see cref="filePath"/> and attaches it to the <see cref="assistant"/>.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="filePath">The local file path to upload.</param>
@@ -162,7 +162,7 @@ namespace OpenAI.Assistants
         }
 
         /// <summary>
-        /// Removes and Deletes a file from the assistant.
+        /// Removes and Deletes a file from the <see cref="assistant"/>.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="fileId">The ID of the file to delete.</param>
