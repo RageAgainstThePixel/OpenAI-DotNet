@@ -24,6 +24,7 @@ namespace OpenAI.Images
             => !string.IsNullOrWhiteSpace(Url)
                 ? Url
                 : !string.IsNullOrWhiteSpace(B64_Json)
-                    ? B64_Json : null;
+                    ? B64_Json
+                    : string.Empty;
     }
 }

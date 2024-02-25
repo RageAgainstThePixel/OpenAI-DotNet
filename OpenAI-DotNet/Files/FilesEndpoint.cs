@@ -17,7 +17,7 @@ namespace OpenAI.Files
     /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/files"/>
     /// </summary>
-    public sealed class FilesEndpoint : BaseEndPoint
+    public sealed class FilesEndpoint : OpenAIBaseEndpoint
     {
         private class FilesList
         {
@@ -46,8 +46,8 @@ namespace OpenAI.Files
                 query = new Dictionary<string, string> { { nameof(purpose), purpose } };
             }
 
-            var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Files;
         }
 
@@ -85,8 +85,8 @@ namespace OpenAI.Files
             content.Add(new StringContent(request.Purpose), "purpose");
             content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
             request.Dispose();
-            var response = await client.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken: cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
@@ -102,7 +102,7 @@ namespace OpenAI.Files
 
             async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                var response = await client.Client.DeleteAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
+                using var response = await client.Client.DeleteAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
                 // We specifically don't use the extension method here bc we need to check if it's still processing the file.
                 var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
@@ -120,7 +120,7 @@ namespace OpenAI.Files
                     }
                 }
 
-                await response.CheckResponseAsync(cancellationToken);
+                await response.CheckResponseAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
                 return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
             }
         }
@@ -133,8 +133,8 @@ namespace OpenAI.Files
         /// <returns><see cref="FileResponse"/></returns>
         public async Task<FileResponse> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
-            var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
         }
 
@@ -191,7 +191,7 @@ namespace OpenAI.Files
             await response.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
             return filePath;
         }
-        
+
         /// <summary>
         /// Gets the specified file as stream
         /// </summary>

@@ -1,9 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 
 namespace OpenAI.Extensions
 {
@@ -30,16 +28,10 @@ namespace OpenAI.Extensions
             return eventData != doneTag;
         }
 
-        public static StringContent ToJsonStringContent(this string json, bool debug)
+        public static StringContent ToJsonStringContent(this string json)
         {
             const string jsonContent = "application/json";
-
-            if (debug)
-            {
-                Console.WriteLine(json);
-            }
-
-            return new StringContent(json, Encoding.UTF8, jsonContent);
+            return new StringContent(json, null, jsonContent);
         }
 
         public static string ToSnakeCase(string @string)

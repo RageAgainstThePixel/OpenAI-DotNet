@@ -45,7 +45,14 @@ namespace OpenAI.Assistants
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
         public CreateAssistantRequest(AssistantResponse assistant, string model = null, string name = null, string description = null, string instructions = null, IEnumerable<Tool> tools = null, IEnumerable<string> files = null, IReadOnlyDictionary<string, string> metadata = null)
-            : this(string.IsNullOrWhiteSpace(model) ? assistant.Model : model, string.IsNullOrWhiteSpace(name) ? assistant.Name : name, string.IsNullOrWhiteSpace(description) ? assistant.Description : description, string.IsNullOrWhiteSpace(instructions) ? assistant.Instructions : instructions, tools ?? assistant.Tools, files ?? assistant.FileIds, metadata ?? assistant.Metadata)
+            : this(
+                string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
+                string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
+                string.IsNullOrWhiteSpace(description) ? assistant.Description : description,
+                string.IsNullOrWhiteSpace(instructions) ? assistant.Instructions : instructions,
+                tools ?? assistant.Tools,
+                files ?? assistant.FileIds,
+                metadata ?? assistant.Metadata)
         {
         }
 

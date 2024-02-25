@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace OpenAI
 {
-    public abstract class BaseEndPoint
+    public abstract class OpenAIBaseEndpoint
     {
-        protected BaseEndPoint(OpenAIClient client) => this.client = client;
+        protected OpenAIBaseEndpoint(OpenAIClient client) => this.client = client;
 
         // ReSharper disable once InconsistentNaming
         protected readonly OpenAIClient client;

@@ -15,7 +15,7 @@ namespace OpenAI.Audio
     /// Transforms audio into text.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/audio"/>
     /// </summary>
-    public sealed class AudioEndpoint : BaseEndPoint
+    public sealed class AudioEndpoint : OpenAIBaseEndpoint
     {
         private class AudioResponse
         {
@@ -43,9 +43,9 @@ namespace OpenAI.Audio
         /// <returns><see cref="ReadOnlyMemory{T}"/></returns>
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
-            var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent(EnableDebug);
-            var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(cancellationToken).ConfigureAwait(false);
+            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(false, jsonContent, null, cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
             int bytesRead;
@@ -71,6 +71,7 @@ namespace OpenAI.Audio
                 totalBytesRead += bytesRead;
             }
 
+            await response.CheckResponseAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
             return new ReadOnlyMemory<byte>(memoryStream.GetBuffer(), 0, totalBytesRead);
         }
 
@@ -108,8 +109,8 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json
                 ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
@@ -145,8 +146,8 @@ namespace OpenAI.Audio
 
             request.Dispose();
 
-            var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
 
             return responseFormat == AudioResponseFormat.Json
                 ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text

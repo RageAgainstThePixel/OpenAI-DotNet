@@ -11,7 +11,7 @@ namespace OpenAI.Audio
         /// Constructor.
         /// </summary>
         /// <param name="audioPath">
-        /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
+        /// The audio file to transcribe, in one of these formats flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
         /// </param>
         /// <param name="model">
         /// ID of the model to use.
@@ -112,7 +112,7 @@ namespace OpenAI.Audio
         ~AudioTranscriptionRequest() => Dispose(false);
 
         /// <summary>
-        /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
+        /// The audio file to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
         /// </summary>
         public Stream Audio { get; }
 

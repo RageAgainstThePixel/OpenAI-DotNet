@@ -208,8 +208,8 @@ namespace OpenAI
                                     apiKey = nextPart.Trim();
                                     break;
                                 case ORGANIZATION:
-                                case OPENAI_ORGANIZATION_ID:
                                 case OPEN_AI_ORGANIZATION_ID:
+                                case OPENAI_ORGANIZATION_ID:
                                     organization = nextPart.Trim();
                                     break;
                             }

@@ -11,7 +11,7 @@ namespace OpenAI.Audio
         /// Constructor.
         /// </summary>
         /// <param name="audioPath">
-        /// The audio file to translate, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm
+        /// The audio file to translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
         /// </param>
         /// <param name="model">
         /// ID of the model to use. Only whisper-1 is currently available.
@@ -44,7 +44,7 @@ namespace OpenAI.Audio
         /// Constructor.
         /// </summary>
         /// <param name="audio">
-        /// The audio file to translate, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
+        /// The audio file to translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
         /// </param>
         /// <param name="audioName">
         /// The name of the audio file to translate.
