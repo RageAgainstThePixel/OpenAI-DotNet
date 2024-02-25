@@ -17,7 +17,7 @@ namespace OpenAI.Files
     /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/files"/>
     /// </summary>
-    public sealed class FilesEndpoint : BaseEndPoint
+    public sealed class FilesEndpoint : OpenAIBaseEndpoint
     {
         private class FilesList
         {

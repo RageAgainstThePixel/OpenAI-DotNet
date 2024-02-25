@@ -16,7 +16,7 @@ namespace OpenAI.Chat
     /// Given a chat conversation, the model will return a chat completion response.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/chat"/>
     /// </summary>
-    public sealed class ChatEndpoint : BaseEndPoint
+    public sealed class ChatEndpoint : OpenAIBaseEndpoint
     {
         /// <inheritdoc />
         public ChatEndpoint(OpenAIClient client) : base(client) { }

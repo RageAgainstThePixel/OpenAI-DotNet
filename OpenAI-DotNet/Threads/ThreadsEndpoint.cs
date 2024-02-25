@@ -12,7 +12,7 @@ namespace OpenAI.Threads
     /// Create threads that assistants can interact with.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
     /// </summary>
-    public sealed class ThreadsEndpoint : BaseEndPoint
+    public sealed class ThreadsEndpoint : OpenAIBaseEndpoint
     {
         public ThreadsEndpoint(OpenAIClient client) : base(client) { }
 

@@ -15,7 +15,7 @@ namespace OpenAI.Audio
     /// Transforms audio into text.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/audio"/>
     /// </summary>
-    public sealed class AudioEndpoint : BaseEndPoint
+    public sealed class AudioEndpoint : OpenAIBaseEndpoint
     {
         private class AudioResponse
         {

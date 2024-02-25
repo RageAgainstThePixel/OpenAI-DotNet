@@ -12,7 +12,7 @@ namespace OpenAI.Embeddings
     /// Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.<br/>
     /// <see href="https://platform.openai.com/docs/guides/embeddings"/>
     /// </summary>
-    public sealed class EmbeddingsEndpoint : BaseEndPoint
+    public sealed class EmbeddingsEndpoint : OpenAIBaseEndpoint
     {
         /// <inheritdoc />
         public EmbeddingsEndpoint(OpenAIClient client) : base(client) { }

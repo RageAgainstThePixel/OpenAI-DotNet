@@ -15,7 +15,7 @@ namespace OpenAI.Models
     /// You can refer to the Models documentation to understand which models are available for certain endpoints: <see href="https://platform.openai.com/docs/models/model-endpoint-compatibility"/>.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/models"/>
     /// </summary>
-    public sealed class ModelsEndpoint : BaseEndPoint
+    public sealed class ModelsEndpoint : OpenAIBaseEndpoint
     {
         private sealed class ModelsList
         {

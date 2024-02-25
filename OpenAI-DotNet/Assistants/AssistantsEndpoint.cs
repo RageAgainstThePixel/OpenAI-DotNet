@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Assistants
 {
-    public sealed class AssistantsEndpoint : BaseEndPoint
+    public sealed class AssistantsEndpoint : OpenAIBaseEndpoint
     {
         internal AssistantsEndpoint(OpenAIClient client) : base(client) { }
 

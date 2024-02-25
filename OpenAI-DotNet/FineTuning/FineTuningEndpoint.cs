@@ -14,7 +14,7 @@ namespace OpenAI.FineTuning
     /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/><br/>
     /// <see href="https://platform.openai.com/docs/api-reference/fine-tuning"/>
     /// </summary>
-    public sealed class FineTuningEndpoint : BaseEndPoint
+    public sealed class FineTuningEndpoint : OpenAIBaseEndpoint
     {
         /// <inheritdoc />
         public FineTuningEndpoint(OpenAIClient client) : base(client) { }
