@@ -110,96 +110,91 @@ namespace OpenAI.Extensions
         {
             var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-            if (debugResponse || !response.IsSuccessStatusCode)
+            if (debugResponse && response.RequestMessage != null)
             {
-                if (response.RequestMessage != null)
+                var debugMessage = new StringBuilder();
+
+                if (!string.IsNullOrWhiteSpace(methodName))
                 {
-                    var debugMessage = new StringBuilder();
+                    debugMessage.Append($"{methodName} -> ");
+                }
 
-                    if (!string.IsNullOrWhiteSpace(methodName))
+                debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
+
+                var debugMessageObject = new Dictionary<string, Dictionary<string, object>>
+                {
+                    ["Request"] = new()
                     {
-                        debugMessage.Append($"{methodName} -> ");
+                        ["Headers"] = response.RequestMessage.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
                     }
+                };
 
-                    debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
+                if (requestContent != null)
+                {
+                    var requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-                    var debugMessageObject = new Dictionary<string, Dictionary<string, object>>
-                    {
-                        ["Request"] = new()
-                        {
-                            ["Headers"] = response.RequestMessage.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
-                        }
-                    };
-
-                    if (requestContent != null)
-                    {
-                        var requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-
-                        if (!string.IsNullOrWhiteSpace(requestAsString))
-                        {
-                            try
-                            {
-                                debugMessageObject["Request"]["Body"] = JsonNode.Parse(requestAsString);
-                            }
-                            catch
-                            {
-                                debugMessageObject["Request"]["Body"] = requestAsString;
-                            }
-                        }
-                    }
-
-                    debugMessageObject["Response"] = new()
-                    {
-                        ["Headers"] = response.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
-                    };
-
-                    if (responseStream != null || !string.IsNullOrWhiteSpace(responseAsString))
-                    {
-                        debugMessageObject["Response"]["Body"] = new Dictionary<string, object>();
-                    }
-
-                    if (responseStream != null)
-                    {
-                        var body = Encoding.UTF8.GetString(responseStream.ToArray());
-
-                        try
-                        {
-                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = JsonNode.Parse(body);
-                        }
-                        catch
-                        {
-                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = body;
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(responseAsString))
+                    if (!string.IsNullOrWhiteSpace(requestAsString))
                     {
                         try
                         {
-                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = JsonNode.Parse(responseAsString);
+                            debugMessageObject["Request"]["Body"] = JsonNode.Parse(requestAsString);
                         }
                         catch
                         {
-                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = responseAsString;
+                            debugMessageObject["Request"]["Body"] = requestAsString;
                         }
                     }
-
-                    debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, new JsonSerializerOptions { WriteIndented = true }));
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new HttpRequestException(debugMessage.ToString());
-                    }
-
-                    if (debugResponse)
-                    {
-                        Console.WriteLine(debugMessage.ToString());
-                    }
                 }
-                else
+
+                debugMessageObject["Response"] = new()
                 {
-                    throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
+                    ["Headers"] = response.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
+                };
+
+                if (responseStream != null || !string.IsNullOrWhiteSpace(responseAsString))
+                {
+                    debugMessageObject["Response"]["Body"] = new Dictionary<string, object>();
                 }
+
+                if (responseStream != null)
+                {
+                    var body = Encoding.UTF8.GetString(responseStream.ToArray());
+
+                    try
+                    {
+                        ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = JsonNode.Parse(body);
+                    }
+                    catch
+                    {
+                        ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = body;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(responseAsString))
+                {
+                    try
+                    {
+                        ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = JsonNode.Parse(responseAsString);
+                    }
+                    catch
+                    {
+                        ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = responseAsString;
+                    }
+                }
+
+                debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, new JsonSerializerOptions { WriteIndented = true }));
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(debugMessage.ToString());
+                }
+
+                Console.WriteLine(debugMessage.ToString());
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
             }
 
             return responseAsString;
