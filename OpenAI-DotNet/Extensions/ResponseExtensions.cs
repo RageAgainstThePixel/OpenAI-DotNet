@@ -153,7 +153,7 @@ namespace OpenAI.Extensions
                         ["Headers"] = response.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
                     };
 
-                    if (responseStream != null || string.IsNullOrWhiteSpace(responseAsString))
+                    if (responseStream != null || !string.IsNullOrWhiteSpace(responseAsString))
                     {
                         debugMessageObject["Response"]["Body"] = new Dictionary<string, object>();
                     }
