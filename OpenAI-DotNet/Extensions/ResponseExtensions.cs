@@ -1,12 +1,16 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -102,29 +106,110 @@ namespace OpenAI.Extensions
             }
         }
 
-        internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse = false, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
+        internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, HttpContent requestContent = null, MemoryStream responseStream = null, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
         {
             var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-            if (!response.IsSuccessStatusCode)
+            if (debugResponse || !response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
-            }
+                if (response.RequestMessage != null)
+                {
+                    var debugMessage = new StringBuilder();
 
-            if (debugResponse)
-            {
-                Console.WriteLine(responseAsString);
+                    if (!string.IsNullOrWhiteSpace(methodName))
+                    {
+                        debugMessage.Append($"{methodName} -> ");
+                    }
+
+                    debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
+
+                    var debugMessageObject = new Dictionary<string, Dictionary<string, object>>
+                    {
+                        ["Request"] = new()
+                        {
+                            ["Headers"] = response.RequestMessage.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
+                        }
+                    };
+
+                    if (requestContent != null)
+                    {
+                        var requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                        if (!string.IsNullOrWhiteSpace(requestAsString))
+                        {
+                            try
+                            {
+                                debugMessageObject["Request"]["Body"] = JsonNode.Parse(requestAsString);
+                            }
+                            catch
+                            {
+                                debugMessageObject["Request"]["Body"] = requestAsString;
+                            }
+                        }
+                    }
+
+                    debugMessageObject["Response"] = new()
+                    {
+                        ["Headers"] = response.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
+                    };
+
+                    if (responseStream != null || string.IsNullOrWhiteSpace(responseAsString))
+                    {
+                        debugMessageObject["Response"]["Body"] = new Dictionary<string, object>();
+                    }
+
+                    if (responseStream != null)
+                    {
+                        var body = Encoding.UTF8.GetString(responseStream.ToArray());
+
+                        try
+                        {
+                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = JsonNode.Parse(body);
+                        }
+                        catch
+                        {
+                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Stream"] = body;
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(responseAsString))
+                    {
+                        try
+                        {
+                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = JsonNode.Parse(responseAsString);
+                        }
+                        catch
+                        {
+                            ((Dictionary<string, object>)debugMessageObject["Response"]["Body"])["Content"] = responseAsString;
+                        }
+                    }
+
+                    debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, new JsonSerializerOptions { WriteIndented = true }));
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException(debugMessage.ToString());
+                    }
+
+                    if (debugResponse)
+                    {
+                        Console.WriteLine(debugMessage.ToString());
+                    }
+                }
+                else
+                {
+                    throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
+                }
             }
 
             return responseAsString;
         }
 
-        internal static async Task CheckResponseAsync(this HttpResponseMessage response, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
+        internal static async Task CheckResponseAsync(this HttpResponseMessage response, bool debug, StringContent requestContent = null, MemoryStream responseStream = null, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
         {
-            if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode || debug)
             {
-                var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                throw new HttpRequestException(message: $"{methodName} Failed! HTTP status code: {response.StatusCode} | Response body: {responseAsString}", null, statusCode: response.StatusCode);
+                await response.ReadAsStringAsync(debug, requestContent, responseStream, cancellationToken, methodName).ConfigureAwait(false);
             }
         }
 
