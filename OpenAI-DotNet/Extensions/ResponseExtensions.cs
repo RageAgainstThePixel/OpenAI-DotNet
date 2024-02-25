@@ -109,25 +109,26 @@ namespace OpenAI.Extensions
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, HttpContent requestContent = null, MemoryStream responseStream = null, CancellationToken cancellationToken = default, [CallerMemberName] string methodName = null)
         {
             var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var debugMessage = new StringBuilder();
 
-            if (debugResponse && response.RequestMessage != null)
+            if (!response.IsSuccessStatusCode || debugResponse)
             {
-                var debugMessage = new StringBuilder();
-
                 if (!string.IsNullOrWhiteSpace(methodName))
                 {
                     debugMessage.Append($"{methodName} -> ");
                 }
 
-                debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
+                var debugMessageObject = new Dictionary<string, Dictionary<string, object>>();
 
-                var debugMessageObject = new Dictionary<string, Dictionary<string, object>>
+                if (response.RequestMessage != null)
                 {
-                    ["Request"] = new()
+                    debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
+
+                    debugMessageObject["Request"] = new()
                     {
                         ["Headers"] = response.RequestMessage.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
-                    }
-                };
+                    };
+                }
 
                 if (requestContent != null)
                 {
@@ -183,12 +184,6 @@ namespace OpenAI.Extensions
                 }
 
                 debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, new JsonSerializerOptions { WriteIndented = true }));
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException(debugMessage.ToString());
-                }
-
                 Console.WriteLine(debugMessage.ToString());
             }
 
