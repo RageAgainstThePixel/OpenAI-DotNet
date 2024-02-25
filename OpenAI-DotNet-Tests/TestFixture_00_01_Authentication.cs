@@ -187,8 +187,6 @@ namespace OpenAI.Tests
             }
 
             Assert.IsFalse(File.Exists(".openai"));
-            
-            OpenAIAuthentication.Default = null;
         }
     }
 }
