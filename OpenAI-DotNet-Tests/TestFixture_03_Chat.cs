@@ -133,7 +133,7 @@ namespace OpenAI.Tests
 
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r- Always prompt the user for their location."),
+                new(Role.System, "You are a helpful weather assistant. Always ask the user for their location."),
                 new(Role.User, "What's the weather like today?"),
             };
 
@@ -179,6 +179,7 @@ namespace OpenAI.Tests
             }
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "tool_calls");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
@@ -199,7 +200,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r- Always prompt the user for their location."),
+                new(Role.System, "You are a helpful weather assistant. Always prompt the user for their location."),
                 new(Role.User, "What's the weather like today?"),
             };
 
@@ -256,6 +257,7 @@ namespace OpenAI.Tests
             }
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "tool_calls");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
@@ -282,7 +284,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r - Use the appropriate unit based on geographical location."),
+                new(Role.System, "You are a helpful weather assistant. Use the appropriate unit based on geographical location."),
                 new(Role.User, "What's the weather like today in Los Angeles, USA and Tokyo, Japan?"),
             };
 
@@ -356,6 +358,7 @@ namespace OpenAI.Tests
             messages.Add(response.FirstChoice.Message);
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "stop");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));

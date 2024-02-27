@@ -13,8 +13,10 @@ namespace OpenAI.Tests.Weather
             Fahrenheit
         }
 
-        [Function("Get the current weather in a given location")]
-        public static async Task<string> GetCurrentWeatherAsync(string location, WeatherUnit unit)
+        [Function("Get the current weather in a given location.")]
+        public static async Task<string> GetCurrentWeatherAsync(
+           [FunctionParameter("The location the user is currently in.")] string location,
+           [FunctionParameter("The units the use has requested temperature in. Typically this is based on the users location.")] WeatherUnit unit)
         {
             var temp = new Random().Next(-10, 40);
 
