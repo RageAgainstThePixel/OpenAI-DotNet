@@ -30,9 +30,9 @@ namespace OpenAI.Chat
             string user = null)
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty, responseFormat, seed, stops, temperature, topP, topLogProbs, user)
         {
-            var tooList = tools?.ToList();
+            var toolList = tools?.ToList();
 
-            if (tooList != null && tooList.Any())
+            if (toolList != null && toolList.Any())
             {
                 if (string.IsNullOrWhiteSpace(toolChoice))
                 {
@@ -43,8 +43,9 @@ namespace OpenAI.Chat
                     if (!toolChoice.Equals("none") &&
                         !toolChoice.Equals("auto"))
                     {
-                        var tool = tooList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice));
-                        ToolChoice = tool ?? throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
+                        var tool = toolList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice)) ??
+                            throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
+                        ToolChoice = new { type = "function", function = new { name = tool.Function.Name } };
                     }
                     else
                     {
@@ -53,7 +54,7 @@ namespace OpenAI.Chat
                 }
             }
 
-            Tools = tooList?.ToList();
+            Tools = toolList?.ToList();
         }
 
         /// <summary>
