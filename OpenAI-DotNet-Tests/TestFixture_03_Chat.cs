@@ -133,7 +133,7 @@ namespace OpenAI.Tests
 
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r- Always prompt the user for their location."),
+                new(Role.System, "You are a helpful weather assistant. Always ask the user for their location."),
                 new(Role.User, "What's the weather like today?"),
             };
 
@@ -143,7 +143,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -179,6 +179,7 @@ namespace OpenAI.Tests
             }
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "tool_calls");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
@@ -188,7 +189,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
-            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages);
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Console.WriteLine(response);
         }
@@ -199,7 +200,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r- Always prompt the user for their location."),
+                new(Role.System, "You are a helpful weather assistant. Always prompt the user for their location."),
                 new(Role.User, "What's the weather like today?"),
             };
 
@@ -209,7 +210,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false);
-            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -236,7 +237,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            if (!string.IsNullOrEmpty(response.ToString()))
+            if (response.FirstChoice.FinishReason == "stop")
             {
                 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
@@ -256,6 +257,7 @@ namespace OpenAI.Tests
             }
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "tool_calls");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
@@ -266,7 +268,7 @@ namespace OpenAI.Tests
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
 
-            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -282,7 +284,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
             {
-                new(Role.System, "You are a helpful weather assistant.\n\r - Use the appropriate unit based on geographical location."),
+                new(Role.System, "You are a helpful weather assistant. Use the appropriate unit based on geographical location."),
                 new(Role.User, "What's the weather like today in Los Angeles, USA and Tokyo, Japan?"),
             };
 
@@ -309,7 +311,7 @@ namespace OpenAI.Tests
                 messages.Add(new Message(toolCall, output));
             }
 
-            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
             Assert.IsNotNull(response);
@@ -331,7 +333,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, tools: tools);
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -356,6 +358,7 @@ namespace OpenAI.Tests
             messages.Add(response.FirstChoice.Message);
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "stop");
+            Assert.IsTrue(response.FirstChoice.Message.ToolCalls.Count == 1);
             var usedTool = response.FirstChoice.Message.ToolCalls[0];
             Assert.IsNotNull(usedTool);
             Assert.IsTrue(usedTool.Function.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));

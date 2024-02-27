@@ -46,6 +46,13 @@ namespace OpenAI.Extensions
                 }
 
                 schema["properties"]![parameter.Name] = GenerateJsonSchema(parameter.ParameterType);
+
+                var functionParameterAttribute = parameter.GetCustomAttribute<FunctionParameterAttribute>();
+
+                if (functionParameterAttribute != null)
+                {
+                    schema["properties"]![parameter.Name]!["description"] = functionParameterAttribute.Description;
+                }
             }
 
             if (requiredParameters.Count > 0)

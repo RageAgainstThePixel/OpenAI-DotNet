@@ -766,23 +766,30 @@ Console.WriteLine($"Modify run {run.Id} -> {run.Metadata["key"]}");
 
 ##### [Thread Submit Tool Outputs to Run](https://platform.openai.com/docs/api-reference/runs/submitToolOutputs)
 
-When a run has the status: `requires_action` and `required_action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
+When a run has the status: `requires_action` and `required_action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed.
+All outputs must be submitted in a single request.
 
 ```csharp
 using var api = new OpenAIClient();
 var tools = new List<Tool>
 {
     // Use a predefined tool
-    Tool.Retrieval,
+    Tool.Retrieval, Tool.CodeInterpreter,
     // Or create a tool from a type and the name of the method you want to use for function calling
-    Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+    Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync)),
+    // Pass in an instance of an object to call a method on it
+    Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync))),
+    // Define func<,> callbacks
+    Tool.FromFunc("name_of_func", () => { /* callback function */ }),
+    Tool.FromFunc<T1,T2,TResult>("func_with_multiple_params", (t1, t2) => { /* logic that calculates return value */ return tResult; })
 };
 var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
 var testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
 var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?");
 // waiting while run is Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
-// Invoke all of the tool call functions and return the tool outputs.
+
+// Invoke all the tool call functions and return the tool outputs.
 var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
 
 foreach (var toolOutput in toolOutputs)
@@ -913,13 +920,11 @@ Console.WriteLine(cumulativeDelta);
 
 #### [Chat Tools](https://platform.openai.com/docs/guides/function-calling)
 
-> Only available with the latest 0613 model series!
-
 ```csharp
 using var api = new OpenAIClient();
 var messages = new List<Message>
 {
-    new Message(Role.System, "You are a helpful weather assistant."),
+    new(Role.System, "You are a helpful weather assistant. Always prompt the user for their location."),
     new Message(Role.User, "What's the weather like today?"),
 };
 
@@ -929,7 +934,14 @@ foreach (var message in messages)
 }
 
 // Define the tools that the assistant is able to use:
-var tools = Tool.GetAllAvailableTools(includeDefaults: false);
+// 1. Get a list of all the static methods decorated with FunctionAttribute
+var tools = Tool.GetAllAvailableTools(includeDefaults: false, forceUpdate: true, clearCache: true);
+// 2. Define a custom list of tools:
+var tools = new List<Tool>
+{
+    Tool.GetOrCreateTool(objectInstance, "TheNameOfTheMethodToCall"),
+    Tool.FromFunc("a_custom_name_for_your_function", ()=> { /* Some logic to run */ })
+};
 var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 messages.Add(response.FirstChoice.Message);
@@ -944,24 +956,29 @@ response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 messages.Add(response.FirstChoice.Message);
 
-if (!string.IsNullOrEmpty(response.ToString()))
+if (response.FirstChoice.FinishReason == "stop")
 {
     Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
-    var unitMessage = new Message(Role.User, "celsius");
+    var unitMessage = new Message(Role.User, "Fahrenheit");
     messages.Add(unitMessage);
     Console.WriteLine($"{unitMessage.Role}: {unitMessage.Content}");
     chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
     response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 }
 
-var usedTool = response.FirstChoice.Message.ToolCalls[0];
-Console.WriteLine($"{response.FirstChoice.Message.Role}: {usedTool.Function.Name} | Finish Reason: {response.FirstChoice.FinishReason}");
-Console.WriteLine($"{usedTool.Function.Arguments}");
-// Invoke the used tool to get the function result!
-var functionResult = await usedTool.InvokeFunctionAsync();
-messages.Add(new Message(usedTool, functionResult));
-Console.WriteLine($"{Role.Tool}: {functionResult}");
+// iterate over all tool calls and invoke them
+foreach (var toolCall in response.FirstChoice.Message.ToolCalls)
+{
+    Console.WriteLine($"{response.FirstChoice.Message.Role}: {toolCall.Function.Name} | Finish Reason: {response.FirstChoice.FinishReason}");
+    Console.WriteLine($"{toolCall.Function.Arguments}");
+    // Invokes function to get a generic json result to return for tool call.
+    var functionResult = await toolCall.InvokeFunctionAsync();
+    // If you know the return type and do additional processing you can use generic overload
+    var functionResult = await toolCall.InvokeFunctionAsync<string>();
+    messages.Add(new Message(toolCall, functionResult));
+    Console.WriteLine($"{Role.Tool}: {functionResult}");
+}
 // System: You are a helpful weather assistant.
 // User: What's the weather like today?
 // Assistant: Sure, may I know your current location? | Finish Reason: stop
@@ -971,7 +988,7 @@ Console.WriteLine($"{Role.Tool}: {functionResult}");
 //   "location": "Glasgow, Scotland",
 //   "unit": "celsius"
 // }
-// Tool: The current weather in Glasgow, Scotland is 20 celsius
+// Tool: The current weather in Glasgow, Scotland is 39°C.
 ```
 
 #### [Chat Vision](https://platform.openai.com/docs/guides/vision)

@@ -28,12 +28,14 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.1</Version>
+    <Version>7.7.2</Version>
     <PackageReleaseNotes>
+Version 7.7.2
+- Added FunctionParameterAttribute to help better inform the feature how to format the Function json
 Version 7.7.1
 - More Function utilities and invoking methods
   - Added FunctionPropertyAttribute to help better inform the feature how to format the Function json
-  - Added FromFunc-&gt;,-&lt; overloads for convenance
+  - Added FromFunc&lt;,&gt; overloads for convenance
   - Fixed invoke args sometimes being casting to wrong type
   - Added additional protections for static and instanced function calls
   - Added additional tool utilities:
