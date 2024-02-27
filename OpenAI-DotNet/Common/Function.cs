@@ -253,12 +253,12 @@ namespace OpenAI
                 }
 
                 var result = Invoke<object>();
-                return JsonSerializer.Serialize(new { result });
+                return JsonSerializer.Serialize(new { result }, OpenAIClient.JsonSerializationOptions);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return JsonSerializer.Serialize(new { error = e.Message });
+                return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
         }
 
@@ -305,12 +305,12 @@ namespace OpenAI
                 }
 
                 var result = await InvokeAsync<object>(cancellationToken);
-                return JsonSerializer.Serialize(new { result });
+                return JsonSerializer.Serialize(new { result }, OpenAIClient.JsonSerializationOptions);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return JsonSerializer.Serialize(new { error = e.Message });
+                return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
         }
 
@@ -384,7 +384,7 @@ namespace OpenAI
                     }
                     else if (value is string @enum && parameter.ParameterType.IsEnum)
                     {
-                        invokeArgs[i] = Enum.Parse(parameter.ParameterType, @enum);
+                        invokeArgs[i] = Enum.Parse(parameter.ParameterType, @enum, true);
                     }
                     else if (value is JsonElement element)
                     {

@@ -789,7 +789,7 @@ var run = await testAssistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, plea
 // waiting while run is Queued and InProgress
 run = await run.WaitForStatusChangeAsync();
 
-// Invoke all of the tool call functions and return the tool outputs.
+// Invoke all the tool call functions and return the tool outputs.
 var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
 
 foreach (var toolOutput in toolOutputs)

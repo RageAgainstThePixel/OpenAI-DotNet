@@ -143,7 +143,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -189,7 +189,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
-            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages);
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Console.WriteLine(response);
         }
@@ -210,7 +210,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false);
-            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -237,7 +237,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(response.Choices.Count == 1);
             messages.Add(response.FirstChoice.Message);
 
-            if (!string.IsNullOrEmpty(response.ToString()))
+            if (response.FirstChoice.FinishReason == "stop")
             {
                 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
 
@@ -268,7 +268,7 @@ namespace OpenAI.Tests
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
 
-            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -311,7 +311,7 @@ namespace OpenAI.Tests
                 messages.Add(new Message(toolCall, output));
             }
 
-            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "auto");
+            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
             Assert.IsNotNull(response);
@@ -333,7 +333,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, tools: tools);
+            var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
