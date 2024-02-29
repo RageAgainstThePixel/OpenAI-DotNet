@@ -261,13 +261,14 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> WaitForStatusChangeAsync(this RunResponse run, int? pollingInterval = null, int? timeout = null, CancellationToken cancellationToken = default)
         {
-            using var cts = timeout is null or < 0 ? new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30)) : new CancellationTokenSource();
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30));
             using var chainedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
             RunResponse result;
             do
             {
-                result = await run.UpdateAsync(cancellationToken: chainedCts.Token).ConfigureAwait(false);
-                await Task.Delay(pollingInterval ?? 500, chainedCts.Token).ConfigureAwait(false);
+                await Task.Delay(pollingInterval ?? 500, chainedCts.Token);
+                cancellationToken.ThrowIfCancellationRequested();
+                result = await run.UpdateAsync(cancellationToken: chainedCts.Token);
             } while (result.Status is RunStatus.Queued or RunStatus.InProgress or RunStatus.Cancelling);
             return result;
         }

@@ -28,8 +28,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.3</Version>
+    <Version>7.7.4</Version>
     <PackageReleaseNotes>
+Version 7.7.4
+- Fixed Threads.RunResponse.WaitForStatusChangeAsync timeout
 Version 7.7.3
 - Updated ChatRequest toolChoice to only send type and name of function, reducing token usage
 Version 7.7.2
