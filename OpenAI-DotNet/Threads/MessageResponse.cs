@@ -22,14 +22,14 @@ namespace OpenAI.Threads
         public string Id { get; private set; }
 
         /// <summary>
-        /// The object type, which is always thread.
+        /// The object type, which is always message.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
 
         /// <summary>
-        /// The Unix timestamp (in seconds) for when the thread was created.
+        /// The Unix timestamp (in seconds) for when the message was created.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created_at")]
