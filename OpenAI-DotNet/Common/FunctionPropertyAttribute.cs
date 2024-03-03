@@ -4,7 +4,7 @@ using System;
 
 namespace OpenAI
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public sealed class FunctionPropertyAttribute : Attribute
     {
         /// <summary>
