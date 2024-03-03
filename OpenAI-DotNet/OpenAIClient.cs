@@ -112,7 +112,8 @@ namespace OpenAI
         internal static JsonSerializerOptions JsonSerializationOptions { get; } = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters = { new JsonStringEnumConverterFactory() }
+            Converters = { new JsonStringEnumConverterFactory() },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
         };
 
         /// <summary>
