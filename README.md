@@ -552,7 +552,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
         model: "gpt-4-turbo-preview"));
 var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
-var threadRequest = new CreateThreadRequest(messages);
+var threadRequest = new CreateThreadAndRunRequest(messages);
 var run = await assistant.CreateThreadAndRunAsync(threadRequest);
 Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
 ```
