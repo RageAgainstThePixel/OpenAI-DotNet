@@ -1186,7 +1186,7 @@ Returns information about a specific file.
 
 ```csharp
 using var api = new OpenAIClient();
-var file = await GetFileInfoAsync(fileId);
+var file = await api.FilesEndpoint.GetFileInfoAsync(fileId);
 Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 ```
 
