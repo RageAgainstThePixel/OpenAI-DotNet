@@ -77,7 +77,7 @@ namespace OpenAI.Audio
         {
             var responseAsString = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
             return request.ResponseFormat is AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json
-                ? JsonSerializer.Deserialize<AudioTranscriptionResponse>(responseAsString)?.Text
+                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
                 : responseAsString;
         }
 
@@ -87,8 +87,8 @@ namespace OpenAI.Audio
         /// <remarks>This method expects the request format to be either <see cref="AudioResponseFormat.Json"/> or <see cref="AudioResponseFormat.Verbose_Json"/>.</remarks>
         /// <param name="request"><see cref="AudioTranscriptionRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="AudioTranscriptionResponse"/>.</returns>
-        public async Task<AudioTranscriptionResponse> CreateTranscriptionJsonAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
+        /// <returns><see cref="AudioResponse"/>.</returns>
+        public async Task<AudioResponse> CreateTranscriptionJsonAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
             if (request.ResponseFormat is not (AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json))
             {
@@ -96,7 +96,7 @@ namespace OpenAI.Audio
             }
 
             var responseAsString = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<AudioTranscriptionResponse>(responseAsString);
+            return JsonSerializer.Deserialize<AudioResponse>(responseAsString);
         }
 
         private async Task<string> Internal_CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
@@ -153,7 +153,7 @@ namespace OpenAI.Audio
         {
             var responseAsString = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
             return request.ResponseFormat is AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json
-                ? JsonSerializer.Deserialize<AudioTranscriptionResponse>(responseAsString)?.Text
+                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
                 : responseAsString;
         }
 
@@ -164,7 +164,7 @@ namespace OpenAI.Audio
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<AudioTranscriptionResponse> CreateTranslationJsonAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
+        public async Task<AudioResponse> CreateTranslationJsonAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
             if (request.ResponseFormat is not (AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json))
             {
@@ -172,7 +172,7 @@ namespace OpenAI.Audio
             }
 
             var responseAsString = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<AudioTranscriptionResponse>(responseAsString);
+            return JsonSerializer.Deserialize<AudioResponse>(responseAsString);
         }
 
         private async Task<string> Internal_CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
