@@ -26,7 +26,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
             using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Json, temperature: 0.1f, language: "en");
-            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
+            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
             Assert.IsNotNull(response);
         }
 
