@@ -1068,9 +1068,22 @@ Transcribes audio into the input language.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
-var response = await api.AudioEndpoint.CreateTranscriptionAsync(request);
+using var request = new AudioTranscriptionRequest(Path.GetFullPath(audioAssetPath), language: "en");
+var response = await api.AudioEndpoint.CreateTranscriptionTextAsync(request);
 Console.WriteLine(response);
+```
+
+You can also get detailed information using `verbose_json` to get timestamp granularities:
+
+```csharp
+using var api = new OpenAIClient();
+using var request = new AudioTranscriptionRequest(transcriptionAudio, responseFormat: AudioResponseFormat.Verbose_Json, timestampGranularity: TimestampGranularity.Word, temperature: 0.1f, language: "en");
+var response = await api.AudioEndpoint.CreateTranscriptionTextAsync(request);
+
+foreach (var word in response.Words)
+{
+    Console.WriteLine($"[{word.Start}-{word.End}] \"{word.Word}\"");
+}
 ```
 
 #### [Create Translation](https://platform.openai.com/docs/api-reference/audio/createTranslation)
@@ -1079,8 +1092,8 @@ Translates audio into into English.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
-var response = await api.AudioEndpoint.CreateTranslationAsync(request);
+using var request = new AudioTranslationRequest(Path.GetFullPath(audioAssetPath));
+var response = await api.AudioEndpoint.CreateTranslationTextAsync(request);
 Console.WriteLine(response);
 ```
 
@@ -1186,7 +1199,7 @@ Returns information about a specific file.
 
 ```csharp
 using var api = new OpenAIClient();
-var file = await GetFileInfoAsync(fileId);
+var file = await  api.FilesEndpoint.GetFileInfoAsync(fileId);
 Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 ```
 
