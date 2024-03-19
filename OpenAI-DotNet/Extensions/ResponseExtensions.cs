@@ -124,7 +124,7 @@ namespace OpenAI.Extensions
                 {
                     debugMessage.Append($"[{response.RequestMessage.Method}:{(int)response.StatusCode}] {response.RequestMessage.RequestUri}\n");
 
-                    debugMessageObject["Request"] = new()
+                    debugMessageObject["Request"] = new Dictionary<string, object>
                     {
                         ["Headers"] = response.RequestMessage.Headers.ToDictionary(pair => pair.Key, pair => pair.Value),
                     };
@@ -132,7 +132,40 @@ namespace OpenAI.Extensions
 
                 if (requestContent != null)
                 {
-                    var requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    debugMessageObject["Request"]["Body-Headers"] = requestContent.Headers.ToDictionary(pair => pair.Key, pair => pair.Value);
+                    string requestAsString;
+
+                    if (requestContent is MultipartFormDataContent multipartFormData)
+                    {
+                        var stringContents = multipartFormData.Select<HttpContent, object>(content =>
+                        {
+                            var headers = content.Headers.ToDictionary(pair => pair.Key, pair => pair.Value);
+                            switch (content)
+                            {
+                                case StringContent stringContent:
+                                    var valueAsString = stringContent.ReadAsStringAsync(cancellationToken).Result;
+                                    object value;
+
+                                    try
+                                    {
+                                        value = JsonNode.Parse(valueAsString);
+                                    }
+                                    catch
+                                    {
+                                        value = valueAsString;
+                                    }
+
+                                    return new { headers, value };
+                                default:
+                                    return new { headers };
+                            }
+                        });
+                        requestAsString = JsonSerializer.Serialize(stringContents);
+                    }
+                    else
+                    {
+                        requestAsString = await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    }
 
                     if (!string.IsNullOrWhiteSpace(requestAsString))
                     {

@@ -13,6 +13,10 @@ namespace OpenAI.Audio
         [EnumMember(Value = "aac")]
         AAC,
         [EnumMember(Value = "flac")]
-        Flac
+        Flac,
+        [EnumMember(Value = "wav")]
+        WAV,
+        [EnumMember(Value = "pcm")]
+        PCM
     }
 }

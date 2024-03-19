@@ -28,8 +28,19 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.5</Version>
+    <Version>7.7.6</Version>
     <PackageReleaseNotes>
+Version 7.7.6
+- Added support for Audio Transcription and Translation verbose json output
+  - Added support for timestamp granularities for segments and words
+  - Added AudioResponse
+  - Marked CreateTranscriptionAsync obsolete
+  - Added CreateTranscriptionTextAsync
+  - Added CreateTranscriptionJsonAsync
+  - Marked CreateTranspationAsync obsolete
+  - Added CreateTranslationTextAsync
+  - Added CreateTranslationJsonAsync
+- Updated SpeechResponseFormat to include wav and pcm
 Version 7.7.5
 - Allow FunctionPropertyAttribute to be assignable to fields
 - Updated Function schema generation

@@ -39,14 +39,21 @@ namespace OpenAI.Audio
         /// Macedonian, Malay, Marathi, Maori, Nepali, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Serbian,
         /// Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh.
         /// </param>
+        /// <param name="timestampGranularity">
+        /// The timestamp granularities to populate for this transcription.
+        /// response_format must be set verbose_json to use timestamp granularities.
+        /// Either or both of these options are supported: <see cref="TimestampGranularity.Word"/>, or <see cref="TimestampGranularity.Segment"/>. <br/>
+        /// Note: There is no additional latency for segment timestamps, but generating word timestamps incurs additional latency.
+        /// </param>
         public AudioTranscriptionRequest(
             string audioPath,
             string model = null,
             string prompt = null,
             AudioResponseFormat responseFormat = AudioResponseFormat.Json,
             float? temperature = null,
-            string language = null)
-            : this(File.OpenRead(audioPath), Path.GetFileName(audioPath), model, prompt, responseFormat, temperature, language)
+            string language = null,
+            TimestampGranularity timestampGranularity = TimestampGranularity.None)
+            : this(File.OpenRead(audioPath), Path.GetFileName(audioPath), model, prompt, responseFormat, temperature, language, timestampGranularity)
         {
         }
 
@@ -85,6 +92,12 @@ namespace OpenAI.Audio
         /// Macedonian, Malay, Marathi, Maori, Nepali, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Serbian,
         /// Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh.
         /// </param>
+        /// <param name="timestampGranularity">
+        /// The timestamp granularities to populate for this transcription.
+        /// response_format must be set verbose_json to use timestamp granularities.
+        /// Either or both of these options are supported: <see cref="TimestampGranularity.Word"/>, or <see cref="TimestampGranularity.Segment"/>. <br/>
+        /// Note: There is no additional latency for segment timestamps, but generating word timestamps incurs additional latency.
+        /// </param>
         public AudioTranscriptionRequest(
             Stream audio,
             string audioName,
@@ -92,7 +105,8 @@ namespace OpenAI.Audio
             string prompt = null,
             AudioResponseFormat responseFormat = AudioResponseFormat.Json,
             float? temperature = null,
-            string language = null)
+            string language = null,
+            TimestampGranularity timestampGranularity = TimestampGranularity.None)
         {
             Audio = audio;
 
@@ -107,6 +121,13 @@ namespace OpenAI.Audio
             ResponseFormat = responseFormat;
             Temperature = temperature;
             Language = language;
+
+            if (timestampGranularity != TimestampGranularity.None && responseFormat != AudioResponseFormat.Verbose_Json)
+            {
+                throw new ArgumentException($"{nameof(responseFormat)} must be set {AudioResponseFormat.Verbose_Json} to use timestamp granularities.");
+            }
+
+            TimestampGranularities = timestampGranularity;
         }
 
         ~AudioTranscriptionRequest() => Dispose(false);
@@ -156,6 +177,14 @@ namespace OpenAI.Audio
         /// Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh.
         /// </summary>
         public string Language { get; }
+
+        /// <summary>
+        /// The timestamp granularities to populate for this transcription.
+        /// response_format must be set verbose_json to use timestamp granularities.
+        /// Either or both of these options are supported: <see cref="TimestampGranularity.Word"/>, or <see cref="TimestampGranularity.Segment"/>. <br/>
+        /// Note: There is no additional latency for segment timestamps, but generating word timestamps incurs additional latency.
+        /// </summary>
+        public TimestampGranularity TimestampGranularities { get; }
 
         private void Dispose(bool disposing)
         {
