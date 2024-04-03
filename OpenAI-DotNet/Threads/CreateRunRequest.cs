@@ -13,13 +13,14 @@ namespace OpenAI.Threads
         {
         }
 
-        public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, double? temperature = null)
         {
             AssistantId = assistantId;
             Model = model;
             Instructions = instructions;
             Tools = tools?.ToList();
             Metadata = metadata;
+            Temperature = temperature;
         }
 
         /// <summary>
@@ -53,5 +54,14 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; }
+
+        /// <summary>
+        /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output
+        /// more random, while lower values like 0.2 will make it more focused and deterministic.
+        /// When null the default temperature (1) will be used.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonPropertyName("temperature")]
+        public double? Temperature { get; }
     }
 }

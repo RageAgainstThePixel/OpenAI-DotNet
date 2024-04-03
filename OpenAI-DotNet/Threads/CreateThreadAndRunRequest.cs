@@ -39,7 +39,7 @@ namespace OpenAI.Threads
         /// <param name="createThreadRequest">
         /// Optional, <see cref="CreateThreadRequest"/>.
         /// </param>
-        public CreateThreadAndRunRequest(string assistantId, string model = null, string instructions = null, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, CreateThreadRequest createThreadRequest = null)
+        public CreateThreadAndRunRequest(string assistantId, string model = null, string instructions = null, IReadOnlyList<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, CreateThreadRequest createThreadRequest = null, double? temperature = null)
         {
             AssistantId = assistantId;
             Model = model;
@@ -47,6 +47,7 @@ namespace OpenAI.Threads
             Tools = tools;
             Metadata = metadata;
             ThreadRequest = createThreadRequest;
+            Temperature = temperature;
         }
 
         /// <summary>
@@ -84,6 +85,15 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; }
+
+        /// <summary>
+        /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output
+        /// more random, while lower values like 0.2 will make it more focused and deterministic.
+        /// When null the default temperature (1) will be used.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonPropertyName("temperature")]
+        public double? Temperature { get; }
 
         [JsonPropertyName("thread")]
         public CreateThreadRequest ThreadRequest { get; }
