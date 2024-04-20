@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Files;
+using OpenAI.Models;
 using OpenAI.Tests.Weather;
 using OpenAI.Threads;
 using System;
@@ -216,7 +217,7 @@ namespace OpenAI.Tests
                 new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: "gpt-4-turbo-preview"));
+                    model: Model.GPT4_Turbo));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();

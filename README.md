@@ -420,7 +420,7 @@ Modifies an assistant.
 using var api = new OpenAIClient();
 var createRequest = new CreateAssistantRequest("gpt-3.5-turbo");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
-var modifyRequest = new CreateAssistantRequest("gpt-4-turbo-preview");
+var modifyRequest = new CreateAssistantRequest(Model.GPT4_Turbo);
 var modifiedAssistant = await api.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
@@ -550,7 +550,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-turbo-preview"));
+        model: Model.GPT4_Turbo));
 var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
 var threadRequest = new CreateThreadRequest(messages);
 var run = await assistant.CreateThreadAndRunAsync(threadRequest);
@@ -726,7 +726,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: "gpt-4-turbo-preview"));
+        model: Model.GPT4_Turbo));
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
 var run = await thread.CreateRunAsync(assistant);
@@ -1007,7 +1007,7 @@ var messages = new List<Message>
         new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
     })
 };
-var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
 ```
@@ -1028,7 +1028,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant designed to output JSON."),
     new Message(Role.User, "Who won the world series in 2020?"),
 };
-var chatRequest = new ChatRequest(messages, "gpt-4-turbo-preview", responseFormat: ChatResponseFormat.Json);
+var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo, responseFormat: ChatResponseFormat.Json);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)
