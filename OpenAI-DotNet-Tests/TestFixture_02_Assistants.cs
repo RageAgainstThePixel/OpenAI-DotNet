@@ -43,7 +43,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("test-assistant", assistant.Name);
             Assert.AreEqual("Used for unit testing.", assistant.Description);
             Assert.AreEqual("You are test assistant", assistant.Instructions);
-            Assert.AreEqual("gpt-3.5-turbo", assistant.Model);
+            Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
             Assert.IsNotEmpty(assistant.Metadata);
             testAssistant = assistant;
             Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
@@ -80,7 +80,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
             Assert.AreEqual("You are modified test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT4_Turbo, assistant.Model);
+            Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
             Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
             Console.WriteLine($"{assistant.Id} -> modified");
         }
