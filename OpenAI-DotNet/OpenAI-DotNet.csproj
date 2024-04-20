@@ -35,6 +35,7 @@ Version 7.7.7
   - Added gpt-4-turbo
   - Marked some models as deprecated since they are no longer available
 - Added temperature to CreateRunRequest and CreateThreadAndRunRequest
+- Fixed temperature to string conversion to be invariant culture for audio requests
 Version 7.7.6
 - Added support for Audio Transcription and Translation verbose json output
   - Added support for timestamp granularities for segments and words

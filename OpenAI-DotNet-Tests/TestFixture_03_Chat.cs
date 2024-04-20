@@ -84,7 +84,7 @@ namespace OpenAI.Tests
                 new(Role.System, "You are a helpful assistant designed to output JSON."),
                 new(Role.User, "Who won the world series in 2020?"),
             };
-            var chatRequest = new ChatRequest(messages, "gpt-4-turbo-preview", responseFormat: ChatResponseFormat.Json);
+            var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo, responseFormat: ChatResponseFormat.Json);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -289,7 +289,7 @@ namespace OpenAI.Tests
             };
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo, tools: tools, toolChoice: "auto");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -311,7 +311,7 @@ namespace OpenAI.Tests
                 messages.Add(new Message(toolCall, output));
             }
 
-            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "none");
+            chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo, tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
             Assert.IsNotNull(response);
