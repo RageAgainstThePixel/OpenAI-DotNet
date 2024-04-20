@@ -28,8 +28,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.6</Version>
+    <Version>7.7.7</Version>
     <PackageReleaseNotes>
+Version 7.7.7
+- Updated static models list
+  - Added gpt-4-turbo
+  - Marked some models as deprecated since they are no longer available
 Version 7.7.6
 - Added support for Audio Transcription and Translation verbose json output
   - Added support for timestamp granularities for segments and words
