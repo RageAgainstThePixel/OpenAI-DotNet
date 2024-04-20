@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_03_Chat : AbstractTestFixture
+    internal class TestFixture_04_Chat : AbstractTestFixture
     {
         [Test]
         public async Task Test_01_01_GetChatCompletion()
@@ -24,7 +24,7 @@ namespace OpenAI.Tests
                 new(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT4);
+            var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);

@@ -16,7 +16,7 @@ namespace OpenAI.Tests
     /// <summary>
     /// https://github.com/openai/openai-cookbook/blob/main/examples/Assistants_API_overview_python.ipynb
     /// </summary>
-    internal class TestFixture_12_Threads : AbstractTestFixture
+    internal class TestFixture_03_Threads : AbstractTestFixture
     {
         private static RunResponse testRun;
         private static ThreadResponse testThread;
