@@ -383,7 +383,7 @@ namespace OpenAI.Tests
                     new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -404,7 +404,7 @@ namespace OpenAI.Tests
                     new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
