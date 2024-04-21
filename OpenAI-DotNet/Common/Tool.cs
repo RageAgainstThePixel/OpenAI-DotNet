@@ -118,6 +118,7 @@ namespace OpenAI
         public static void ClearRegisteredTools()
         {
             toolCache.Clear();
+            Function.ClearFunctionCache();
             toolCache.Add(CodeInterpreter);
             toolCache.Add(Retrieval);
         }

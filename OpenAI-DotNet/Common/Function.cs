@@ -252,6 +252,8 @@ namespace OpenAI
 
         private static readonly ConcurrentDictionary<string, Function> functionCache = new();
 
+        internal static void ClearFunctionCache() => functionCache.Clear();
+
         /// <summary>
         /// Invokes the function and returns the result as json.
         /// </summary>
