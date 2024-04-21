@@ -2,6 +2,7 @@
 
 using OpenAI.Extensions;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -121,7 +122,7 @@ namespace OpenAI.Audio
 
             if (request.Temperature.HasValue)
             {
-                content.Add(new StringContent(request.Temperature.ToString()), "temperature");
+                content.Add(new StringContent(request.Temperature.Value.ToString(CultureInfo.InvariantCulture)), "temperature");
             }
 
             switch (request.TimestampGranularities)
@@ -192,7 +193,7 @@ namespace OpenAI.Audio
 
             if (request.Temperature.HasValue)
             {
-                content.Add(new StringContent(request.Temperature.ToString()), "temperature");
+                content.Add(new StringContent(request.Temperature.Value.ToString(CultureInfo.InvariantCulture)), "temperature");
             }
 
             request.Dispose();

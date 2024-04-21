@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Files;
+using OpenAI.Models;
 using OpenAI.Tests.Weather;
 using OpenAI.Threads;
 using System;
@@ -16,7 +17,7 @@ namespace OpenAI.Tests
     /// <summary>
     /// https://github.com/openai/openai-cookbook/blob/main/examples/Assistants_API_overview_python.ipynb
     /// </summary>
-    internal class TestFixture_12_Threads : AbstractTestFixture
+    internal class TestFixture_03_Threads : AbstractTestFixture
     {
         private static RunResponse testRun;
         private static ThreadResponse testThread;
@@ -216,7 +217,7 @@ namespace OpenAI.Tests
                 new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: "gpt-4-turbo-preview"));
+                    model: Model.GPT4_Turbo));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
@@ -346,6 +347,7 @@ namespace OpenAI.Tests
         {
             var tools = new List<Tool>
             {
+                Tool.CodeInterpreter,
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
             var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");

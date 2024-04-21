@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_03_Chat : AbstractTestFixture
+    internal class TestFixture_04_Chat : AbstractTestFixture
     {
         [Test]
         public async Task Test_01_01_GetChatCompletion()
@@ -24,7 +24,7 @@ namespace OpenAI.Tests
                 new(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
                 new(Role.User, "Where was it played?"),
             };
-            var chatRequest = new ChatRequest(messages, Model.GPT4);
+            var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -84,7 +84,7 @@ namespace OpenAI.Tests
                 new(Role.System, "You are a helpful assistant designed to output JSON."),
                 new(Role.User, "Who won the world series in 2020?"),
             };
-            var chatRequest = new ChatRequest(messages, "gpt-4-turbo-preview", responseFormat: ChatResponseFormat.Json);
+            var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo, responseFormat: ChatResponseFormat.Json);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -289,7 +289,7 @@ namespace OpenAI.Tests
             };
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo, tools: tools, toolChoice: "auto");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -311,7 +311,7 @@ namespace OpenAI.Tests
                 messages.Add(new Message(toolCall, output));
             }
 
-            chatRequest = new ChatRequest(messages, model: "gpt-4-turbo-preview", tools: tools, toolChoice: "none");
+            chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo, tools: tools, toolChoice: "none");
             response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
 
             Assert.IsNotNull(response);
@@ -383,7 +383,7 @@ namespace OpenAI.Tests
                     new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -404,7 +404,7 @@ namespace OpenAI.Tests
                     new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
                 })
             };
-            var chatRequest = new ChatRequest(messages, model: "gpt-4-vision-preview");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);

@@ -118,6 +118,7 @@ namespace OpenAI
         public static void ClearRegisteredTools()
         {
             toolCache.Clear();
+            Function.ClearFunctionCache();
             toolCache.Add(CodeInterpreter);
             toolCache.Add(Retrieval);
         }
@@ -244,7 +245,7 @@ namespace OpenAI
                 return tool;
             }
 
-            tool = new Tool(new Function(functionName, description ?? string.Empty, method));
+            tool = new Tool(Function.GetOrCreateFunction(functionName, description ?? string.Empty, method));
             toolCache.Add(tool);
             return tool;
         }
