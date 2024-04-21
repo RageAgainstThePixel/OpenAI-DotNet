@@ -9,7 +9,7 @@ namespace OpenAI.Threads
     public sealed class CreateRunRequest
     {
         public CreateRunRequest(string assistantId, CreateRunRequest request)
-            : this(assistantId, request?.Model, request?.Instructions, request?.Tools, request?.Metadata)
+            : this(assistantId, request?.Model, request?.Instructions, request?.Tools, request?.Metadata, request?.Temperature)
         {
         }
 
