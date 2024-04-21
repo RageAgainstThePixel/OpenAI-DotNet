@@ -347,6 +347,7 @@ namespace OpenAI.Tests
         {
             var tools = new List<Tool>
             {
+                Tool.CodeInterpreter,
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
             var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");

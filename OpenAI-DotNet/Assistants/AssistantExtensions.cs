@@ -187,7 +187,12 @@ namespace OpenAI.Assistants
         /// <returns>Tool output result as <see cref="string"/></returns>
         public static string InvokeToolCall(this AssistantResponse assistant, ToolCall toolCall)
         {
-            var tool = assistant.Tools.FirstOrDefault(tool => toolCall.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
+            if (toolCall.Type != "function")
+            {
+                throw new InvalidOperationException($"Cannot invoke built in tool {toolCall.Type}");
+            }
+
+            var tool = assistant.Tools.FirstOrDefault(tool => tool.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
                 throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.Type}");
             tool.Function.Arguments = toolCall.FunctionCall.Arguments;
             return tool.InvokeFunction();
@@ -202,7 +207,12 @@ namespace OpenAI.Assistants
         /// <returns>Tool output result as <see cref="string"/></returns>
         public static async Task<string> InvokeToolCallAsync(this AssistantResponse assistant, ToolCall toolCall, CancellationToken cancellationToken = default)
         {
-            var tool = assistant.Tools.FirstOrDefault(tool => toolCall.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
+            if (toolCall.Type != "function")
+            {
+                throw new InvalidOperationException($"Cannot invoke built in tool {toolCall.Type}");
+            }
+
+            var tool = assistant.Tools.FirstOrDefault(tool => tool.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
                 throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.Type}");
             tool.Function.Arguments = toolCall.FunctionCall.Arguments;
             return await tool.InvokeFunctionAsync(cancellationToken).ConfigureAwait(false);
