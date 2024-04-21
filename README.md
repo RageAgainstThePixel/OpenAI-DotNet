@@ -353,7 +353,7 @@ Retrieves a model instance, providing basic information about the model such as 
 
 ```csharp
 using var api = new OpenAIClient();
-var model = await api.ModelsEndpoint.GetModelDetailsAsync("text-davinci-003");
+var model = await api.ModelsEndpoint.GetModelDetailsAsync("gpt-4-turbo");
 Console.WriteLine(model.ToString());
 ```
 
@@ -398,7 +398,7 @@ Create an assistant with a model and instructions.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new CreateAssistantRequest("gpt-3.5-turbo");
+var request = new CreateAssistantRequest(Model.GPT4_Turbo);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
@@ -418,7 +418,7 @@ Modifies an assistant.
 
 ```csharp
 using var api = new OpenAIClient();
-var createRequest = new CreateAssistantRequest("gpt-3.5-turbo");
+var createRequest = new CreateAssistantRequest(Model.GPT3_5_Turbo);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
 var modifyRequest = new CreateAssistantRequest(Model.GPT4_Turbo);
 var modifiedAssistant = await api.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, modifyRequest);
@@ -868,7 +868,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4);
+var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 var choice = response.FirstChoice;
 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
@@ -994,7 +994,6 @@ foreach (var toolCall in response.FirstChoice.Message.ToolCalls)
 #### [Chat Vision](https://platform.openai.com/docs/guides/vision)
 
 > :warning: Beta Feature
-> Currently, GPT-4 with vision does not support the `message.name` parameter, functions/tools, nor the `response_format` parameter.
 
 ```csharp
 using var api = new OpenAIClient();
