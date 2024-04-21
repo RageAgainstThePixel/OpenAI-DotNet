@@ -68,6 +68,11 @@ namespace OpenAI
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
 
+            if (functionCache.ContainsKey(name))
+            {
+                throw new ArgumentException($"The function \"{name}\" is already registered.");
+            }
+
             Name = name;
             Description = description;
             Parameters = JsonNode.Parse(parameters);
@@ -82,11 +87,17 @@ namespace OpenAI
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
 
+            if (functionCache.ContainsKey(name))
+            {
+                throw new ArgumentException($"The function \"{name}\" is already registered.");
+            }
+
             Name = name;
             Description = description;
             MethodInfo = method;
             Parameters = method.GenerateJsonSchema();
             Instance = instance;
+
             functionCache[Name] = this;
         }
 
