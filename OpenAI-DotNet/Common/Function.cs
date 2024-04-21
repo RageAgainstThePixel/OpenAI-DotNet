@@ -84,7 +84,6 @@ namespace OpenAI
             functionCache[Name] = this;
         }
 
-
         internal Function(string name, string description, MethodInfo method, object instance = null)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
@@ -105,6 +104,11 @@ namespace OpenAI
 
             functionCache[Name] = this;
         }
+
+        internal static Function GetOrCreateFunction(string name, string description, MethodInfo method, object instance = null)
+            => functionCache.TryGetValue(name, out var function)
+                ? function
+                : new Function(name, description, method, instance);
 
         #region Func<,> Overloads
 
