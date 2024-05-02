@@ -116,11 +116,14 @@ namespace OpenAI.Proxy
         {
             try
             {
+                // ReSharper disable once MethodHasAsyncOverload
+                // just in case either method is implemented we call it twice.
                 authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
+                await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers);
 
                 var method = new HttpMethod(httpContext.Request.Method);
                 var uri = new Uri(string.Format(openAIClient.OpenAIClientSettings.BaseRequestUrlFormat, $"{endpoint}{httpContext.Request.QueryString}"));
-                var openAIRequest = new HttpRequestMessage(method, uri);
+                using var openAIRequest = new HttpRequestMessage(method, uri);
                 openAIRequest.Content = new StreamContent(httpContext.Request.Body);
 
                 if (httpContext.Request.ContentType != null)

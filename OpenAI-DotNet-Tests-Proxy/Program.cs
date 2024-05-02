@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using OpenAI.Proxy;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace OpenAI.Tests.Proxy
 {
@@ -20,6 +21,18 @@ namespace OpenAI.Tests.Proxy
         {
             public override void ValidateAuthentication(IHeaderDictionary request)
             {
+                // You will need to implement your own class to properly test
+                // custom issued tokens you've setup for your end users.
+                if (!request.Authorization.ToString().Contains(TestUserToken))
+                {
+                    throw new AuthenticationException("User is not authorized");
+                }
+            }
+
+            public override async Task ValidateAuthenticationAsync(IHeaderDictionary request)
+            {
+                await Task.CompletedTask; // remote resource call
+
                 // You will need to implement your own class to properly test
                 // custom issued tokens you've setup for your end users.
                 if (!request.Authorization.ToString().Contains(TestUserToken))
