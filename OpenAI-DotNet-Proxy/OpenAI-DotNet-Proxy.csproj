@@ -7,18 +7,20 @@
         <Authors>Stephen Hodgson</Authors>
         <Product>OpenAI-DotNet-Proxy</Product>
         <Description>A simple Proxy API gateway for OpenAI-DotNet to make authenticated requests from a front end application without exposing your API keys.</Description>
-        <Copyright>2023</Copyright>
+        <Copyright>2024</Copyright>
         <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
         <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
         <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-turbo, gpt-3, chatGPT, api-proxy, proxy, gateway</PackageTags>
         <Title>OpenAI API Proxy</Title>
         <PackageId>OpenAI-DotNet-Proxy</PackageId>
-        <Version>7.2.0</Version>
+        <Version>7.7.7</Version>
         <Company>RageAgainstThePixel</Company>
         <RootNamespace>OpenAI.Proxy</RootNamespace>
         <PackageIcon>OpenAI-DotNet-Icon.png</PackageIcon>
-        <PackageReleaseNotes>Initial Release!</PackageReleaseNotes>
+        <PackageReleaseNotes>Version 7.7.7
+- Added ValidateAuthenticationAsync
+        </PackageReleaseNotes>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageReadmeFile>Readme.md</PackageReadmeFile>
