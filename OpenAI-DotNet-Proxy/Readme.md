@@ -63,7 +63,19 @@ public partial class Program
         {
             // You will need to implement your own class to properly test
             // custom issued tokens you've setup for your end users.
-            if (!request.Authorization.ToString().Contains(userToken))
+            if (!request.Authorization.ToString().Contains(TestUserToken))
+            {
+                throw new AuthenticationException("User is not authorized");
+            }
+        }
+
+        public override async Task ValidateAuthenticationAsync(IHeaderDictionary request)
+        {
+            await Task.CompletedTask; // remote resource call
+
+            // You will need to implement your own class to properly test
+            // custom issued tokens you've setup for your end users.
+            if (!request.Authorization.ToString().Contains(TestUserToken))
             {
                 throw new AuthenticationException("User is not authorized");
             }
