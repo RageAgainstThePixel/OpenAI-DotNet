@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Authentication;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;
 
@@ -192,7 +193,7 @@ namespace OpenAI.Proxy
             catch (Exception e)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await httpContext.Response.WriteAsync(e.ToString());
+                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new { error = new { e.Message, e.StackTrace } }));
             }
         }
 
