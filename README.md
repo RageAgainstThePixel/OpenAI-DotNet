@@ -287,7 +287,7 @@ In this example, we demonstrate how to set up and use `OpenAIProxyStartup` in a 
     - Powershell install: `Install-Package OpenAI-DotNet-Proxy`
     - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
-4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxyStartup.CreateDefaultHost` method, passing your custom `AuthenticationFilter` as a type argument.
+4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxyStartup.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
 5. Create `OpenAIAuthentication` and `OpenAIClientSettings` as you would normally with your API keys, org id, or Azure settings.
 
 ```csharp
@@ -299,7 +299,19 @@ public partial class Program
         {
             // You will need to implement your own class to properly test
             // custom issued tokens you've setup for your end users.
-            if (!request.Authorization.ToString().Contains(userToken))
+            if (!request.Authorization.ToString().Contains(TestUserToken))
+            {
+                throw new AuthenticationException("User is not authorized");
+            }
+        }
+
+        public override async Task ValidateAuthenticationAsync(IHeaderDictionary request)
+        {
+            await Task.CompletedTask; // remote resource call
+
+            // You will need to implement your own class to properly test
+            // custom issued tokens you've setup for your end users.
+            if (!request.Authorization.ToString().Contains(TestUserToken))
             {
                 throw new AuthenticationException("User is not authorized");
             }
@@ -311,8 +323,7 @@ public partial class Program
         var auth = OpenAIAuthentication.LoadFromEnv();
         var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
         using var openAIClient = new OpenAIClient(auth, settings);
-        var proxy = OpenAIProxyStartup.CreateDefaultHost<AuthenticationFilter>(args, openAIClient);
-        proxy.Run();
+        OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }
 }
 ```

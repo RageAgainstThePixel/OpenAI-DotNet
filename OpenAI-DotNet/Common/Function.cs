@@ -101,7 +101,6 @@ namespace OpenAI
             MethodInfo = method;
             Parameters = method.GenerateJsonSchema();
             Instance = instance;
-
             functionCache[Name] = this;
         }
 

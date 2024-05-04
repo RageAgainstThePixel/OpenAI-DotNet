@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Authentication;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;
 
@@ -99,6 +100,31 @@ namespace OpenAI.Proxy
                 }).Build();
         }
 
+        /// <summary>
+        /// Creates a new <see cref="WebApplication"/> that acts as a proxy web api for OpenAI.
+        /// </summary>
+        /// <typeparam name="T"><see cref="IAuthenticationFilter"/> type to use to validate your custom issued tokens.</typeparam>
+        /// <param name="args">Startup args.</param>
+        /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAIClientSettings"/>.</param>
+        public static WebApplication CreateWebApplication<T>(string[] args, OpenAIClient openAIClient) where T : class, IAuthenticationFilter
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.AllowSynchronousIO = false;
+                options.Limits.MinRequestBodyDataRate = null;
+                options.Limits.MinResponseDataRate = null;
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(2);
+            });
+            builder.Services.AddSingleton(openAIClient);
+            builder.Services.AddSingleton<IAuthenticationFilter, T>();
+            var app = builder.Build();
+            var startup = new OpenAIProxyStartup();
+            startup.Configure(app, app.Environment);
+            return app;
+        }
+
         private static async Task HealthEndpoint(HttpContext context)
         {
             // Respond with a 200 OK status code and a plain text message
@@ -167,7 +193,7 @@ namespace OpenAI.Proxy
             catch (Exception e)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await httpContext.Response.WriteAsync(e.Message);
+                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new { error = new { e.Message, e.StackTrace } }));
             }
         }
 

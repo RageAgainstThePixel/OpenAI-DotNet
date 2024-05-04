@@ -28,8 +28,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.7</Version>
+    <Version>7.7.8</Version>
     <PackageReleaseNotes>
+Version 7.7.8
+- Updated OpenAIClientSettings.ctr to allow for domain http protocol override (i.e. http://localhost:8080 or http://0.0.0.0:8080)
+- Updated OpenAIClientSettings.BaseRequest public for easier access when implementing custom proxies.
+- Updated OpenAIClientSettings.IsAzureDeployment public for easier access when implementing custom proxies.
 Version 7.7.7
 - Updated static models list
   - Added gpt-4-turbo
