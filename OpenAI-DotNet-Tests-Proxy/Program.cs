@@ -1,7 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using OpenAI.Proxy;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ namespace OpenAI.Tests.Proxy
     {
         private const string TestUserToken = "aAbBcCdDeE123456789";
 
-        // ReSharper disable once ClassNeverInstantiated.Local
         private class AuthenticationFilter : AbstractAuthenticationFilter
         {
             public override void ValidateAuthentication(IHeaderDictionary request)
@@ -46,9 +44,8 @@ namespace OpenAI.Tests.Proxy
         {
             var auth = OpenAIAuthentication.LoadFromEnv();
             var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
-            var openAIClient = new OpenAIClient(auth, settings);
-            var proxy = OpenAIProxyStartup.CreateDefaultHost<AuthenticationFilter>(args, openAIClient);
-            proxy.Run();
+            using var openAIClient = new OpenAIClient(auth, settings);
+            OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
         }
     }
 }
