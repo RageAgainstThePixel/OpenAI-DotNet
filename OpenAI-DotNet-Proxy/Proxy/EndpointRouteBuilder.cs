@@ -42,9 +42,16 @@ namespace OpenAI.Proxy
 #endif
         };
 
-        public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter)
+        /// <summary>
+        /// Maps the <see cref="OpenAIClient"/> endpoints.
+        /// </summary>
+        /// <param name="endpoints"><see cref="IEndpointRouteBuilder"/>.</param>
+        /// <param name="openAIClient"><see cref="OpenAIClient"/>.</param>
+        /// <param name="authenticationFilter"><see cref="IAuthenticationFilter"/>.</param>
+        /// <param name="routePrefix">Optional, custom route prefix. i.e. '/openai'.</param>
+        public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter, string routePrefix = "")
         {
-            endpoints.Map($"{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
+            endpoints.Map($"{routePrefix}{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
 
             async Task HandleRequest(HttpContext httpContext, string endpoint)
             {
