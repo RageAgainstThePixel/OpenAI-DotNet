@@ -21,7 +21,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ResponseFormat responseFormat = ResponseFormat.Text,
+            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -134,7 +134,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ResponseFormat responseFormat = ResponseFormat.Text,
+            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -155,12 +155,7 @@ namespace OpenAI.Chat
             MaxTokens = maxTokens;
             Number = number;
             PresencePenalty = presencePenalty;
-
-            if (responseFormat == ResponseFormat.Json)
-            {
-                ResponseFormat = responseFormat;
-            }
-
+            ResponseFormat = responseFormat;
             Seed = seed;
             Stops = stops;
             Temperature = temperature;
@@ -261,8 +256,7 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ResponseFormat ResponseFormat { get; }
+        public ResponseFormatObject ResponseFormat { get; }
 
         /// <summary>
         /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically,
