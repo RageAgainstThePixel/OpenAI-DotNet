@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,10 +36,24 @@ namespace OpenAI.Threads
         /// Deletes the thread.
         /// </summary>
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="deleteToolResources">Optional, should tool resources, such as vector stores be deleted when this thread is deleted?</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if the thread was successfully deleted.</returns>
-        public static async Task<bool> DeleteAsync(this ThreadResponse thread, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.DeleteThreadAsync(thread, cancellationToken).ConfigureAwait(false);
+        public static async Task<bool> DeleteAsync(this ThreadResponse thread, bool deleteToolResources = false, CancellationToken cancellationToken = default)
+        {
+            var deleteTasks = new List<Task<bool>> { thread.Client.ThreadsEndpoint.DeleteThreadAsync(thread, cancellationToken) };
+
+            if (deleteToolResources && thread.ToolResources?.FileSearch?.VectorStoreIds is { Count: > 0 })
+            {
+                deleteTasks.AddRange(
+                    from vectorStoreId in thread.ToolResources?.FileSearch?.VectorStoreIds
+                    where !string.IsNullOrWhiteSpace(vectorStoreId)
+                    select thread.Client.VectorStoresEndpoint.DeleteVectorStoreAsync(vectorStoreId, cancellationToken));
+            }
+
+            await Task.WhenAll(deleteTasks).ConfigureAwait(false);
+            return deleteTasks.TrueForAll(task => task.Result);
+        }
 
         #region Messages
 

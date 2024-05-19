@@ -100,7 +100,8 @@ namespace OpenAI.Tests
                     Assert.IsFalse(File.Exists(testFilePath));
                 }
 
-                await testThread.CreateMessageAsync("hello world!");
+                message = await testThread.CreateMessageAsync("hello world!");
+                Assert.IsNotNull(message);
                 message = await testThread.CreateMessageAsync(new(
                     content: "Test create message",
                     attachments: new[] { new Attachment(file.Id, Tool.FileSearch) },
@@ -165,62 +166,14 @@ namespace OpenAI.Tests
             Console.WriteLine($"Modify message metadata: {modifiedThreadMessage.Id} -> {string.Join("\n", modifiedThreadMessage.Metadata.Select(meta => $"[{meta.Key}] {meta.Value}"))}");
         }
 
-        //[Test]
-        [Obsolete]
-        public async Task Test_04_04_UploadAndDownloadMessageFiles()
-        {
-            Assert.IsNotNull(testThread);
-            Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var file1 = await CreateTestFileAsync("test_1.txt");
-            var file2 = await CreateTestFileAsync("test_2.txt");
-            try
-            {
-                var createRequest = new CreateMessageRequest("Test content with files", new[] { file1.Id, file2.Id });
-                var message = await testThread.CreateMessageAsync(createRequest);
-                var fileList = await message.ListFilesAsync();
-                Assert.IsNotNull(fileList);
-                Assert.AreEqual(2, fileList.Items.Count);
-
-                foreach (var file in fileList.Items)
-                {
-                    var retrieved = await message.RetrieveFileAsync(file);
-                    Assert.IsNotNull(retrieved);
-                    Console.WriteLine(file.Id);
-                    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-                    //var filePath = await message.DownloadFileContentAsync(file, Directory.GetCurrentDirectory(), true);
-                    //Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
-                    //Assert.IsTrue(File.Exists(filePath));
-                    //File.Delete(filePath);
-                }
-
-                var threadList = await testThread.ListFilesAsync(message);
-                Assert.IsNotNull(threadList);
-                Assert.IsNotEmpty(threadList.Items);
-
-                //foreach (var file in threadList.Items)
-                //{
-                //    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-                //    var filePath = await file.DownloadContentAsync(Directory.GetCurrentDirectory(), true);
-                //    Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
-                //    Assert.IsTrue(File.Exists(filePath));
-                //    File.Delete(filePath);
-                //}
-            }
-            finally
-            {
-                await CleanupFileAsync(file1);
-                await CleanupFileAsync(file2);
-            }
-        }
-
         [Test]
         public async Task Test_05_DeleteThread()
         {
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var isDeleted = await testThread.DeleteAsync();
+            var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
             Assert.IsTrue(isDeleted);
-            Console.WriteLine($"Deleted thread {testThread.Id}");
+            Console.WriteLine($"Deleted thread -> {testThread.Id}");
         }
 
         [Test]
@@ -249,7 +202,7 @@ namespace OpenAI.Tests
             }
             finally
             {
-                await thread.DeleteAsync();
+                await thread.DeleteAsync(deleteToolResources: true);
             }
         }
 
@@ -296,7 +249,7 @@ namespace OpenAI.Tests
         {
             Assert.NotNull(testRun);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            // run in Queued and InProgress can't be modified
+            // a run that is Queued or InProgress can't be modified
             var run = await testRun.WaitForStatusChangeAsync();
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Completed);
@@ -352,7 +305,7 @@ namespace OpenAI.Tests
 
             if (testThread != null)
             {
-                var isDeleted = await testThread.DeleteAsync();
+                var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
                 Assert.IsTrue(isDeleted);
             }
         }
@@ -451,7 +404,7 @@ namespace OpenAI.Tests
 
             if (testThread != null)
             {
-                var isDeleted = await testThread.DeleteAsync();
+                var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
                 Assert.IsTrue(isDeleted);
             }
         }

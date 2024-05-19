@@ -103,7 +103,7 @@ namespace OpenAI.Tests
             Assert.AreEqual("You are modified test assistant", assistant.Instructions);
             Assert.AreEqual(Model.GPT4o.ToString(), assistant.Model);
             Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
-            Console.WriteLine($"{assistant.Id} -> modified");
+            Console.WriteLine($"modified assistant -> {assistant.Id}");
         }
 
         [Test]
@@ -111,19 +111,9 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-
-            try
-            {
-                Assert.IsNotNull(testAssistant.ToolResources?.FileSearch?.VectorStoreIds);
-                Assert.IsNotEmpty(testAssistant.ToolResources.FileSearch.VectorStoreIds);
-                await OpenAIClient.VectorStoresEndpoint.DeleteVectorStoreAsync(testAssistant.ToolResources.FileSearch.VectorStoreIds[0]);
-            }
-            finally
-            {
-                var result = await testAssistant.DeleteAsync();
-                Assert.IsTrue(result);
-                Console.WriteLine($"{testAssistant.Id} -> deleted");
-            }
+            var result = await testAssistant.DeleteAsync(deleteToolResources: true);
+            Assert.IsTrue(result);
+            Console.WriteLine($"deleted assistant -> {testAssistant.Id}");
         }
     }
 }

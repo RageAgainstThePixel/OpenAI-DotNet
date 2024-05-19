@@ -41,10 +41,24 @@ namespace OpenAI.Assistants
         /// Delete the assistant.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="deleteToolResources">Optional, should tool resources, such as vector stores be deleted when this assistant is deleted?</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if the <see cref="assistant"/> was successfully deleted.</returns>
-        public static async Task<bool> DeleteAsync(this AssistantResponse assistant, CancellationToken cancellationToken = default)
-            => await assistant.Client.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id, cancellationToken).ConfigureAwait(false);
+        public static async Task<bool> DeleteAsync(this AssistantResponse assistant, bool deleteToolResources = false, CancellationToken cancellationToken = default)
+        {
+            var deleteTasks = new List<Task<bool>> { assistant.Client.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id, cancellationToken) };
+
+            if (deleteToolResources && assistant.ToolResources?.FileSearch?.VectorStoreIds is { Count: > 0 })
+            {
+                deleteTasks.AddRange(
+                    from vectorStoreId in assistant.ToolResources?.FileSearch?.VectorStoreIds
+                    where !string.IsNullOrWhiteSpace(vectorStoreId)
+                    select assistant.Client.VectorStoresEndpoint.DeleteVectorStoreAsync(vectorStoreId, cancellationToken));
+            }
+
+            await Task.WhenAll(deleteTasks).ConfigureAwait(false);
+            return deleteTasks.TrueForAll(task => task.Result);
+        }
 
         /// <summary>
         /// Create a thread and run it.
