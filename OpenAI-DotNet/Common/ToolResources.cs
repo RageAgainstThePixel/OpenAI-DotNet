@@ -12,6 +12,8 @@ namespace OpenAI
     /// </summary>
     public class ToolResources
     {
+        public ToolResources() { }
+
         /// <summary>
         /// Constructor.
         /// </summary>

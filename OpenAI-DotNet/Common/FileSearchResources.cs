@@ -10,6 +10,8 @@ namespace OpenAI
     /// </summary>
     public class FileSearchResources
     {
+        public FileSearchResources() { }
+
         /// <summary>
         /// The vector store attached to this assistant/thread.
         /// There can be a maximum of 1 vector store attached to the assistant/thread.

@@ -76,7 +76,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ResponseFormat responseFormat = ResponseFormat.Text)
+            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -92,7 +92,15 @@ namespace OpenAI.Assistants
         }
 
         [Obsolete("use new .ctr")]
-        public CreateAssistantRequest(AssistantResponse assistant, string model = null, string name = null, string description = null, string instructions = null, IEnumerable<Tool> tools = null, IEnumerable<string> files = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateAssistantRequest(
+            AssistantResponse assistant,
+            string model = null,
+            string name = null,
+            string description = null,
+            string instructions = null,
+            IEnumerable<Tool> tools = null,
+            IEnumerable<string> files = null,
+            IReadOnlyDictionary<string, string> metadata = null)
         {
         }
 
@@ -161,7 +169,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ResponseFormat responseFormat = ResponseFormat.Text)
+            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             Name = name;
@@ -221,15 +229,6 @@ namespace OpenAI.Assistants
         public ToolResources ToolResources { get; }
 
         /// <summary>
-        /// A list of file IDs attached to this assistant.
-        /// There can be a maximum of 20 files attached to the assistant.
-        /// Files are ordered by their creation date in ascending order.
-        /// </summary>
-        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
-        [JsonPropertyName("file_ids")]
-        public IReadOnlyList<string> FileIds { get; }
-
-        /// <summary>
         /// What sampling temperature to use, between 0 and 2.
         /// Higher values like 0.8 will make the output more random,
         /// while lower values like 0.2 will make it more focused and deterministic.
@@ -258,8 +257,7 @@ namespace OpenAI.Assistants
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ResponseFormat ResponseFormat { get; }
+        public ResponseFormatObject ResponseFormat { get; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
