@@ -330,7 +330,7 @@ namespace OpenAI.Threads
 
         #endregion Runs
 
-        #region Files
+        #region Files (Obsolete)
 
         /// <summary>
         /// Returns a list of message files.
@@ -364,6 +364,6 @@ namespace OpenAI.Threads
             return response.Deserialize<MessageFileResponse>(responseAsString, client);
         }
 
-        #endregion Files
+        #endregion Files (Obsolete)
     }
 }

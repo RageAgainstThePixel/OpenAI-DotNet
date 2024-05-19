@@ -14,15 +14,16 @@ using System.Threading.Tasks;
 namespace OpenAI.Files
 {
     /// <summary>
-    /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
+    /// Files are used to upload documents that can be used with features like Assistants, Fine-tuning, and Batch API.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/files"/>
     /// </summary>
     public sealed class FilesEndpoint : OpenAIBaseEndpoint
     {
         private class FilesList
         {
+            [JsonInclude]
             [JsonPropertyName("data")]
-            public IReadOnlyList<FileResponse> Files { get; set; }
+            public IReadOnlyList<FileResponse> Files { get; private set; }
         }
 
         /// <inheritdoc />
@@ -52,20 +53,28 @@ namespace OpenAI.Files
         }
 
         /// <summary>
-        /// Upload a file that contains document(s) to be used across various endpoints/features.
-        /// Currently, the size of all the files uploaded by one organization can be up to 1 GB.
-        /// Please contact us if you need to increase the storage limit.
+        /// Upload a file that can be used across various endpoints.
+        /// Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 100 GB.
         /// </summary>
         /// <param name="filePath">
         /// Local file path to upload.
         /// </param>
         /// <param name="purpose">
-        /// The intended purpose of the uploaded documents.
-        /// If the purpose is set to "fine-tune", each line is a JSON record with "prompt" and "completion"
-        /// fields representing your training examples.
+        /// The intended purpose of the uploaded file.
+        /// Use 'assistants' for Assistants and Message files,
+        /// 'vision' for Assistants image file inputs,
+        /// 'batch' for Batch API,
+        /// and 'fine-tune' for Fine-tuning.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FileResponse"/>.</returns>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>The Assistants API supports files up to 2 million tokens and of specific file types.</description></item>
+        /// <item><description>The Fine-tuning API only supports .jsonl files.</description></item>
+        /// <item><description>The Batch API only supports .jsonl files up to 100 MB in size.</description></item>
+        /// </list>
+        /// </remarks>
         public async Task<FileResponse> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
             => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken).ConfigureAwait(false);
 
@@ -199,8 +208,6 @@ namespace OpenAI.Files
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The file as a stream in an asynchronous operation.</returns>
         public async Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
-        {
-            return await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
-        }
+            => await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
     }
 }

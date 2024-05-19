@@ -166,7 +166,7 @@ namespace OpenAI
         public AudioEndpoint AudioEndpoint { get; }
 
         /// <summary>
-        /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
+        /// Files are used to upload documents that can be used with features like Assistants, Fine-tuning, and Batch API.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/files"/>
         /// </summary>
         public FilesEndpoint FilesEndpoint { get; }
