@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using OpenAI.Extensions;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {

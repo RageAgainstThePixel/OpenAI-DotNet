@@ -1,8 +1,8 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Text.Json.Serialization;
 using OpenAI.Extensions;
 using OpenAI.Models;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Audio
 {

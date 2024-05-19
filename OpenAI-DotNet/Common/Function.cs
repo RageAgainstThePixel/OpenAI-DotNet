@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +38,7 @@ namespace OpenAI
         /// </param>
         public Function(string name, string description = null, JsonNode parameters = null)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
@@ -68,7 +69,7 @@ namespace OpenAI
         /// </param>
         public Function(string name, string description, string parameters)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
@@ -86,7 +87,7 @@ namespace OpenAI
 
         internal Function(string name, string description, MethodInfo method, object instance = null)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
