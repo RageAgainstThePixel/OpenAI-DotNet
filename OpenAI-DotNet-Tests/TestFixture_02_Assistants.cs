@@ -30,7 +30,11 @@ namespace OpenAI.Tests
             }
             finally
             {
-                File.Delete(testFilePath);
+                if (File.Exists(testFilePath))
+                {
+                    File.Delete(testFilePath);
+                }
+
                 Assert.IsFalse(File.Exists(testFilePath));
             }
 
