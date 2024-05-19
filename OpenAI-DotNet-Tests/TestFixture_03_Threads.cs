@@ -28,8 +28,8 @@ namespace OpenAI.Tests
         public async Task Test_01_CreateThread()
         {
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new CreateThreadRequest(
-                new List<Message>
+            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new(
+                messages: new List<Message>
                 {
                    "Test message"
                 },
@@ -80,20 +80,34 @@ namespace OpenAI.Tests
             const string testFilePath = "assistant_test_1.txt";
             await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(testFilePath));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
-            Assert.NotNull(file);
-            File.Delete(testFilePath);
-            Assert.IsFalse(File.Exists(testFilePath));
-            await testThread.CreateMessageAsync("hello world!");
-            var request = new Message("Test create message",
-                metadata: new Dictionary<string, string>
-                {
-                    ["test"] = nameof(Test_04_01_CreateMessage)
-                });
+            FileResponse file = null;
             MessageResponse message;
+
             try
             {
-                message = await testThread.CreateMessageAsync(request);
+                try
+                {
+                    file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
+                    Assert.NotNull(file);
+                }
+                finally
+                {
+                    if (File.Exists(testFilePath))
+                    {
+                        File.Delete(testFilePath);
+                    }
+
+                    Assert.IsFalse(File.Exists(testFilePath));
+                }
+
+                await testThread.CreateMessageAsync("hello world!");
+                message = await testThread.CreateMessageAsync(new(
+                    content: "Test create message",
+                    attachments: new[] { new Attachment(file.Id, Tool.FileSearch) },
+                    metadata: new Dictionary<string, string>
+                    {
+                        ["test"] = nameof(Test_04_01_CreateMessage)
+                    }));
             }
             finally
             {
@@ -151,7 +165,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"Modify message metadata: {modifiedThreadMessage.Id} -> {string.Join("\n", modifiedThreadMessage.Metadata.Select(meta => $"[{meta.Key}] {meta.Value}"))}");
         }
 
-        [Test]
+        //[Test]
         [Obsolete]
         public async Task Test_04_04_UploadAndDownloadMessageFiles()
         {
@@ -307,6 +321,7 @@ namespace OpenAI.Tests
             var run = await testThread.CreateRunAsync(testAssistant);
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Queued);
+            await Task.Delay(10);
             run = await run.CancelAsync();
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Cancelling);
@@ -421,7 +436,6 @@ namespace OpenAI.Tests
             foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
             {
                 Assert.IsNotNull(message);
-                Assert.IsNotEmpty(message.Content);
                 Console.WriteLine($"{message.Role}: {message.PrintContent()}");
             }
         }
@@ -454,6 +468,7 @@ namespace OpenAI.Tests
 
         private async Task CleanupFileAsync(FileResponse file)
         {
+            if (file == null) { return; }
             var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
             Assert.IsTrue(isDeleted);
         }

@@ -35,7 +35,7 @@ namespace OpenAI.Threads
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
                 request?.ToolChoice as string ?? (string)request?.ToolChoice?.funcion?.name,
-                request?.ResponseFormat ?? ResponseFormat.Text)
+                request?.ResponseFormat ?? OpenAI.ResponseFormat.Text)
         {
         }
 
@@ -130,7 +130,7 @@ namespace OpenAI.Threads
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
             string toolChoice = null,
-            ResponseFormat responseFormat = ResponseFormat.Text)
+            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
         {
             AssistantId = assistantId;
             Model = model;
@@ -297,7 +297,7 @@ namespace OpenAI.Threads
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ResponseFormat ResponseFormat { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ResponseFormatObject ResponseFormat { get; private set; }
     }
 }

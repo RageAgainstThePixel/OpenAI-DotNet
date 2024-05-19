@@ -27,7 +27,11 @@ namespace OpenAI.Threads
         /// This can be useful for storing additional information about the object in a structured format.
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
-        public Message(string content, Role role = Role.User, IEnumerable<Attachment> attachments = null, IReadOnlyDictionary<string, string> metadata = null)
+        public Message(
+            string content,
+            Role role = Role.User,
+            IEnumerable<Attachment> attachments = null,
+            IReadOnlyDictionary<string, string> metadata = null)
             : this(new List<Content> { new(content) }, role, attachments, metadata)
         {
         }
@@ -49,7 +53,11 @@ namespace OpenAI.Threads
         /// This can be useful for storing additional information about the object in a structured format.
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
-        public Message(IEnumerable<Content> content, Role role = Role.User, IEnumerable<Attachment> attachments = null, IReadOnlyDictionary<string, string> metadata = null)
+        public Message(
+            IEnumerable<Content> content,
+            Role role = Role.User,
+            IEnumerable<Attachment> attachments = null,
+            IReadOnlyDictionary<string, string> metadata = null)
         {
             Content = content?.ToList();
             Role = role;
@@ -78,7 +86,7 @@ namespace OpenAI.Threads
         /// A list of files attached to the message, and the tools they were added to.
         /// </summary>
         [JsonInclude]
-        [JsonPropertyName("Attachments")]
+        [JsonPropertyName("attachments")]
         public IReadOnlyList<Attachment> Attachments { get; private set; }
 
         /// <summary>
