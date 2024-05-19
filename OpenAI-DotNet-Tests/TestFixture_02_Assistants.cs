@@ -81,12 +81,11 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var request = new CreateAssistantRequest(
+            var assistant = await testAssistant.ModifyAsync(new(
                 model: Model.GPT4o,
                 name: "Test modified",
                 description: "Modified description",
-                instructions: "You are modified test assistant");
-            var assistant = await testAssistant.ModifyAsync(request);
+                instructions: "You are modified test assistant"));
             Assert.IsNotNull(assistant);
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
