@@ -8,7 +8,7 @@ namespace OpenAI
     /// <summary>
     /// <see cref="Tool.CodeInterpreter"/> resources.
     /// </summary>
-    public class CodeInterpreterResources
+    public sealed class CodeInterpreterResources
     {
         /// <summary>
         /// Constructor.

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Batch
 {
-    public class BatchErrors
+    public sealed class BatchErrors
     {
         [JsonInclude]
         [JsonPropertyName("data")]

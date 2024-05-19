@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Batch
 {
-    public class BatchResponse : BaseResponse
+    public sealed class BatchResponse : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("id")]

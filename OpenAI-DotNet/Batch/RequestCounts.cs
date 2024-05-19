@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Batch
 {
-    public class RequestCounts
+    public sealed class RequestCounts
     {
         /// <summary>
         /// Total number of requests in the batch.

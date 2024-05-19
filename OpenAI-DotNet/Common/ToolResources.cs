@@ -10,7 +10,7 @@ namespace OpenAI
     /// For example, the <see cref="Tool.CodeInterpreter"/> requres a list of file ids,
     /// While the <see cref="Tool.FileSearch"/> requires a list vector store ids.
     /// </summary>
-    public class ToolResources
+    public sealed class ToolResources
     {
         public ToolResources() { }
 

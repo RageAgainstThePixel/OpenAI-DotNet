@@ -8,7 +8,7 @@ namespace OpenAI
     /// <summary>
     /// <see cref="Tool.FileSearch"/> resources.
     /// </summary>
-    public class FileSearchResources
+    public sealed class FileSearchResources
     {
         public FileSearchResources() { }
 

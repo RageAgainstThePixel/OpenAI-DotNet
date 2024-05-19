@@ -9,7 +9,7 @@ namespace OpenAI
     /// A helper to create a vector store with file_ids and attach it to an assistant/thread.
     /// There can be a maximum of 1 vector store attached to the assistant/thread.
     /// </summary>
-    public class VectorStoreRequest
+    public sealed class VectorStoreRequest
     {
         /// <summary>
         /// Constructor.

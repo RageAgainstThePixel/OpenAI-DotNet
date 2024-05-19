@@ -13,7 +13,7 @@ namespace OpenAI.Batch
     /// The Batch API returns completions within 24 hours for a 50% discount.
     /// <see href="https://platform.openai.com/docs/api-reference/batch"/>
     /// </summary>
-    public class BatchEndpoint : OpenAIBaseEndpoint
+    public sealed class BatchEndpoint : OpenAIBaseEndpoint
     {
         public BatchEndpoint(OpenAIClient client) : base(client) { }
 
