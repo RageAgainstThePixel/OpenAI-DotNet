@@ -1,6 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -85,12 +86,12 @@ namespace OpenAI.Threads
         /// Create a message.
         /// </summary>
         /// <param name="threadId">The id of the thread to create a message for.</param>
-        /// <param name="request"></param>
+        /// <param name="message"><see cref="Message"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public async Task<MessageResponse> CreateMessageAsync(string threadId, CreateMessageRequest request, CancellationToken cancellationToken = default)
+        public async Task<MessageResponse> CreateMessageAsync(string threadId, Message message, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var jsonContent = JsonSerializer.Serialize(message, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/messages"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<MessageResponse>(responseAsString, client);
@@ -101,11 +102,20 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="threadId">The id of the thread the messages belong to.</param>
         /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="runId">Optional, filter messages by the run ID that generated them.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessage}"/>.</returns>
-        public async Task<ListResponse<MessageResponse>> ListMessagesAsync(string threadId, ListQuery query = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<MessageResponse>> ListMessagesAsync(string threadId, ListQuery query = null, string runId = null, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages", query), cancellationToken).ConfigureAwait(false);
+            Dictionary<string, string> queryParams = query;
+
+            if (!string.IsNullOrWhiteSpace(runId))
+            {
+                queryParams ??= new();
+                queryParams.Add("run_id", runId);
+            }
+
+            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages", queryParams), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<MessageResponse>>(responseAsString, client);
         }
@@ -163,40 +173,6 @@ namespace OpenAI.Threads
         }
 
         #endregion Messages
-
-        #region Files
-
-        /// <summary>
-        /// Returns a list of message files.
-        /// </summary>
-        /// <param name="threadId">The id of the thread that the message and files belong to.</param>
-        /// <param name="messageId">The id of the message that the files belongs to.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        public async Task<ListResponse<MessageFileResponse>> ListFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
-        {
-            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", query), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<MessageFileResponse>>(responseAsString, client);
-        }
-
-        /// <summary>
-        /// Retrieve message file.
-        /// </summary>
-        /// <param name="threadId">The id of the thread to which the message and file belong.</param>
-        /// <param name="messageId">The id of the message the file belongs to.</param>
-        /// <param name="fileId">The id of the file being retrieved.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="MessageFileResponse"/>.</returns>
-        public async Task<MessageFileResponse> RetrieveFileAsync(string threadId, string messageId, string fileId, CancellationToken cancellationToken = default)
-        {
-            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<MessageFileResponse>(responseAsString, client);
-        }
-
-        #endregion Files
 
         #region Runs
 
@@ -353,5 +329,41 @@ namespace OpenAI.Threads
         }
 
         #endregion Runs
+
+        #region Files
+
+        /// <summary>
+        /// Returns a list of message files.
+        /// </summary>
+        /// <param name="threadId">The id of the thread that the message and files belong to.</param>
+        /// <param name="messageId">The id of the message that the files belongs to.</param>
+        /// <param name="query"><see cref="ListQuery"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
+        [Obsolete]
+        public async Task<ListResponse<MessageFileResponse>> ListFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
+        {
+            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", query), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<ListResponse<MessageFileResponse>>(responseAsString, client);
+        }
+
+        /// <summary>
+        /// Retrieve message file.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to which the message and file belong.</param>
+        /// <param name="messageId">The id of the message the file belongs to.</param>
+        /// <param name="fileId">The id of the file being retrieved.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="MessageFileResponse"/>.</returns>
+        [Obsolete]
+        public async Task<MessageFileResponse> RetrieveFileAsync(string threadId, string messageId, string fileId, CancellationToken cancellationToken = default)
+        {
+            using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<MessageFileResponse>(responseAsString, client);
+        }
+
+        #endregion Files
     }
 }

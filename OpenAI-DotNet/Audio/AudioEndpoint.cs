@@ -29,7 +29,7 @@ namespace OpenAI.Audio
         /// <param name="request"><see cref="SpeechRequest"/>.</param>
         /// <param name="chunkCallback">Optional, partial chunk <see cref="ReadOnlyMemory{T}"/> callback to stream audio as it arrives.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ReadOnlyMemory{T}"/></returns>
+        /// <returns><see cref="ReadOnlyMemory{T}"/>.</returns>
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();

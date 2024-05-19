@@ -24,6 +24,20 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) for when the run step was created.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("created_at")]
+        public int? CreatedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? CreatedAt
+            => CreatedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds.Value).DateTime
+                : null;
+
         /// <summary>
         /// The ID of the assistant associated with the run step.
         /// </summary>
@@ -76,29 +90,16 @@ namespace OpenAI.Threads
         public Error LastError { get; private set; }
 
         /// <summary>
-        /// The Unix timestamp (in seconds) for when the run step was created.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("created_at")]
-        public int? CreatedAtUnixTimeSeconds { get; private set; }
-
-        [JsonIgnore]
-        public DateTime? CreatedAt
-            => CreatedAtUnixTimeSeconds.HasValue
-                ? DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds.Value).DateTime
-                : null;
-
-        /// <summary>
         /// The Unix timestamp (in seconds) for when the run step expired. A step is considered expired if the parent run is expired.
         /// </summary>
         [JsonInclude]
-        [JsonPropertyName("expires_at")]
-        public int? ExpiresAtUnixTimeSeconds { get; private set; }
+        [JsonPropertyName("expired_at")]
+        public int? ExpiredAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime? ExpiresAt
-            => ExpiresAtUnixTimeSeconds.HasValue
-                ? DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixTimeSeconds.Value).DateTime
+        public DateTime? ExpiredAt
+            => ExpiredAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(ExpiredAtUnixTimeSeconds.Value).DateTime
                 : null;
 
         /// <summary>

@@ -24,7 +24,10 @@ namespace OpenAI
 
         public static implicit operator Tool(Function function) => new(function);
 
-        public static Tool Retrieval { get; } = new() { Type = "retrieval" };
+        [Obsolete("Use FileSearch")]
+        public static Tool Retrieval { get; } = new() { Type = "file_search" };
+
+        public static Tool FileSearch { get; } = new() { Type = "file_search" };
 
         public static Tool CodeInterpreter { get; } = new() { Type = "code_interpreter" };
 
@@ -108,7 +111,7 @@ namespace OpenAI
 
         private static readonly List<Tool> toolCache = new()
         {
-            Retrieval,
+            FileSearch,
             CodeInterpreter
         };
 
@@ -120,7 +123,7 @@ namespace OpenAI
             toolCache.Clear();
             Function.ClearFunctionCache();
             toolCache.Add(CodeInterpreter);
-            toolCache.Add(Retrieval);
+            toolCache.Add(FileSearch);
         }
 
         /// <summary>
@@ -305,8 +308,7 @@ namespace OpenAI
             return tool;
         }
 
-        public static Tool FromFunc<T1, T2, TResult>(string name, Func<T1, T2, TResult> function,
-            string description = null)
+        public static Tool FromFunc<T1, T2, TResult>(string name, Func<T1, T2, TResult> function, string description = null)
         {
             if (TryGetTool(name, function, out var tool))
             {
@@ -318,8 +320,7 @@ namespace OpenAI
             return tool;
         }
 
-        public static Tool FromFunc<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> function,
-            string description = null)
+        public static Tool FromFunc<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> function, string description = null)
         {
             if (TryGetTool(name, function, out var tool))
             {

@@ -30,6 +30,13 @@ namespace OpenAI.Threads
         [JsonPropertyName("tool_outputs")]
         public IReadOnlyList<ToolOutput> ToolOutputs { get; }
 
+        /// <summary>
+        /// If true, returns a stream of events that happen during the Run as server-sent events,
+        /// terminating when the Run enters a terminal state with a data: [DONE] message.
+        /// </summary>
+        [JsonPropertyName("stream")]
+        public bool Stream { get; internal set; }
+
         public static implicit operator SubmitToolOutputsRequest(ToolOutput toolOutput) => new(toolOutput);
 
         public static implicit operator SubmitToolOutputsRequest(ToolOutput[] toolOutputs) => new(toolOutputs);

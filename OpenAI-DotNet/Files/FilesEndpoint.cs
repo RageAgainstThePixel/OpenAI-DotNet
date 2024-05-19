@@ -130,7 +130,7 @@ namespace OpenAI.Files
         /// </summary>
         /// <param name="fileId">The ID of the file to use for this request.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="FileResponse"/></returns>
+        /// <returns><see cref="FileResponse"/>.</returns>
         public async Task<FileResponse> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
@@ -144,7 +144,7 @@ namespace OpenAI.Files
         /// <param name="fileId">The file id to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The full path of the downloaded file.</returns>
         public async Task<string> DownloadFileAsync(string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
@@ -158,7 +158,7 @@ namespace OpenAI.Files
         /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The full path of the downloaded file.</returns>
         public async Task<string> DownloadFileAsync(FileResponse fileData, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
@@ -196,7 +196,7 @@ namespace OpenAI.Files
         /// Gets the specified file as stream
         /// </summary>
         /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The file as a stream in an asynchronous operation.</returns>
         public async Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
         {

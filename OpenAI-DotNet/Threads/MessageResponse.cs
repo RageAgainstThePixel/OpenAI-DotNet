@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,41 @@ namespace OpenAI.Threads
         public string ThreadId { get; private set; }
 
         /// <summary>
+        /// The status of the message, which can be either 'in_progress', 'incomplete', or 'completed'.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("status")]
+        [JsonConverter(typeof(JsonStringEnumConverter<MessageStatus>))]
+        public MessageStatus Status { get; private set; }
+
+        /// <summary>
+        /// On an incomplete message, details about why the message is incomplete.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("incomplete_details")]
+        public IncompleteDetails IncompleteDetails { get; private set; }
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) for when the message was completed.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("completed_at")]
+        public int CompletedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime CompletedAt => DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds).DateTime;
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) for when the message was marked as incomplete.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("incomplete_at")]
+        public int IncompleteAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime IncompleteAt => DateTimeOffset.FromUnixTimeSeconds(IncompleteAtUnixTimeSeconds).DateTime;
+
+        /// <summary>
         /// The entity that produced the message. One of user or assistant.
         /// </summary>
         [JsonInclude]
@@ -78,9 +114,16 @@ namespace OpenAI.Threads
         /// Useful for tools like 'retrieval' and 'code_interpreter' that can access files.
         /// A maximum of 10 files can be attached to a message.
         /// </summary>
+        [JsonIgnore]
+        [Obsolete("Use Attachments instead.")]
+        public IReadOnlyList<string> FileIds => Attachments?.Select(attachment => attachment.FileId).ToList();
+
+        /// <summary>
+        /// A list of files attached to the message, and the tools they were added to.
+        /// </summary>
         [JsonInclude]
-        [JsonPropertyName("file_ids")]
-        public IReadOnlyList<string> FileIds { get; private set; }
+        [JsonPropertyName("Attachments")]
+        public IReadOnlyList<Attachment> Attachments { get; private set; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
@@ -92,6 +135,8 @@ namespace OpenAI.Threads
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         public static implicit operator string(MessageResponse message) => message?.ToString();
+
+        public static implicit operator Message(MessageResponse response) => new(response.Content, response.Role, response.Attachments, response.Metadata);
 
         public override string ToString() => Id;
 

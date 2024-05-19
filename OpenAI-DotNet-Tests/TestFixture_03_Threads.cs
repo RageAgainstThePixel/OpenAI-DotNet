@@ -33,7 +33,7 @@ namespace OpenAI.Tests
                 {
                    "Test message"
                 },
-                new Dictionary<string, string>
+                metadata: new Dictionary<string, string>
                 {
                     ["test"] = nameof(Test_01_CreateThread)
                 }));
@@ -85,9 +85,8 @@ namespace OpenAI.Tests
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
             await testThread.CreateMessageAsync("hello world!");
-            var request = new CreateMessageRequest("Test create message",
-                new[] { file.Id },
-                new Dictionary<string, string>
+            var request = new Message("Test create message",
+                metadata: new Dictionary<string, string>
                 {
                     ["test"] = nameof(Test_04_01_CreateMessage)
                 });
@@ -153,6 +152,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_04_04_UploadAndDownloadMessageFiles()
         {
             Assert.IsNotNull(testThread);
@@ -217,7 +217,7 @@ namespace OpenAI.Tests
                 new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: Model.GPT4_Turbo));
+                    model: Model.GPT4o));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
@@ -372,7 +372,7 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(runStep.Client);
                 var retrievedRunStep = await runStep.UpdateAsync();
                 Assert.IsNotNull(retrievedRunStep);
-                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiredAt}");
                 var retrieveStepRunStep = await run.RetrieveRunStepAsync(runStep.Id);
                 Assert.IsNotNull(retrieveStepRunStep);
             }
@@ -405,7 +405,7 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(runStep.Client);
                 var retrievedRunStep = await runStep.UpdateAsync();
                 Assert.IsNotNull(retrievedRunStep);
-                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {(runStep.ExpiresAtUnixTimeSeconds.HasValue ? runStep.ExpiresAt : runStep.CompletedAt)}");
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {(runStep.ExpiredAtUnixTimeSeconds.HasValue ? runStep.ExpiredAt : runStep.CompletedAt)}");
                 if (runStep.StepDetails.ToolCalls == null) { continue; }
 
                 foreach (var runStepToolCall in runStep.StepDetails.ToolCalls)

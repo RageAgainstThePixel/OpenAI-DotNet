@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,34 +10,6 @@ namespace OpenAI.FineTuning
 {
     public sealed class FineTuneJobResponse : BaseResponse
     {
-        public FineTuneJobResponse() { }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        internal FineTuneJobResponse(FineTuneJob job)
-        {
-            Object = job.Object;
-            Id = job.Id;
-            Model = job.Model;
-            CreateAtUnixTimeSeconds = job.CreateAtUnixTimeSeconds;
-            FinishedAtUnixTimeSeconds = job.FinishedAtUnixTimeSeconds;
-            FineTunedModel = job.FineTunedModel;
-            OrganizationId = job.OrganizationId;
-            ResultFiles = job.ResultFiles;
-            Status = job.Status;
-            ValidationFile = job.ValidationFile;
-            TrainingFile = job.TrainingFile;
-            HyperParameters = job.HyperParameters;
-            TrainedTokens = job.TrainedTokens;
-            events = new List<EventResponse>(job.Events.Count);
-
-            foreach (var jobEvent in job.Events)
-            {
-                jobEvent.Client = Client;
-                events.Add(jobEvent);
-            }
-        }
-#pragma warning restore CS0618 // Type or member is obsolete
-
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
@@ -83,6 +56,7 @@ namespace OpenAI.FineTuning
 
         [JsonInclude]
         [JsonPropertyName("status")]
+        [JsonConverter(typeof(JsonStringEnumConverter<JobStatus>))]
         public JobStatus Status { get; private set; }
 
         [JsonInclude]

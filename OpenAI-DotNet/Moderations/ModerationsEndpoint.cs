@@ -46,7 +46,7 @@ namespace OpenAI.Moderations
         /// <summary>
         /// Classifies if text violates OpenAI's Content Policy
         /// </summary>
-        /// <param name="request"><see cref="ModerationsRequest"/></param>
+        /// <param name="request"><see cref="ModerationsRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {

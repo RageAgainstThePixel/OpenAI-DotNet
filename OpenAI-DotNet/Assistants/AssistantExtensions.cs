@@ -21,10 +21,21 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public static async Task<AssistantResponse> ModifyAsync(this AssistantResponse assistant, CreateAssistantRequest request, CancellationToken cancellationToken = default)
-        {
-            request = new CreateAssistantRequest(assistant: assistant, model: request.Model, name: request.Name, description: request.Description, instructions: request.Instructions, tools: request.Tools, files: request.FileIds, metadata: request.Metadata);
-            return await assistant.Client.AssistantsEndpoint.ModifyAssistantAsync(assistantId: assistant.Id, request: request, cancellationToken: cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-        }
+            => await assistant.Client.AssistantsEndpoint.ModifyAssistantAsync(
+                assistantId: assistant.Id,
+                request: new CreateAssistantRequest(
+                    assistant: assistant,
+                    model: request.Model,
+                    name: request.Name,
+                    description: request.Description,
+                    instructions: request.Instructions,
+                    toolResources: request.ToolResources,
+                    tools: request.Tools,
+                    metadata: request.Metadata,
+                    temperature: request.Temperature,
+                    topP: request.TopP,
+                    responseFormat: request.ResponseFormat),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Delete the assistant.
@@ -54,6 +65,7 @@ namespace OpenAI.Assistants
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{AssistantFile}"/>.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<ListResponse<AssistantFileResponse>> ListFilesAsync(this AssistantResponse assistant, ListQuery query = null, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.ListFilesAsync(assistant.Id, query, cancellationToken).ConfigureAwait(false);
 
@@ -67,6 +79,7 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<AssistantFileResponse> AttachFileAsync(this AssistantResponse assistant, FileResponse file, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.AttachFileAsync(assistant.Id, file, cancellationToken).ConfigureAwait(false);
 
@@ -77,6 +90,7 @@ namespace OpenAI.Assistants
         /// <param name="filePath">The local file path to upload.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<AssistantFileResponse> UploadFileAsync(this AssistantResponse assistant, string filePath, CancellationToken cancellationToken = default)
         {
             var file = await assistant.Client.FilesEndpoint.UploadFileAsync(new FileUploadRequest(filePath, "assistants"), cancellationToken).ConfigureAwait(false);
@@ -91,7 +105,7 @@ namespace OpenAI.Assistants
         /// <param name="fileName">The name of the file.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
-
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<AssistantFileResponse> UploadFileAsync(this AssistantResponse assistant, Stream stream, string fileName, CancellationToken cancellationToken = default)
         {
             var file = await assistant.Client.FilesEndpoint.UploadFileAsync(new FileUploadRequest(stream, fileName, "assistants"), cancellationToken).ConfigureAwait(false);
@@ -105,20 +119,9 @@ namespace OpenAI.Assistants
         /// <param name="fileId">The ID of the file we're getting.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="AssistantFileResponse"/>.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<AssistantFileResponse> RetrieveFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.RetrieveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
-
-        // TODO 400 bad request errors. Likely OpenAI bug downloading assistant file content.
-        ///// <summary>
-        ///// Downloads the <see cref="assistantFile"/> to the specified <see cref="directory"/>.
-        ///// </summary>
-        ///// <param name="assistantFile"><see cref="AssistantFileResponse"/>.</param>
-        ///// <param name="directory">The directory to download the file into.</param>
-        ///// <param name="deleteCachedFile">Optional, delete the cached file. Defaults to false.</param>
-        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        ///// <returns>The full path of the downloaded file.</returns>
-        //public static async Task<string> DownloadFileAsync(this AssistantFileResponse assistantFile, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-        //    => await assistantFile.Client.FilesEndpoint.DownloadFileAsync(assistantFile.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Remove the file from the assistant it is attached to.
@@ -131,6 +134,7 @@ namespace OpenAI.Assistants
         /// <param name="file"><see cref="AssistantResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<bool> RemoveFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
             => await file.Client.AssistantsEndpoint.RemoveFileAsync(file.AssistantId, file.Id, cancellationToken).ConfigureAwait(false);
 
@@ -146,6 +150,7 @@ namespace OpenAI.Assistants
         /// <param name="fileId">The ID of the file to remove.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if file was removed.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<bool> RemoveFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
 
@@ -155,6 +160,7 @@ namespace OpenAI.Assistants
         /// <param name="file"><see cref="AssistantResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if the file was successfully removed from the assistant and deleted.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<bool> DeleteFileAsync(this AssistantFileResponse file, CancellationToken cancellationToken = default)
         {
             var isRemoved = await file.RemoveFileAsync(cancellationToken).ConfigureAwait(false);
@@ -168,6 +174,7 @@ namespace OpenAI.Assistants
         /// <param name="fileId">The ID of the file to delete.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>True, if the file was successfully removed from the assistant and deleted.</returns>
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public static async Task<bool> DeleteFileAsync(this AssistantResponse assistant, string fileId, CancellationToken cancellationToken = default)
         {
             var isRemoved = await assistant.Client.AssistantsEndpoint.RemoveFileAsync(assistant.Id, fileId, cancellationToken).ConfigureAwait(false);
@@ -184,7 +191,7 @@ namespace OpenAI.Assistants
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCall"><see cref="ToolCall"/>.</param>
-        /// <returns>Tool output result as <see cref="string"/></returns>
+        /// <returns>Tool output result as <see cref="string"/>.</returns>
         public static string InvokeToolCall(this AssistantResponse assistant, ToolCall toolCall)
         {
             if (toolCall.Type != "function")
@@ -204,7 +211,7 @@ namespace OpenAI.Assistants
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCall"><see cref="ToolCall"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns>Tool output result as <see cref="string"/></returns>
+        /// <returns>Tool output result as <see cref="string"/>.</returns>
         public static async Task<string> InvokeToolCallAsync(this AssistantResponse assistant, ToolCall toolCall, CancellationToken cancellationToken = default)
         {
             if (toolCall.Type != "function")

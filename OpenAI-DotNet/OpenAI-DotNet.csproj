@@ -14,7 +14,7 @@ An OpenAI API account is required.
 
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
-</Description>
+    </Description>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
@@ -28,8 +28,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>7.7.8</Version>
+    <Version>8.0.0</Version>
     <PackageReleaseNotes>
+Version 8.0.0
+- Updated Assistants Beta v2
 Version 7.7.8
 - Updated OpenAIClientSettings.ctr to allow for domain http protocol override (i.e. http://localhost:8080 or http://0.0.0.0:8080)
 - Updated OpenAIClientSettings.BaseRequest public for easier access when implementing custom proxies.

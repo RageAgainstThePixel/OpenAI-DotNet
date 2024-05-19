@@ -24,7 +24,8 @@ namespace OpenAI.Tests
             var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
             File.Delete(testFilePath);
             Assert.IsFalse(File.Exists(testFilePath));
-            var request = new CreateAssistantRequest(Model.GPT3_5_Turbo,
+
+            var request = new CreateAssistantRequest(Model.GPT4_Turbo,
                 name: "test-assistant",
                 description: "Used for unit testing.",
                 instructions: "You are test assistant",
@@ -35,15 +36,15 @@ namespace OpenAI.Tests
                 },
                 tools: new[]
                 {
-                    Tool.Retrieval
-                },
-                files: new[] { file.Id });
+                    Tool.FileSearch
+                });
+            // TODO update with new file uploading
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
             Assert.IsNotNull(assistant);
             Assert.AreEqual("test-assistant", assistant.Name);
             Assert.AreEqual("Used for unit testing.", assistant.Description);
             Assert.AreEqual("You are test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT3_5_Turbo.ToString(), assistant.Model);
+            Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
             Assert.IsNotEmpty(assistant.Metadata);
             testAssistant = assistant;
             Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
@@ -71,7 +72,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
             var request = new CreateAssistantRequest(
-                model: Model.GPT4_Turbo,
+                model: Models.Model.GPT4o,
                 name: "Test modified",
                 description: "Modified description",
                 instructions: "You are modified test assistant");
@@ -80,12 +81,13 @@ namespace OpenAI.Tests
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
             Assert.AreEqual("You are modified test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
+            Assert.AreEqual(Models.Model.GPT4o.ToString(), assistant.Model);
             Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
             Console.WriteLine($"{assistant.Id} -> modified");
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_04_01_UploadAssistantFile()
         {
             Assert.IsNotNull(testAssistant);
@@ -99,6 +101,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_04_02_ListAssistantFiles()
         {
             Assert.IsNotNull(testAssistant);
@@ -125,6 +128,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_04_03_RemoveAssistantFile()
         {
             Assert.IsNotNull(testAssistant);
@@ -142,6 +146,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_04_04_DeleteAssistantFiles()
         {
             Assert.IsNotNull(testAssistant);

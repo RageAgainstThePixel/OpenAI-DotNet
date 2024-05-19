@@ -1,5 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -36,10 +38,20 @@ namespace OpenAI.Threads
         public CodeInterpreter CodeInterpreter { get; private set; }
 
         /// <summary>
+        /// The File Search tool call definition.
+        /// </summary>
+        /// <remarks>
+        /// For now, this is always going to be an empty object.
+        /// </remarks>
+        [JsonInclude]
+        [JsonPropertyName("file_search")]
+        public IReadOnlyDictionary<string, object> FileSearch { get; private set; }
+
+        /// <summary>
         /// For now, this is always going to be an empty object.
         /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("retrieval")]
+        [JsonIgnore]
+        [Obsolete("Removed")]
         public object Retrieval { get; private set; }
     }
 }

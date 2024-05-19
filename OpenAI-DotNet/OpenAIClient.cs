@@ -2,6 +2,7 @@
 
 using OpenAI.Assistants;
 using OpenAI.Audio;
+using OpenAI.Batch;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using OpenAI.Extensions;
@@ -11,6 +12,7 @@ using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
 using OpenAI.Threads;
+using OpenAI.VectorStores;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -67,12 +69,11 @@ namespace OpenAI
             ModerationsEndpoint = new ModerationsEndpoint(this);
             ThreadsEndpoint = new ThreadsEndpoint(this);
             AssistantsEndpoint = new AssistantsEndpoint(this);
+            BatchEndpoint = new BatchEndpoint(this);
+            VectorStoresEndpoint = new VectorStoresEndpoint(this);
         }
 
-        ~OpenAIClient()
-        {
-            Dispose(false);
-        }
+        ~OpenAIClient() => Dispose(false);
 
         #region IDisposable
 
@@ -196,6 +197,19 @@ namespace OpenAI
         /// </summary>
         public ThreadsEndpoint ThreadsEndpoint { get; }
 
+        /// <summary>
+        /// Create large batches of API requests for asynchronous processing.
+        /// The Batch API returns completions within 24 hours for a 50% discount.
+        /// <see href="https://platform.openai.com/docs/api-reference/batch"/>
+        /// </summary>
+        public BatchEndpoint BatchEndpoint { get; }
+
+        /// <summary>
+        /// Vector stores are used to store files for use by the file_search tool.
+        /// <see href="https://platform.openai.com/docs/api-reference/vector-stores"/>
+        /// </summary>
+        public VectorStoresEndpoint VectorStoresEndpoint { get; }
+
         #endregion Endpoints
 
         private HttpClient SetupClient(HttpClient client = null)
@@ -213,7 +227,7 @@ namespace OpenAI
             }
 
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v1");
+            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v2");
 
             if (OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||

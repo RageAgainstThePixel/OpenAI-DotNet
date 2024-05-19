@@ -30,10 +30,10 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ResponseFormat responseFormat = ResponseFormat.Url, string user = null)
+        protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ImageResponseFormat responseFormat = ImageResponseFormat.Url, string user = null)
         {
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.DallE_2 : model;
             Number = numberOfResults;
@@ -65,12 +65,12 @@ namespace OpenAI.Images
         /// <summary>
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </summary>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ResponseFormat>))]
+        [JsonConverter(typeof(JsonStringEnumConverter<ImageResponseFormat>))]
         [FunctionProperty("The format in which the generated images are returned. Must be one of url or b64_json.")]
-        public ResponseFormat ResponseFormat { get; }
+        public ImageResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.

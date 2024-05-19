@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
+    [Obsolete("Removed. Use Assistant.ToolResources instead.")]
     public sealed class MessageFileResponse : BaseResponse
     {
         /// <summary>

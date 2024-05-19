@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace OpenAI.Images
 {
-    public enum ResponseFormat
+    public enum ImageResponseFormat
     {
         [EnumMember(Value = "url")]
         Url,

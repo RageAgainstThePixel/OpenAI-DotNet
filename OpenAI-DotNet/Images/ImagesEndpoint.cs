@@ -25,7 +25,7 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates an image given a prompt.
         /// </summary>
-        /// <param name="request"><see cref="ImageGenerationRequest"/></param>
+        /// <param name="request"><see cref="ImageGenerationRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates an edited or extended image given an original image and a prompt.
         /// </summary>
-        /// <param name="request"><see cref="ImageEditRequest"/></param>
+        /// <param name="request"><see cref="ImageEditRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(ImageEditRequest request, CancellationToken cancellationToken = default)
@@ -73,7 +73,7 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates a variation of a given image.
         /// </summary>
-        /// <param name="request"><see cref="ImageVariationRequest"/></param>
+        /// <param name="request"><see cref="ImageVariationRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(ImageVariationRequest request, CancellationToken cancellationToken = default)

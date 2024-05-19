@@ -1,9 +1,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Text.Json.Serialization;
 using OpenAI.Extensions;
+using System;
+using System.Text.Json.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     public sealed class Content
     {
@@ -21,6 +22,12 @@ namespace OpenAI.Chat
             Text = input;
         }
 
+        public Content(ImageFile imageFile)
+        {
+            Type = ContentType.ImageFile;
+            ImageFile = imageFile;
+        }
+
         public Content(ContentType type, string input)
         {
             Type = type;
@@ -33,6 +40,10 @@ namespace OpenAI.Chat
                 case ContentType.ImageUrl:
                     ImageUrl = new ImageUrl(input);
                     break;
+                case ContentType.ImageFile:
+                    throw new ArgumentException("Use the ImageFile constructor for ImageFile content.");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -51,8 +62,15 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageUrl ImageUrl { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("image_file")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ImageFile ImageFile { get; private set; }
+
         public static implicit operator Content(string input) => new(ContentType.Text, input);
 
         public static implicit operator Content(ImageUrl imageUrl) => new(imageUrl);
+
+        public static implicit operator Content(ImageFile imageFile) => new(imageFile);
     }
 }

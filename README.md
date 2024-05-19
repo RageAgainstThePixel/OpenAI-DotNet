@@ -38,7 +38,7 @@ Install-Package OpenAI-DotNet
 
 > Check out our new api docs!
 
-https://rageagainstthepixel.github.io/OpenAI-DotNet :new:
+<https://rageagainstthepixel.github.io/OpenAI-DotNet> :new:
 
 ### Table of Contents
 
@@ -51,7 +51,7 @@ https://rageagainstthepixel.github.io/OpenAI-DotNet :new:
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Assistants](#assistants)
+- [Assistants](#assistants) :warning: :construction:
   - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant)
   - [Retrieve Assistant](#retrieve-assistant)
@@ -63,7 +63,7 @@ https://rageagainstthepixel.github.io/OpenAI-DotNet :new:
   - [Retrieve File from Assistant](#retrieve-file-from-assistant)
   - [Remove File from Assistant](#remove-file-from-assistant)
   - [Delete File from Assistant](#delete-file-from-assistant)
-- [Threads](#threads)
+- [Threads](#threads) :warning: :construction:
   - [Create Thread](#create-thread)
   - [Create Thread and Run](#create-thread-and-run)
   - [Retrieve Thread](#retrieve-thread)
@@ -96,7 +96,7 @@ https://rageagainstthepixel.github.io/OpenAI-DotNet :new:
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images)
+- [Images](#images) :warning: :construction:
   - [Create Image](#create-image)
   - [Edit Image](#edit-image)
   - [Create Image Variation](#create-image-variation)
@@ -409,7 +409,7 @@ Create an assistant with a model and instructions.
 
 ```csharp
 using var api = new OpenAIClient();
-var request = new CreateAssistantRequest(Model.GPT4_Turbo);
+var request = new CreateAssistantRequest(Model.GPT4o);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(request);
 ```
 
@@ -429,9 +429,9 @@ Modifies an assistant.
 
 ```csharp
 using var api = new OpenAIClient();
-var createRequest = new CreateAssistantRequest(Model.GPT3_5_Turbo);
+var createRequest = new CreateAssistantRequest(Model.GPT4_Turbo);
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(createRequest);
-var modifyRequest = new CreateAssistantRequest(Model.GPT4_Turbo);
+var modifyRequest = new CreateAssistantRequest(Model.GPT4o);
 var modifiedAssistant = await api.AssistantsEndpoint.ModifyAssistantAsync(assistant.Id, modifyRequest);
 // OR AssistantExtension for easier use!
 var modifiedAssistantEx = await assistant.ModifyAsync(modifyRequest);
@@ -561,7 +561,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: Model.GPT4_Turbo));
+        model: Model.GPT4o));
 var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
 var threadRequest = new CreateThreadRequest(messages);
 var run = await assistant.CreateThreadAndRunAsync(threadRequest);
@@ -737,7 +737,7 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-        model: Model.GPT4_Turbo));
+        model: Model.GPT4o));
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
 var run = await thread.CreateRunAsync(assistant);
@@ -879,7 +879,7 @@ var messages = new List<Message>
     new Message(Role.Assistant, "The Los Angeles Dodgers won the World Series in 2020."),
     new Message(Role.User, "Where was it played?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo);
+var chatRequest = new ChatRequest(messages, Model.GPT4o);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 var choice = response.FirstChoice;
 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");
@@ -1017,7 +1017,7 @@ var messages = new List<Message>
         new ImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg", ImageDetail.Low)
     })
 };
-var chatRequest = new ChatRequest(messages, model: Model.GPT4_Turbo);
+var chatRequest = new ChatRequest(messages, model: Model.GPT4o);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
 ```
@@ -1038,7 +1038,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant designed to output JSON."),
     new Message(Role.User, "Who won the world series in 2020?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4_Turbo, responseFormat: ChatResponseFormat.Json);
+var chatRequest = new ChatRequest(messages, Model.GPT4o, responseFormat: ResponseFormat.Json);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)
@@ -1242,7 +1242,7 @@ Response includes details of the enqueued job including job status and the name 
 using var api = new OpenAIClient();
 var fileId = "file-abc123";
 var request = new CreateFineTuneRequest(fileId);
-var job = await api.FineTuningEndpoint.CreateJobAsync(Model.GPT3_5_Turbo, request);
+var job = await api.FineTuningEndpoint.CreateJobAsync(Model.GPT4_Turbo, request);
 Console.WriteLine($"Started {job.Id} | Status: {job.Status}");
 ```
 
