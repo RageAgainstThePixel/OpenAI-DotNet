@@ -340,7 +340,7 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        [Obsolete]
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<ListResponse<MessageFileResponse>> ListFilesAsync(string threadId, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files", query), cancellationToken).ConfigureAwait(false);
@@ -356,7 +356,7 @@ namespace OpenAI.Threads
         /// <param name="fileId">The id of the file being retrieved.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageFileResponse"/>.</returns>
-        [Obsolete]
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<MessageFileResponse> RetrieveFileAsync(string threadId, string messageId, string fileId, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{threadId}/messages/{messageId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);

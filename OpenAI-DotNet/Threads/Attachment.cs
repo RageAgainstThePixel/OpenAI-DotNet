@@ -8,6 +8,15 @@ namespace OpenAI.Threads
 {
     public sealed class Attachment
     {
+        public Attachment() { }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="fileId">The ID of the file to attach to the message.</param>
+        /// <param name="tool">The tool to add this file to.</param>
+        public Attachment(string fileId, Tool tool) : this(fileId, new[] { tool }) { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -16,7 +25,7 @@ namespace OpenAI.Threads
         public Attachment(string fileId, IEnumerable<Tool> tools)
         {
             FileId = fileId;
-            Tools = tools.ToList();
+            Tools = tools?.ToList();
         }
 
         /// <summary>
