@@ -41,7 +41,7 @@ namespace OpenAI.Batch
         {
             // ReSharper disable once InconsistentNaming
             const string completion_window = "24h";
-            var request = new { input_file_id = inputFileId, endpoint, completion_window };
+            var request = new { input_file_id = inputFileId, endpoint, completion_window, metadata };
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
