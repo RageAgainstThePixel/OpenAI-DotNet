@@ -77,7 +77,7 @@ namespace OpenAI.Threads
         {
             using var response = await client.Client.DeleteAsync(GetUrl($"/{threadId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+            return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
 
         #region Messages

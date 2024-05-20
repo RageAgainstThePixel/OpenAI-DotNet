@@ -119,7 +119,7 @@ namespace OpenAI.VectorStores
         {
             using var response = await client.Client.DeleteAsync(GetUrl($"/{vectorStoreId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+            return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
 
         #region Files
@@ -192,7 +192,7 @@ namespace OpenAI.VectorStores
         {
             using var response = await client.Client.DeleteAsync(GetUrl($"/{vectorStoreId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+            return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
 
         #endregion Files
@@ -268,7 +268,7 @@ namespace OpenAI.VectorStores
         {
             using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<VectorStoreFileBatch>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            var result = response.Deserialize<VectorStoreFileBatch>(responseAsString, client);
             return result.Status == VectorStoreFileStatus.Cancelled;
         }
 

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Audio
 {
-    public sealed class AudioResponse
+    public sealed class AudioResponse : BaseResponse
     {
         /// <summary>
         /// The language of the input audio.

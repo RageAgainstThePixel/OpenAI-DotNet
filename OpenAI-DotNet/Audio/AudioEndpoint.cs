@@ -64,10 +64,6 @@ namespace OpenAI.Audio
             return new ReadOnlyMemory<byte>(memoryStream.GetBuffer(), 0, totalBytesRead);
         }
 
-        [Obsolete("Use CreateTranscriptionTextAsync or CreateTranscriptionJsonAsync instead.")]
-        public async Task<string> CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
-            => await CreateTranscriptionTextAsync(request, cancellationToken).ConfigureAwait(false);
-
         /// <summary>
         /// Transcribes audio into the input language.
         /// </summary>
@@ -76,9 +72,9 @@ namespace OpenAI.Audio
         /// <returns>The transcribed text.</returns>
         public async Task<string> CreateTranscriptionTextAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
-            var responseAsString = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
+            var (response, responseAsString) = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
             return request.ResponseFormat is AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json
-                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
+                ? response.Deserialize<AudioResponse>(responseAsString, client)?.Text
                 : responseAsString;
         }
 
@@ -96,11 +92,11 @@ namespace OpenAI.Audio
                 throw new ArgumentException("Response format must be Json or Verbose Json.", nameof(request.ResponseFormat));
             }
 
-            var responseAsString = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<AudioResponse>(responseAsString);
+            var (response, responseAsString) = await Internal_CreateTranscriptionAsync(request, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<AudioResponse>(responseAsString, client);
         }
 
-        private async Task<string> Internal_CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
+        private async Task<(HttpResponseMessage, string)> Internal_CreateTranscriptionAsync(AudioTranscriptionRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
             using var audioData = new MemoryStream();
@@ -137,12 +133,8 @@ namespace OpenAI.Audio
 
             using var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
-            return responseAsString;
+            return (response, responseAsString);
         }
-
-        [Obsolete("Use CreateTranslationTextAsync or CreateTranslationJsonAsync instead.")]
-        public async Task<string> CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
-            => await CreateTranslationTextAsync(request, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Translates audio into English.
@@ -152,9 +144,9 @@ namespace OpenAI.Audio
         /// <returns>The translated text.</returns>
         public async Task<string> CreateTranslationTextAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
-            var responseAsString = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
+            var (response, responseAsString) = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
             return request.ResponseFormat is AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json
-                ? JsonSerializer.Deserialize<AudioResponse>(responseAsString)?.Text
+                ? response.Deserialize<AudioResponse>(responseAsString, client)?.Text
                 : responseAsString;
         }
 
@@ -172,11 +164,11 @@ namespace OpenAI.Audio
                 throw new ArgumentException("Response format must be Json or Verbose Json.", nameof(request.ResponseFormat));
             }
 
-            var responseAsString = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<AudioResponse>(responseAsString);
+            var (response, responseAsString) = await Internal_CreateTranslationAsync(request, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<AudioResponse>(responseAsString, client);
         }
 
-        private async Task<string> Internal_CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
+        private async Task<(HttpResponseMessage, string)> Internal_CreateTranslationAsync(AudioTranslationRequest request, CancellationToken cancellationToken = default)
         {
             using var content = new MultipartFormDataContent();
             using var audioData = new MemoryStream();
@@ -200,7 +192,7 @@ namespace OpenAI.Audio
 
             using var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
-            return responseAsString;
+            return (response, responseAsString);
         }
     }
 }

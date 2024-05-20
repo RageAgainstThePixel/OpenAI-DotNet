@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    internal sealed class DeletedResponse
+    internal sealed class DeletedResponse : BaseResponse
     {
         [JsonInclude]
         [JsonPropertyName("id")]

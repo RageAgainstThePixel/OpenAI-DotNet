@@ -17,7 +17,7 @@ namespace OpenAI.Models
     /// </summary>
     public sealed class ModelsEndpoint : OpenAIBaseEndpoint
     {
-        private sealed class ModelsList
+        private sealed class ModelsList : BaseResponse
         {
             [JsonInclude]
             [JsonPropertyName("data")]
@@ -39,7 +39,7 @@ namespace OpenAI.Models
         {
             using var response = await client.Client.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<ModelsList>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Models;
+            return response.Deserialize<ModelsList>(responseAsString, client)?.Models;
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace OpenAI.Models
             {
                 using var response = await client.Client.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
             }
             catch (Exception e)
             {

@@ -92,10 +92,9 @@ namespace OpenAI.Assistants
         /// There can be a maximum of 20 files attached to the assistant.
         /// Files are ordered by their creation date in ascending order.
         /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("file_ids")]
+        [JsonIgnore]
         [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
-        public IReadOnlyList<string> FileIds { get; private set; }
+        public IReadOnlyList<string> FileIds => null;
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.

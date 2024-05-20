@@ -66,20 +66,26 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
-        public int CompletedAtUnixTimeSeconds { get; private set; }
+        public int? CompletedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime CompletedAt => DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds).DateTime;
+        public DateTime? CompletedAt
+            => CompletedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the message was marked as incomplete.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("incomplete_at")]
-        public int IncompleteAtUnixTimeSeconds { get; private set; }
+        public int? IncompleteAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
-        public DateTime IncompleteAt => DateTimeOffset.FromUnixTimeSeconds(IncompleteAtUnixTimeSeconds).DateTime;
+        public DateTime? IncompleteAt
+            => IncompleteAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(IncompleteAtUnixTimeSeconds.Value).DateTime
+                : null;
 
         /// <summary>
         /// The entity that produced the message. One of user or assistant.

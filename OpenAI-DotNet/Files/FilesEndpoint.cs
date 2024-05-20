@@ -19,7 +19,7 @@ namespace OpenAI.Files
     /// </summary>
     public sealed class FilesEndpoint : OpenAIBaseEndpoint
     {
-        private class FilesList
+        private class FilesList : BaseResponse
         {
             [JsonInclude]
             [JsonPropertyName("data")]
@@ -49,7 +49,7 @@ namespace OpenAI.Files
 
             using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Files;
+            return response.Deserialize<FilesList>(resultAsString, client)?.Files;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace OpenAI.Files
             request.Dispose();
             using var response = await client.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<FileResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace OpenAI.Files
                 }
 
                 await response.CheckResponseAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
             }
         }
 
@@ -144,7 +144,7 @@ namespace OpenAI.Files
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            return response.Deserialize<FileResponse>(responseAsString, client);
         }
 
         /// <summary>

@@ -84,7 +84,7 @@ namespace OpenAI.Batch
         {
             using var response = await client.Client.PostAsync(GetUrl($"/{batchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<BatchResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            var result = response.Deserialize<BatchResponse>(responseAsString, client);
             return result.Status == BatchStatus.Cancelled;
         }
     }
