@@ -16,6 +16,6 @@ namespace OpenAI
 
         public static implicit operator ResponseFormatObject(ResponseFormat type) => new(type);
 
-        public static implicit operator ResponseFormat(ResponseFormatObject type) => type.Type;
+        public static implicit operator ResponseFormat(ResponseFormatObject format) => format.Type;
     }
 }
