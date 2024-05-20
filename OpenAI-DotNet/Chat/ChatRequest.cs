@@ -256,7 +256,6 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ResponseFormatObject ResponseFormat { get; }
 
         /// <summary>

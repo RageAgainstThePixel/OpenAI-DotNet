@@ -137,7 +137,6 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ResponseFormatObject ResponseFormat { get; private set; }
 
         public static implicit operator string(AssistantResponse assistant) => assistant?.Id;
