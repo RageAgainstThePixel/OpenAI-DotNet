@@ -55,7 +55,7 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("text")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Text { get; private set; }
+        public dynamic Text { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("image_url")]
@@ -76,7 +76,7 @@ namespace OpenAI
         public override string ToString()
             => Type switch
             {
-                ContentType.Text => Text,
+                ContentType.Text => Text?.ToString(),
                 ContentType.ImageUrl => ImageUrl.ToString(),
                 ContentType.ImageFile => ImageFile.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Type))

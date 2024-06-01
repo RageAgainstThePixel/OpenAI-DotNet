@@ -99,7 +99,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public dynamic Content { get; private set; }
+        public IReadOnlyList<Content> Content { get; private set; }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
@@ -143,12 +143,7 @@ namespace OpenAI.Threads
         public static implicit operator string(MessageResponse message) => message?.ToString();
 
         public static implicit operator Message(MessageResponse response)
-            => response?.Content switch
-            {
-                string content => new(content, response.Role, response.Attachments, response.Metadata),
-                IReadOnlyList<Content> contents => new(contents, response.Role, response.Attachments, response.Metadata),
-                _ => throw new InvalidOperationException($"{response?.Content.GetType()} is not a valid Content type.")
-            };
+            => new(response.Content, response.Role, response.Attachments, response.Metadata);
 
         public override string ToString() => Id;
 
@@ -158,11 +153,6 @@ namespace OpenAI.Threads
         /// </summary>
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
         public string PrintContent()
-            => Content switch
-            {
-                string content => content,
-                IReadOnlyList<Content> contents => string.Join("\n", contents.Select(content => content?.ToString())),
-                _ => throw new InvalidOperationException($"{Content.GetType()} is not a valid Content type.")
-            };
+            => string.Join("\n", Content.Select(content => content?.ToString()));
     }
 }
