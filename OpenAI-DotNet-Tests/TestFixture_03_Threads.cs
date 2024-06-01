@@ -199,6 +199,12 @@ namespace OpenAI.Tests
                 run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items)
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
             }
             finally
             {

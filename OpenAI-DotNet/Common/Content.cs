@@ -72,5 +72,14 @@ namespace OpenAI
         public static implicit operator Content(ImageUrl imageUrl) => new(imageUrl);
 
         public static implicit operator Content(ImageFile imageFile) => new(imageFile);
+
+        public override string ToString()
+            => Type switch
+            {
+                ContentType.Text => Text,
+                ContentType.ImageUrl => ImageUrl.ToString(),
+                ContentType.ImageFile => ImageFile.ToString(),
+                _ => throw new ArgumentOutOfRangeException(nameof(Type))
+            };
     }
 }

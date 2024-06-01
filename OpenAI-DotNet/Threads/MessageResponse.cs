@@ -162,7 +162,7 @@ namespace OpenAI.Threads
             {
                 string content => content,
                 IReadOnlyList<Content> contents => string.Join("\n", contents.Select(content => content?.ToString())),
-                _ => string.Empty
+                _ => throw new InvalidOperationException($"{Content.GetType()} is not a valid Content type.")
             };
     }
 }

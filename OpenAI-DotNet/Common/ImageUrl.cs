@@ -42,5 +42,7 @@ namespace OpenAI
         [JsonPropertyName("detail")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageDetail Detail { get; private set; }
+
+        public override string ToString() => Url;
     }
 }
