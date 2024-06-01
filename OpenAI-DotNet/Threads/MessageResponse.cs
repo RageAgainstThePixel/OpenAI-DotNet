@@ -147,7 +147,7 @@ namespace OpenAI.Threads
             {
                 string content => new(content, response.Role, response.Attachments, response.Metadata),
                 IReadOnlyList<Content> contents => new(contents, response.Role, response.Attachments, response.Metadata),
-                _ => null
+                _ => throw new InvalidOperationException($"{response?.Content.GetType()} is not a valid Content type.")
             };
 
         public override string ToString() => Id;
