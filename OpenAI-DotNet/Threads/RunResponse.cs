@@ -250,8 +250,8 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormat { get; private set; }
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        public ResponseFormat ResponseFormat { get; private set; }
 
         public static implicit operator string(RunResponse run) => run?.ToString();
 

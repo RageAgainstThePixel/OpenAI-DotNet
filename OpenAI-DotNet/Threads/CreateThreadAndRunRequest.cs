@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -298,8 +299,8 @@ namespace OpenAI.Threads
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormat { get; private set; }
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        public ResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// The optional <see cref="CreateThreadRequest"/> options to use.

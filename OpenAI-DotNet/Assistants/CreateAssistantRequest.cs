@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -257,7 +258,8 @@ namespace OpenAI.Assistants
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        public ResponseFormatObject ResponseFormat { get; }
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        public ResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.

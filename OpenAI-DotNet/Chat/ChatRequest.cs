@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -256,7 +257,8 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        public ResponseFormatObject ResponseFormat { get; }
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        public ResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically,

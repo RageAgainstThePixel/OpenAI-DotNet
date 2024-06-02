@@ -6,6 +6,8 @@ namespace OpenAI
 {
     public enum ResponseFormat
     {
+        [EnumMember(Value = "auto")]
+        Auto = 0,
         [EnumMember(Value = "text")]
         Text,
         [EnumMember(Value = "json_object")]
