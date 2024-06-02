@@ -41,17 +41,17 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    if (toolChoice.Equals("none") ||
-                        toolChoice.Equals("required") ||
-                        toolChoice.Equals("auto"))
-                    {
-                        ToolChoice = toolChoice;
-                    }
-                    else
+                    if (!toolChoice.Equals("none") &&
+                        !toolChoice.Equals("required") &&
+                        !toolChoice.Equals("auto"))
                     {
                         var tool = toolList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice)) ??
                                    throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
                         ToolChoice = new { type = "function", function = new { name = tool.Function.Name } };
+                    }
+                    else
+                    {
+                        ToolChoice = toolChoice;
                     }
                 }
             }
