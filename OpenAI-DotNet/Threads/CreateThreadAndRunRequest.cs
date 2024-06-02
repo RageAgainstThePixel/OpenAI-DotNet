@@ -31,7 +31,7 @@ namespace OpenAI.Threads
                 request?.MaxPromptTokens,
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
-                request?.ToolChoice as string ?? (string)request?.ToolChoice?.funcion?.name,
+                request?.ToolChoice as string ?? (string)request?.ToolChoice?.function?.name,
                 request?.ResponseFormat ?? ChatResponseFormat.Auto)
         {
         }
