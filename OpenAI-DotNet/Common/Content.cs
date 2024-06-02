@@ -10,16 +10,22 @@ namespace OpenAI
     {
         public Content() { }
 
-        public Content(ImageUrl imageUrl)
-        {
-            Type = ContentType.ImageUrl;
-            ImageUrl = imageUrl;
-        }
-
         public Content(string input)
         {
             Type = ContentType.Text;
             Text = input;
+        }
+
+        public Content(TextContent textContent)
+        {
+            Type = ContentType.Text;
+            Text = textContent;
+        }
+
+        public Content(ImageUrl imageUrl)
+        {
+            Type = ContentType.ImageUrl;
+            ImageUrl = imageUrl;
         }
 
         public Content(ImageFile imageFile)
@@ -54,6 +60,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("text")]
+        [JsonConverter(typeof(StringOrObjectConverter<TextContent>))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public dynamic Text { get; private set; }
 
@@ -77,8 +84,8 @@ namespace OpenAI
             => Type switch
             {
                 ContentType.Text => Text?.ToString(),
-                ContentType.ImageUrl => ImageUrl.ToString(),
-                ContentType.ImageFile => ImageFile.ToString(),
+                ContentType.ImageUrl => ImageUrl?.ToString(),
+                ContentType.ImageFile => ImageFile?.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Type))
             };
     }

@@ -183,8 +183,9 @@ namespace OpenAI.Tests
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
                 new CreateAssistantRequest(
                     name: "Math Tutor",
-                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: Model.GPT4o));
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ResponseFormat.Json));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
@@ -277,10 +278,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var run = await testThread.CreateRunAsync(testAssistant);
+            var run = await testThread.CreateRunAsync(new CreateRunRequest(testAssistant));
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Queued);
-            await Task.Delay(10);
             run = await run.CancelAsync();
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Cancelling);

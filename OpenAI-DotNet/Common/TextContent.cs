@@ -8,7 +8,9 @@ namespace OpenAI
 {
     public class TextContent
     {
-        public TextContent(string value, IEnumerable<string> annotations = null)
+        public TextContent() { }
+
+        public TextContent(string value, IEnumerable<Annotation> annotations = null)
         {
             Value = value;
             Annotations = annotations?.ToList();
@@ -20,7 +22,8 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("annotations")]
-        public IReadOnlyList<string> Annotations { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyList<Annotation> Annotations { get; private set; }
 
         public static implicit operator TextContent(string value) => new(value);
 

@@ -2,7 +2,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Threads
+namespace OpenAI
 {
     public sealed class FilePath
     {

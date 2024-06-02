@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Assistants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -210,11 +211,21 @@ namespace OpenAI.Threads
         /// Create a run.
         /// </summary>
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>
-        /// <param name="assistantId">Id of the assistant to use for the run.</param>
+        /// <param name="assistant">The <see cref="AssistantResponse"/> to use for the run.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, string assistantId, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, new CreateRunRequest(assistantId), cancellationToken).ConfigureAwait(false);
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, CancellationToken cancellationToken = default)
+        {
+            var request = new CreateRunRequest(
+                assistant,
+                model: assistant.Model,
+                instructions: assistant.Instructions,
+                tools: assistant.Tools,
+                temperature: assistant.Temperature,
+                topP: assistant.TopP,
+                responseFormat: assistant.ResponseFormat);
+            return await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Gets the thread associated to the <see cref="RunResponse"/>.
