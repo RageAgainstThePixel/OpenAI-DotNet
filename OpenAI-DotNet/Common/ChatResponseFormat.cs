@@ -6,7 +6,6 @@ namespace OpenAI
 {
     public enum ChatResponseFormat
     {
-        [EnumMember(Value = "auto")]
         Auto = 0,
         [EnumMember(Value = "text")]
         Text,
