@@ -1038,7 +1038,7 @@ var messages = new List<Message>
     new Message(Role.System, "You are a helpful assistant designed to output JSON."),
     new Message(Role.User, "Who won the world series in 2020?"),
 };
-var chatRequest = new ChatRequest(messages, Model.GPT4o, responseFormat: ResponseFormat.Json);
+var chatRequest = new ChatRequest(messages, Model.GPT4o, responseFormat: ChatResponseFormat.Json);
 var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 
 foreach (var choice in response.Choices)
