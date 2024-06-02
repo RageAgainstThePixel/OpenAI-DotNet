@@ -5,17 +5,4 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    internal sealed class ResponseFormatObject
-    {
-        public ResponseFormatObject(ChatResponseFormat type) => Type = type;
-
-        [JsonInclude]
-        [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ChatResponseFormat>))]
-        public ChatResponseFormat Type { get; private set; }
-
-        public static implicit operator ResponseFormatObject(ChatResponseFormat type) => new(type);
-
-        public static implicit operator ChatResponseFormat(ResponseFormatObject format) => format.Type;
-    }
 }

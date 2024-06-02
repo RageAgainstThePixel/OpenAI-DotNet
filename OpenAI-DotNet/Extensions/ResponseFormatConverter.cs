@@ -8,6 +8,20 @@ namespace OpenAI.Extensions
 {
     internal sealed class ResponseFormatConverter : JsonConverter<ChatResponseFormat>
     {
+        private class ResponseFormatObject
+        {
+            public ResponseFormatObject(ChatResponseFormat type) => Type = type;
+
+            [JsonInclude]
+            [JsonPropertyName("type")]
+            [JsonConverter(typeof(JsonStringEnumConverter<ChatResponseFormat>))]
+            public ChatResponseFormat Type { get; private set; }
+
+            public static implicit operator ResponseFormatObject(ChatResponseFormat type) => new(type);
+
+            public static implicit operator ChatResponseFormat(ResponseFormatObject format) => format.Type;
+        }
+
         public override ChatResponseFormat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
@@ -35,7 +49,7 @@ namespace OpenAI.Extensions
             switch (value)
             {
                 case ChatResponseFormat.Auto:
-                    writer.WriteStringValue(value.ToString().ToLower());
+                    writer.WriteNullValue();
                     break;
                 case ChatResponseFormat.Text:
                     writer.WriteStartObject();
