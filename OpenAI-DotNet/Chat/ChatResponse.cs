@@ -77,22 +77,24 @@ namespace OpenAI.Chat
 
         internal void CopyFrom(ChatResponse other)
         {
-            if (!string.IsNullOrWhiteSpace(other?.Id))
+            if (other is null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
             {
                 Id = other.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.Object))
+            if (!string.IsNullOrWhiteSpace(other.Object))
             {
                 Object = other.Object;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.Model))
+            if (!string.IsNullOrWhiteSpace(other.Model))
             {
                 Model = other.Model;
             }
 
-            if (other?.Usage != null)
+            if (other.Usage != null)
             {
                 if (Usage == null)
                 {
@@ -104,7 +106,7 @@ namespace OpenAI.Chat
                 }
             }
 
-            if (other?.Choices is { Count: > 0 })
+            if (other.Choices is { Count: > 0 })
             {
                 choices ??= new List<Choice>();
 

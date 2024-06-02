@@ -27,8 +27,8 @@ namespace OpenAI.Extensions
                 case string stringValue:
                     writer.WriteStringValue(stringValue);
                     break;
-                case TextContent textContent:
-                    JsonSerializer.Serialize(writer, textContent, options);
+                case T @object:
+                    JsonSerializer.Serialize(writer, @object, options);
                     break;
                 default:
                     throw new JsonException($"Unexpected value type: {value.GetType()}");
