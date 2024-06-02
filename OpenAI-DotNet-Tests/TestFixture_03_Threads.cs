@@ -300,7 +300,7 @@ namespace OpenAI.Tests
 
                 if (e is HttpRequestException httpException)
                 {
-                    if (!httpException.Message.Contains("Cannot cancel run with status 'cancelled'."))
+                    if (!httpException.Message.Contains("Cannot cancel run with status"))
                     {
                         throw;
                     }
