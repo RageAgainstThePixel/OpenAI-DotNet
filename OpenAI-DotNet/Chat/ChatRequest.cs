@@ -46,7 +46,7 @@ namespace OpenAI.Chat
                         !toolChoice.Equals("auto"))
                     {
                         var tool = toolList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice)) ??
-                                   throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
+                            throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
                         ToolChoice = new { type = "function", function = new { name = tool.Function.Name } };
                     }
                     else
