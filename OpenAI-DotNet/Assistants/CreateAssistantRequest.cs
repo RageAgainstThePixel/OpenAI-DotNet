@@ -77,7 +77,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -170,7 +170,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             Name = name;
@@ -259,6 +259,7 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ChatResponseFormat ResponseFormat { get; }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -135,7 +135,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -258,6 +258,7 @@ namespace OpenAI.Chat
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ChatResponseFormat ResponseFormat { get; }
 
         /// <summary>
