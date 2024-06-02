@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace OpenAI
 {
-    public enum ResponseFormat
+    public enum ChatResponseFormat
     {
         [EnumMember(Value = "auto")]
         Auto = 0,

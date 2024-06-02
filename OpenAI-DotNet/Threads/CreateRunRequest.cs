@@ -36,7 +36,7 @@ namespace OpenAI.Threads
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
                 request?.ToolChoice as string ?? (string)request?.ToolChoice?.funcion?.name,
-                request?.ResponseFormat ?? OpenAI.ResponseFormat.Text)
+                request?.ResponseFormat ?? ChatResponseFormat.Text)
         {
         }
 
@@ -131,7 +131,7 @@ namespace OpenAI.Threads
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
             string toolChoice = null,
-            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         {
             AssistantId = assistantId;
             Model = model;
@@ -287,7 +287,7 @@ namespace OpenAI.Threads
 
         /// <summary>
         /// An object specifying the format that the model must output.
-        /// Setting to <see cref="ResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -299,6 +299,6 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        public ResponseFormat ResponseFormat { get; private set; }
+        public ChatResponseFormat ResponseFormat { get; private set; }
     }
 }

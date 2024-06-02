@@ -7,15 +7,15 @@ namespace OpenAI
 {
     internal sealed class ResponseFormatObject
     {
-        public ResponseFormatObject(ResponseFormat type) => Type = type;
+        public ResponseFormatObject(ChatResponseFormat type) => Type = type;
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ResponseFormat>))]
-        public ResponseFormat Type { get; private set; }
+        [JsonConverter(typeof(JsonStringEnumConverter<ChatResponseFormat>))]
+        public ChatResponseFormat Type { get; private set; }
 
-        public static implicit operator ResponseFormatObject(ResponseFormat type) => new(type);
+        public static implicit operator ResponseFormatObject(ChatResponseFormat type) => new(type);
 
-        public static implicit operator ResponseFormat(ResponseFormatObject format) => format.Type;
+        public static implicit operator ChatResponseFormat(ResponseFormatObject format) => format.Type;
     }
 }

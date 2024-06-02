@@ -186,7 +186,7 @@ namespace OpenAI.Tests
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
                     model: Model.GPT4o,
-                    responseFormat: ResponseFormat.Json));
+                    responseFormat: ChatResponseFormat.Json));
             Assert.NotNull(assistant);
             testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();

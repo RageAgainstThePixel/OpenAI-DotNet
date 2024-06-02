@@ -238,7 +238,7 @@ namespace OpenAI.Threads
 
         /// <summary>
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -251,7 +251,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        public ResponseFormat ResponseFormat { get; private set; }
+        public ChatResponseFormat ResponseFormat { get; private set; }
 
         public static implicit operator string(RunResponse run) => run?.ToString();
 

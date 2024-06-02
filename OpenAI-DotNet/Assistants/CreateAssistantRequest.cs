@@ -58,7 +58,7 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
         /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
         /// for example via your system message. If you don't do this, the model may generate an unending stream of
@@ -77,7 +77,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -152,7 +152,7 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
         /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
         /// for example via your system message. If you don't do this, the model may generate an unending stream of
@@ -170,7 +170,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ResponseFormat responseFormat = OpenAI.ResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             Name = name;
@@ -247,7 +247,7 @@ namespace OpenAI.Assistants
 
         /// <summary>
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -259,7 +259,7 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        public ResponseFormat ResponseFormat { get; }
+        public ChatResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
