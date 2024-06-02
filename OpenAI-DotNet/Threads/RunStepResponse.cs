@@ -97,10 +97,18 @@ namespace OpenAI.Threads
         public int? ExpiredAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
+        [Obsolete("use ExpiredAtUnixTimeSeconds")]
+        public int? ExpiresAtUnitTimeSeconds => ExpiredAtUnixTimeSeconds;
+
+        [JsonIgnore]
         public DateTime? ExpiredAt
             => ExpiredAtUnixTimeSeconds.HasValue
                 ? DateTimeOffset.FromUnixTimeSeconds(ExpiredAtUnixTimeSeconds.Value).DateTime
                 : null;
+
+        [JsonIgnore]
+        [Obsolete("Use ExpiredAt")]
+        public DateTime? ExpiresAt => ExpiredAt;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was cancelled.

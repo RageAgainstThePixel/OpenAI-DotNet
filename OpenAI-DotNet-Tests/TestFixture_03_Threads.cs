@@ -405,6 +405,7 @@ namespace OpenAI.Tests
             foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
             {
                 Assert.IsNotNull(message);
+                Assert.IsNotEmpty(message.Content);
                 Console.WriteLine($"{message.Role}: {message.PrintContent()}");
             }
         }

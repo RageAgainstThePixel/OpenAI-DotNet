@@ -9,26 +9,13 @@ namespace OpenAI.Extensions
     internal sealed class StringOrObjectConverter<T> : JsonConverter<dynamic>
     {
         public override dynamic Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            try
+            => reader.TokenType switch
             {
-                switch (reader.TokenType)
-                {
-                    case JsonTokenType.Null:
-                        return null;
-                    case JsonTokenType.String:
-                        return reader.GetString();
-                    case JsonTokenType.StartObject:
-                        return JsonSerializer.Deserialize<T>(ref reader, options);
-                    default:
-                        throw new JsonException($"Unexpected token type: {reader.TokenType}");
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error reading {typeof(T).Name} from JSON.", e);
-            }
-        }
+                JsonTokenType.Null => null,
+                JsonTokenType.String => reader.GetString(),
+                JsonTokenType.StartObject => JsonSerializer.Deserialize<T>(ref reader, options),
+                _ => throw new JsonException($"Unexpected token type: {reader.TokenType}")
+            };
 
         public override void Write(Utf8JsonWriter writer, dynamic value, JsonSerializerOptions options)
         {
