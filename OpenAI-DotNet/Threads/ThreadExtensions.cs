@@ -132,7 +132,7 @@ namespace OpenAI.Threads
 
         #endregion Messages
 
-        #region Files
+        #region Files (Obsolete)
 
         /// <summary>
         /// Returns a list of message files.
@@ -142,7 +142,7 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        [Obsolete]
+        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
         public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this ThreadResponse thread, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
             => await thread.Client.ThreadsEndpoint.ListFilesAsync(thread.Id, messageId, query, cancellationToken).ConfigureAwait(false);
 
@@ -153,7 +153,7 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        [Obsolete]
+        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
         public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this MessageResponse message, ListQuery query = null, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id, query, cancellationToken).ConfigureAwait(false);
 
@@ -164,36 +164,11 @@ namespace OpenAI.Threads
         /// <param name="fileId">The id of the file being retrieved.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageFileResponse"/>.</returns>
-        [Obsolete]
+        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
         public static async Task<MessageFileResponse> RetrieveFileAsync(this MessageResponse message, string fileId, CancellationToken cancellationToken = default)
             => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message.ThreadId, message.Id, fileId, cancellationToken).ConfigureAwait(false);
 
-        // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-        ///// <summary>
-        ///// Downloads a message file content to local disk.
-        ///// </summary>
-        ///// <param name="message"><see cref="MessageResponse"/>.</param>
-        ///// <param name="fileId">The id of the file being retrieved.</param>
-        ///// <param name="directory">Directory to save the file content.</param>
-        ///// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
-        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        ///// <returns>Path to the downloaded file content.</returns>
-        //public static async Task<string> DownloadFileContentAsync(this MessageResponse message, string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-        //    => await message.Client.FilesEndpoint.DownloadFileAsync(fileId, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
-
-        // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-        ///// <summary>
-        ///// Downloads a message file content to local disk.
-        ///// </summary>
-        ///// <param name="file"><see cref="MessageFileResponse"/>.</param>
-        ///// <param name="directory">Directory to save the file content.</param>
-        ///// <param name="deleteCachedFile">Optional, delete cached file. Defaults to false.</param>
-        ///// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        ///// <returns>Path to the downloaded file content.</returns>
-        //public static async Task<string> DownloadContentAsync(this MessageFileResponse file, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
-        //    => await file.Client.FilesEndpoint.DownloadFileAsync(file.Id, directory, deleteCachedFile, cancellationToken).ConfigureAwait(false);
-
-        #endregion Files
+        #endregion Files (Obsolete)
 
         #region Runs
 

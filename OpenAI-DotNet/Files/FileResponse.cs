@@ -59,7 +59,7 @@ namespace OpenAI.Files
         [JsonPropertyName("purpose")]
         public string Purpose { get; private set; }
 
-        public static implicit operator string(FileResponse file) => file?.ToString();
+        public static implicit operator string(FileResponse fileData) => fileData.Id;
 
         public override string ToString() => Id;
     }

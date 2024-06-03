@@ -68,9 +68,6 @@ namespace OpenAI.Threads
         /// <summary>
         /// The role of the entity that is creating the message.
         /// </summary>
-        /// <remarks>
-        /// Currently only user is supported.
-        /// </remarks>
         [JsonPropertyName("role")]
         public Role Role { get; }
 

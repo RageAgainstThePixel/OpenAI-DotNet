@@ -9,7 +9,7 @@ namespace OpenAI
     {
         public Usage() { }
 
-        public Usage(int promptTokens, int completionTokens, int totalTokens)
+        public Usage(int? promptTokens, int? completionTokens, int? totalTokens)
         {
             PromptTokens = promptTokens;
             CompletionTokens = completionTokens;

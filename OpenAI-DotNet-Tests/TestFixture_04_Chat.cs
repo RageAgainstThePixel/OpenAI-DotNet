@@ -443,7 +443,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_02_GetChatLogProbsSteaming()
+        public async Task Test_04_02_GetChatLogProbsStreaming()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>

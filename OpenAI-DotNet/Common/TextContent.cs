@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public class TextContent
+    public sealed class TextContent
     {
         public TextContent() { }
 
@@ -16,10 +16,16 @@ namespace OpenAI
             Annotations = annotations?.ToList();
         }
 
+        /// <summary>
+        /// The data that makes up the text.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("value")]
         public string Value { get; private set; }
 
+        /// <summary>
+        /// Annotations
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("annotations")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

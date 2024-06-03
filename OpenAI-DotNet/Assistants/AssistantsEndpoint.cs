@@ -84,7 +84,7 @@ namespace OpenAI.Assistants
             return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
 
-        #region Files
+        #region Files (Obsolete)
 
         /// <summary>
         /// Returns a list of assistant files.
@@ -160,6 +160,6 @@ namespace OpenAI.Assistants
             return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
         }
 
-        #endregion Files
+        #endregion Files (Obsolete)
     }
 }

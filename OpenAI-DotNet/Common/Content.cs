@@ -10,10 +10,9 @@ namespace OpenAI
     {
         public Content() { }
 
-        public Content(string input)
+        public Content(string text)
+            : this(ContentType.Text, text)
         {
-            Type = ContentType.Text;
-            Text = input;
         }
 
         public Content(TextContent textContent)
@@ -56,6 +55,7 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter<ContentType>))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public ContentType Type { get; private set; }
 
         [JsonInclude]
@@ -87,6 +87,6 @@ namespace OpenAI
                 ContentType.ImageUrl => ImageUrl?.ToString(),
                 ContentType.ImageFile => ImageFile?.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Type))
-            };
+            } ?? string.Empty;
     }
 }

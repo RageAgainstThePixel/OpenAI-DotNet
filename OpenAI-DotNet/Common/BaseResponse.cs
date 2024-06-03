@@ -40,7 +40,6 @@ namespace OpenAI
         /// <summary>
         /// The maximum number of requests that are permitted before exhausting the rate limit.
         /// </summary>
-
         [JsonIgnore]
         public int? LimitRequests { get; internal set; }
 
