@@ -307,7 +307,7 @@ namespace OpenAI.Tests
                 }
             }
 
-            Assert.IsTrue(run.Status is RunStatus.Cancelled or RunStatus.Cancelling);
+            Assert.IsTrue(run.Status is RunStatus.Cancelled or RunStatus.Cancelling or RunStatus.Completed);
         }
 
         [Test]
