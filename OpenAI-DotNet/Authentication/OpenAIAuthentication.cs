@@ -11,9 +11,11 @@ namespace OpenAI
     /// </summary>
     public sealed class OpenAIAuthentication
     {
+        internal const string CONFIG_FILE = ".openai";
         private const string OPENAI_KEY = nameof(OPENAI_KEY);
         private const string OPENAI_API_KEY = nameof(OPENAI_API_KEY);
         private const string OPENAI_SECRET_KEY = nameof(OPENAI_SECRET_KEY);
+        private const string OPENAI_PROJECT_ID = nameof(OPENAI_PROJECT_ID);
         private const string OPEN_AI_PROJECT_ID = nameof(OPEN_AI_PROJECT_ID);
         private const string TEST_OPENAI_SECRET_KEY = nameof(TEST_OPENAI_SECRET_KEY);
         private const string OPENAI_ORGANIZATION_ID = nameof(OPENAI_ORGANIZATION_ID);
@@ -131,6 +133,11 @@ namespace OpenAI
 
             var projectId = Environment.GetEnvironmentVariable(OPEN_AI_PROJECT_ID);
 
+            if (string.IsNullOrWhiteSpace(projectId))
+            {
+                projectId = Environment.GetEnvironmentVariable(OPENAI_PROJECT_ID);
+            }
+
             return string.IsNullOrEmpty(apiKey) ? null : new OpenAIAuthentication(apiKey, organizationId, projectId);
         }
 
@@ -164,7 +171,7 @@ namespace OpenAI
         /// or <see langword="null"/> if it was not successful in finding a config
         /// (or if the config file didn't contain correctly formatted API keys)
         /// </returns>
-        public static OpenAIAuthentication LoadFromDirectory(string directory = null, string filename = ".openai", bool searchUp = true)
+        public static OpenAIAuthentication LoadFromDirectory(string directory = null, string filename = CONFIG_FILE, bool searchUp = true)
         {
             if (string.IsNullOrWhiteSpace(directory))
             {
@@ -217,6 +224,7 @@ namespace OpenAI
                                 case OPENAI_ORGANIZATION_ID:
                                     organization = nextPart.Trim();
                                     break;
+                                case OPENAI_PROJECT_ID:
                                 case OPEN_AI_PROJECT_ID:
                                     projectId = nextPart.Trim();
                                     break;
