@@ -251,6 +251,11 @@ namespace OpenAI
                 client.DefaultRequestHeaders.Add("OpenAI-Organization", OpenAIAuthentication.OrganizationId);
             }
 
+            if (!string.IsNullOrWhiteSpace(OpenAIAuthentication.ProjectId))
+            {
+                client.DefaultRequestHeaders.Add("OpenAI-Project", OpenAIAuthentication.ProjectId);
+            }
+
             return client;
         }
     }

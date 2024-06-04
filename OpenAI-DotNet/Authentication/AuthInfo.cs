@@ -8,11 +8,12 @@ namespace OpenAI
     internal class AuthInfo
     {
         internal const string SecretKeyPrefix = "sk-";
+        internal const string ProjectPrefix = "proj_";
         internal const string SessionKeyPrefix = "sess-";
         internal const string OrganizationPrefix = "org-";
 
         [JsonConstructor]
-        public AuthInfo(string apiKey, string organizationId = null)
+        public AuthInfo(string apiKey, string organizationId = null, string projectId = null)
         {
             ApiKey = apiKey;
 
@@ -25,6 +26,16 @@ namespace OpenAI
 
                 OrganizationId = organizationId;
             }
+
+            if (!string.IsNullOrWhiteSpace(projectId))
+            {
+                if (!projectId.Contains(ProjectPrefix))
+                {
+                    throw new InvalidCredentialException($"{nameof(projectId)} must start with '{ProjectPrefix}'");
+                }
+
+                ProjectId = projectId;
+            }
         }
 
         [JsonPropertyName("apiKey")]
@@ -32,5 +43,8 @@ namespace OpenAI
 
         [JsonPropertyName("organization")]
         public string OrganizationId { get; }
+
+        [JsonPropertyName("project")]
+        public string ProjectId { get; }
     }
 }
