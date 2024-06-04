@@ -42,7 +42,7 @@ Install-Package OpenAI-DotNet
 
 ### Table of Contents
 
-- [Authentication](#authentication)
+- [Authentication](#authentication) :new: :warning: :construction:
 - [OpenAIClient](#handling-openaiclient-and-httpclient-lifecycle)
 - [Azure OpenAI](#azure-openai)
   - [Azure Active Directory Authentication](#azure-active-directory-authentication)
@@ -51,7 +51,7 @@ Install-Package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Assistants](#assistants) :warning: :construction:
+- [Assistants](#assistants) :new: :warning: :construction:
   - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant)
   - [Retrieve Assistant](#retrieve-assistant)
@@ -63,7 +63,7 @@ Install-Package OpenAI-DotNet
   - [Retrieve File from Assistant](#retrieve-file-from-assistant)
   - [Remove File from Assistant](#remove-file-from-assistant)
   - [Delete File from Assistant](#delete-file-from-assistant)
-- [Threads](#threads) :warning: :construction:
+- [Threads](#threads) :new: :warning: :construction:
   - [Create Thread](#create-thread)
   - [Create Thread and Run](#create-thread-and-run)
   - [Retrieve Thread](#retrieve-thread)
@@ -129,7 +129,8 @@ You use the `OpenAIAuthentication` when you initialize the API as shown:
 
 #### Pass keys directly with constructor
 
-:warning: We recommended using the environment variables to load the API key instead of having it hard coded in your source. It is not recommended use this method in production, but only for accepting user credentials, local testing and quick start scenarios.
+> [!WARNING]
+> We recommended using the environment variables to load the API key instead of having it hard coded in your source. It is not recommended use this method in production, but only for accepting user credentials, local testing and quick start scenarios.
 
 ```csharp
 using var api = new OpenAIClient("sk-apiKey");
@@ -138,7 +139,7 @@ using var api = new OpenAIClient("sk-apiKey");
 Or create a `OpenAIAuthentication` object manually
 
 ```csharp
-using var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId"));
+using var api = new OpenAIClient(new OpenAIAuthentication("sk-apiKey", "org-yourOrganizationId", "proj_yourProjectId"));
 ```
 
 #### Load key from configuration file
@@ -147,22 +148,25 @@ Attempts to load api keys from a configuration file, by default `.openai` in the
 
 To create a configuration file, create a new text file named `.openai` and containing the line:
 
-> Organization entry is optional.
+> [!NOTE]
+> Organization and project ids entry is optional.
 
 ##### Json format
 
 ```json
 {
   "apiKey": "sk-aaaabbbbbccccddddd",
-  "organization": "org-yourOrganizationId"
+  "organizationId": "org-yourOrganizationId",
+  "projectId": "proj_yourProjectId"
 }
 ```
 
 ##### Deprecated format
 
 ```shell
-OPENAI_KEY=sk-aaaabbbbbccccddddd
-ORGANIZATION=org-yourOrganizationId
+OPENAI_API_KEY=sk-aaaabbbbbccccddddd
+OPENAI_ORGANIZATION_ID=org-yourOrganizationId
+OPENAI_PROJECT_ID=proj_yourProjectId
 ```
 
 You can also load the configuration file directly with known path by calling static methods in `OpenAIAuthentication`:
@@ -185,6 +189,7 @@ Use your system's environment variables specify an api key and organization to u
 
 - Use `OPENAI_API_KEY` for your api key.
 - Use `OPENAI_ORGANIZATION_ID` to specify an organization.
+- Use `OPENAI_PROJECT_ID` to specify a project.
 
 ```csharp
 using var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
@@ -380,7 +385,8 @@ Assert.IsTrue(isDeleted);
 
 ### [Assistants](https://platform.openai.com/docs/api-reference/assistants)
 
-> :warning: Beta Feature
+> [!WARNING]
+> Beta Feature. API subject to breaking changes.
 
 Build assistants that can call models and use tools to perform tasks.
 
@@ -533,7 +539,8 @@ Assert.IsTrue(isDeleted);
 
 ### [Threads](https://platform.openai.com/docs/api-reference/threads)
 
-> :warning: Beta Feature
+> [!WARNING]
+> Beta Feature. API subject to breaking changes.
 
 Create Threads that [Assistants](#assistants) can interact with.
 
@@ -1004,7 +1011,8 @@ foreach (var toolCall in response.FirstChoice.Message.ToolCalls)
 
 #### [Chat Vision](https://platform.openai.com/docs/guides/vision)
 
-> :warning: Beta Feature
+> [!WARNING]
+> Beta Feature. API subject to breaking changes.
 
 ```csharp
 using var api = new OpenAIClient();
@@ -1024,13 +1032,14 @@ Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.M
 
 #### [Chat Json Mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
 
-> :warning: Beta Feature
+> [!WARNING]
+> Beta Feature. API subject to breaking changes.
 
-Important notes:
-
-- When using JSON mode, always instruct the model to produce JSON via some message in the conversation, for example via your system message. If you don't include an explicit instruction to generate JSON, the model may generate an unending stream of whitespace and the request may run continually until it reaches the token limit. To help ensure you don't forget, the API will throw an error if the string "JSON" does not appear somewhere in the context.
-- The JSON in the message the model returns may be partial (i.e. cut off) if `finish_reason` is length, which indicates the generation exceeded max_tokens or the conversation exceeded the token limit. To guard against this, check `finish_reason` before parsing the response.
-- JSON mode will not guarantee the output matches any specific schema, only that it is valid and parses without errors.
+> [!IMPORTANT]
+>
+> - When using JSON mode, always instruct the model to produce JSON via some message in the conversation, for example via your system message. If you don't include an explicit instruction to generate JSON, the model may generate an unending stream of whitespace and the request may run continually until it reaches the token limit. To help ensure you don't forget, the API will throw an error if the string "JSON" does not appear somewhere in the context.
+> - The JSON in the message the model returns may be partial (i.e. cut off) if `finish_reason` is length, which indicates the generation exceeded max_tokens or the conversation exceeded the token limit. To guard against this, check `finish_reason` before parsing the response.
+> - JSON mode will not guarantee the output matches any specific schema, only that it is valid and parses without errors.
 
 ```csharp
 var messages = new List<Message>
