@@ -121,7 +121,7 @@ Install-Package OpenAI-DotNet
 
 There are 3 ways to provide your API keys, in order of precedence:
 
-1. [Pass keys directly with constructor](#pass-keys-directly-with-constructor)
+1. [Pass keys directly with constructor](#pass-keys-directly-with-constructor) :warning:
 2. [Load key from configuration file](#load-key-from-configuration-file)
 3. [Use System Environment Variables](#use-system-environment-variables)
 
@@ -149,7 +149,7 @@ Attempts to load api keys from a configuration file, by default `.openai` in the
 To create a configuration file, create a new text file named `.openai` and containing the line:
 
 > [!NOTE]
-> Organization and project ids entry is optional.
+> Organization and project id entries are optional.
 
 ##### Json format
 
