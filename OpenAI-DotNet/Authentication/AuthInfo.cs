@@ -44,7 +44,7 @@ namespace OpenAI
         [JsonPropertyName("organization")]
         public string OrganizationId { get; }
 
-        [JsonPropertyName("project")]
+        [JsonPropertyName("projectId")]
         public string ProjectId { get; }
     }
 }
