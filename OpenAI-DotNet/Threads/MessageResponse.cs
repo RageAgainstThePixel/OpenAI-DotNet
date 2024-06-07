@@ -15,6 +15,10 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class MessageResponse : BaseResponse, IStreamEvent
     {
+        public MessageResponse() { }
+
+        internal MessageResponse(MessageResponse other) => CopyFrom(other);
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -154,5 +158,10 @@ namespace OpenAI.Threads
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
         public string PrintContent()
             => string.Join("\n", Content.Select(content => content?.ToString()));
+
+        internal void CopyFrom(MessageResponse partialMessage)
+        {
+            // TODO Implement
+        }
     }
 }

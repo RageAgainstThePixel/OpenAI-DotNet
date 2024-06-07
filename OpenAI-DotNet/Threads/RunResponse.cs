@@ -14,9 +14,9 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class RunResponse : BaseResponse, IStreamEvent
     {
-        internal RunResponse(RunResponse other) => CopyFrom(other);
-
         public RunResponse() { }
+
+        internal RunResponse(RunResponse other) => CopyFrom(other);
 
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.

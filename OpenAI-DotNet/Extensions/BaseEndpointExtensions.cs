@@ -100,7 +100,6 @@ namespace OpenAI.Extensions
                             previousEvent[nameof(data)] = eventObject[type];
                             var eventData = JsonSerializer.Serialize(previousEvent, sseJsonOptions);
                             eventCallback?.Invoke(response, eventData);
-                            Console.WriteLine(eventData);
                             events.Push(previousEvent);
                         }
                         else
@@ -109,7 +108,6 @@ namespace OpenAI.Extensions
                             {
                                 var eventData = JsonSerializer.Serialize(eventObject, sseJsonOptions);
                                 eventCallback?.Invoke(response, eventData);
-                                Console.WriteLine(eventData);
                             }
 
                             events.Push(eventObject);

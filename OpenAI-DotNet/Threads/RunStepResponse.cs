@@ -14,6 +14,10 @@ namespace OpenAI.Threads
     /// </summary>
     public sealed class RunStepResponse : BaseResponse, IStreamEvent
     {
+        public RunStepResponse() { }
+
+        internal RunStepResponse(RunStepResponse other) => CopyFrom(other);
+
         /// <summary>
         /// The identifier of the run step, which can be referenced in API endpoints.
         /// </summary>
@@ -168,5 +172,10 @@ namespace OpenAI.Threads
         public static implicit operator string(RunStepResponse runStep) => runStep?.ToString();
 
         public override string ToString() => Id;
+
+        internal void CopyFrom(RunStepResponse partialRunStep)
+        {
+            // TODO implement
+        }
     }
 }

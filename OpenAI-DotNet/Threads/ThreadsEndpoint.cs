@@ -230,6 +230,8 @@ namespace OpenAI.Threads
 
             runRequest.Stream = true;
             RunResponse run = null;
+            RunStepResponse runStep = null;
+            MessageResponse message = null;
             using var payload = JsonSerializer.Serialize(runRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
 
             using var response = await this.StreamEventsAsync(GetUrl($"/{threadId}/runs"), payload, (eventResponse, eventData) =>
@@ -249,22 +251,52 @@ namespace OpenAI.Threads
 
                 if (@event.StartsWith("thread.run.step"))
                 {
-                    var runStep = eventResponse.Deserialize<RunStepResponse>(data, client);
-                    eventHandler?.Invoke(runStep);
+                    var partialRunStep = eventResponse.Deserialize<RunStepResponse>(data, client);
+
+                    if (runStep == null)
+                    {
+                        runStep = new RunStepResponse(partialRunStep);
+                    }
+                    else
+                    {
+                        runStep.CopyFrom(partialRunStep);
+                    }
+
+                    eventHandler?.Invoke(partialRunStep);
                     return;
                 }
 
                 if (@event.StartsWith("thread.run"))
                 {
-                    run = eventResponse.Deserialize<RunResponse>(data, client);
-                    eventHandler?.Invoke(run);
+                    var partialRun = eventResponse.Deserialize<RunResponse>(data, client);
+
+                    if (run == null)
+                    {
+                        run = new RunResponse(partialRun);
+                    }
+                    else
+                    {
+                        run.CopyFrom(partialRun);
+                    }
+
+                    eventHandler?.Invoke(partialRun);
                     return;
                 }
 
                 if (@event.StartsWith("thread.message"))
                 {
-                    var message = eventResponse.Deserialize<MessageResponse>(data, client);
-                    eventHandler?.Invoke(message);
+                    var partialMessage = eventResponse.Deserialize<MessageResponse>(data, client);
+
+                    if (message == null)
+                    {
+                        message = new MessageResponse(partialMessage);
+                    }
+                    else
+                    {
+                        message.CopyFrom(partialMessage);
+                    }
+
+                    eventHandler?.Invoke(partialMessage);
                     return;
                 }
 
