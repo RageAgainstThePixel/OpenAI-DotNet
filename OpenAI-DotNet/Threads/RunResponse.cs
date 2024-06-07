@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -163,12 +164,18 @@ namespace OpenAI.Threads
         [JsonPropertyName("instructions")]
         public string Instructions { get; private set; }
 
+        private List<Tool> tools;
+
         /// <summary>
         /// The list of tools that the assistant used for this run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<Tool> Tools { get; private set; }
+        public IReadOnlyList<Tool> Tools
+        {
+            get => tools;
+            private set => tools = value?.ToList();
+        }
 
         /// <summary>
         /// The list of File IDs the assistant used for this run.
@@ -222,7 +229,7 @@ namespace OpenAI.Threads
         public int? MaxCompletionTokens { get; private set; }
 
         /// <summary>
-        /// Controls for how a thread will be truncated prior to the run. Use this to control the intial context window of the run.
+        /// Controls for how a thread will be truncated prior to the run. Use this to control the initial context window of the run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("truncation_strategy")]
@@ -276,28 +283,133 @@ namespace OpenAI.Threads
             }
 
             CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
-            ThreadId = other.ThreadId;
-            AssistantId = other.AssistantId;
+
+            if (!string.IsNullOrWhiteSpace(other.ThreadId))
+            {
+                ThreadId = other.ThreadId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.AssistantId))
+            {
+                AssistantId = other.AssistantId;
+            }
+
             Status = other.Status;
-            RequiredAction = other.RequiredAction;
-            LastError = other.LastError;
-            ExpiresAtUnixTimeSeconds = other.ExpiresAtUnixTimeSeconds;
-            StartedAtUnixTimeSeconds = other.StartedAtUnixTimeSeconds;
-            CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
-            FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
-            CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
-            IncompleteDetails = other.IncompleteDetails;
-            Model = other.Model;
-            Instructions = other.Instructions;
-            Tools = other.Tools;
-            Metadata = other.Metadata;
-            Usage = other.Usage;
-            Temperature = other.Temperature;
-            TopP = other.TopP;
-            MaxPromptTokens = other.MaxPromptTokens;
-            MaxCompletionTokens = other.MaxCompletionTokens;
-            TruncationStrategy = other.TruncationStrategy;
-            ToolChoice = other.ToolChoice;
+
+            if (other.RequiredAction != null)
+            {
+                RequiredAction = other.RequiredAction;
+            }
+
+            if (other.LastError != null)
+            {
+                LastError = other.LastError;
+            }
+
+            if (other.ExpiresAtUnixTimeSeconds.HasValue)
+            {
+                ExpiresAtUnixTimeSeconds = other.ExpiresAtUnixTimeSeconds;
+            }
+
+            if (other.StartedAtUnixTimeSeconds.HasValue)
+            {
+                StartedAtUnixTimeSeconds = other.StartedAtUnixTimeSeconds;
+            }
+
+            if (other.CancelledAtUnixTimeSeconds.HasValue)
+            {
+                CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
+            }
+
+            if (other.FailedAtUnixTimeSeconds.HasValue)
+            {
+                FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.IncompleteDetails != null)
+            {
+                IncompleteDetails = other.IncompleteDetails;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Model))
+            {
+                Model = other.Model;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Instructions))
+            {
+                Instructions = other.Instructions;
+            }
+
+            if (other is { Tools: not null })
+            {
+                tools ??= new List<Tool>();
+
+                foreach (var otherTool in other.Tools)
+                {
+                    if (otherTool == null) { continue; }
+
+                    if (otherTool.Index.HasValue)
+                    {
+                        if (otherTool.Index + 1 > Tools.Count)
+                        {
+                            tools.Insert(otherTool.Index.Value, new Tool(otherTool));
+                        }
+
+                        tools[otherTool.Index.Value].CopyFrom(otherTool);
+                    }
+                    else
+                    {
+                        tools.Add(new Tool(otherTool));
+                    }
+                }
+            }
+
+            if (other.Metadata is { Count: > 0 })
+            {
+                Metadata = other.Metadata;
+            }
+
+            if (other.Usage != null)
+            {
+                Usage = other.Usage;
+            }
+
+            if (other.Temperature.HasValue)
+            {
+                Temperature = other.Temperature;
+            }
+
+            if (other.TopP.HasValue)
+            {
+                TopP = other.TopP;
+            }
+
+            if (other.MaxPromptTokens.HasValue)
+            {
+                MaxPromptTokens = other.MaxPromptTokens;
+            }
+
+            if (other.MaxCompletionTokens.HasValue)
+            {
+                MaxCompletionTokens = other.MaxCompletionTokens;
+            }
+
+            if (other.TruncationStrategy != null)
+            {
+                TruncationStrategy = other.TruncationStrategy;
+            }
+
+            if (other.ToolChoice != null)
+            {
+                ToolChoice = other.ToolChoice;
+            }
+
             ResponseFormat = other.ResponseFormat;
         }
     }

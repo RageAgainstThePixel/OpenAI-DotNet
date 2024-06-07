@@ -173,9 +173,82 @@ namespace OpenAI.Threads
 
         public override string ToString() => Id;
 
-        internal void CopyFrom(RunStepResponse partialRunStep)
+        internal void CopyFrom(RunStepResponse other)
         {
-            // TODO implement
+            if (other == null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
+            {
+                Id = other.Id;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Object))
+            {
+                Object = other.Object;
+            }
+
+            if (other.CreatedAtUnixTimeSeconds.HasValue)
+            {
+                CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.AssistantId))
+            {
+                AssistantId = other.AssistantId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.ThreadId))
+            {
+                ThreadId = other.ThreadId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.RunId))
+            {
+                RunId = other.RunId;
+            }
+
+            Type = other.Type;
+            Status = other.Status;
+
+            if (other.StepDetails != null)
+            {
+                StepDetails = other.StepDetails;
+            }
+
+            if (other.LastError != null)
+            {
+                LastError = other.LastError;
+            }
+
+            if (other.ExpiredAtUnixTimeSeconds.HasValue)
+            {
+                ExpiredAtUnixTimeSeconds = other.ExpiredAtUnixTimeSeconds;
+            }
+
+            if (other.CancelledAtUnixTimeSeconds.HasValue)
+            {
+                CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
+            }
+
+            if (other.FailedAtUnixTimeSeconds.HasValue)
+            {
+                FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.Metadata is { Count: > 0 })
+            {
+                Metadata = new Dictionary<string, string>(other.Metadata);
+            }
+
+            if (other.Usage != null)
+            {
+                Usage = other.Usage;
+            }
         }
     }
 }
