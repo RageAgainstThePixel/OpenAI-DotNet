@@ -58,11 +58,15 @@ namespace OpenAI.Extensions
                         string data;
 
                         const string comment = nameof(comment);
-                        type = TrimStart(match.Groups[nameof(type)].Value);
+                        const string eventMessage = "event";
+                        const string doneMessage = "done";
+                        const string doneTag = "[DONE]";
+
+                        type = match.Groups[nameof(type)].Value;
                         // If the field type is not provided, treat it as a comment
                         type = string.IsNullOrEmpty(type) ? comment : type;
                         value = TrimStart(match.Groups[nameof(value)].Value);
-                        data = TrimStart(match.Groups[nameof(data)].Value);
+                        data = match.Groups[nameof(data)].Value;
 
                         string TrimStart(string input)
                         {
@@ -77,8 +81,8 @@ namespace OpenAI.Extensions
                             return input.Substring(start, end - start + 1);
                         }
 
-                        if ((type.Equals("event") && value.Equals("done") && data.Equals("[DONE]")) ||
-                            (type.Equals("data") && value.Equals("[DONE]")))
+                        if ((type.Equals(eventMessage) && value.Equals(doneMessage) && data.Equals(doneTag)) ||
+                            (type.Equals(nameof(data)) && value.Equals(doneTag)))
                         {
                             isEndOfStream = true;
                             break;
@@ -107,7 +111,7 @@ namespace OpenAI.Extensions
                             }
                         }
 
-                        if (type.Equals("data") && events.Count > 0 && events.Peek().ContainsKey("event"))
+                        if (type.Equals(nameof(data)) && events.Count > 0 && events.Peek().ContainsKey(eventMessage))
                         {
                             var previousEvent = events.Pop();
                             previousEvent[nameof(data)] = eventObject[type];
@@ -117,7 +121,7 @@ namespace OpenAI.Extensions
                         }
                         else
                         {
-                            if (!type.Equals("event"))
+                            if (!type.Equals(eventMessage))
                             {
                                 var eventData = JsonSerializer.Serialize(eventObject, sseJsonOptions);
                                 eventCallback?.Invoke(response, eventData);
