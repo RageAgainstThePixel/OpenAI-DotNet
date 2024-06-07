@@ -52,7 +52,6 @@ namespace OpenAI.Extensions
 
                     for (var i = 0; i < matches.Count; i++)
                     {
-                        Match match = matches[i];
                         string type;
                         string value;
                         string data;
@@ -62,24 +61,13 @@ namespace OpenAI.Extensions
                         const string doneMessage = "done";
                         const string doneTag = "[DONE]";
 
+                        Match match = matches[i];
                         type = match.Groups[nameof(type)].Value;
                         // If the field type is not provided, treat it as a comment
                         type = string.IsNullOrEmpty(type) ? comment : type;
-                        value = TrimStart(match.Groups[nameof(value)].Value);
+                        // The UTF-8 decode algorithm strips one leading UTF-8 Byte Order Mark (BOM), if any.
+                        value = match.Groups[nameof(value)].Value.TrimStart(' ');
                         data = match.Groups[nameof(data)].Value;
-
-                        string TrimStart(string input)
-                        {
-                            var start = 0;
-                            var end = input.Length - 1;
-
-                            while (start <= end && input[start] == ' ')
-                            {
-                                start++;
-                            }
-
-                            return input.Substring(start, end - start + 1);
-                        }
 
                         if ((type.Equals(eventMessage) && value.Equals(doneMessage) && data.Equals(doneTag)) ||
                             (type.Equals(nameof(data)) && value.Equals(doneTag)))
