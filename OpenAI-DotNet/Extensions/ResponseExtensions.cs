@@ -256,15 +256,13 @@ namespace OpenAI.Extensions
         {
             T result;
 
-            var json = jNode.ToString();
-
             try
             {
-                result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
+                result = jNode.Deserialize<T>(OpenAIClient.JsonSerializationOptions);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {json}\n{e}");
+                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {jNode.ToJsonString(debugJsonOptions)}\n{e}");
                 throw;
             }
 
