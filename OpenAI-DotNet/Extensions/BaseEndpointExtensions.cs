@@ -3,10 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -20,23 +18,17 @@ namespace OpenAI.Extensions
 
         private static Regex sseRegex = new(ssePattern);
 
-        private static JsonSerializerOptions sseJsonOptions = new()
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-
         /// <summary>
         /// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
         /// </summary>
-        public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Action<HttpResponseMessage, string> eventCallback, CancellationToken cancellationToken)
+        public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Action<HttpResponseMessage, ServerSentEvent> eventCallback, CancellationToken cancellationToken)
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Content = payload;
             var response = await baseEndpoint.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, payload, null, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            using var responseStream = baseEndpoint.EnableDebug ? new MemoryStream() : null;
-            var events = new Stack<Dictionary<string, object>>();
+            var events = new Stack<ServerSentEvent>();
             using var reader = new StreamReader(stream);
             var isEndOfStream = false;
 
@@ -44,93 +36,94 @@ namespace OpenAI.Extensions
             {
                 while (await reader.ReadLineAsync() is { } streamData)
                 {
-                    if (isEndOfStream) { break; }
+                    if (isEndOfStream)
+                    {
+                        break;
+                    }
+
                     cancellationToken.ThrowIfCancellationRequested();
-                    if (string.IsNullOrWhiteSpace(streamData)) { continue; }
+
+                    if (string.IsNullOrWhiteSpace(streamData))
+                    {
+                        continue;
+                    }
 
                     var matches = sseRegex.Matches(streamData);
 
                     for (var i = 0; i < matches.Count; i++)
                     {
-                        string type;
+                        ServerSentEventKind type;
                         string value;
                         string data;
 
-                        const string comment = nameof(comment);
-                        const string eventMessage = "event";
-                        const string doneMessage = "done";
-                        const string doneTag = "[DONE]";
-
                         Match match = matches[i];
-                        type = match.Groups[nameof(type)].Value;
+
                         // If the field type is not provided, treat it as a comment
-                        type = string.IsNullOrEmpty(type) ? comment : type;
+                        type = ServerSentEvent.EventMap.GetValueOrDefault(match.Groups[nameof(type)].Value.Trim(), ServerSentEventKind.Comment);
+
                         // The UTF-8 decode algorithm strips one leading UTF-8 Byte Order Mark (BOM), if any.
                         value = match.Groups[nameof(value)].Value.TrimStart(' ');
                         data = match.Groups[nameof(data)].Value;
 
-                        if ((type.Equals(eventMessage) && value.Equals(doneMessage) && data.Equals(doneTag)) ||
-                            (type.Equals(nameof(data)) && value.Equals(doneTag)))
+                        const string doneTag = "[DONE]";
+                        const string doneEvent = "done";
+
+                        // if either value or data equals doneTag then stop processing events.
+                        if (value.Equals(doneTag) || data.Equals(doneTag) || value.Equals(doneEvent))
                         {
                             isEndOfStream = true;
                             break;
                         }
 
-                        var eventObject = new Dictionary<string, object>();
+                        var @event = new ServerSentEvent(type);
 
                         try
                         {
-                            eventObject[type] = JsonNode.Parse(value);
+                            @event.Value = JsonNode.Parse(value);
                         }
                         catch
                         {
-                            eventObject[type] = value;
+                            @event.Value = value;
                         }
 
                         if (!string.IsNullOrWhiteSpace(data))
                         {
                             try
                             {
-                                eventObject[nameof(data)] = JsonNode.Parse(data);
+                                @event.Data = JsonNode.Parse(data);
                             }
                             catch
                             {
-                                eventObject[nameof(data)] = data;
+                                @event.Data = string.IsNullOrWhiteSpace(data) ? null : data;
                             }
                         }
 
-                        if (type.Equals(nameof(data)) && events.Count > 0 && events.Peek().ContainsKey(eventMessage))
+                        if (type == ServerSentEventKind.Data &&
+                            events.Count > 0 &&
+                            events.Peek().Event == ServerSentEventKind.Event)
                         {
                             var previousEvent = events.Pop();
-                            previousEvent[nameof(data)] = eventObject[type];
-                            var eventData = JsonSerializer.Serialize(previousEvent, sseJsonOptions);
-                            eventCallback?.Invoke(response, eventData);
+                            previousEvent.Data = @event.Value;
+                            eventCallback?.Invoke(response, previousEvent);
                             events.Push(previousEvent);
                         }
                         else
                         {
-                            if (!type.Equals(eventMessage))
+                            if (type != ServerSentEventKind.Event)
                             {
-                                var eventData = JsonSerializer.Serialize(eventObject, sseJsonOptions);
-                                eventCallback?.Invoke(response, eventData);
+                                eventCallback?.Invoke(response, @event);
                             }
 
-                            events.Push(eventObject);
+                            events.Push(@event);
                         }
                     }
                 }
             }
             finally
             {
-                if (responseStream != null)
-                {
-                    var orderedEvents = new List<Dictionary<string, object>>(events);
-                    orderedEvents.Reverse();
-                    await responseStream.WriteAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(orderedEvents)), cancellationToken);
-                }
+                await response.CheckResponseAsync(baseEndpoint.EnableDebug, payload, null, events.Reverse().ToList(), cancellationToken).ConfigureAwait(false);
             }
 
-            await response.CheckResponseAsync(baseEndpoint.EnableDebug, payload, responseStream, cancellationToken).ConfigureAwait(false);
             return response;
         }
     }

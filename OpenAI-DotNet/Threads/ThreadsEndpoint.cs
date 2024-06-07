@@ -4,7 +4,6 @@ using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +29,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = request != null ? JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent() : null;
             using var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ThreadResponse>(responseAsString, client);
         }
 
@@ -64,7 +63,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ThreadResponse>(responseAsString, client);
         }
 
@@ -94,7 +93,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = JsonSerializer.Serialize(message, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/messages"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<MessageResponse>(responseAsString, client);
         }
 
@@ -169,7 +168,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/messages/{messageId}"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<MessageResponse>(responseAsString, client);
         }
 
@@ -208,7 +207,7 @@ namespace OpenAI.Threads
 
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/runs"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, client);
         }
 
@@ -234,24 +233,22 @@ namespace OpenAI.Threads
             MessageResponse message = null;
             using var payload = JsonSerializer.Serialize(runRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
 
-            using var response = await this.StreamEventsAsync(GetUrl($"/{threadId}/runs"), payload, (eventResponse, eventData) =>
+            using var response = await this.StreamEventsAsync(GetUrl($"/{threadId}/runs"), payload, (sseResponse, ssEvent) =>
             {
-                if (string.IsNullOrWhiteSpace(eventData)) { return; }
+                Console.WriteLine(ssEvent.ToString());
 
-                var eventPayload = JsonNode.Parse(eventData)!;
-                var @event = eventPayload["event"]!.GetValue<string>();
-                var data = eventPayload["data"]!;
+                var @event = ssEvent.Value.GetValue<string>();
 
                 if (@event.Equals("thread.created"))
                 {
-                    var thread = eventResponse.Deserialize<ThreadResponse>(data, client);
+                    var thread = sseResponse.Deserialize<ThreadResponse>(ssEvent, client);
                     eventHandler?.Invoke(thread);
                     return;
                 }
 
                 if (@event.StartsWith("thread.run.step"))
                 {
-                    var partialRunStep = eventResponse.Deserialize<RunStepResponse>(data, client);
+                    var partialRunStep = sseResponse.Deserialize<RunStepResponse>(ssEvent, client);
 
                     if (runStep == null)
                     {
@@ -268,7 +265,7 @@ namespace OpenAI.Threads
 
                 if (@event.StartsWith("thread.run"))
                 {
-                    var partialRun = eventResponse.Deserialize<RunResponse>(data, client);
+                    var partialRun = sseResponse.Deserialize<RunResponse>(ssEvent, client);
 
                     if (run == null)
                     {
@@ -285,7 +282,7 @@ namespace OpenAI.Threads
 
                 if (@event.StartsWith("thread.message"))
                 {
-                    var partialMessage = eventResponse.Deserialize<MessageResponse>(data, client);
+                    var partialMessage = sseResponse.Deserialize<MessageResponse>(ssEvent, client);
 
                     if (message == null)
                     {
@@ -302,10 +299,10 @@ namespace OpenAI.Threads
 
                 if (@event.Equals("error"))
                 {
-                    eventHandler?.Invoke(eventResponse.Deserialize<Error>(data, client));
+                    eventHandler?.Invoke(sseResponse.Deserialize<Error>(ssEvent, client));
                 }
 
-                Console.WriteLine($"Unhandled event: {@event}:{data}");
+                Console.WriteLine($"Unhandled event: {@event}");
             }, cancellationToken);
 
             if (run == null) { return null; }
@@ -329,7 +326,7 @@ namespace OpenAI.Threads
 
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl("/runs"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, client);
         }
 
@@ -364,7 +361,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, client);
         }
 
@@ -382,7 +379,7 @@ namespace OpenAI.Threads
         {
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/runs/{runId}/submit_tool_outputs"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, client);
         }
 
