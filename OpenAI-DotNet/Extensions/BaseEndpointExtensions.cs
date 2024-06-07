@@ -58,11 +58,24 @@ namespace OpenAI.Extensions
                         string data;
 
                         const string comment = nameof(comment);
-                        type = match.Groups[nameof(type)].Value.Trim();
+                        type = TrimStart(match.Groups[nameof(type)].Value);
                         // If the field type is not provided, treat it as a comment
                         type = string.IsNullOrEmpty(type) ? comment : type;
-                        value = match.Groups[nameof(value)].Value.Trim();
-                        data = match.Groups[nameof(data)].Value.Trim();
+                        value = TrimStart(match.Groups[nameof(value)].Value);
+                        data = TrimStart(match.Groups[nameof(data)].Value);
+
+                        string TrimStart(string input)
+                        {
+                            var start = 0;
+                            var end = input.Length - 1;
+
+                            while (start <= end && input[start] == ' ')
+                            {
+                                start++;
+                            }
+
+                            return input.Substring(start, end - start + 1);
+                        }
 
                         if ((type.Equals("event") && value.Equals("done") && data.Equals("[DONE]")) ||
                             (type.Equals("data") && value.Equals("[DONE]")))

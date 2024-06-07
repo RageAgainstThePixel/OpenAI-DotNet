@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Error : IStreamEvent
+    public sealed class Error : BaseResponse, IStreamEvent
     {
         /// <summary>
         /// An error code identifying the error type.

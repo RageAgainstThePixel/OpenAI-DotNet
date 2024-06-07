@@ -300,6 +300,11 @@ namespace OpenAI.Threads
                     return;
                 }
 
+                if (@event.Equals("error"))
+                {
+                    eventHandler?.Invoke(eventResponse.Deserialize<Error>(data, client));
+                }
+
                 Console.WriteLine($"Unhandled event: {@event}:{data}");
             }, cancellationToken);
 
