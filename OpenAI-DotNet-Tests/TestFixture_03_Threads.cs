@@ -178,7 +178,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_06_01_CreateRun()
+        public async Task Test_06_01_01_CreateRun()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
@@ -197,6 +197,46 @@ namespace OpenAI.Tests
                 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
                 Assert.NotNull(message);
                 var run = await thread.CreateRunAsync(assistant);
+                Assert.IsNotNull(run);
+                run = await run.WaitForStatusChangeAsync();
+                Assert.IsNotNull(run);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items)
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
+            }
+            finally
+            {
+                await thread.DeleteAsync(deleteToolResources: true);
+            }
+        }
+
+        [Test]
+        public async Task Test_06_01_02_CreateStreamingRun()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ChatResponseFormat.Json));
+            Assert.NotNull(assistant);
+            testAssistant = assistant;
+            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
+            Assert.NotNull(thread);
+
+            try
+            {
+                var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
+
+                Assert.NotNull(message);
+
+                var run = await thread.CreateStreamingRunAsync(Console.WriteLine, new CreateRunRequest(assistant));
+
                 Assert.IsNotNull(run);
                 run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);

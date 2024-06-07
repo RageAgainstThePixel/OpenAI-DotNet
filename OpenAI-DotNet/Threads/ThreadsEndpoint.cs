@@ -4,6 +4,7 @@ using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -194,7 +195,7 @@ namespace OpenAI.Threads
         /// Create a run.
         /// </summary>
         /// <param name="threadId">The id of the thread to run.</param>
-        /// <param name="request"></param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, CancellationToken cancellationToken = default)
@@ -209,6 +210,70 @@ namespace OpenAI.Threads
             using var response = await client.Client.PostAsync(GetUrl($"/{threadId}/runs"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<RunResponse>(responseAsString, client);
+        }
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to run.</param>
+        /// <param name="eventHandler"><see cref="IStreamEvent"/> handler callback.</param>
+        /// <param name="runRequest"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateStreamingRunAsync(string threadId, Action<IStreamEvent> eventHandler, CreateRunRequest runRequest = null, CancellationToken cancellationToken = default)
+        {
+            if (runRequest == null || string.IsNullOrWhiteSpace(runRequest.AssistantId))
+            {
+                var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                runRequest = new CreateRunRequest(assistant, runRequest);
+            }
+
+            runRequest.Stream = true;
+            RunResponse run = null;
+            using var payload = JsonSerializer.Serialize(runRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+
+            using var response = await this.StreamEventsAsync(GetUrl($"/{threadId}/runs"), payload, (eventResponse, eventData) =>
+            {
+                if (string.IsNullOrWhiteSpace(eventData)) { return; }
+
+                var eventPayload = JsonNode.Parse(eventData)!;
+                var @event = eventPayload["event"]!.GetValue<string>();
+                var data = eventPayload["data"]!;
+
+                if (@event.Equals("thread.created"))
+                {
+                    var thread = eventResponse.Deserialize<ThreadResponse>(data, client);
+                    eventHandler?.Invoke(thread);
+                    return;
+                }
+
+                if (@event.StartsWith("thread.run.step"))
+                {
+                    var runStep = eventResponse.Deserialize<RunStepResponse>(data, client);
+                    eventHandler?.Invoke(runStep);
+                    return;
+                }
+
+                if (@event.StartsWith("thread.run"))
+                {
+                    run = eventResponse.Deserialize<RunResponse>(data, client);
+                    eventHandler?.Invoke(run);
+                    return;
+                }
+
+                if (@event.StartsWith("thread.message"))
+                {
+                    var message = eventResponse.Deserialize<MessageResponse>(data, client);
+                    eventHandler?.Invoke(message);
+                    return;
+                }
+
+                Console.WriteLine($"Unhandled event: {@event}:{data}");
+            }, cancellationToken);
+
+            if (run == null) { return null; }
+            run.SetResponseData(response.Headers, client);
+            return run;
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace OpenAI.Threads
     /// Messages can include text, images, and other files.
     /// Messages stored as a list on the Thread.
     /// </summary>
-    public sealed class MessageResponse : BaseResponse
+    public sealed class MessageResponse : BaseResponse, IStreamEvent
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.

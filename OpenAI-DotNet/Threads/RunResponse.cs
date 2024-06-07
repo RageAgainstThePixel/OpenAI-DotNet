@@ -12,8 +12,12 @@ namespace OpenAI.Threads
     /// The Assistant uses it's configuration and the Thread's Messages to perform tasks by calling models and tools.
     /// As part of a Run, the Assistant appends Messages to the Thread.
     /// </summary>
-    public sealed class RunResponse : BaseResponse
+    public sealed class RunResponse : BaseResponse, IStreamEvent
     {
+        internal RunResponse(RunResponse other) => CopyFrom(other);
+
+        public RunResponse() { }
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -256,5 +260,45 @@ namespace OpenAI.Threads
         public static implicit operator string(RunResponse run) => run?.ToString();
 
         public override string ToString() => Id;
+
+        internal void CopyFrom(RunResponse other)
+        {
+            if (other is null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
+            {
+                Id = other.Id;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Object))
+            {
+                Object = other.Object;
+            }
+
+            CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
+            ThreadId = other.ThreadId;
+            AssistantId = other.AssistantId;
+            Status = other.Status;
+            RequiredAction = other.RequiredAction;
+            LastError = other.LastError;
+            ExpiresAtUnixTimeSeconds = other.ExpiresAtUnixTimeSeconds;
+            StartedAtUnixTimeSeconds = other.StartedAtUnixTimeSeconds;
+            CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
+            FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
+            CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            IncompleteDetails = other.IncompleteDetails;
+            Model = other.Model;
+            Instructions = other.Instructions;
+            Tools = other.Tools;
+            Metadata = other.Metadata;
+            Usage = other.Usage;
+            Temperature = other.Temperature;
+            TopP = other.TopP;
+            MaxPromptTokens = other.MaxPromptTokens;
+            MaxCompletionTokens = other.MaxCompletionTokens;
+            TruncationStrategy = other.TruncationStrategy;
+            ToolChoice = other.ToolChoice;
+            ResponseFormat = other.ResponseFormat;
+        }
     }
 }

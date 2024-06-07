@@ -50,51 +50,12 @@ namespace OpenAI.Chat
         public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
-            using var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
-            request.Content = jsonContent;
-            using var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, jsonContent, null, cancellationToken).ConfigureAwait(false);
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            using var reader = new StreamReader(stream);
             ChatResponse chatResponse = null;
-            using var responseStream = EnableDebug ? new MemoryStream() : null;
-
-            if (responseStream != null)
+            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (eventResponse, eventData) =>
             {
-                await responseStream.WriteAsync("["u8.ToArray(), cancellationToken);
-            }
-
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (!streamData.TryGetEventStreamData(out var eventData))
-                {
-                    // if response stream is not null, remove last comma
-                    responseStream?.SetLength(responseStream.Length - 1);
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-
-                if (responseStream != null)
-                {
-                    string data;
-
-                    try
-                    {
-                        data = JsonNode.Parse(eventData)?.ToJsonString(OpenAIClient.JsonSerializationOptions);
-                    }
-                    catch
-                    {
-                        data = $"{{{eventData}}}";
-                    }
-
-                    await responseStream.WriteAsync(Encoding.UTF8.GetBytes($"{data},"), cancellationToken);
-                }
-
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, client);
+                if (string.IsNullOrWhiteSpace(eventData)) { return; }
+                var partialResponse = eventResponse.Deserialize<ChatResponse>(JsonNode.Parse(eventData)!["data"], client);
 
                 if (chatResponse == null)
                 {
@@ -106,17 +67,10 @@ namespace OpenAI.Chat
                 }
 
                 resultHandler?.Invoke(partialResponse);
-            }
 
-            if (responseStream != null)
-            {
-                await responseStream.WriteAsync("]"u8.ToArray(), cancellationToken);
-            }
-
-            await response.CheckResponseAsync(EnableDebug, jsonContent, responseStream, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken);
 
             if (chatResponse == null) { return null; }
-
             chatResponse.SetResponseData(response.Headers, client);
             resultHandler?.Invoke(chatResponse);
             return chatResponse;

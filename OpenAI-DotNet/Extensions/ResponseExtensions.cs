@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -33,6 +34,12 @@ namespace OpenAI.Extensions
         {
             NumberGroupSeparator = ",",
             NumberDecimalSeparator = "."
+        };
+
+        private static readonly JsonSerializerOptions debugJsonOptions = new()
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
 
         internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers, OpenAIClient client)
@@ -216,7 +223,7 @@ namespace OpenAI.Extensions
                     }
                 }
 
-                debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, new JsonSerializerOptions { WriteIndented = true }));
+                debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, debugJsonOptions));
                 Console.WriteLine(debugMessage.ToString());
             }
 
@@ -236,9 +243,31 @@ namespace OpenAI.Extensions
             }
         }
 
-        internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client) where T : BaseResponse
+        internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client)
+            where T : BaseResponse
         {
             var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
+            result.SetResponseData(response.Headers, client);
+            return result;
+        }
+
+        internal static T Deserialize<T>(this HttpResponseMessage response, JsonNode jNode, OpenAIClient client)
+            where T : BaseResponse
+        {
+            T result;
+
+            var json = jNode.ToString();
+
+            try
+            {
+                result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {json}\n{e}");
+                throw;
+            }
+
             result.SetResponseData(response.Headers, client);
             return result;
         }

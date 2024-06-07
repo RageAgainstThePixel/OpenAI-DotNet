@@ -183,6 +183,17 @@ namespace OpenAI.Threads
             => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
+        /// Create a run and stream the events.
+        /// </summary>
+        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
+        /// <param name="eventHandler">The event handler to handle streamed run events.</param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public static async Task<RunResponse> CreateStreamingRunAsync(this ThreadResponse thread, Action<IStreamEvent> eventHandler, CreateRunRequest request = null, CancellationToken cancellationToken = default)
+            => await thread.Client.ThreadsEndpoint.CreateStreamingRunAsync(thread, eventHandler, request, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
         /// Create a run.
         /// </summary>
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>

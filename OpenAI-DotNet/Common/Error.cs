@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Error
+    public sealed class Error : IStreamEvent
     {
         /// <summary>
         /// An error code identifying the error type.
@@ -41,6 +41,9 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("line")]
         public int? Line { get; private set; }
+
+        [JsonIgnore]
+        public string Object => "error";
 
         public override string ToString()
         {
