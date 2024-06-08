@@ -13,8 +13,12 @@ namespace OpenAI.Threads
     /// Messages can include text, images, and other files.
     /// Messages stored as a list on the Thread.
     /// </summary>
-    public sealed class MessageResponse : BaseResponse
+    public sealed class MessageResponse : BaseResponse, IStreamEvent
     {
+        public MessageResponse() { }
+
+        internal MessageResponse(MessageResponse other) => AppendFrom(other);
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -28,6 +32,11 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public MessageDelta Delta { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the message was created.
@@ -59,6 +68,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("incomplete_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IncompleteDetails IncompleteDetails { get; private set; }
 
         /// <summary>
@@ -66,6 +76,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CompletedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -79,6 +90,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("incomplete_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? IncompleteAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -94,12 +106,18 @@ namespace OpenAI.Threads
         [JsonPropertyName("role")]
         public Role Role { get; private set; }
 
+        private List<Content> content = new();
+
         /// <summary>
         /// The content of the message in array of text and/or images.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public IReadOnlyList<Content> Content { get; private set; }
+        public IReadOnlyList<Content> Content
+        {
+            get => content;
+            private set => content = value?.ToList();
+        }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
@@ -129,6 +147,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("Attachments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<Attachment> Attachments { get; private set; }
 
         /// <summary>
@@ -138,6 +157,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         public static implicit operator string(MessageResponse message) => message?.ToString();
@@ -153,6 +173,78 @@ namespace OpenAI.Threads
         /// </summary>
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
         public string PrintContent()
-            => string.Join("\n", Content.Select(content => content?.ToString()));
+            => content == null
+                ? string.Empty
+                : string.Join("\n", content.Select(c => c?.ToString()));
+
+        internal void AppendFrom(MessageResponse other)
+        {
+            if (other == null) { return; }
+
+            if (other.Delta != null)
+            {
+                if (Role == 0 &&
+                    other.Delta.Role > 0)
+                {
+                    Role = other.Delta.Role;
+                }
+
+                if (other.Delta.Content != null)
+                {
+                    content ??= new List<Content>();
+                    content.AppendFrom(other.Delta.Content);
+                }
+
+                // bail early since we only care about the delta content
+                return;
+            }
+
+            if (Role == 0 &&
+                other.Role > 0)
+            {
+                Role = other.Role;
+            }
+
+            if (other.content != null)
+            {
+                content = other.content;
+            }
+
+            if (CreatedAtUnixTimeSeconds == 0 &&
+                other.CreatedAtUnixTimeSeconds > 0)
+            {
+                CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.IncompleteAtUnixTimeSeconds.HasValue)
+            {
+                IncompleteAtUnixTimeSeconds = other.IncompleteAtUnixTimeSeconds;
+            }
+
+            if (other.Status > 0)
+            {
+                Status = other.Status;
+            }
+
+            if (other.IncompleteDetails != null)
+            {
+                IncompleteDetails = other.IncompleteDetails;
+            }
+
+            if (other.Attachments != null)
+            {
+                Attachments = other.Attachments;
+            }
+
+            if (other.Metadata != null)
+            {
+                Metadata = other.Metadata;
+            }
+        }
     }
 }

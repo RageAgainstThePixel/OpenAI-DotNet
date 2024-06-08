@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -12,8 +13,12 @@ namespace OpenAI.Threads
     /// The Assistant uses it's configuration and the Thread's Messages to perform tasks by calling models and tools.
     /// As part of a Run, the Assistant appends Messages to the Thread.
     /// </summary>
-    public sealed class RunResponse : BaseResponse
+    public sealed class RunResponse : BaseResponse, IStreamEvent
     {
+        public RunResponse() { }
+
+        internal RunResponse(RunResponse other) => AppendFrom(other);
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -66,6 +71,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("required_action")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public RequiredAction RequiredAction { get; private set; }
 
         /// <summary>
@@ -74,6 +80,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("last_error")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Error LastError { get; private set; }
 
         /// <summary>
@@ -81,6 +88,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("expires_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? ExpiresAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -94,6 +102,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("started_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? StartedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -107,6 +116,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CancelledAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -120,6 +130,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? FailedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -133,6 +144,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CompletedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -143,6 +155,7 @@ namespace OpenAI.Threads
 
         [JsonInclude]
         [JsonPropertyName("incomplete_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IncompleteDetails IncompleteDetails { get; private set; }
 
         /// <summary>
@@ -159,12 +172,19 @@ namespace OpenAI.Threads
         [JsonPropertyName("instructions")]
         public string Instructions { get; private set; }
 
+        private List<Tool> tools;
+
         /// <summary>
         /// The list of tools that the assistant used for this run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<Tool> Tools { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public IReadOnlyList<Tool> Tools
+        {
+            get => tools;
+            private set => tools = value?.ToList();
+        }
 
         /// <summary>
         /// The list of File IDs the assistant used for this run.
@@ -180,6 +200,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         /// <summary>
@@ -187,6 +208,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("usage")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Usage Usage { get; private set; }
 
         /// <summary>
@@ -194,6 +216,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("temperature")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public double? Temperature { get; private set; }
 
         /// <summary>
@@ -201,6 +224,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("top_p")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public double? TopP { get; private set; }
 
         /// <summary>
@@ -208,6 +232,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("max_prompt_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? MaxPromptTokens { get; private set; }
 
         /// <summary>
@@ -215,10 +240,11 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("max_completion_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? MaxCompletionTokens { get; private set; }
 
         /// <summary>
-        /// Controls for how a thread will be truncated prior to the run. Use this to control the intial context window of the run.
+        /// Controls for how a thread will be truncated prior to the run. Use this to control the initial context window of the run.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("truncation_strategy")]
@@ -256,5 +282,107 @@ namespace OpenAI.Threads
         public static implicit operator string(RunResponse run) => run?.ToString();
 
         public override string ToString() => Id;
+
+        internal void AppendFrom(RunResponse other)
+        {
+            if (other is null) { return; }
+
+            if (other.Status > 0)
+            {
+                Status = other.Status;
+            }
+
+            if (other.RequiredAction != null)
+            {
+                RequiredAction = other.RequiredAction;
+            }
+
+            if (other.LastError != null)
+            {
+                LastError = other.LastError;
+            }
+
+            if (other.ExpiresAtUnixTimeSeconds.HasValue)
+            {
+                ExpiresAtUnixTimeSeconds = other.ExpiresAtUnixTimeSeconds;
+            }
+
+            if (other.StartedAtUnixTimeSeconds.HasValue)
+            {
+                StartedAtUnixTimeSeconds = other.StartedAtUnixTimeSeconds;
+            }
+
+            if (other.CancelledAtUnixTimeSeconds.HasValue)
+            {
+                CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
+            }
+
+            if (other.FailedAtUnixTimeSeconds.HasValue)
+            {
+                FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.IncompleteDetails != null)
+            {
+                IncompleteDetails = other.IncompleteDetails;
+            }
+
+            if (other is { Tools: not null })
+            {
+                tools ??= new List<Tool>();
+                tools.AppendFrom(other.Tools);
+            }
+
+            if (other.Metadata is { Count: > 0 })
+            {
+                Metadata = other.Metadata;
+            }
+
+            if (other.Usage != null)
+            {
+                Usage = other.Usage;
+            }
+
+            if (other.Temperature.HasValue)
+            {
+                Temperature = other.Temperature;
+            }
+
+            if (other.TopP.HasValue)
+            {
+                TopP = other.TopP;
+            }
+
+            if (other.MaxPromptTokens.HasValue)
+            {
+                MaxPromptTokens = other.MaxPromptTokens;
+            }
+
+            if (other.MaxCompletionTokens.HasValue)
+            {
+                MaxCompletionTokens = other.MaxCompletionTokens;
+            }
+
+            if (other.TruncationStrategy != null)
+            {
+                TruncationStrategy = other.TruncationStrategy;
+            }
+
+            if (other.ToolChoice is string stringToolChoice)
+            {
+                ToolChoice = stringToolChoice;
+            }
+            else
+            {
+                ToolChoice = other.ToolChoice;
+            }
+
+            ResponseFormat = other.ResponseFormat;
+        }
     }
 }

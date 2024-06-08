@@ -10,7 +10,7 @@ namespace OpenAI.Threads
     /// A conversation session between an Assistant and a user.
     /// Threads store Messages and automatically handle truncation to fit content into a model's context.
     /// </summary>
-    public sealed class ThreadResponse : BaseResponse
+    public sealed class ThreadResponse : BaseResponse, IStreamEvent
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
@@ -44,6 +44,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_resources")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ToolResources ToolResources { get; private set; }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         public static implicit operator string(ThreadResponse thread) => thread?.ToString();

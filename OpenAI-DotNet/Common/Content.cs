@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Content
+    public sealed class Content : IAppendable<Content>
     {
         public Content() { }
 
@@ -53,6 +53,11 @@ namespace OpenAI
         }
 
         [JsonInclude]
+        [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Index { get; }
+
+        [JsonInclude]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter<ContentType>))]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
@@ -62,7 +67,7 @@ namespace OpenAI
         [JsonPropertyName("text")]
         [JsonConverter(typeof(StringOrObjectConverter<TextContent>))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public dynamic Text { get; private set; }
+        public object Text { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("image_url")]
@@ -88,5 +93,58 @@ namespace OpenAI
                 ContentType.ImageFile => ImageFile?.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Type))
             } ?? string.Empty;
+
+        public void AppendFrom(Content other)
+        {
+            if (other == null) { return; }
+
+            if (other.Type > 0)
+            {
+                Type = other.Type;
+            }
+
+            if (other.Text is TextContent otherTextContent)
+            {
+                if (Text is TextContent textContent)
+                {
+                    textContent.AppendFrom(otherTextContent);
+                }
+                else
+                {
+                    Text = otherTextContent;
+                }
+            }
+            else if (other.Text is string otherStringContent)
+            {
+                if (!string.IsNullOrWhiteSpace(otherStringContent))
+                {
+                    Text += otherStringContent;
+                }
+            }
+
+            if (other.ImageUrl != null)
+            {
+                if (ImageUrl == null)
+                {
+                    ImageUrl = other.ImageUrl;
+                }
+                else
+                {
+                    ImageUrl.AppendFrom(other.ImageUrl);
+                }
+            }
+
+            if (other.ImageFile != null)
+            {
+                if (ImageFile == null)
+                {
+                    ImageFile = other.ImageFile;
+                }
+                else
+                {
+                    ImageFile.AppendFrom(other.ImageFile);
+                }
+            }
+        }
     }
 }

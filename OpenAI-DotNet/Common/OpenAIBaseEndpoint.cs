@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
 namespace OpenAI
 {
@@ -11,6 +12,10 @@ namespace OpenAI
 
         // ReSharper disable once InconsistentNaming
         protected readonly OpenAIClient client;
+
+        internal OpenAIClient Client => client;
+
+        internal HttpClient HttpClient => client.Client;
 
         /// <summary>
         /// The root endpoint address.

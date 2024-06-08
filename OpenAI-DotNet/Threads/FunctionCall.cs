@@ -26,5 +26,25 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("output")]
         public string Output { get; private set; }
+
+        internal void AppendFrom(FunctionCall other)
+        {
+            if (other == null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Name))
+            {
+                Name += other.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Arguments))
+            {
+                Arguments += other.Arguments;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Output))
+            {
+                Output += other.Output;
+            }
+        }
     }
 }

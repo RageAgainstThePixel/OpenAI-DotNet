@@ -18,7 +18,7 @@ namespace OpenAI.Tests.Weather
            [FunctionParameter("The location the user is currently in.")] string location,
            [FunctionParameter("The units the user has requested temperature in. Typically this is based on the users location.")] WeatherUnit unit)
         {
-            var temp = new Random().Next(-10, 40);
+            var temp = new Random().Next(10, 40);
 
             temp = unit switch
             {

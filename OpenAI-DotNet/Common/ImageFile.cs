@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
@@ -7,7 +8,7 @@ namespace OpenAI
     /// <summary>
     /// References an image file in the content of a message.
     /// </summary>
-    public sealed class ImageFile
+    public sealed class ImageFile : IAppendable<ImageFile>
     {
         /// <summary>
         /// Constructor.
@@ -25,6 +26,11 @@ namespace OpenAI
             FileId = fileId;
             Detail = detail;
         }
+
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Index { get; }
 
         /// <summary>
         /// The file ID of the image in the message content.
@@ -45,5 +51,20 @@ namespace OpenAI
         public ImageDetail Detail { get; private set; }
 
         public override string ToString() => FileId;
+
+        public void AppendFrom(ImageFile other)
+        {
+            if (other == null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.FileId))
+            {
+                FileId = other.FileId;
+            }
+
+            if (other.Detail > 0)
+            {
+                Detail = other.Detail;
+            }
+        }
     }
 }

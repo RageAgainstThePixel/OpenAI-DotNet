@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace OpenAI
 {
-    public sealed class Tool
+    public sealed class Tool : IAppendable<Tool>
     {
         public Tool() { }
 
-        public Tool(Tool other) => CopyFrom(other);
+        public Tool(Tool other) => AppendFrom(other);
 
         public Tool(Function function)
         {
@@ -37,7 +38,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("index")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Index { get; private set; }
 
         [JsonInclude]
@@ -49,9 +50,11 @@ namespace OpenAI
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Function Function { get; private set; }
 
-        internal void CopyFrom(Tool other)
+        public void AppendFrom(Tool other)
         {
-            if (!string.IsNullOrWhiteSpace(other?.Id))
+            if (other == null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
             {
                 Id = other.Id;
             }
@@ -61,12 +64,12 @@ namespace OpenAI
                 Index = other.Index.Value;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.Type))
+            if (!string.IsNullOrWhiteSpace(other.Type))
             {
                 Type = other.Type;
             }
 
-            if (other?.Function != null)
+            if (other.Function != null)
             {
                 if (Function == null)
                 {
@@ -74,7 +77,7 @@ namespace OpenAI
                 }
                 else
                 {
-                    Function.CopyFrom(other.Function);
+                    Function.AppendFrom(other.Function);
                 }
             }
         }

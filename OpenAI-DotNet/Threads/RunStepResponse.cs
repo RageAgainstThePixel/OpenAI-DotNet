@@ -12,8 +12,12 @@ namespace OpenAI.Threads
     /// An Assistant can call tools or create Messages during it's run.
     /// Examining Run Steps allows you to introspect how the Assistant is getting to it's final results.
     /// </summary>
-    public sealed class RunStepResponse : BaseResponse
+    public sealed class RunStepResponse : BaseResponse, IStreamEvent
     {
+        public RunStepResponse() { }
+
+        internal RunStepResponse(RunStepResponse other) => AppendFrom(other);
+
         /// <summary>
         /// The identifier of the run step, which can be referenced in API endpoints.
         /// </summary>
@@ -25,11 +29,17 @@ namespace OpenAI.Threads
         [JsonPropertyName("object")]
         public string Object { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public RunStepDelta Delta { get; }
+
         /// <summary>
         /// The Unix timestamp (in seconds) for when the run step was created.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("created_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CreatedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -80,6 +90,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("step_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public StepDetails StepDetails { get; private set; }
 
         /// <summary>
@@ -87,6 +98,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("last_error")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Error LastError { get; private set; }
 
         /// <summary>
@@ -94,6 +106,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("expired_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? ExpiredAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -115,6 +128,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("cancelled_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CancelledAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -128,6 +142,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("failed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? FailedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -141,6 +156,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("completed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CompletedAtUnixTimeSeconds { get; private set; }
 
         [JsonIgnore]
@@ -156,6 +172,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         /// <summary>
@@ -163,10 +180,89 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("usage")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Usage Usage { get; private set; }
 
         public static implicit operator string(RunStepResponse runStep) => runStep?.ToString();
 
         public override string ToString() => Id;
+
+        internal void AppendFrom(RunStepResponse other)
+        {
+            if (other == null) { return; }
+
+            if (other.Delta != null)
+            {
+                if (other.Delta.StepDetails != null)
+                {
+                    if (StepDetails == null)
+                    {
+                        StepDetails = new StepDetails(other.Delta.StepDetails);
+                    }
+                    else
+                    {
+                        StepDetails.AppendFrom(other.Delta.StepDetails);
+                    }
+                }
+
+                // don't update other fields if we are just appending Delta
+                return;
+            }
+
+            if (other.CreatedAtUnixTimeSeconds.HasValue)
+            {
+                CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
+            }
+
+            if (other.Type > 0)
+            {
+                Type = other.Type;
+            }
+
+            if (other.Status > 0)
+            {
+                Status = other.Status;
+            }
+
+            if (other.StepDetails != null)
+            {
+                StepDetails = other.StepDetails;
+            }
+
+            if (other.LastError != null)
+            {
+                LastError = other.LastError;
+            }
+
+            if (other.ExpiredAtUnixTimeSeconds.HasValue)
+            {
+                ExpiredAtUnixTimeSeconds = other.ExpiredAtUnixTimeSeconds;
+            }
+
+            if (other.CancelledAtUnixTimeSeconds.HasValue)
+            {
+                CancelledAtUnixTimeSeconds = other.CancelledAtUnixTimeSeconds;
+            }
+
+            if (other.FailedAtUnixTimeSeconds.HasValue)
+            {
+                FailedAtUnixTimeSeconds = other.FailedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.Metadata is { Count: > 0 })
+            {
+                Metadata = new Dictionary<string, string>(other.Metadata);
+            }
+
+            if (other.Usage != null)
+            {
+                Usage = other.Usage;
+            }
+        }
     }
 }

@@ -150,7 +150,7 @@ namespace OpenAI
 
         #endregion Func<,> Overloads
 
-        internal Function(Function other) => CopyFrom(other);
+        internal Function(Function other) => AppendFrom(other);
 
         /// <summary>
         /// The name of the function to generate arguments for.<br/>
@@ -229,7 +229,7 @@ namespace OpenAI
         [JsonIgnore]
         private MethodInfo MethodInfo { get; }
 
-        internal void CopyFrom(Function other)
+        internal void AppendFrom(Function other)
         {
             if (!string.IsNullOrWhiteSpace(other.Name))
             {

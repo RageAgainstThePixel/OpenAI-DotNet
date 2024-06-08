@@ -330,23 +330,6 @@ namespace OpenAI.Chat
         [JsonPropertyName("user")]
         public string User { get; }
 
-        /// <summary>
-        /// Pass "auto" to let the OpenAI service decide, "none" if none are to be called,
-        /// or "functionName" to force function call. Defaults to "auto".
-        /// </summary>
-        [Obsolete("Use ToolChoice")]
-        [JsonPropertyName("function_call")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public dynamic FunctionCall { get; }
-
-        /// <summary>
-        /// An optional list of functions to get arguments for.
-        /// </summary>
-        [Obsolete("Use Tools")]
-        [JsonPropertyName("functions")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public IReadOnlyList<Function> Functions { get; }
-
         /// <inheritdoc />
         public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
     }

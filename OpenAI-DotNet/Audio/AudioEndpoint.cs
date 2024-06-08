@@ -34,7 +34,7 @@ namespace OpenAI.Audio
         {
             using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(false, jsonContent, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
             int bytesRead;
@@ -60,7 +60,7 @@ namespace OpenAI.Audio
                 totalBytesRead += bytesRead;
             }
 
-            await response.CheckResponseAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(EnableDebug, jsonContent, cancellationToken: cancellationToken).ConfigureAwait(false);
             return new ReadOnlyMemory<byte>(memoryStream.GetBuffer(), 0, totalBytesRead);
         }
 
@@ -132,7 +132,7 @@ namespace OpenAI.Audio
             request.Dispose();
 
             using var response = await client.Client.PostAsync(GetUrl("/transcriptions"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }
 
@@ -191,7 +191,7 @@ namespace OpenAI.Audio
             request.Dispose();
 
             using var response = await client.Client.PostAsync(GetUrl("/translations"), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, null, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }
     }
