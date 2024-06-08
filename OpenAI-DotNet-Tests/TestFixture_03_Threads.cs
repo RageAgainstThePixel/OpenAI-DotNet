@@ -247,10 +247,6 @@ namespace OpenAI.Tests
                     Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }
             }
-            catch (Exception e)
-            {
-                Assert.Fail(e.ToString());
-            }
             finally
             {
                 await assistant.DeleteAsync();
@@ -311,6 +307,7 @@ namespace OpenAI.Tests
                 Assert.NotNull(thread);
                 Assert.IsNotNull(run);
                 run = await run.WaitForStatusChangeAsync();
+                Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
                 var messages = await thread.ListMessagesAsync();
 
@@ -318,10 +315,6 @@ namespace OpenAI.Tests
                 {
                     Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }
-            }
-            catch (Exception e)
-            {
-                Assert.Fail(e.ToString());
             }
             finally
             {
