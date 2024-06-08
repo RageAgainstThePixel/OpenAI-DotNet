@@ -62,7 +62,7 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    chatResponse.CopyFrom(partialResponse);
+                    chatResponse.AppendFrom(partialResponse);
                 }
 
                 resultHandler?.Invoke(partialResponse);
@@ -138,7 +138,7 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    chatResponse.CopyFrom(partialResponse);
+                    chatResponse.AppendFrom(partialResponse);
                 }
 
                 yield return partialResponse;

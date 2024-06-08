@@ -2,8 +2,13 @@
 
 namespace OpenAI
 {
+    /// <summary>
+    /// Common interface for streaming events
+    /// </summary>
     public interface IStreamEvent
     {
-        public string Object { get; }
+        string Object { get; }
+
+        string ToJsonString();
     }
 }

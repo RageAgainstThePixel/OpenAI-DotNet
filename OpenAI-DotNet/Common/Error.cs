@@ -12,6 +12,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("code")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Code { get; private set; }
 
         /// <summary>
@@ -19,6 +20,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("message")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Message { get; private set; }
 
         /// <summary>
@@ -26,6 +28,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("param")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Parameter { get; private set; }
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Type { get; private set; }
 
         /// <summary>
@@ -40,6 +44,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("line")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Line { get; private set; }
 
         [JsonIgnore]

@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace OpenAI.Chat
     {
         public ChatResponse() { }
 
-        internal ChatResponse(ChatResponse other) => CopyFrom(other);
+        internal ChatResponse(ChatResponse other) => AppendFrom(other);
 
         /// <summary>
         /// A unique identifier for the chat completion.
@@ -65,7 +66,7 @@ namespace OpenAI.Chat
         public IReadOnlyList<Choice> Choices
         {
             get => choices;
-            private set => choices = value.ToList();
+            private set => choices = value?.ToList();
         }
 
         [JsonIgnore]
@@ -75,7 +76,7 @@ namespace OpenAI.Chat
 
         public static implicit operator string(ChatResponse response) => response?.ToString();
 
-        internal void CopyFrom(ChatResponse other)
+        internal void AppendFrom(ChatResponse other)
         {
             if (other is null) { return; }
 
@@ -102,23 +103,14 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    Usage.CopyFrom(other.Usage);
+                    Usage.AppendFrom(other.Usage);
                 }
             }
 
             if (other.Choices is { Count: > 0 })
             {
                 choices ??= new List<Choice>();
-
-                foreach (var otherChoice in other.Choices)
-                {
-                    if (otherChoice.Index + 1 > choices.Count)
-                    {
-                        choices.Insert(otherChoice.Index, otherChoice);
-                    }
-
-                    choices[otherChoice.Index].CopyFrom(otherChoice);
-                }
+                choices.AppendFrom(other.Choices);
             }
         }
 

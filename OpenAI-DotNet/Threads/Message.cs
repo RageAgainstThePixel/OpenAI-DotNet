@@ -84,6 +84,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("attachments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<Attachment> Attachments { get; private set; }
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; }
 
         /// <summary>

@@ -1,13 +1,20 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ToolCall
+    public sealed class ToolCall : IAppendable<ToolCall>
     {
+        public ToolCall() { }
+
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        public int? Index { get; private set; }
+
         /// <summary>
         /// The ID of the tool call.
         /// This ID must be referenced when you submit the tool outputs in using the Submit tool outputs to run endpoint.
@@ -53,5 +60,47 @@ namespace OpenAI.Threads
         [JsonIgnore]
         [Obsolete("Removed")]
         public object Retrieval { get; private set; }
+
+        public void AppendFrom(ToolCall other)
+        {
+            if (other == null)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
+            {
+                Id = other.Id;
+            }
+
+            if (other.FunctionCall != null)
+            {
+                if (FunctionCall == null)
+                {
+                    FunctionCall = other.FunctionCall;
+                }
+                else
+                {
+                    FunctionCall.AppendFrom(other.FunctionCall);
+                }
+            }
+
+            if (other.CodeInterpreter != null)
+            {
+                if (CodeInterpreter == null)
+                {
+                    CodeInterpreter = other.CodeInterpreter;
+                }
+                else
+                {
+                    CodeInterpreter.AppendFrom(other.CodeInterpreter);
+                }
+            }
+
+            if (other.FileSearch != null)
+            {
+                FileSearch = other.FileSearch;
+            }
+        }
     }
 }

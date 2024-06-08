@@ -39,7 +39,7 @@ namespace OpenAI.Extensions
         internal static readonly JsonSerializerOptions DebugJsonOptions = new()
         {
             WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         };
 
         internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers, OpenAIClient client)

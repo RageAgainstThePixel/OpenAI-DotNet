@@ -44,6 +44,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_resources")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ToolResources ToolResources { get; private set; }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         public static implicit operator string(ThreadResponse thread) => thread?.ToString();

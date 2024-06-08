@@ -32,6 +32,10 @@ namespace OpenAI.Threads
             Metadata = metadata;
         }
 
+        public CreateThreadRequest(string message) : this(new[] { new Message(message) })
+        {
+        }
+
         /// <summary>
         /// A list of messages to start the thread with.
         /// </summary>
@@ -55,6 +59,6 @@ namespace OpenAI.Threads
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; }
 
-        public static implicit operator CreateThreadRequest(string message) => new(new[] { new Message(message) });
+        public static implicit operator CreateThreadRequest(string message) => new(message);
     }
 }

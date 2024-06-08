@@ -188,12 +188,11 @@ namespace OpenAI.Tests
                     model: Model.GPT4o,
                     responseFormat: ChatResponseFormat.Json));
             Assert.NotNull(assistant);
-            testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
-            Assert.NotNull(thread);
 
             try
             {
+                Assert.NotNull(thread);
                 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
                 Assert.NotNull(message);
                 var run = await thread.CreateRunAsync(assistant);
@@ -210,6 +209,7 @@ namespace OpenAI.Tests
             }
             finally
             {
+                await assistant.DeleteAsync();
                 await thread.DeleteAsync(deleteToolResources: true);
             }
         }
@@ -225,40 +225,126 @@ namespace OpenAI.Tests
                     model: Model.GPT4o,
                     responseFormat: ChatResponseFormat.Json));
             Assert.NotNull(assistant);
-            testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
-            Assert.NotNull(thread);
 
             try
             {
+                Assert.NotNull(thread);
                 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
-
                 Assert.NotNull(message);
 
-                var run = await thread.CreateStreamingRunAsync(Console.WriteLine, new CreateRunRequest(assistant));
+                var run = await thread.CreateRunAsync(assistant, streamEvent =>
+                {
+                    Console.WriteLine(streamEvent.ToJsonString());
+                });
 
-                Assert.IsNotNull(run);
-                run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
                 var messages = await thread.ListMessagesAsync();
 
-                foreach (var response in messages.Items)
+                foreach (var response in messages.Items.Reverse())
                 {
                     Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }
             }
+            catch (Exception e)
+            {
+                Assert.Fail(e.ToString());
+            }
             finally
             {
+                await assistant.DeleteAsync();
                 await thread.DeleteAsync(deleteToolResources: true);
+            }
+        }
+
+        [Test]
+        public async Task Test_06_01_03_CreateStreamingRun_ToolCalls()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var tools = new List<Tool>
+            {
+                Tool.CodeInterpreter,
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+            };
+            var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+            Assert.NotNull(assistant);
+            ThreadResponse thread = null;
+
+            try
+            {
+                async void StreamEventHandler(IStreamEvent streamEvent)
+                {
+                    try
+                    {
+                        switch (streamEvent)
+                        {
+                            case ThreadResponse threadResponse:
+                                thread = threadResponse;
+                                break;
+                            case RunResponse runResponse:
+                                if (runResponse.Status == RunStatus.RequiresAction)
+                                {
+                                    var toolOutputs = await assistant.GetToolOutputsAsync(runResponse.RequiredAction.SubmitToolOutputs.ToolCalls);
+
+                                    foreach (var toolOutput in toolOutputs)
+                                    {
+                                        Console.WriteLine($"Tool Output: {toolOutput}");
+                                    }
+
+                                    await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
+                                }
+                                break;
+                            default:
+                                Console.WriteLine(streamEvent.ToJsonString());
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                var run = await assistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?", StreamEventHandler);
+                Assert.NotNull(thread);
+                Assert.IsNotNull(run);
+                run = await run.WaitForStatusChangeAsync();
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items.Reverse())
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.ToString());
+            }
+            finally
+            {
+                if (thread != null)
+                {
+                    await thread.DeleteAsync();
+                }
+
+                await assistant.DeleteAsync(deleteToolResources: true);
             }
         }
 
         [Test]
         public async Task Test_06_02_CreateThreadAndRun()
         {
-            Assert.NotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ChatResponseFormat.Json));
+            Assert.NotNull(testAssistant);
             var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
             var threadRequest = new CreateThreadRequest(messages);
             var run = await testAssistant.CreateThreadAndRunAsync(threadRequest);
