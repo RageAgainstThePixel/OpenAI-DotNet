@@ -198,14 +198,14 @@ namespace OpenAI.VectorStores
         /// A file id that the vector store should use. Useful for tools like 'file_search' that can access files.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="VectorStoreFileBatch"/>.</returns>
-        public async Task<VectorStoreFileBatch> CreateVectorStoreFileBatch(string vectorStoreId, IReadOnlyList<string> fileIds, ChunkingStrategy chunkingStrategy = null, CancellationToken cancellationToken = default)
+        /// <returns><see cref="VectorStoreFileBatchResponse"/>.</returns>
+        public async Task<VectorStoreFileBatchResponse> CreateVectorStoreFileBatch(string vectorStoreId, IReadOnlyList<string> fileIds, ChunkingStrategy chunkingStrategy = null, CancellationToken cancellationToken = default)
         {
             if (fileIds is not { Count: not 0 }) { throw new ArgumentNullException(nameof(fileIds)); }
             using var payload = JsonSerializer.Serialize(new { file_ids = fileIds, chunking_strategy = chunkingStrategy }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<VectorStoreFileBatch>(responseAsString, client);
+            return response.Deserialize<VectorStoreFileBatchResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace OpenAI.VectorStores
         /// <param name="filter">Optional, filter by file status.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{VectorStoreFileBatch}"/>.</returns>
-        public async Task<ListResponse<VectorStoreFileBatch>> ListVectorStoreFileBatchesAsync(string vectorStoreId, string fileBatchId, ListQuery query = null, VectorStoreFileStatus? filter = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<VectorStoreFileBatchResponse>> ListVectorStoreFileBatchesAsync(string vectorStoreId, string fileBatchId, ListQuery query = null, VectorStoreFileStatus? filter = null, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> queryParams = query;
 
@@ -229,7 +229,7 @@ namespace OpenAI.VectorStores
 
             using var response = await client.Client.GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/files", queryParams), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ListResponse<VectorStoreFileBatch>>(responseAsString, client);
+            return response.Deserialize<ListResponse<VectorStoreFileBatchResponse>>(responseAsString, client);
         }
 
         /// <summary>
@@ -238,12 +238,12 @@ namespace OpenAI.VectorStores
         /// <param name="vectorStoreId">The ID of the vector store that the files belong to.</param>
         /// <param name="fileBatchId">The ID of the file batch being retrieved.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="VectorStoreFileBatch"/>.</returns>
-        public async Task<VectorStoreFileBatch> GetVectorStoreFileBatchAsync(string vectorStoreId, string fileBatchId, CancellationToken cancellationToken = default)
+        /// <returns><see cref="VectorStoreFileBatchResponse"/>.</returns>
+        public async Task<VectorStoreFileBatchResponse> GetVectorStoreFileBatchAsync(string vectorStoreId, string fileBatchId, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}"), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<VectorStoreFileBatch>(responseAsString, client);
+            return response.Deserialize<VectorStoreFileBatchResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace OpenAI.VectorStores
         {
             using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            var result = response.Deserialize<VectorStoreFileBatch>(responseAsString, client);
+            var result = response.Deserialize<VectorStoreFileBatchResponse>(responseAsString, client);
             return result.Status == VectorStoreFileStatus.Cancelled;
         }
 
