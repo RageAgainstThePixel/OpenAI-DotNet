@@ -1,8 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
@@ -76,11 +75,6 @@ namespace OpenAI
         public string ResetTokens { get; internal set; }
 
         public string ToJsonString()
-            => JsonSerializer.Serialize<object>(this, jsonOptions);
-
-        private static readonly JsonSerializerOptions jsonOptions = new()
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
+            => this.ToEscapedJsonString<object>();
     }
 }

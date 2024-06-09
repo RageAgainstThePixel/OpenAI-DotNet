@@ -2,6 +2,8 @@
 
 using System.Linq;
 using System.Net.Http;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace OpenAI.Extensions
 {
@@ -41,5 +43,13 @@ namespace OpenAI.Extensions
                     @string.Select((x, i) => i > 0 && char.IsUpper(x)
                         ? $"_{x}"
                         : x.ToString())).ToLower();
+
+        public static string ToEscapedJsonString<T>(this T @object)
+            => JsonSerializer.Serialize(@object, escapedJsonOptions);
+
+        private static readonly JsonSerializerOptions escapedJsonOptions = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
     }
 }

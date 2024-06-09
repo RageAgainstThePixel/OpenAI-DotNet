@@ -470,7 +470,8 @@ namespace OpenAI.Threads
                             streamEventHandler?.Invoke(sseResponse.Deserialize<Error>(ssEvent, client));
                             return;
                         default:
-                            Console.WriteLine($"Unhandled event: {ssEvent}");
+                            // if not properly handled raise it up to caller to deal with it themselves.
+                            streamEventHandler.Invoke(ssEvent);
                             return;
                     }
                 }

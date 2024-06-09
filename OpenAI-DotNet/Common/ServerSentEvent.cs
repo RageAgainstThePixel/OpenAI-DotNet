@@ -1,11 +1,13 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
-namespace OpenAI.Extensions
+namespace OpenAI
 {
-    public sealed class ServerSentEvent
+    public sealed class ServerSentEvent : IStreamEvent
     {
         internal static readonly Dictionary<string, ServerSentEventKind> EventMap = new()
         {
@@ -13,18 +15,27 @@ namespace OpenAI.Extensions
             { "event", ServerSentEventKind.Event },
             { "data", ServerSentEventKind.Data },
             { "id", ServerSentEventKind.Id },
-            { "retry", ServerSentEventKind.Retry },
+            { "retry", ServerSentEventKind.Retry }
         };
 
         internal ServerSentEvent(ServerSentEventKind @event) => Event = @event;
 
+        [JsonInclude]
         public ServerSentEventKind Event { get; }
 
+        [JsonInclude]
         public JsonNode Value { get; internal set; }
 
+        [JsonInclude]
         public JsonNode Data { get; internal set; }
 
+        [JsonIgnore]
+        public string Object => "stream.event";
+
         public override string ToString()
+            => ToJsonString();
+
+        public string ToJsonString()
         {
             var @event = new JsonObject
             {
@@ -38,7 +49,7 @@ namespace OpenAI.Extensions
                 @event.Add(ServerSentEventKind.Data.ToString().ToLower(), Data);
             }
 
-            return @event.ToJsonString(ResponseExtensions.DebugJsonOptions);
+            return @event.ToEscapedJsonString();
         }
     }
 }
