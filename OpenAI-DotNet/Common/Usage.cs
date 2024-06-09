@@ -57,10 +57,4 @@ namespace OpenAI
                 (a.CompletionTokens ?? 0) + (b.CompletionTokens ?? 0),
                 (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0));
     }
-
-    public sealed class StreamOptions
-    {
-        [JsonPropertyName("include_usage")]
-        public bool IncludeUsage { get; } = true;
-    }
 }
