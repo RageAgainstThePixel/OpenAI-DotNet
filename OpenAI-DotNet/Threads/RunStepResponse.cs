@@ -12,7 +12,7 @@ namespace OpenAI.Threads
     /// An Assistant can call tools or create Messages during it's run.
     /// Examining Run Steps allows you to introspect how the Assistant is getting to it's final results.
     /// </summary>
-    public sealed class RunStepResponse : BaseResponse, IStreamEvent
+    public sealed class RunStepResponse : BaseResponse, IServerSentEvent
     {
         public RunStepResponse() { }
 

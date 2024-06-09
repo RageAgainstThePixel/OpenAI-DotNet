@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class ChatResponse : BaseResponse, IStreamEvent
+    public sealed class ChatResponse : BaseResponse, IServerSentEvent
     {
         public ChatResponse() { }
 

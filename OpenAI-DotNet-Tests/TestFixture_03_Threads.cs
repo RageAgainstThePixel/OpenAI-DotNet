@@ -270,7 +270,7 @@ namespace OpenAI.Tests
 
             try
             {
-                async void StreamEventHandler(IStreamEvent streamEvent)
+                async void StreamEventHandler(IServerSentEvent streamEvent)
                 {
                     try
                     {

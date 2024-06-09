@@ -199,7 +199,7 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Action<IStreamEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
             {
@@ -228,7 +228,7 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Action<IStreamEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
             {
@@ -296,7 +296,7 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public async Task<RunResponse> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, Action<IStreamEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public async Task<RunResponse> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             request.Stream = streamEventHandler != null;
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
@@ -394,7 +394,7 @@ namespace OpenAI.Threads
 
         #endregion Files (Obsolete)
 
-        private async Task<RunResponse> StreamRunAsync(string endpoint, StringContent payload, Action<IStreamEvent> streamEventHandler, CancellationToken cancellationToken = default)
+        private async Task<RunResponse> StreamRunAsync(string endpoint, StringContent payload, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
         {
             RunResponse run = null;
             RunStepResponse runStep = null;

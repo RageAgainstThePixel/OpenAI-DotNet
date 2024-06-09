@@ -13,7 +13,7 @@ namespace OpenAI.Threads
     /// The Assistant uses it's configuration and the Thread's Messages to perform tasks by calling models and tools.
     /// As part of a Run, the Assistant appends Messages to the Thread.
     /// </summary>
-    public sealed class RunResponse : BaseResponse, IStreamEvent
+    public sealed class RunResponse : BaseResponse, IServerSentEvent
     {
         public RunResponse() { }
 

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class ServerSentEvent : IStreamEvent
+    public sealed class ServerSentEvent : IServerSentEvent
     {
         internal static readonly Dictionary<string, ServerSentEventKind> EventMap = new()
         {

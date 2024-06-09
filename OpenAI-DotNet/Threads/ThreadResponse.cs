@@ -10,7 +10,7 @@ namespace OpenAI.Threads
     /// A conversation session between an Assistant and a user.
     /// Threads store Messages and automatically handle truncation to fit content into a model's context.
     /// </summary>
-    public sealed class ThreadResponse : BaseResponse, IStreamEvent
+    public sealed class ThreadResponse : BaseResponse, IServerSentEvent
     {
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.

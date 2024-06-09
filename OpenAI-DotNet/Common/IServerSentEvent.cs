@@ -3,9 +3,9 @@
 namespace OpenAI
 {
     /// <summary>
-    /// Common interface for streaming events
+    /// Common interface for streaming server sent events
     /// </summary>
-    public interface IStreamEvent
+    public interface IServerSentEvent
     {
         string Object { get; }
 
