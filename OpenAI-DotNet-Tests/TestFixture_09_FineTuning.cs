@@ -95,7 +95,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.FineTuningEndpoint);
             var fileData = await CreateTestTrainingDataAsync();
             Assert.IsNotNull(fileData);
-            var request = new CreateFineTuneJobRequest(Model.GPT4_Turbo, fileData);
+            var request = new CreateFineTuneJobRequest(Model.GPT3_5_Turbo, fileData);
             var job = await OpenAIClient.FineTuningEndpoint.CreateJobAsync(request);
 
             Assert.IsNotNull(job);
