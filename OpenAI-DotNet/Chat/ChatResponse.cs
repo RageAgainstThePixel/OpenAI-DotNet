@@ -25,9 +25,6 @@ namespace OpenAI.Chat
         [JsonPropertyName("object")]
         public string Object { get; private set; }
 
-        [Obsolete("Use CreatedAtUnixTimeSeconds")]
-        public int Created => CreatedAtUnixTimeSeconds;
-
         /// <summary>
         /// The Unix timestamp (in seconds) of when the chat completion was created.
         /// </summary>
@@ -116,6 +113,8 @@ namespace OpenAI.Chat
 
         public string GetUsage(bool log = true)
         {
+            if (Usage == null) { return string.Empty; }
+
             var message = $"{Id} | {Model} | {Usage}";
 
             if (log)

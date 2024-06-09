@@ -45,11 +45,18 @@ namespace OpenAI.Chat
         /// </summary>
         /// <param name="chatRequest">The chat request which contains the message content.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
+        /// <param name="streamUsage">
+        /// Optional, If set, an additional chunk will be streamed before the 'data: [DONE]' message.
+        /// The 'usage' field on this chunk shows the token usage statistics for the entire request,
+        /// and the 'choices' field will always be an empty array. All other chunks will also include a 'usage' field,
+        /// but with a null value.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, CancellationToken cancellationToken = default)
+        public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
+            chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
             ChatResponse chatResponse = null;
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (sseResponse, ssEvent) =>
@@ -78,14 +85,21 @@ namespace OpenAI.Chat
         /// <summary>
         /// Created a completion for the chat message and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(ChatRequest, Action{ChatResponse}, CancellationToken)"/> instead.
+        /// you may need to use <see cref="StreamCompletionAsync(ChatRequest, Action{ChatResponse}, bool, CancellationToken)"/> instead.
         /// </summary>
         /// <param name="chatRequest">The chat request which contains the message content.</param>
+        /// <param name="streamUsage">
+        /// Optional, If set, an additional chunk will be streamed before the 'data: [DONE]' message.
+        /// The 'usage' field on this chunk shows the token usage statistics for the entire request,
+        /// and the 'choices' field will always be an empty array. All other chunks will also include a 'usage' field,
+        /// but with a null value.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, bool streamUsage = false, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
+            chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
             using var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = jsonContent;
