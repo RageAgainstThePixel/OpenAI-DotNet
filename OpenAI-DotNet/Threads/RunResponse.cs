@@ -262,6 +262,10 @@ namespace OpenAI.Threads
         [JsonPropertyName("tool_choice")]
         public dynamic ToolChoice { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("parallel_tool_calls")]
+        public bool ParallelToolCalls { get; private set; }
+
         /// <summary>
         /// Specifies the format that the model must output.
         /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
