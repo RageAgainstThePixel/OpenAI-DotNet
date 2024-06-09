@@ -32,6 +32,7 @@ namespace OpenAI.Threads
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
                 request?.ToolChoice as string ?? ((Tool)request?.ToolChoice)?.Function?.Name,
+                request?.ParallelToolCalls,
                 request?.ResponseFormat ?? ChatResponseFormat.Auto)
         {
         }
@@ -105,6 +106,9 @@ namespace OpenAI.Threads
         /// Specifying a particular tool like {"type": "file_search"} or {"type": "function", "function": {"name": "my_function"}}
         /// forces the model to call that tool.
         /// </param>
+        /// <param name="parallelToolCalls">
+        /// Whether to enable parallel function calling during tool use.
+        /// </param>
         /// <param name="responseFormat">
         /// An object specifying the format that the model must output.
         /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
@@ -132,6 +136,7 @@ namespace OpenAI.Threads
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
             string toolChoice = null,
+            bool? parallelToolCalls = null,
             ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             CreateThreadRequest createThreadRequest = null)
         {
@@ -174,6 +179,7 @@ namespace OpenAI.Threads
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;
             ResponseFormat = responseFormat;
+            ParallelToolCalls = parallelToolCalls;
             ThreadRequest = createThreadRequest;
         }
 
@@ -285,6 +291,12 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonPropertyName("tool_choice")]
         public dynamic ToolChoice { get; }
+
+        /// <summary>
+        /// Whether to enable parallel function calling during tool use.
+        /// </summary>
+        [JsonPropertyName("parallel_tool_calls")]
+        public bool? ParallelToolCalls { get; }
 
         /// <summary>
         /// An object specifying the format that the model must output.
