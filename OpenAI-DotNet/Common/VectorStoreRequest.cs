@@ -46,6 +46,8 @@ namespace OpenAI
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
+        public static implicit operator VectorStoreRequest(string fileId) => new(new List<string> { fileId });
+
         public static implicit operator VectorStoreRequest(List<string> fileIds) => new(fileIds);
     }
 }

@@ -62,5 +62,12 @@ namespace OpenAI.VectorStores
         [JsonInclude]
         [JsonPropertyName("last_error")]
         public Error LastError { get; private set; }
+
+        /// <summary>
+        /// The strategy used to chunk the file.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("chunking_strategy")]
+        public ChunkingStrategy ChunkingStrategy { get; private set; }
     }
 }

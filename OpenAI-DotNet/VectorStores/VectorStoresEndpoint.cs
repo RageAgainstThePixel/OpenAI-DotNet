@@ -22,31 +22,14 @@ namespace OpenAI.VectorStores
         /// <summary>
         /// Creates a new Vector Store.
         /// </summary>
-        /// <param name="fileIds">
-        /// A list of file ids that the vector store should use.
-        /// Useful for tools like 'file_search' that can access files.
-        /// </param>
-        /// <param name="name">
-        /// Optional, name of the vector store.
-        /// </param>
-        /// <param name="expiresAfter">
-        /// The number of days after the anchor time that the vector store will expire.
-        /// </param>
-        /// <param name="metadata">
-        /// Set of 16 key-value pairs that can be attached to an object.
-        /// This can be useful for storing additional information about the object in a structured format.
-        /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
-        /// </param>
+        /// <param name="request"><see cref="CreateVectorStoreRequest"/>.</param>
         /// <param name="cancellationToken">Optional <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="VectorStoreResponse"/>.</returns>
-        public async Task<VectorStoreResponse> CreateVectorStoreAsync(IReadOnlyList<string> fileIds, string name = null, int? expiresAfter = null, IReadOnlyDictionary<string, object> metadata = null, CancellationToken cancellationToken = default)
+        public async Task<VectorStoreResponse> CreateVectorStoreAsync(CreateVectorStoreRequest request, CancellationToken cancellationToken = default)
         {
-            if (fileIds is not { Count: not 0 }) { throw new ArgumentNullException(nameof(fileIds)); }
-            var expirationPolicy = expiresAfter.HasValue ? new ExpirationPolicy(expiresAfter.Value) : null;
-            var request = new { file_ids = fileIds, name, expires_after = expirationPolicy, metadata };
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<VectorStoreResponse>(responseAsString, client);
         }
 
@@ -101,9 +84,9 @@ namespace OpenAI.VectorStores
         {
             var expirationPolicy = expiresAfter.HasValue ? new ExpirationPolicy(expiresAfter.Value) : null;
             var request = new { name, expires_after = expirationPolicy, metadata };
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<VectorStoreResponse>(responseAsString, client);
         }
 
@@ -132,11 +115,14 @@ namespace OpenAI.VectorStores
         /// A File ID that the vector store should use.
         /// Useful for tools like file_search that can access files.
         /// </param>
+        /// <param name="chunkingStrategy">
+        /// A file id that the vector store should use. Useful for tools like 'file_search' that can access files.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="VectorStoreFileResponse"/>.</returns>
-        public async Task<VectorStoreFileResponse> CreateVectorStoreFileAsync(string vectorStoreId, string fileId, CancellationToken cancellationToken = default)
+        public async Task<VectorStoreFileResponse> CreateVectorStoreFileAsync(string vectorStoreId, string fileId, ChunkingStrategy chunkingStrategy = null, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(new { file_id = fileId }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var jsonContent = JsonSerializer.Serialize(new { file_id = fileId, chunking_strategy = chunkingStrategy }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/files"), jsonContent, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<VectorStoreFileResponse>(responseAsString, client);
@@ -208,14 +194,17 @@ namespace OpenAI.VectorStores
         /// <param name="fileIds">
         /// A list of File IDs that the vector store should use. Useful for tools like file_search that can access files.
         /// </param>
+        /// <param name="chunkingStrategy">
+        /// A file id that the vector store should use. Useful for tools like 'file_search' that can access files.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="VectorStoreFileBatch"/>.</returns>
-        public async Task<VectorStoreFileBatch> CreateVectorStoreFileBatch(string vectorStoreId, IReadOnlyList<string> fileIds, CancellationToken cancellationToken = default)
+        public async Task<VectorStoreFileBatch> CreateVectorStoreFileBatch(string vectorStoreId, IReadOnlyList<string> fileIds, ChunkingStrategy chunkingStrategy = null, CancellationToken cancellationToken = default)
         {
             if (fileIds is not { Count: not 0 }) { throw new ArgumentNullException(nameof(fileIds)); }
-            using var jsonContent = JsonSerializer.Serialize(new { file_ids = fileIds }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(new { file_ids = fileIds, chunking_strategy = chunkingStrategy }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<VectorStoreFileBatch>(responseAsString, client);
         }
 
@@ -223,11 +212,12 @@ namespace OpenAI.VectorStores
         /// Returns a list of vector store files in a batch.
         /// </summary>
         /// <param name="vectorStoreId">The ID of the vector store that the files belong to.</param>
+        /// <param name="fileBatchId">The ID of the file batch.</param>
         /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
         /// <param name="filter">Optional, filter by file status.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{VectorStoreFileBatch}"/>.</returns>
-        public async Task<ListResponse<VectorStoreFileBatch>> ListVectorStoreFileBatchesAsync(string vectorStoreId, ListQuery query = null, VectorStoreFileStatus? filter = null, CancellationToken cancellationToken = default)
+        public async Task<ListResponse<VectorStoreFileBatch>> ListVectorStoreFileBatchesAsync(string vectorStoreId, string fileBatchId, ListQuery query = null, VectorStoreFileStatus? filter = null, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> queryParams = query;
 
@@ -237,7 +227,7 @@ namespace OpenAI.VectorStores
                 queryParams.Add("filter", $"{filter.Value}");
             }
 
-            using var response = await client.Client.GetAsync(GetUrl($"/{vectorStoreId}/file_batches", queryParams), cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/files", queryParams), cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ListResponse<VectorStoreFileBatch>>(responseAsString, client);
         }

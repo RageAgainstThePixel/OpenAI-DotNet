@@ -102,5 +102,7 @@ namespace OpenAI.VectorStores
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public Dictionary<string, object> Metadata { get; private set; }
+
+        public override string ToString() => Id;
     }
 }
