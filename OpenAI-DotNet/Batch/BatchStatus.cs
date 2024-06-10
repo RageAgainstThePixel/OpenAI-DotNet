@@ -9,19 +9,19 @@ namespace OpenAI.Batch
         NotStarted = 0,
         [EnumMember(Value = "validating")]
         Validating,
-        [EnumMember(Value = "failed")]
-        Failed,
         [EnumMember(Value = "in_progress")]
         InProgress,
         [EnumMember(Value = "finalizing")]
         Finalizing,
+        [EnumMember(Value = "cancelling")]
+        Cancelling,
+        [EnumMember(Value = "cancelled")]
+        Cancelled,
         [EnumMember(Value = "completed")]
         Completed,
         [EnumMember(Value = "expired")]
         Expired,
-        [EnumMember(Value = "cancelled")]
-        Cancelling,
-        [EnumMember(Value = "cancelled")]
-        Cancelled
+        [EnumMember(Value = "failed")]
+        Failed,
     }
 }
