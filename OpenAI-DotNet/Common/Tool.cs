@@ -112,11 +112,59 @@ namespace OpenAI
         public async Task<T> InvokeFunctionAsync<T>(CancellationToken cancellationToken = default)
             => await Function.InvokeAsync<T>(cancellationToken).ConfigureAwait(false);
 
+        #region Tool Cache
+
         private static readonly List<Tool> toolCache = new()
         {
             FileSearch,
             CodeInterpreter
         };
+
+        /// <summary>
+        /// Gets a list of all available tools.
+        /// </summary>
+        /// <remarks>
+        /// This method will scan all assemblies for static methods decorated with the <see cref="FunctionAttribute"/>.
+        /// </remarks>
+        /// <param name="includeDefaults">Optional, Whether to include the default tools (Retrieval and CodeInterpreter).</param>
+        /// <param name="forceUpdate">Optional, Whether to force an update of the tool cache.</param>
+        /// <param name="clearCache">Optional, whether to force the tool cache to be cleared before updating.</param>
+        /// <returns>A list of all available tools.</returns>
+        public static IReadOnlyList<Tool> GetAllAvailableTools(bool includeDefaults = true, bool forceUpdate = false, bool clearCache = false)
+        {
+            if (clearCache)
+            {
+                ClearRegisteredTools();
+            }
+
+            if (forceUpdate || toolCache.All(tool => tool.Type != "function"))
+            {
+                var tools = new List<Tool>();
+                tools.AddRange(
+                    from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    from type in assembly.GetTypes()
+                    from method in type.GetMethods()
+                    where method.IsStatic
+                    let functionAttribute = method.GetCustomAttribute<FunctionAttribute>()
+                    where functionAttribute != null
+                    let name = $"{type.FullName}.{method.Name}".Replace('.', '_')
+                    let description = functionAttribute.Description
+                    select Function.GetOrCreateFunction(name, description, method)
+                    into function
+                    select new Tool(function));
+
+                foreach (var newTool in tools.Where(tool =>
+                             !toolCache.Any(knownTool =>
+                                 knownTool.Type == "function" && knownTool.Function.Name == tool.Function.Name && knownTool.Function.Instance == null)))
+                {
+                    toolCache.Add(newTool);
+                }
+            }
+
+            return !includeDefaults
+                ? toolCache.Where(tool => tool.Type == "function").ToList()
+                : toolCache;
+        }
 
         /// <summary>
         /// Clears the tool cache of all previously registered tools.
@@ -159,68 +207,27 @@ namespace OpenAI
 
             toolCache.Add(tool);
             return true;
-
-        }
-
-        private static bool TryGetTool(string name, object instance, out Tool tool)
-        {
-            foreach (var knownTool in toolCache.Where(knownTool =>
-                         knownTool.Type == "function" &&
-                         knownTool.Function.Name == name &&
-                         ReferenceEquals(knownTool, instance)))
-            {
-                tool = knownTool;
-                return true;
-            }
-
-            tool = null;
-            return false;
         }
 
         /// <summary>
-        /// Gets a list of all available tools.
+        /// Tries to remove a tool from the Tool cache.
         /// </summary>
-        /// <remarks>
-        /// This method will scan all assemblies for static methods decorated with the <see cref="FunctionAttribute"/>.
-        /// </remarks>
-        /// <param name="includeDefaults">Optional, Whether to include the default tools (Retrieval and CodeInterpreter).</param>
-        /// <param name="forceUpdate">Optional, Whether to force an update of the tool cache.</param>
-        /// <param name="clearCache">Optional, whether to force the tool cache to be cleared before updating.</param>
-        /// <returns>A list of all available tools.</returns>
-        public static IReadOnlyList<Tool> GetAllAvailableTools(bool includeDefaults = true, bool forceUpdate = false, bool clearCache = false)
+        /// <param name="tool">The tool to remove.</param>
+        /// <returns>True, if the tool was removed from the cache.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static bool TryUnregisterTool(Tool tool)
         {
-            if (clearCache)
+            if (!IsToolRegistered(tool))
             {
-                ClearRegisteredTools();
+                return false;
             }
 
-            if (forceUpdate || toolCache.All(tool => tool.Type != "function"))
+            if (tool.Type != "function")
             {
-                var tools = new List<Tool>();
-                tools.AddRange(
-                    from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from type in assembly.GetTypes()
-                    from method in type.GetMethods()
-                    where method.IsStatic
-                    let functionAttribute = method.GetCustomAttribute<FunctionAttribute>()
-                    where functionAttribute != null
-                    let name = $"{type.FullName}.{method.Name}".Replace('.', '_')
-                    let description = functionAttribute.Description
-                    select new Function(name, description, method)
-                    into function
-                    select new Tool(function));
-
-                foreach (var newTool in tools.Where(tool =>
-                             !toolCache.Any(knownTool =>
-                                 knownTool.Type == "function" && knownTool.Function.Name == tool.Function.Name && knownTool.Function.Instance == null)))
-                {
-                    toolCache.Add(newTool);
-                }
+                throw new InvalidOperationException("Only function tools can be unregistered.");
             }
 
-            return !includeDefaults
-                ? toolCache.Where(tool => tool.Type == "function").ToList()
-                : toolCache;
+            return Function.TryRemoveFunction(tool.Function.Name) && toolCache.Remove(tool);
         }
 
         /// <summary>
@@ -280,10 +287,26 @@ namespace OpenAI
                 return tool;
             }
 
-            tool = new Tool(new Function(functionName, description ?? string.Empty, method, instance));
+            tool = new Tool(Function.GetOrCreateFunction(functionName, description ?? string.Empty, method, instance));
             toolCache.Add(tool);
             return tool;
         }
+
+        private static bool TryGetTool(string name, object instance, out Tool tool)
+        {
+            foreach (var knownTool in toolCache.Where(knownTool =>
+                         knownTool.Type == "function" && knownTool.Function.Name == name &&
+                         ReferenceEquals(knownTool.Function.Instance, instance)))
+            {
+                tool = knownTool;
+                return true;
+            }
+
+            tool = null;
+            return false;
+        }
+
+        #endregion Tool Cache
 
         #region Func<,> Overloads
 
