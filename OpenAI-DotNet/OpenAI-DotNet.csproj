@@ -28,8 +28,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>8.0.0</Version>
+    <Version>8.0.1</Version>
     <PackageReleaseNotes>
+Version 8.0.1
+- Fixed Thread.Run.Status enum ordering
 Version 8.0.0
 - Updated Assistants Beta v2
 - Added support for specifying project id
