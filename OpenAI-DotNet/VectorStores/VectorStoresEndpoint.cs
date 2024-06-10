@@ -275,23 +275,23 @@ namespace OpenAI.VectorStores
         /// <returns>True, if the vector store file batch was cancelled, otherwise false.</returns>
         public async Task<bool> CancelVectorStoreFileBatchAsync(string vectorStoreId, string fileBatchId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
             var result = response.Deserialize<VectorStoreFileBatchResponse>(responseAsString, client);
 
-            try
+            if (result.Status < VectorStoreFileStatus.Cancelling)
             {
-                if (result.Status < VectorStoreFileStatus.Cancelling)
+                try
                 {
                     result = await result.WaitForStatusChangeAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
-            }
-            catch (Exception)
-            {
-                // ignored
+                catch (Exception)
+                {
+                    // ignored
+                }
             }
 
-            return result.Status is VectorStoreFileStatus.Cancelling or VectorStoreFileStatus.Cancelled or VectorStoreFileStatus.Completed or VectorStoreFileStatus.Failed;
+            return result.Status >= VectorStoreFileStatus.Cancelling;
         }
 
         #endregion Batches

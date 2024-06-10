@@ -404,11 +404,9 @@ namespace OpenAI.Tests
 
             try
             {
-                run = await run.CancelAsync();
-                Assert.IsNotNull(run);
-                Assert.IsTrue(run.Status == RunStatus.Cancelling);
-                // waiting while run is cancelling
-                run = await run.WaitForStatusChangeAsync();
+                var runCancelled = await run.CancelAsync();
+                Assert.IsNotNull(runCancelled);
+                Assert.IsTrue(runCancelled);
             }
             catch (Exception e)
             {
@@ -426,6 +424,7 @@ namespace OpenAI.Tests
                 }
             }
 
+            run = await run.UpdateAsync();
             Assert.IsTrue(run.Status is RunStatus.Cancelled or RunStatus.Cancelling or RunStatus.Completed);
         }
 

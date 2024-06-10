@@ -342,7 +342,7 @@ namespace OpenAI.Threads
         /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
+        public static async Task<bool> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
             => await run.Client.ThreadsEndpoint.CancelRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
 
         /// <summary>

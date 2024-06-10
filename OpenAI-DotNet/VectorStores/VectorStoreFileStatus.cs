@@ -9,13 +9,13 @@ namespace OpenAI.VectorStores
         NotStarted = 0,
         [EnumMember(Value = "in_progress")]
         InProgress,
-        [EnumMember(Value = "completed")]
-        Completed,
         [EnumMember(Value = "cancelling")]
         Cancelling,
         [EnumMember(Value = "cancelled")]
         Cancelled,
+        [EnumMember(Value = "completed")]
+        Completed,
         [EnumMember(Value = "failed")]
-        Failed
+        Failed,
     }
 }
