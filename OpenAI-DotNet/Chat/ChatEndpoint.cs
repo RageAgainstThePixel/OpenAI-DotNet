@@ -34,9 +34,9 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/completions"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<ChatResponse>(responseAsString, client);
         }
 
@@ -45,56 +45,23 @@ namespace OpenAI.Chat
         /// </summary>
         /// <param name="chatRequest">The chat request which contains the message content.</param>
         /// <param name="resultHandler">An action to be called as each new result arrives.</param>
+        /// <param name="streamUsage">
+        /// Optional, If set, an additional chunk will be streamed before the 'data: [DONE]' message.
+        /// The 'usage' field on this chunk shows the token usage statistics for the entire request,
+        /// and the 'choices' field will always be an empty array. All other chunks will also include a 'usage' field,
+        /// but with a null value.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, CancellationToken cancellationToken = default)
+        public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
-            using var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
-            request.Content = jsonContent;
-            using var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, jsonContent, null, cancellationToken).ConfigureAwait(false);
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            using var reader = new StreamReader(stream);
+            chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
             ChatResponse chatResponse = null;
-            using var responseStream = EnableDebug ? new MemoryStream() : null;
-
-            if (responseStream != null)
+            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (sseResponse, ssEvent) =>
             {
-                await responseStream.WriteAsync("["u8.ToArray(), cancellationToken);
-            }
-
-            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (!streamData.TryGetEventStreamData(out var eventData))
-                {
-                    // if response stream is not null, remove last comma
-                    responseStream?.SetLength(responseStream.Length - 1);
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(eventData)) { continue; }
-
-                if (responseStream != null)
-                {
-                    string data;
-
-                    try
-                    {
-                        data = JsonNode.Parse(eventData)?.ToJsonString(OpenAIClient.JsonSerializationOptions);
-                    }
-                    catch
-                    {
-                        data = $"{{{eventData}}}";
-                    }
-
-                    await responseStream.WriteAsync(Encoding.UTF8.GetBytes($"{data},"), cancellationToken);
-                }
-
-                var partialResponse = response.Deserialize<ChatResponse>(eventData, client);
+                var partialResponse = sseResponse.Deserialize<ChatResponse>(ssEvent, client);
 
                 if (chatResponse == null)
                 {
@@ -102,21 +69,14 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    chatResponse.CopyFrom(partialResponse);
+                    chatResponse.AppendFrom(partialResponse);
                 }
 
                 resultHandler?.Invoke(partialResponse);
-            }
 
-            if (responseStream != null)
-            {
-                await responseStream.WriteAsync("]"u8.ToArray(), cancellationToken);
-            }
-
-            await response.CheckResponseAsync(EnableDebug, jsonContent, responseStream, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken);
 
             if (chatResponse == null) { return null; }
-
             chatResponse.SetResponseData(response.Headers, client);
             resultHandler?.Invoke(chatResponse);
             return chatResponse;
@@ -125,19 +85,26 @@ namespace OpenAI.Chat
         /// <summary>
         /// Created a completion for the chat message and stream the results as they come in.<br/>
         /// If you are not using C# 8 supporting IAsyncEnumerable{T} or if you are using the .NET Framework,
-        /// you may need to use <see cref="StreamCompletionAsync(ChatRequest, Action{ChatResponse}, CancellationToken)"/> instead.
+        /// you may need to use <see cref="StreamCompletionAsync(ChatRequest, Action{ChatResponse}, bool, CancellationToken)"/> instead.
         /// </summary>
         /// <param name="chatRequest">The chat request which contains the message content.</param>
+        /// <param name="streamUsage">
+        /// Optional, If set, an additional chunk will be streamed before the 'data: [DONE]' message.
+        /// The 'usage' field on this chunk shows the token usage statistics for the entire request,
+        /// and the 'choices' field will always be an empty array. All other chunks will also include a 'usage' field,
+        /// but with a null value.
+        /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<ChatResponse> StreamCompletionEnumerableAsync(ChatRequest chatRequest, bool streamUsage = false, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             chatRequest.Stream = true;
-            using var jsonContent = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
+            using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
-            request.Content = jsonContent;
+            request.Content = payload;
             using var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
             ChatResponse chatResponse = null;
@@ -185,7 +152,7 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    chatResponse.CopyFrom(partialResponse);
+                    chatResponse.AppendFrom(partialResponse);
                 }
 
                 yield return partialResponse;
@@ -196,7 +163,7 @@ namespace OpenAI.Chat
                 await responseStream.WriteAsync("]"u8.ToArray(), cancellationToken);
             }
 
-            await response.CheckResponseAsync(EnableDebug, jsonContent, responseStream, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(EnableDebug, payload, responseStream, null, cancellationToken).ConfigureAwait(false);
 
             if (chatResponse == null) { yield break; }
 

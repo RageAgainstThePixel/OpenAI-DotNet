@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -78,13 +79,23 @@ namespace OpenAI.Assistants
         public IReadOnlyList<Tool> Tools { get; private set; }
 
         /// <summary>
+        /// A set of resources that are used by the assistant's tools.
+        /// The resources are specific to the type of tool.
+        /// For example, the code_interpreter tool requires a list of file IDs,
+        /// while the file_search tool requires a list of vector store IDs.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("tool_resources")]
+        public ToolResources ToolResources { get; private set; }
+
+        /// <summary>
         /// A list of file IDs attached to this assistant.
         /// There can be a maximum of 20 files attached to the assistant.
         /// Files are ordered by their creation date in ascending order.
         /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("file_ids")]
-        public IReadOnlyList<string> FileIds { get; private set; }
+        [JsonIgnore]
+        [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
+        public IReadOnlyList<string> FileIds => null;
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
@@ -94,6 +105,41 @@ namespace OpenAI.Assistants
         [JsonInclude]
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
+
+        /// <summary>
+        /// What sampling temperature to use, between 0 and 2.
+        /// Higher values like 0.8 will make the output more random,
+        /// while lower values like 0.2 will make it more focused and deterministic.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("temperature")]
+        public double Temperature { get; private set; }
+
+        /// <summary>
+        /// An alternative to sampling with temperature, called nucleus sampling,
+        /// where the model considers the results of the tokens with top_p probability mass.
+        /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("top_p")]
+        public double TopP { get; private set; }
+
+        /// <summary>
+        /// Specifies the format that the model must output.
+        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// which guarantees the message the model generates is valid JSON.
+        /// </summary>
+        /// <remarks>
+        /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
+        /// for example via your system message. If you don't do this, the model may generate an unending stream of
+        /// whitespace until the generation reaches the token limit, which may take a lot of time and give the appearance
+        /// of a "stuck" request. Also note that the message content may be partial (i.e. cut off) if finish_reason="length",
+        /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
+        /// </remarks>
+        [JsonInclude]
+        [JsonPropertyName("response_format")]
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        public ChatResponseFormat ResponseFormat { get; private set; }
 
         public static implicit operator string(AssistantResponse assistant) => assistant?.Id;
 

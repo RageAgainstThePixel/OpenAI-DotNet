@@ -8,6 +8,7 @@ namespace OpenAI.Assistants
     /// <summary>
     /// File attached to an assistant.
     /// </summary>
+    [Obsolete("Removed. Use Assistant.ToolResources instead.")]
     public sealed class AssistantFileResponse : BaseResponse
     {
         /// <summary>

@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +22,15 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
             double? topP = null,
             int? topLogProbs = null,
+            bool? parallelToolCalls = null,
             string user = null)
-            : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty, responseFormat, seed, stops, temperature, topP, topLogProbs, user)
+            : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty, responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, user)
         {
             var toolList = tools?.ToList();
 
@@ -41,6 +43,7 @@ namespace OpenAI.Chat
                 else
                 {
                     if (!toolChoice.Equals("none") &&
+                        !toolChoice.Equals("required") &&
                         !toolChoice.Equals("auto"))
                     {
                         var tool = toolList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice)) ??
@@ -122,6 +125,9 @@ namespace OpenAI.Chat
         /// An integer between 0 and 5 specifying the number of most likely tokens to return at each token position,
         /// each with an associated log probability.
         /// </param>
+        /// <param name="parallelToolCalls">
+        /// Whether to enable parallel function calling during tool use.
+        /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
@@ -133,12 +139,13 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
             double? topP = null,
             int? topLogProbs = null,
+            bool? parallelToolCalls = null,
             string user = null)
         {
             Messages = messages?.ToList();
@@ -148,19 +155,20 @@ namespace OpenAI.Chat
                 throw new ArgumentNullException(nameof(messages), $"Missing required {nameof(messages)} parameter");
             }
 
-            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT3_5_Turbo : model;
+            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             FrequencyPenalty = frequencyPenalty;
             LogitBias = logitBias;
             MaxTokens = maxTokens;
             Number = number;
             PresencePenalty = presencePenalty;
-            ResponseFormat = ChatResponseFormat.Json == responseFormat ? responseFormat : null;
+            ResponseFormat = responseFormat;
             Seed = seed;
             Stops = stops;
             Temperature = temperature;
             TopP = topP;
             LogProbs = topLogProbs.HasValue ? topLogProbs.Value > 0 : null;
             TopLogProbs = topLogProbs;
+            ParallelToolCalls = parallelToolCalls;
             User = user;
         }
 
@@ -255,8 +263,9 @@ namespace OpenAI.Chat
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ResponseFormat ResponseFormat { get; }
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ChatResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically,
@@ -281,6 +290,10 @@ namespace OpenAI.Chat
         [JsonPropertyName("stream")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Stream { get; internal set; }
+
+        [JsonPropertyName("stream_options")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public StreamOptions StreamOptions { get; internal set; }
 
         /// <summary>
         /// What sampling temperature to use, between 0 and 2.
@@ -322,27 +335,16 @@ namespace OpenAI.Chat
         public dynamic ToolChoice { get; }
 
         /// <summary>
+        /// Whether to enable parallel function calling during tool use.
+        /// </summary>
+        [JsonPropertyName("parallel_tool_calls")]
+        public bool? ParallelToolCalls { get; }
+
+        /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         [JsonPropertyName("user")]
         public string User { get; }
-
-        /// <summary>
-        /// Pass "auto" to let the OpenAI service decide, "none" if none are to be called,
-        /// or "functionName" to force function call. Defaults to "auto".
-        /// </summary>
-        [Obsolete("Use ToolChoice")]
-        [JsonPropertyName("function_call")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public dynamic FunctionCall { get; }
-
-        /// <summary>
-        /// An optional list of functions to get arguments for.
-        /// </summary>
-        [Obsolete("Use Tools")]
-        [JsonPropertyName("functions")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public IReadOnlyList<Function> Functions { get; }
 
         /// <inheritdoc />
         public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);

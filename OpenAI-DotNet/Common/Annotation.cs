@@ -3,10 +3,14 @@
 using OpenAI.Extensions;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Threads
+namespace OpenAI
 {
-    public sealed class Annotation
+    public sealed class Annotation : IAppendable<Annotation>
     {
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        public int? Index { get; private set; }
+
         [JsonInclude]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter<AnnotationType>))]
@@ -42,5 +46,35 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("end_index")]
         public int EndIndex { get; private set; }
+
+        public void AppendFrom(Annotation other)
+        {
+            if (other == null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Text))
+            {
+                Text += other.Text;
+            }
+
+            if (other.FileCitation != null)
+            {
+                FileCitation = other.FileCitation;
+            }
+
+            if (other.FilePath != null)
+            {
+                FilePath = other.FilePath;
+            }
+
+            if (other.StartIndex > 0)
+            {
+                StartIndex = other.StartIndex;
+            }
+
+            if (other.EndIndex > 0)
+            {
+                EndIndex = other.EndIndex;
+            }
+        }
     }
 }

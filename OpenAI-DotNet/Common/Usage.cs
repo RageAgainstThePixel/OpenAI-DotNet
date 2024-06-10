@@ -9,7 +9,7 @@ namespace OpenAI
     {
         public Usage() { }
 
-        public Usage(int promptTokens, int completionTokens, int totalTokens)
+        private Usage(int? promptTokens, int? completionTokens, int? totalTokens)
         {
             PromptTokens = promptTokens;
             CompletionTokens = completionTokens;
@@ -18,17 +18,20 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("prompt_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? PromptTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("completion_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? CompletionTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("total_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? TotalTokens { get; private set; }
 
-        internal void CopyFrom(Usage other)
+        internal void AppendFrom(Usage other)
         {
             if (other?.PromptTokens != null)
             {

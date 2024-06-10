@@ -14,7 +14,7 @@ namespace OpenAI.FineTuning
             string suffix = null,
             string validationFileId = null)
         {
-            Model = model ?? Models.Model.GPT3_5_Turbo;
+            Model = model ?? Models.Model.GPT4_Turbo;
             TrainingFileId = trainingFileId;
             HyperParameters = hyperParameters;
             Suffix = suffix;

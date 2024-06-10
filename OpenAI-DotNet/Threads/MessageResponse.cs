@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace OpenAI.Threads
     /// Messages can include text, images, and other files.
     /// Messages stored as a list on the Thread.
     /// </summary>
-    public sealed class MessageResponse : BaseResponse
+    public sealed class MessageResponse : BaseResponse, IServerSentEvent
     {
+        public MessageResponse() { }
+
+        internal MessageResponse(MessageResponse other) => AppendFrom(other);
+
         /// <summary>
         /// The identifier, which can be referenced in API endpoints.
         /// </summary>
@@ -27,6 +32,11 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public MessageDelta Delta { get; private set; }
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the message was created.
@@ -46,18 +56,68 @@ namespace OpenAI.Threads
         public string ThreadId { get; private set; }
 
         /// <summary>
+        /// The status of the message, which can be either 'in_progress', 'incomplete', or 'completed'.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("status")]
+        [JsonConverter(typeof(JsonStringEnumConverter<MessageStatus>))]
+        public MessageStatus Status { get; private set; }
+
+        /// <summary>
+        /// On an incomplete message, details about why the message is incomplete.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("incomplete_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public IncompleteDetails IncompleteDetails { get; private set; }
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) for when the message was completed.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("completed_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? CompletedAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? CompletedAt
+            => CompletedAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(CompletedAtUnixTimeSeconds.Value).DateTime
+                : null;
+
+        /// <summary>
+        /// The Unix timestamp (in seconds) for when the message was marked as incomplete.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("incomplete_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? IncompleteAtUnixTimeSeconds { get; private set; }
+
+        [JsonIgnore]
+        public DateTime? IncompleteAt
+            => IncompleteAtUnixTimeSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(IncompleteAtUnixTimeSeconds.Value).DateTime
+                : null;
+
+        /// <summary>
         /// The entity that produced the message. One of user or assistant.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("role")]
         public Role Role { get; private set; }
 
+        private List<Content> content = new();
+
         /// <summary>
         /// The content of the message in array of text and/or images.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
-        public IReadOnlyList<Content> Content { get; private set; }
+        public IReadOnlyList<Content> Content
+        {
+            get => content;
+            private set => content = value?.ToList();
+        }
 
         /// <summary>
         /// If applicable, the ID of the assistant that authored this message.
@@ -78,9 +138,17 @@ namespace OpenAI.Threads
         /// Useful for tools like 'retrieval' and 'code_interpreter' that can access files.
         /// A maximum of 10 files can be attached to a message.
         /// </summary>
+        [JsonIgnore]
+        [Obsolete("Use Attachments instead.")]
+        public IReadOnlyList<string> FileIds => Attachments?.Select(attachment => attachment.FileId).ToList();
+
+        /// <summary>
+        /// A list of files attached to the message, and the tools they were added to.
+        /// </summary>
         [JsonInclude]
-        [JsonPropertyName("file_ids")]
-        public IReadOnlyList<string> FileIds { get; private set; }
+        [JsonPropertyName("Attachments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public IReadOnlyList<Attachment> Attachments { get; private set; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
@@ -89,9 +157,13 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         public static implicit operator string(MessageResponse message) => message?.ToString();
+
+        public static implicit operator Message(MessageResponse response)
+            => new(response.Content, response.Role, response.Attachments, response.Metadata);
 
         public override string ToString() => Id;
 
@@ -100,6 +172,79 @@ namespace OpenAI.Threads
         /// putting each item on a new line.
         /// </summary>
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
-        public string PrintContent() => string.Join("\n", Content.Select(content => content?.ToString()));
+        public string PrintContent()
+            => content == null
+                ? string.Empty
+                : string.Join("\n", content.Select(c => c?.ToString()));
+
+        internal void AppendFrom(MessageResponse other)
+        {
+            if (other == null) { return; }
+
+            if (other.Delta != null)
+            {
+                if (Role == 0 &&
+                    other.Delta.Role > 0)
+                {
+                    Role = other.Delta.Role;
+                }
+
+                if (other.Delta.Content != null)
+                {
+                    content ??= new List<Content>();
+                    content.AppendFrom(other.Delta.Content);
+                }
+
+                // bail early since we only care about the delta content
+                return;
+            }
+
+            if (Role == 0 &&
+                other.Role > 0)
+            {
+                Role = other.Role;
+            }
+
+            if (other.content != null)
+            {
+                content = other.content;
+            }
+
+            if (CreatedAtUnixTimeSeconds == 0 &&
+                other.CreatedAtUnixTimeSeconds > 0)
+            {
+                CreatedAtUnixTimeSeconds = other.CreatedAtUnixTimeSeconds;
+            }
+
+            if (other.CompletedAtUnixTimeSeconds.HasValue)
+            {
+                CompletedAtUnixTimeSeconds = other.CompletedAtUnixTimeSeconds;
+            }
+
+            if (other.IncompleteAtUnixTimeSeconds.HasValue)
+            {
+                IncompleteAtUnixTimeSeconds = other.IncompleteAtUnixTimeSeconds;
+            }
+
+            if (other.Status > 0)
+            {
+                Status = other.Status;
+            }
+
+            if (other.IncompleteDetails != null)
+            {
+                IncompleteDetails = other.IncompleteDetails;
+            }
+
+            if (other.Attachments != null)
+            {
+                Attachments = other.Attachments;
+            }
+
+            if (other.Metadata != null)
+            {
+                Metadata = other.Metadata;
+            }
+        }
     }
 }

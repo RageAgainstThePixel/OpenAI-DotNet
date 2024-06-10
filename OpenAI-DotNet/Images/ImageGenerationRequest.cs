@@ -33,7 +33,7 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </param>
         /// <param name="size">
         /// The size of the generated images.
@@ -55,7 +55,7 @@ namespace OpenAI.Images
             Model model = null,
             int numberOfResults = 1,
             string quality = null,
-            ResponseFormat responseFormat = ResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
             string size = null,
             string style = null,
             string user = null)
@@ -98,18 +98,18 @@ namespace OpenAI.Images
         /// </summary>
         [JsonPropertyName("quality")]
         [FunctionProperty("The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image. This param is only supported for dall-e-3.",
-            possibleValues: new object[] { "standard", "hd" })]
+            possibleValues: ["standard", "hd"])]
         public string Quality { get; }
 
         /// <summary>
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </summary>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ResponseFormat>))]
+        [JsonConverter(typeof(JsonStringEnumConverter<ImageResponseFormat>))]
         [FunctionProperty("The format in which the generated images are returned. Must be one of url or b64_json.", true)]
-        public ResponseFormat ResponseFormat { get; }
+        public ImageResponseFormat ResponseFormat { get; }
 
         /// <summary>
         /// The size of the generated images.

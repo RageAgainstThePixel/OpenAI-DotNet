@@ -12,14 +12,16 @@ namespace OpenAI.Threads
         InProgress,
         [EnumMember(Value = "requires_action")]
         RequiresAction,
+        [EnumMember(Value = "incomplete")]
+        Incomplete,
         [EnumMember(Value = "cancelling")]
         Cancelling,
         [EnumMember(Value = "cancelled")]
         Cancelled,
-        [EnumMember(Value = "failed")]
-        Failed,
         [EnumMember(Value = "completed")]
         Completed,
+        [EnumMember(Value = "failed")]
+        Failed,
         [EnumMember(Value = "expired")]
         Expired
     }

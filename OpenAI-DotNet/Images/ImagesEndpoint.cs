@@ -25,20 +25,20 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates an image given a prompt.
         /// </summary>
-        /// <param name="request"><see cref="ImageGenerationRequest"/></param>
+        /// <param name="request"><see cref="ImageGenerationRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Creates an edited or extended image given an original image and a prompt.
         /// </summary>
-        /// <param name="request"><see cref="ImageEditRequest"/></param>
+        /// <param name="request"><see cref="ImageEditRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(ImageEditRequest request, CancellationToken cancellationToken = default)
@@ -73,7 +73,7 @@ namespace OpenAI.Images
         /// <summary>
         /// Creates a variation of a given image.
         /// </summary>
-        /// <param name="request"><see cref="ImageVariationRequest"/></param>
+        /// <param name="request"><see cref="ImageVariationRequest"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(ImageVariationRequest request, CancellationToken cancellationToken = default)
@@ -98,7 +98,7 @@ namespace OpenAI.Images
 
         private async Task<IReadOnlyList<ImageResult>> DeserializeResponseAsync(HttpResponseMessage response, HttpContent requestContent, CancellationToken cancellationToken = default)
         {
-            var resultAsString = await response.ReadAsStringAsync(EnableDebug, requestContent, null, cancellationToken).ConfigureAwait(false);
+            var resultAsString = await response.ReadAsStringAsync(EnableDebug, requestContent, cancellationToken).ConfigureAwait(false);
             var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, client);
 
             if (imagesResponse?.Results is not { Count: not 0 })

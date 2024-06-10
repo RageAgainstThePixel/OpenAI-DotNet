@@ -2,6 +2,7 @@
 
 using NUnit.Framework;
 using OpenAI.Assistants;
+using OpenAI.Files;
 using OpenAI.Models;
 using System;
 using System.Collections.Generic;
@@ -21,32 +22,53 @@ namespace OpenAI.Tests
             const string testFilePath = "assistant_test_1.txt";
             await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(testFilePath));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
-            File.Delete(testFilePath);
-            Assert.IsFalse(File.Exists(testFilePath));
-            var request = new CreateAssistantRequest(Model.GPT3_5_Turbo,
-                name: "test-assistant",
-                description: "Used for unit testing.",
-                instructions: "You are test assistant",
-                metadata: new Dictionary<string, string>
+            FileResponse file = null;
+
+            try
+            {
+                try
                 {
-                    ["int"] = "1",
-                    ["test"] = Guid.NewGuid().ToString()
-                },
-                tools: new[]
+                    file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, FilePurpose.Assistants);
+                }
+                finally
                 {
-                    Tool.Retrieval
-                },
-                files: new[] { file.Id });
-            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
-            Assert.IsNotNull(assistant);
-            Assert.AreEqual("test-assistant", assistant.Name);
-            Assert.AreEqual("Used for unit testing.", assistant.Description);
-            Assert.AreEqual("You are test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT3_5_Turbo.ToString(), assistant.Model);
-            Assert.IsNotEmpty(assistant.Metadata);
-            testAssistant = assistant;
-            Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
+                    if (File.Exists(testFilePath))
+                    {
+                        File.Delete(testFilePath);
+                    }
+
+                    Assert.IsFalse(File.Exists(testFilePath));
+                }
+
+                var request = new CreateAssistantRequest(Model.GPT4_Turbo,
+                    name: "test-assistant",
+                    description: "Used for unit testing.",
+                    instructions: "You are test assistant",
+                    toolResources: new FileSearchResources(new List<string> { file.Id }),
+                    metadata: new Dictionary<string, string>
+                    {
+                        ["int"] = "1",
+                        ["test"] = Guid.NewGuid().ToString()
+                    },
+                    tools: new[] { Tool.FileSearch });
+                var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
+                Assert.IsNotNull(assistant);
+                Assert.AreEqual("test-assistant", assistant.Name);
+                Assert.AreEqual("Used for unit testing.", assistant.Description);
+                Assert.AreEqual("You are test assistant", assistant.Instructions);
+                Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
+                Assert.IsNotEmpty(assistant.Metadata);
+                testAssistant = assistant;
+                Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
+            }
+            finally
+            {
+                if (file != null)
+                {
+                    var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
+                    Assert.IsTrue(isDeleted);
+                }
+            }
         }
 
         [Test]
@@ -70,90 +92,18 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var request = new CreateAssistantRequest(
-                model: Model.GPT4_Turbo,
+            var assistant = await testAssistant.ModifyAsync(new(
+                model: Model.GPT4o,
                 name: "Test modified",
                 description: "Modified description",
-                instructions: "You are modified test assistant");
-            var assistant = await testAssistant.ModifyAsync(request);
+                instructions: "You are modified test assistant"));
             Assert.IsNotNull(assistant);
             Assert.AreEqual("Test modified", assistant.Name);
             Assert.AreEqual("Modified description", assistant.Description);
             Assert.AreEqual("You are modified test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
+            Assert.AreEqual(Model.GPT4o.ToString(), assistant.Model);
             Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
-            Console.WriteLine($"{assistant.Id} -> modified");
-        }
-
-        [Test]
-        public async Task Test_04_01_UploadAssistantFile()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            const string testFilePath = "assistant_test_2.txt";
-            await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
-            Assert.IsTrue(File.Exists(testFilePath));
-            var file = await testAssistant.UploadFileAsync(testFilePath);
-            Assert.IsNotNull(file);
-            Console.WriteLine($"uploaded -> {file.Id}");
-        }
-
-        [Test]
-        public async Task Test_04_02_ListAssistantFiles()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var filesList = await testAssistant.ListFilesAsync();
-            Assert.IsNotNull(filesList);
-            Assert.IsNotEmpty(filesList.Items);
-            Assert.IsTrue(filesList.Items.Count == 2);
-
-            foreach (var file in filesList.Items)
-            {
-                Assert.IsNotNull(file);
-                var retrieved = await testAssistant.RetrieveFileAsync(file);
-                Assert.IsNotNull(retrieved);
-                Assert.IsTrue(retrieved.Id == file.Id);
-                Console.WriteLine($"{retrieved.AssistantId}'s file -> {retrieved.Id}");
-                // TODO 400 Bad Request error when attempting to download assistant files. Likely OpenAI bug.
-                //var downloadPath = await retrieved.DownloadFileAsync(Directory.GetCurrentDirectory(), true);
-                //Console.WriteLine($"downloaded {retrieved} -> {downloadPath}");
-                //Assert.IsTrue(File.Exists(downloadPath));
-                //File.Delete(downloadPath);
-                //Assert.IsFalse(File.Exists(downloadPath));
-            }
-        }
-
-        [Test]
-        public async Task Test_04_03_RemoveAssistantFile()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var filesList = await testAssistant.ListFilesAsync();
-            Assert.IsNotNull(filesList);
-            Assert.IsNotEmpty(filesList.Items);
-            Assert.IsTrue(filesList.Items.Count == 2);
-            var assistantFile = filesList.Items[0];
-            Assert.IsNotNull(assistantFile);
-            var isRemoved = await testAssistant.RemoveFileAsync(assistantFile);
-            Assert.IsTrue(isRemoved);
-            var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(assistantFile);
-            Assert.IsTrue(isDeleted);
-        }
-
-        [Test]
-        public async Task Test_04_04_DeleteAssistantFiles()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var filesList = await testAssistant.ListFilesAsync();
-            Assert.IsNotNull(filesList);
-            Assert.IsNotEmpty(filesList.Items);
-            Assert.IsTrue(filesList.Items.Count == 1);
-            var assistantFile = filesList.Items[0];
-            Assert.IsNotNull(assistantFile);
-            var isDeleted = await testAssistant.DeleteFileAsync(assistantFile);
-            Assert.IsTrue(isDeleted);
+            Console.WriteLine($"modified assistant -> {assistant.Id}");
         }
 
         [Test]
@@ -161,9 +111,9 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(testAssistant);
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var result = await testAssistant.DeleteAsync();
+            var result = await testAssistant.DeleteAsync(deleteToolResources: true);
             Assert.IsTrue(result);
-            Console.WriteLine($"{testAssistant.Id} -> deleted");
+            Console.WriteLine($"deleted assistant -> {testAssistant.Id}");
         }
     }
 }

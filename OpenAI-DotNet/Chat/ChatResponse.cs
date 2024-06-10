@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,11 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
-    public sealed class ChatResponse : BaseResponse
+    public sealed class ChatResponse : BaseResponse, IServerSentEvent
     {
         public ChatResponse() { }
 
-        internal ChatResponse(ChatResponse other) => CopyFrom(other);
+        internal ChatResponse(ChatResponse other) => AppendFrom(other);
 
         /// <summary>
         /// A unique identifier for the chat completion.
@@ -23,9 +24,6 @@ namespace OpenAI.Chat
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }
-
-        [Obsolete("Use CreatedAtUnixTimeSeconds")]
-        public int Created => CreatedAtUnixTimeSeconds;
 
         /// <summary>
         /// The Unix timestamp (in seconds) of when the chat completion was created.
@@ -65,7 +63,7 @@ namespace OpenAI.Chat
         public IReadOnlyList<Choice> Choices
         {
             get => choices;
-            private set => choices = value.ToList();
+            private set => choices = value?.ToList();
         }
 
         [JsonIgnore]
@@ -75,24 +73,26 @@ namespace OpenAI.Chat
 
         public static implicit operator string(ChatResponse response) => response?.ToString();
 
-        internal void CopyFrom(ChatResponse other)
+        internal void AppendFrom(ChatResponse other)
         {
-            if (!string.IsNullOrWhiteSpace(other?.Id))
+            if (other is null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(other.Id))
             {
                 Id = other.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.Object))
+            if (!string.IsNullOrWhiteSpace(other.Object))
             {
                 Object = other.Object;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.Model))
+            if (!string.IsNullOrWhiteSpace(other.Model))
             {
                 Model = other.Model;
             }
 
-            if (other?.Usage != null)
+            if (other.Usage != null)
             {
                 if (Usage == null)
                 {
@@ -100,28 +100,21 @@ namespace OpenAI.Chat
                 }
                 else
                 {
-                    Usage.CopyFrom(other.Usage);
+                    Usage.AppendFrom(other.Usage);
                 }
             }
 
-            if (other?.Choices is { Count: > 0 })
+            if (other.Choices is { Count: > 0 })
             {
                 choices ??= new List<Choice>();
-
-                foreach (var otherChoice in other.Choices)
-                {
-                    if (otherChoice.Index + 1 > choices.Count)
-                    {
-                        choices.Insert(otherChoice.Index, otherChoice);
-                    }
-
-                    choices[otherChoice.Index].CopyFrom(otherChoice);
-                }
+                choices.AppendFrom(other.Choices);
             }
         }
 
         public string GetUsage(bool log = true)
         {
+            if (Usage == null) { return string.Empty; }
+
             var message = $"{Id} | {Model} | {Usage}";
 
             if (log)

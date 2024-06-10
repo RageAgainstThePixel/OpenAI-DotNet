@@ -1,8 +1,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Text.Json.Serialization;
 using OpenAI.Extensions;
 using OpenAI.Models;
+using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Audio
 {
@@ -18,7 +19,7 @@ namespace OpenAI.Audio
         /// <param name="speed">The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.</param>
         public SpeechRequest(string input, Model model = null, SpeechVoice voice = SpeechVoice.Alloy, SpeechResponseFormat responseFormat = SpeechResponseFormat.MP3, float? speed = null)
         {
-            Input = input;
+            Input = !string.IsNullOrWhiteSpace(input) ? input : throw new ArgumentException("Input cannot be null or empty.", nameof(input));
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.TTS_1 : model;
             Voice = voice;
             ResponseFormat = responseFormat;

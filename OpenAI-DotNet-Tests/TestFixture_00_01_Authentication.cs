@@ -13,10 +13,10 @@ namespace OpenAI.Tests
         [SetUp]
         public void Setup()
         {
-            var authJson = new AuthInfo("sk-test12", "org-testOrg");
+            var authJson = new AuthInfo("sk-test12", "org-testOrg", "proj_testProject");
             var authText = JsonSerializer.Serialize(authJson);
-            File.WriteAllText(".openai", authText);
-            Assert.IsTrue(File.Exists(".openai"));
+            File.WriteAllText(OpenAIAuthentication.CONFIG_FILE, authText);
+            Assert.IsTrue(File.Exists(OpenAIAuthentication.CONFIG_FILE));
         }
 
         [Test]
@@ -38,12 +38,14 @@ namespace OpenAI.Tests
         [Test]
         public void Test_02_GetAuthFromFile()
         {
-            var auth = OpenAIAuthentication.LoadFromPath(Path.GetFullPath(".openai"));
+            var auth = OpenAIAuthentication.LoadFromPath(Path.GetFullPath(OpenAIAuthentication.CONFIG_FILE));
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
             Assert.AreEqual("sk-test12", auth.ApiKey);
             Assert.IsNotNull(auth.OrganizationId);
             Assert.AreEqual("org-testOrg", auth.OrganizationId);
+            Assert.IsNotNull(auth.ProjectId);
+            Assert.AreEqual("proj_testProject", auth.ProjectId);
         }
 
         [Test]
@@ -68,7 +70,7 @@ namespace OpenAI.Tests
         public void Test_05_Authentication()
         {
             var defaultAuth = OpenAIAuthentication.Default;
-            var manualAuth = new OpenAIAuthentication("sk-testAA", "org-testAA");
+            var manualAuth = new OpenAIAuthentication("sk-testAA", "org-testAA", "proj_testProject");
             var api = new OpenAIClient();
             var shouldBeDefaultAuth = api.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeDefaultAuth);
@@ -76,8 +78,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(shouldBeDefaultAuth.OrganizationId);
             Assert.AreEqual(defaultAuth.ApiKey, shouldBeDefaultAuth.ApiKey);
             Assert.AreEqual(defaultAuth.OrganizationId, shouldBeDefaultAuth.OrganizationId);
+            Assert.AreEqual(defaultAuth.ProjectId, shouldBeDefaultAuth.ProjectId);
 
-            OpenAIAuthentication.Default = new OpenAIAuthentication("sk-testAA", "org-testAA");
+            OpenAIAuthentication.Default = new OpenAIAuthentication("sk-testAA", "org-testAA", "proj_testProject");
             api = new OpenAIClient();
             var shouldBeManualAuth = api.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeManualAuth);
@@ -85,6 +88,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(shouldBeManualAuth.OrganizationId);
             Assert.AreEqual(manualAuth.ApiKey, shouldBeManualAuth.ApiKey);
             Assert.AreEqual(manualAuth.OrganizationId, shouldBeManualAuth.OrganizationId);
+            Assert.AreEqual(manualAuth.ProjectId, shouldBeDefaultAuth.ProjectId);
 
             OpenAIAuthentication.Default = defaultAuth;
         }
@@ -181,12 +185,12 @@ namespace OpenAI.Tests
         [TearDown]
         public void TearDown()
         {
-            if (File.Exists(".openai"))
+            if (File.Exists(OpenAIAuthentication.CONFIG_FILE))
             {
-                File.Delete(".openai");
+                File.Delete(OpenAIAuthentication.CONFIG_FILE);
             }
 
-            Assert.IsFalse(File.Exists(".openai"));
+            Assert.IsFalse(File.Exists(OpenAIAuthentication.CONFIG_FILE));
         }
     }
 }

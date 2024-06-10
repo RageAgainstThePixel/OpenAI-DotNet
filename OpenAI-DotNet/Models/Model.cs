@@ -74,6 +74,18 @@ namespace OpenAI.Models
         public string Parent { get; private set; }
 
         /// <summary>
+        /// GPT-4o (“o” for “omni”) is our most advanced model.
+        /// It is multimodal (accepting text or image inputs and outputting text),
+        /// and it has the same high intelligence as GPT-4 Turbo but is much more efficient.
+        /// It generates text 2x faster and is 50% cheaper.
+        /// Additionally, GPT-4o has the best vision and performance across non-English languages of our models.
+        /// </summary>
+        /// <remarks>
+        /// Context Window: 128,000 tokens
+        /// </remarks>
+        public static Model GPT4o { get; } = new Model("gpt-4o", "openai");
+
+        /// <summary>
         /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
         /// Will be updated with our latest model iteration.
         /// </summary>
@@ -124,16 +136,25 @@ namespace OpenAI.Models
         /// <summary>
         /// The default model for <see cref="Embeddings.EmbeddingsEndpoint"/>.
         /// </summary>
+        /// <remarks>
+        /// Output Dimension: 1,536
+        /// </remarks>
         public static Model Embedding_Ada_002 { get; } = new("text-embedding-ada-002", "openai");
 
         /// <summary>
         /// A highly efficient model which provides a significant upgrade over its predecessor, the text-embedding-ada-002 model.
         /// </summary>
+        /// <remarks>
+        /// Output Dimension: 1,536
+        /// </remarks>
         public static Model Embedding_3_Small { get; } = new("text-embedding-3-small", "openai");
 
         /// <summary>
-        /// Most capable embedding model for both english and non-english tasks with embeddings of up to 3072 dimensions.
+        /// Most capable embedding model for both english and non-english tasks.
         /// </summary>
+        /// <remarks>
+        /// Output Dimension: 3,072
+        /// </remarks>
         public static Model Embedding_3_Large { get; } = new("text-embedding-3-large", "openai");
 
         /// <summary>

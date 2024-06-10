@@ -33,7 +33,7 @@ namespace OpenAI.Tests
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
-            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_2, responseFormat: ResponseFormat.B64_Json);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_2, responseFormat: ImageResponseFormat.B64_Json);
             var imageResults = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -75,7 +75,7 @@ namespace OpenAI.Tests
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
 
-            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -113,7 +113,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
-            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small, responseFormat: ResponseFormat.B64_Json);
+            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
             Assert.IsNotNull(imageResults);

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,15 +13,16 @@ using System.Threading.Tasks;
 namespace OpenAI.Files
 {
     /// <summary>
-    /// Files are used to upload documents that can be used with features like Fine-tuning.<br/>
+    /// Files are used to upload documents that can be used with features like Assistants, Fine-tuning, and Batch API.<br/>
     /// <see href="https://platform.openai.com/docs/api-reference/files"/>
     /// </summary>
     public sealed class FilesEndpoint : OpenAIBaseEndpoint
     {
-        private class FilesList
+        private class FilesList : BaseResponse
         {
+            [JsonInclude]
             [JsonPropertyName("data")]
-            public IReadOnlyList<FileResponse> Files { get; set; }
+            public IReadOnlyList<FileResponse> Files { get; private set; }
         }
 
         /// <inheritdoc />
@@ -47,25 +47,33 @@ namespace OpenAI.Files
             }
 
             using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FilesList>(resultAsString, OpenAIClient.JsonSerializationOptions)?.Files;
+            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<FilesList>(resultAsString, client)?.Files;
         }
 
         /// <summary>
-        /// Upload a file that contains document(s) to be used across various endpoints/features.
-        /// Currently, the size of all the files uploaded by one organization can be up to 1 GB.
-        /// Please contact us if you need to increase the storage limit.
+        /// Upload a file that can be used across various endpoints.
+        /// Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 100 GB.
         /// </summary>
         /// <param name="filePath">
         /// Local file path to upload.
         /// </param>
         /// <param name="purpose">
-        /// The intended purpose of the uploaded documents.
-        /// If the purpose is set to "fine-tune", each line is a JSON record with "prompt" and "completion"
-        /// fields representing your training examples.
+        /// The intended purpose of the uploaded file.
+        /// Use 'assistants' for Assistants and Message files,
+        /// 'vision' for Assistants image file inputs,
+        /// 'batch' for Batch API,
+        /// and 'fine-tune' for Fine-tuning.
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FileResponse"/>.</returns>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>The Assistants API supports files up to 2 million tokens and of specific file types.</description></item>
+        /// <item><description>The Fine-tuning API only supports .jsonl files.</description></item>
+        /// <item><description>The Batch API only supports .jsonl files up to 100 MB in size.</description></item>
+        /// </list>
+        /// </remarks>
         public async Task<FileResponse> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
             => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken).ConfigureAwait(false);
 
@@ -86,8 +94,8 @@ namespace OpenAI.Files
             content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
             request.Dispose();
             using var response = await client.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<FileResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -120,8 +128,8 @@ namespace OpenAI.Files
                     }
                 }
 
-                await response.CheckResponseAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<DeletedResponse>(responseAsString, OpenAIClient.JsonSerializationOptions)?.Deleted ?? false;
+                await response.CheckResponseAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+                return response.Deserialize<DeletedResponse>(responseAsString, client)?.Deleted ?? false;
             }
         }
 
@@ -130,12 +138,12 @@ namespace OpenAI.Files
         /// </summary>
         /// <param name="fileId">The ID of the file to use for this request.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="FileResponse"/></returns>
+        /// <returns><see cref="FileResponse"/>.</returns>
         public async Task<FileResponse> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<FileResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
+            return response.Deserialize<FileResponse>(responseAsString, client);
         }
 
         /// <summary>
@@ -144,7 +152,7 @@ namespace OpenAI.Files
         /// <param name="fileId">The file id to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The full path of the downloaded file.</returns>
         public async Task<string> DownloadFileAsync(string fileId, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
@@ -158,7 +166,7 @@ namespace OpenAI.Files
         /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
         /// <param name="directory">The directory to download the file into.</param>
         /// <param name="deleteCachedFile">Optional, delete cached file. Default is false.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The full path of the downloaded file.</returns>
         public async Task<string> DownloadFileAsync(FileResponse fileData, string directory, bool deleteCachedFile = false, CancellationToken cancellationToken = default)
         {
@@ -196,11 +204,9 @@ namespace OpenAI.Files
         /// Gets the specified file as stream
         /// </summary>
         /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The file as a stream in an asynchronous operation.</returns>
         public async Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
-        {
-            return await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
-        }
+            => await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
     }
 }

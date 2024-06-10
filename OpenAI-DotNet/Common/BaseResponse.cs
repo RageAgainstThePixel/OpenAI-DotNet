@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Text.Json.Serialization;
 
@@ -40,7 +41,6 @@ namespace OpenAI
         /// <summary>
         /// The maximum number of requests that are permitted before exhausting the rate limit.
         /// </summary>
-
         [JsonIgnore]
         public int? LimitRequests { get; internal set; }
 
@@ -73,5 +73,8 @@ namespace OpenAI
         /// </summary>
         [JsonIgnore]
         public string ResetTokens { get; internal set; }
+
+        public string ToJsonString()
+            => this.ToEscapedJsonString<object>();
     }
 }

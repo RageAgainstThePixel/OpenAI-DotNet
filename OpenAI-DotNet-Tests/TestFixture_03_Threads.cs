@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -28,12 +29,12 @@ namespace OpenAI.Tests
         public async Task Test_01_CreateThread()
         {
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new CreateThreadRequest(
-                new List<Message>
+            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync(new(
+                messages: new List<Message>
                 {
                    "Test message"
                 },
-                new Dictionary<string, string>
+                metadata: new Dictionary<string, string>
                 {
                     ["test"] = nameof(Test_01_CreateThread)
                 }));
@@ -80,21 +81,35 @@ namespace OpenAI.Tests
             const string testFilePath = "assistant_test_1.txt";
             await File.WriteAllTextAsync(testFilePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(testFilePath));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, "assistants");
-            Assert.NotNull(file);
-            File.Delete(testFilePath);
-            Assert.IsFalse(File.Exists(testFilePath));
-            await testThread.CreateMessageAsync("hello world!");
-            var request = new CreateMessageRequest("Test create message",
-                new[] { file.Id },
-                new Dictionary<string, string>
-                {
-                    ["test"] = nameof(Test_04_01_CreateMessage)
-                });
+            FileResponse file = null;
             MessageResponse message;
+
             try
             {
-                message = await testThread.CreateMessageAsync(request);
+                try
+                {
+                    file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, FilePurpose.Assistants);
+                    Assert.NotNull(file);
+                }
+                finally
+                {
+                    if (File.Exists(testFilePath))
+                    {
+                        File.Delete(testFilePath);
+                    }
+
+                    Assert.IsFalse(File.Exists(testFilePath));
+                }
+
+                message = await testThread.CreateMessageAsync("hello world!");
+                Assert.IsNotNull(message);
+                message = await testThread.CreateMessageAsync(new(
+                    content: "Test create message",
+                    attachments: new[] { new Attachment(file.Id, Tool.FileSearch) },
+                    metadata: new Dictionary<string, string>
+                    {
+                        ["test"] = nameof(Test_04_01_CreateMessage)
+                    }));
             }
             finally
             {
@@ -153,78 +168,31 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_04_UploadAndDownloadMessageFiles()
-        {
-            Assert.IsNotNull(testThread);
-            Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var file1 = await CreateTestFileAsync("test_1.txt");
-            var file2 = await CreateTestFileAsync("test_2.txt");
-            try
-            {
-                var createRequest = new CreateMessageRequest("Test content with files", new[] { file1.Id, file2.Id });
-                var message = await testThread.CreateMessageAsync(createRequest);
-                var fileList = await message.ListFilesAsync();
-                Assert.IsNotNull(fileList);
-                Assert.AreEqual(2, fileList.Items.Count);
-
-                foreach (var file in fileList.Items)
-                {
-                    var retrieved = await message.RetrieveFileAsync(file);
-                    Assert.IsNotNull(retrieved);
-                    Console.WriteLine(file.Id);
-                    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-                    //var filePath = await message.DownloadFileContentAsync(file, Directory.GetCurrentDirectory(), true);
-                    //Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
-                    //Assert.IsTrue(File.Exists(filePath));
-                    //File.Delete(filePath);
-                }
-
-                var threadList = await testThread.ListFilesAsync(message);
-                Assert.IsNotNull(threadList);
-                Assert.IsNotEmpty(threadList.Items);
-
-                //foreach (var file in threadList.Items)
-                //{
-                //    // TODO 400 bad request errors. Likely OpenAI bug downloading message file content.
-                //    var filePath = await file.DownloadContentAsync(Directory.GetCurrentDirectory(), true);
-                //    Assert.IsFalse(string.IsNullOrWhiteSpace(filePath));
-                //    Assert.IsTrue(File.Exists(filePath));
-                //    File.Delete(filePath);
-                //}
-            }
-            finally
-            {
-                await CleanupFileAsync(file1);
-                await CleanupFileAsync(file2);
-            }
-        }
-
-        [Test]
         public async Task Test_05_DeleteThread()
         {
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(OpenAIClient.ThreadsEndpoint);
-            var isDeleted = await testThread.DeleteAsync();
+            var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
             Assert.IsTrue(isDeleted);
-            Console.WriteLine($"Deleted thread {testThread.Id}");
+            Console.WriteLine($"Deleted thread -> {testThread.Id}");
         }
 
         [Test]
-        public async Task Test_06_01_CreateRun()
+        public async Task Test_06_01_01_CreateRun()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
                 new CreateAssistantRequest(
                     name: "Math Tutor",
-                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less.",
-                    model: Model.GPT4_Turbo));
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ChatResponseFormat.Json));
             Assert.NotNull(assistant);
-            testAssistant = assistant;
             var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
-            Assert.NotNull(thread);
 
             try
             {
+                Assert.NotNull(thread);
                 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
                 Assert.NotNull(message);
                 var run = await thread.CreateRunAsync(assistant);
@@ -232,18 +200,143 @@ namespace OpenAI.Tests
                 run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items)
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
             }
             finally
             {
-                await thread.DeleteAsync();
+                await assistant.DeleteAsync();
+                await thread.DeleteAsync(deleteToolResources: true);
+            }
+        }
+
+        [Test]
+        public async Task Test_06_01_02_CreateStreamingRun()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ChatResponseFormat.Json));
+            Assert.NotNull(assistant);
+            var thread = await OpenAIClient.ThreadsEndpoint.CreateThreadAsync();
+
+            try
+            {
+                Assert.NotNull(thread);
+                var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
+                Assert.NotNull(message);
+
+                var run = await thread.CreateRunAsync(assistant, streamEvent =>
+                {
+                    Console.WriteLine(streamEvent.ToJsonString());
+                });
+
+                Assert.IsNotNull(run);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items.Reverse())
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
+            }
+            finally
+            {
+                await assistant.DeleteAsync();
+                await thread.DeleteAsync(deleteToolResources: true);
+            }
+        }
+
+        [Test]
+        public async Task Test_06_01_03_CreateStreamingRun_ToolCalls()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+            };
+            var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
+            Assert.NotNull(assistant);
+            ThreadResponse thread = null;
+
+            try
+            {
+                async void StreamEventHandler(IServerSentEvent streamEvent)
+                {
+                    try
+                    {
+                        switch (streamEvent)
+                        {
+                            case ThreadResponse threadResponse:
+                                thread = threadResponse;
+                                break;
+                            case RunResponse runResponse:
+                                if (runResponse.Status == RunStatus.RequiresAction)
+                                {
+                                    var toolOutputs = await assistant.GetToolOutputsAsync(runResponse);
+
+                                    foreach (var toolOutput in toolOutputs)
+                                    {
+                                        Console.WriteLine($"Tool Output: {toolOutput}");
+                                    }
+
+                                    await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
+                                }
+                                break;
+                            default:
+                                Console.WriteLine(streamEvent.ToJsonString());
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                var run = await assistant.CreateThreadAndRunAsync("I'm in Kuala-Lumpur, please tell me what's the temperature now?", StreamEventHandler);
+                Assert.NotNull(thread);
+                Assert.IsNotNull(run);
+                run = await run.WaitForStatusChangeAsync();
+                Assert.IsNotNull(run);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items.Reverse())
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
+            }
+            finally
+            {
+                if (thread != null)
+                {
+                    await thread.DeleteAsync();
+                }
+
+                await assistant.DeleteAsync(deleteToolResources: true);
             }
         }
 
         [Test]
         public async Task Test_06_02_CreateThreadAndRun()
         {
-            Assert.NotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            testAssistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
+                    model: Model.GPT4o,
+                    responseFormat: ChatResponseFormat.Json));
+            Assert.NotNull(testAssistant);
             var messages = new List<Message> { "I need to solve the equation `3x + 11 = 14`. Can you help me?" };
             var threadRequest = new CreateThreadRequest(messages);
             var run = await testAssistant.CreateThreadAndRunAsync(threadRequest);
@@ -282,7 +375,7 @@ namespace OpenAI.Tests
         {
             Assert.NotNull(testRun);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            // run in Queued and InProgress can't be modified
+            // a run that is Queued or InProgress can't be modified
             var run = await testRun.WaitForStatusChangeAsync();
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Completed);
@@ -304,26 +397,34 @@ namespace OpenAI.Tests
             Assert.IsNotNull(testThread);
             Assert.IsNotNull(testAssistant);
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var run = await testThread.CreateRunAsync(testAssistant);
+            var run = await testThread.CreateRunAsync(new CreateRunRequest(testAssistant));
             Assert.IsNotNull(run);
             Assert.IsTrue(run.Status == RunStatus.Queued);
-            run = await run.CancelAsync();
-            Assert.IsNotNull(run);
-            Assert.IsTrue(run.Status == RunStatus.Cancelling);
 
             try
             {
-                // waiting while run is cancelling
-                run = await run.WaitForStatusChangeAsync();
+                var runCancelled = await run.CancelAsync();
+                Assert.IsNotNull(runCancelled);
+                Assert.IsTrue(runCancelled);
             }
             catch (Exception e)
             {
                 // Sometimes runs will get stuck in Cancelling state,
-                // for now we just log when it happens.
+                // or will say it is already cancelled, but it was not,
+                // so for now we just log when it happens.
                 Console.WriteLine(e);
+
+                if (e is HttpRequestException httpException)
+                {
+                    if (!httpException.Message.Contains("Cannot cancel run with status"))
+                    {
+                        throw;
+                    }
+                }
             }
 
-            Assert.IsTrue(run.Status is RunStatus.Cancelled or RunStatus.Cancelling);
+            run = await run.UpdateAsync();
+            Assert.IsTrue(run.Status is RunStatus.Cancelled or RunStatus.Cancelling or RunStatus.Completed);
         }
 
         [Test]
@@ -337,7 +438,7 @@ namespace OpenAI.Tests
 
             if (testThread != null)
             {
-                var isDeleted = await testThread.DeleteAsync();
+                var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
                 Assert.IsTrue(isDeleted);
             }
         }
@@ -372,7 +473,7 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(runStep.Client);
                 var retrievedRunStep = await runStep.UpdateAsync();
                 Assert.IsNotNull(retrievedRunStep);
-                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiresAt}");
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {runStep.ExpiredAt}");
                 var retrieveStepRunStep = await run.RetrieveRunStepAsync(runStep.Id);
                 Assert.IsNotNull(retrieveStepRunStep);
             }
@@ -386,7 +487,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
 
             // Invoke all the tool call functions and return the tool outputs.
-            var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+            var toolOutputs = await testAssistant.GetToolOutputsAsync(run);
 
             foreach (var toolOutput in toolOutputs)
             {
@@ -405,7 +506,7 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(runStep.Client);
                 var retrievedRunStep = await runStep.UpdateAsync();
                 Assert.IsNotNull(retrievedRunStep);
-                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {(runStep.ExpiresAtUnixTimeSeconds.HasValue ? runStep.ExpiresAt : runStep.CompletedAt)}");
+                Console.WriteLine($"[{runStep.Id}] {runStep.Status} {runStep.CreatedAt} -> {(runStep.ExpiredAtUnixTimeSeconds.HasValue ? runStep.ExpiredAt : runStep.CompletedAt)}");
                 if (runStep.StepDetails.ToolCalls == null) { continue; }
 
                 foreach (var runStepToolCall in runStep.StepDetails.ToolCalls)
@@ -437,7 +538,7 @@ namespace OpenAI.Tests
 
             if (testThread != null)
             {
-                var isDeleted = await testThread.DeleteAsync();
+                var isDeleted = await testThread.DeleteAsync(deleteToolResources: true);
                 Assert.IsTrue(isDeleted);
             }
         }
@@ -446,7 +547,7 @@ namespace OpenAI.Tests
         {
             await File.WriteAllTextAsync(filePath, "Knowledge is power!");
             Assert.IsTrue(File.Exists(filePath));
-            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, "assistants");
+            var file = await OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Assistants);
             File.Delete(filePath);
             Assert.IsFalse(File.Exists(filePath));
             return file;
@@ -454,6 +555,7 @@ namespace OpenAI.Tests
 
         private async Task CleanupFileAsync(FileResponse file)
         {
+            if (file == null) { return; }
             var isDeleted = await OpenAIClient.FilesEndpoint.DeleteFileAsync(file);
             Assert.IsTrue(isDeleted);
         }

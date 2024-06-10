@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,20 +38,14 @@ namespace OpenAI
         /// </param>
         public Function(string name, string description = null, JsonNode parameters = null)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
-            }
-
-            if (functionCache.ContainsKey(name))
-            {
-                throw new ArgumentException($"The function \"{name}\" is already registered.");
             }
 
             Name = name;
             Description = description;
             Parameters = parameters;
-            functionCache[Name] = this;
         }
 
         /// <summary>
@@ -68,25 +63,19 @@ namespace OpenAI
         /// </param>
         public Function(string name, string description, string parameters)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
-            }
-
-            if (functionCache.ContainsKey(name))
-            {
-                throw new ArgumentException($"The function \"{name}\" is already registered.");
             }
 
             Name = name;
             Description = description;
             Parameters = JsonNode.Parse(parameters);
-            functionCache[Name] = this;
         }
 
-        internal Function(string name, string description, MethodInfo method, object instance = null)
+        private Function(string name, string description, MethodInfo method, object instance = null)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, NameRegex))
+            if (!Regex.IsMatch(name, NameRegex))
             {
                 throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
             }
@@ -112,44 +101,44 @@ namespace OpenAI
         #region Func<,> Overloads
 
         public static Function FromFunc<TResult>(string name, Func<TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, TResult>(string name, Func<T1, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, TResult>(string name, Func<T1, T2, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> function, string description = null)
-        => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, TResult>(string name, Func<T1, T2, T3, T4, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, TResult>(string name, Func<T1, T2, T3, T4, T5, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, T7, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, T7, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, T7, T8, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         public static Function FromFunc<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>(string name, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function, string description = null)
-            => new(name, description, function.Method, function.Target);
+            => GetOrCreateFunction(name, description, function.Method, function.Target);
 
         #endregion Func<,> Overloads
 
-        internal Function(Function other) => CopyFrom(other);
+        internal Function(Function other) => AppendFrom(other);
 
         /// <summary>
         /// The name of the function to generate arguments for.<br/>
@@ -228,7 +217,7 @@ namespace OpenAI
         [JsonIgnore]
         private MethodInfo MethodInfo { get; }
 
-        internal void CopyFrom(Function other)
+        internal void AppendFrom(Function other)
         {
             if (!string.IsNullOrWhiteSpace(other.Name))
             {
@@ -256,6 +245,8 @@ namespace OpenAI
         private static readonly ConcurrentDictionary<string, Function> functionCache = new();
 
         internal static void ClearFunctionCache() => functionCache.Clear();
+
+        internal static bool TryRemoveFunction(string name) => functionCache.TryRemove(name, out _);
 
         /// <summary>
         /// Invokes the function and returns the result as json.
@@ -379,7 +370,7 @@ namespace OpenAI
 
             if (function.MethodInfo == null)
             {
-                throw new InvalidOperationException($"Failed to find a valid method for {Name}");
+                throw new InvalidOperationException($"Failed to find a valid method to invoke for {Name}");
             }
 
             var requestedArgs = arguments != null

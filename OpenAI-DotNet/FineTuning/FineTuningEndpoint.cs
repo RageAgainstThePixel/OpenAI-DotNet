@@ -30,9 +30,9 @@ namespace OpenAI.FineTuning
         /// <returns><see cref="FineTuneJobResponse"/>.</returns>
         public async Task<FineTuneJobResponse> CreateJobAsync(CreateFineTuneJobRequest jobRequest, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(jobRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/jobs"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, null, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(jobRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/jobs"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<FineTuneJobResponse>(responseAsString, client);
         }
 
@@ -52,7 +52,7 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Gets info about the fine-tune job.
         /// </summary>
-        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJobResponse.Id"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FineTuneJobResponse"/>.</returns>
         public async Task<FineTuneJobResponse> GetJobInfoAsync(string jobId, CancellationToken cancellationToken = default)
@@ -67,21 +67,21 @@ namespace OpenAI.FineTuning
         /// <summary>
         /// Immediately cancel a fine-tune job.
         /// </summary>
-        /// <param name="jobId"><see cref="FineTuneJob.Id"/> to cancel.</param>
+        /// <param name="jobId"><see cref="FineTuneJobResponse.Id"/> to cancel.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="FineTuneJobResponse"/>.</returns>
         public async Task<bool> CancelJobAsync(string jobId, CancellationToken cancellationToken = default)
         {
             using var response = await client.Client.PostAsync(GetUrl($"/jobs/{jobId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<FineTuneJobResponse>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            var result = response.Deserialize<FineTuneJobResponse>(responseAsString, client);
             return result.Status == JobStatus.Cancelled;
         }
 
         /// <summary>
         /// Get fine-grained status updates for a fine-tune job.
         /// </summary>
-        /// <param name="jobId"><see cref="FineTuneJob.Id"/>.</param>
+        /// <param name="jobId"><see cref="FineTuneJobResponse.Id"/>.</param>
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>List of events for <see cref="FineTuneJobResponse"/>.</returns>

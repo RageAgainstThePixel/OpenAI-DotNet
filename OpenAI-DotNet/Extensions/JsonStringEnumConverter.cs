@@ -58,29 +58,29 @@ namespace OpenAI.Extensions
             switch (type)
             {
                 case JsonTokenType.String:
-                {
-                    var stringValue = reader.GetString();
-
-                    if (stringValue != null)
                     {
-                        var value = namingPolicy != null
-                            ? namingPolicy.ConvertName(stringValue)
-                            : stringValue;
+                        var stringValue = reader.GetString();
 
-                        if (stringToEnum.TryGetValue(value, out var enumValue))
+                        if (stringValue != null)
                         {
-                            return enumValue;
-                        }
-                    }
+                            var value = namingPolicy != null
+                                ? namingPolicy.ConvertName(stringValue)
+                                : stringValue;
 
-                    break;
-                }
+                            if (stringToEnum.TryGetValue(value, out var enumValue))
+                            {
+                                return enumValue;
+                            }
+                        }
+
+                        break;
+                    }
                 case JsonTokenType.Number:
-                {
-                    var numValue = reader.GetInt32();
-                    numberToEnum.TryGetValue(numValue, out var enumValue);
-                    return enumValue;
-                }
+                    {
+                        var numValue = reader.GetInt32();
+                        numberToEnum.TryGetValue(numValue, out var enumValue);
+                        return enumValue;
+                    }
             }
 
             return default;

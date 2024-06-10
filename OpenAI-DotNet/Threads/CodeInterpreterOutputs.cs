@@ -5,8 +5,12 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class CodeInterpreterOutputs
+    public sealed class CodeInterpreterOutputs : IAppendable<CodeInterpreterOutputs>
     {
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        public int? Index { get; private set; }
+
         /// <summary>
         /// Output type. Can be either 'logs' or 'image'.
         /// </summary>
@@ -28,5 +32,32 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("image")]
         public ImageFile Image { get; private set; }
+
+        public void AppendFrom(CodeInterpreterOutputs other)
+        {
+            if (other == null) { return; }
+
+            if (Type == 0 && other.Type > 0)
+            {
+                Type = other.Type;
+            }
+
+            if (!string.IsNullOrWhiteSpace(other.Logs))
+            {
+                Logs += other.Logs;
+            }
+
+            if (other.Image != null)
+            {
+                if (Image == null)
+                {
+                    Image = other.Image;
+                }
+                else
+                {
+                    Image.AppendFrom(other.Image);
+                }
+            }
+        }
     }
 }

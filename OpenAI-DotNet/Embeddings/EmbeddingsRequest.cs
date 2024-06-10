@@ -20,7 +20,7 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <param name="model">
         /// ID of the model to use.<br/>
-        /// Defaults to: <see cref="Model.Embedding_Ada_002"/>
+        /// Defaults to: <see cref="Models.Model.Embedding_Ada_002"/>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
@@ -29,6 +29,7 @@ namespace OpenAI.Embeddings
         /// The number of dimensions the resulting output embeddings should have.
         /// Only supported in text-embedding-3 and later models
         /// </param>
+        /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(string input, string model = null, string user = null, int? dimensions = null)
             : this(new List<string> { input }, model, user, dimensions)
         {
@@ -57,6 +58,7 @@ namespace OpenAI.Embeddings
         /// The number of dimensions the resulting output embeddings should have.
         /// Only supported in text-embedding-3 and later models
         /// </param>
+        /// <exception cref="ArgumentNullException">A valid <see cref="input"/> string is a Required parameter.</exception>
         public EmbeddingsRequest(IEnumerable<string> input, string model = null, string user = null, int? dimensions = null)
         {
             Input = input?.ToList();

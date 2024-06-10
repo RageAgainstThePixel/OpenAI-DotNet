@@ -10,20 +10,6 @@ namespace OpenAI.Files
     /// </summary>
     public sealed class FileResponse : BaseResponse
     {
-        public FileResponse() { }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        internal FileResponse(FileData file)
-        {
-            Id = file.Id;
-            Object = file.Object;
-            Size = file.Size;
-            CreatedAtUnixTimeSeconds = file.CreatedAtUnixTimeSeconds;
-            FileName = file.FileName;
-            Purpose = file.Purpose;
-        }
-#pragma warning restore CS0618 // Type or member is obsolete
-
         /// <summary>
         /// The file identifier, which can be referenced in the API endpoints.
         /// </summary>
@@ -32,18 +18,14 @@ namespace OpenAI.Files
         public string Id { get; private set; }
 
         /// <summary>
-        /// The object type, which is always 'file'.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("object")]
-        public string Object { get; private set; }
-
-        /// <summary>
         /// The size of the file, in bytes.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("bytes")]
         public int? Size { get; private set; }
+
+        [JsonIgnore]
+        public int? Bytes => Size;
 
         /// <summary>
         /// The Unix timestamp (in seconds) for when the file was created.
@@ -51,10 +33,6 @@ namespace OpenAI.Files
         [JsonInclude]
         [JsonPropertyName("created_at")]
         public int CreatedAtUnixTimeSeconds { get; private set; }
-
-        [JsonIgnore]
-        [Obsolete("Use CreatedAtUnixTimeSeconds")]
-        public int CreatedUnixTime => CreatedAtUnixTimeSeconds;
 
         [JsonIgnore]
         public DateTime CreatedAt => DateTimeOffset.FromUnixTimeSeconds(CreatedAtUnixTimeSeconds).DateTime;
@@ -67,6 +45,13 @@ namespace OpenAI.Files
         public string FileName { get; private set; }
 
         /// <summary>
+        /// The object type, which is always 'file'.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("object")]
+        public string Object { get; private set; }
+
+        /// <summary>
         /// The intended purpose of the file.
         /// Supported values are 'fine-tune', 'fine-tune-results', 'assistants', and 'assistants_output'.
         /// </summary>
@@ -74,7 +59,7 @@ namespace OpenAI.Files
         [JsonPropertyName("purpose")]
         public string Purpose { get; private set; }
 
-        public static implicit operator string(FileResponse file) => file?.ToString();
+        public static implicit operator string(FileResponse fileData) => fileData.Id;
 
         public override string ToString() => Id;
     }
