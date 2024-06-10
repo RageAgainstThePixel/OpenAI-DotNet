@@ -51,5 +51,9 @@ namespace OpenAI.VectorStores
         [JsonInclude]
         [JsonPropertyName("file_counts")]
         public FileCounts FileCounts { get; private set; }
+
+        public override string ToString() => Id;
+
+        public static implicit operator string(VectorStoreFileBatchResponse response) => response?.ToString();
     }
 }

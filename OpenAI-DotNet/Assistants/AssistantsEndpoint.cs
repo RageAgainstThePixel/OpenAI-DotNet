@@ -37,9 +37,9 @@ namespace OpenAI.Assistants
         public async Task<AssistantResponse> CreateAssistantAsync(CreateAssistantRequest request = null, CancellationToken cancellationToken = default)
         {
             request ??= new CreateAssistantRequest();
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantResponse>(responseAsString, client);
         }
 
@@ -65,9 +65,9 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public async Task<AssistantResponse> ModifyAssistantAsync(string assistantId, CreateAssistantRequest request, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantResponse>(responseAsString, client);
         }
 
@@ -114,14 +114,14 @@ namespace OpenAI.Assistants
         [Obsolete("Files removed from Assistants. Files now belong to ToolResources.")]
         public async Task<AssistantFileResponse> AttachFileAsync(string assistantId, FileResponse file, CancellationToken cancellationToken = default)
         {
-            if (file?.Purpose?.Equals("assistants") != true)
+            if (file?.Purpose?.Equals(FilePurpose.Assistants) != true)
             {
                 throw new InvalidOperationException($"{nameof(file)}.{nameof(file.Purpose)} must be 'assistants'!");
             }
 
-            using var jsonContent = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}/files"), jsonContent, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(new { file_id = file.Id }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl($"/{assistantId}/files"), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<AssistantFileResponse>(responseAsString, client);
         }
 

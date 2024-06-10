@@ -11,9 +11,11 @@ namespace OpenAI.VectorStores
         InProgress,
         [EnumMember(Value = "completed")]
         Completed,
+        [EnumMember(Value = "cancelling")]
+        Cancelling,
         [EnumMember(Value = "cancelled")]
         Cancelled,
         [EnumMember(Value = "failed")]
-        Expired
+        Failed
     }
 }

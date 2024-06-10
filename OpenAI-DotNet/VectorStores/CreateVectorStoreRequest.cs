@@ -1,6 +1,8 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Files;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.VectorStores
@@ -10,11 +12,13 @@ namespace OpenAI.VectorStores
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="name">
+        /// Custom name for the vector store.
+        /// </param>
         /// <param name="fileIds">
         /// A list of file IDs to add to the vector store.
         /// There can be a maximum of 10000 files in a vector store.
         /// </param>
-        /// <param name="name"></param>
         /// <param name="expiresAfter"></param>
         /// <param name="chunkingStrategy">
         /// The chunking strategy used to chunk the file(s). If not set, will use the auto strategy. Only applicable if file_ids is non-empty.
@@ -24,21 +28,24 @@ namespace OpenAI.VectorStores
         /// This can be useful for storing additional information about the vector store in a structured format.
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </param>
-        public CreateVectorStoreRequest(IReadOnlyList<string> fileIds = null, string name = null, int? expiresAfter = null, ChunkingStrategy chunkingStrategy = null, IReadOnlyDictionary<string, string> metadata = null)
+        public CreateVectorStoreRequest(string name = null, IReadOnlyList<string> fileIds = null, int? expiresAfter = null, ChunkingStrategy chunkingStrategy = null, IReadOnlyDictionary<string, string> metadata = null)
         {
-            FileIds = fileIds;
             Name = name;
+            FileIds = fileIds;
             ExpiresAfter = expiresAfter.HasValue ? new ExpirationPolicy(expiresAfter.Value) : null;
-            ChunkingStrategy = chunkingStrategy ?? new ChunkingStrategy(ChunkingStrategyType.Auto);
+            ChunkingStrategy = chunkingStrategy;
             Metadata = metadata;
         }
 
         /// <inheritdoc />
-        public CreateVectorStoreRequest(string fileId, string name = null, int? expiresAfter = null, ChunkingStrategy chunkingStrategy = null, IReadOnlyDictionary<string, string> metadata = null)
-            : this(new List<string> { fileId }, name, expiresAfter, chunkingStrategy, metadata)
+        public CreateVectorStoreRequest(string name, IReadOnlyList<FileResponse> files, int? expiresAfter = null, ChunkingStrategy chunkingStrategy = null, IReadOnlyDictionary<string, string> metadata = null)
+            : this(name, files?.Select(file => file.Id).ToList(), expiresAfter, chunkingStrategy, metadata)
         {
         }
 
+        /// <summary>
+        /// Custom name for the vector store.
+        /// </summary>
         [JsonPropertyName("name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; }
@@ -70,9 +77,5 @@ namespace OpenAI.VectorStores
         [JsonPropertyName("metadata")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, string> Metadata { get; }
-
-        public static implicit operator CreateVectorStoreRequest(string fileId) => new(fileId);
-
-        public static implicit operator CreateVectorStoreRequest(List<string> fileIds) => new(fileIds);
     }
 }

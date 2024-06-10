@@ -19,6 +19,7 @@ namespace OpenAI.VectorStores
         /// The default value is 400.
         /// Note that the overlap must not exceed half of max_chunk_size_tokens.
         /// </param>
+        [JsonConstructor]
         public ChunkingStrategyStatic(int? maxChunkSizeTokens = null, int? chunkOverlapTokens = null)
         {
             MaxChunkSizeTokens = maxChunkSizeTokens ?? 800;
@@ -31,7 +32,7 @@ namespace OpenAI.VectorStores
         /// The minimum value is 100 and the maximum value is 4096.
         /// </summary>
         [JsonPropertyName("max_chunk_size_tokens")]
-        public int MaxChunkSizeTokens { get; }
+        public int? MaxChunkSizeTokens { get; }
 
         /// <summary>
         /// The number of tokens that overlap between chunks.
@@ -39,6 +40,6 @@ namespace OpenAI.VectorStores
         /// Note that the overlap must not exceed half of max_chunk_size_tokens.
         /// </summary>
         [JsonPropertyName("chunk_overlap_tokens")]
-        public int ChunkOverlapTokens { get; }
+        public int? ChunkOverlapTokens { get; }
     }
 }

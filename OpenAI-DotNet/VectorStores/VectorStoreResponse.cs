@@ -104,5 +104,7 @@ namespace OpenAI.VectorStores
         public Dictionary<string, object> Metadata { get; private set; }
 
         public override string ToString() => Id;
+
+        public static implicit operator string(VectorStoreResponse response) => response?.ToString();
     }
 }

@@ -32,9 +32,9 @@ namespace OpenAI.Audio
         /// <returns><see cref="ReadOnlyMemory{T}"/>.</returns>
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/speech"), jsonContent, cancellationToken).ConfigureAwait(false);
-            await response.CheckResponseAsync(false, jsonContent, cancellationToken: cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
             int bytesRead;
@@ -60,7 +60,7 @@ namespace OpenAI.Audio
                 totalBytesRead += bytesRead;
             }
 
-            await response.CheckResponseAsync(EnableDebug, jsonContent, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await response.CheckResponseAsync(EnableDebug, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             return new ReadOnlyMemory<byte>(memoryStream.GetBuffer(), 0, totalBytesRead);
         }
 

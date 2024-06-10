@@ -274,9 +274,9 @@ namespace OpenAI.Threads
             RunResponse result;
             do
             {
-                await Task.Delay(pollingInterval ?? 500, chainedCts.Token);
+                await Task.Delay(pollingInterval ?? 500, chainedCts.Token).ConfigureAwait(false);
                 cancellationToken.ThrowIfCancellationRequested();
-                result = await run.UpdateAsync(cancellationToken: chainedCts.Token);
+                result = await run.UpdateAsync(cancellationToken: chainedCts.Token).ConfigureAwait(false);
             } while (result.Status is RunStatus.Queued or RunStatus.InProgress or RunStatus.Cancelling);
             return result;
         }

@@ -69,5 +69,9 @@ namespace OpenAI.VectorStores
         [JsonInclude]
         [JsonPropertyName("chunking_strategy")]
         public ChunkingStrategy ChunkingStrategy { get; private set; }
+
+        public override string ToString() => Id;
+
+        public static implicit operator string(VectorStoreFileResponse response) => response?.ToString();
     }
 }

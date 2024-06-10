@@ -30,9 +30,9 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
-            using var jsonContent = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/generations"), jsonContent, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, jsonContent, cancellationToken).ConfigureAwait(false);
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+            using var response = await client.Client.PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
