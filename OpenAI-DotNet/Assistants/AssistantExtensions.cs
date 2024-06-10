@@ -153,6 +153,16 @@ namespace OpenAI.Assistants
         public static async Task<IReadOnlyList<ToolOutput>> GetToolOutputsAsync(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls, CancellationToken cancellationToken = default)
             => await Task.WhenAll(toolCalls.Select(async toolCall => await assistant.GetToolOutputAsync(toolCall, cancellationToken).ConfigureAwait(false))).ConfigureAwait(false);
 
+        /// <summary>
+        /// Calls each tool's function, with the provided arguments from the toolCalls and returns the outputs.
+        /// </summary>
+        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="run">The <see cref="RunResponse"/> to complete the tool calls for.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
+        public static async Task<IReadOnlyList<ToolOutput>> GetToolOutputsAsync(this AssistantResponse assistant, RunResponse run, CancellationToken cancellationToken = default)
+            => await GetToolOutputsAsync(assistant, run.RequiredAction.SubmitToolOutputs.ToolCalls, cancellationToken).ConfigureAwait(false);
+
         #endregion Tools
 
         #region Files (Obsolete)

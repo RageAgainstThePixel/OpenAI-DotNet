@@ -260,7 +260,6 @@ namespace OpenAI.Tests
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var tools = new List<Tool>
             {
-                Tool.CodeInterpreter,
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
             var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
@@ -282,7 +281,7 @@ namespace OpenAI.Tests
                             case RunResponse runResponse:
                                 if (runResponse.Status == RunStatus.RequiresAction)
                                 {
-                                    var toolOutputs = await assistant.GetToolOutputsAsync(runResponse.RequiredAction.SubmitToolOutputs.ToolCalls);
+                                    var toolOutputs = await assistant.GetToolOutputsAsync(runResponse);
 
                                     foreach (var toolOutput in toolOutputs)
                                     {
@@ -488,7 +487,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"tool call arguments: {toolCall.FunctionCall.Arguments}");
 
             // Invoke all the tool call functions and return the tool outputs.
-            var toolOutputs = await testAssistant.GetToolOutputsAsync(run.RequiredAction.SubmitToolOutputs.ToolCalls);
+            var toolOutputs = await testAssistant.GetToolOutputsAsync(run);
 
             foreach (var toolOutput in toolOutputs)
             {

@@ -82,7 +82,7 @@ namespace OpenAI.VectorStores
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="VectorStoreResponse"/>.</returns>
-        public async Task<VectorStoreResponse> UpdateVectorStoreAsync(string vectorStoreId, string name = null, int? expiresAfter = null, IReadOnlyDictionary<string, object> metadata = null, CancellationToken cancellationToken = default)
+        public async Task<VectorStoreResponse> ModifyVectorStoreAsync(string vectorStoreId, string name = null, int? expiresAfter = null, IReadOnlyDictionary<string, object> metadata = null, CancellationToken cancellationToken = default)
         {
             var expirationPolicy = expiresAfter.HasValue ? new ExpirationPolicy(expiresAfter.Value) : null;
             var request = new { name, expires_after = expirationPolicy, metadata };

@@ -38,6 +38,8 @@ Version 8.0.0
 - Added Message.ctr to specify specific tool call id, function name, and content
 - Renamed OpenAI.Images.ResponseFormat to OpenAI.Images.ImageResponseFormat
 - Changed ThreadEndpoint.CancelRunAsync return type from RunResponse to bool
+- Fixed Json defined Tools/Functions being improperly added to tool cache
+- Added Tool.TryUnregisterTool to remove a tool from the cache
 Version 7.7.8
 - Updated OpenAIClientSettings.ctr to allow for domain http protocol override (i.e. http://localhost:8080 or http://0.0.0.0:8080)
 - Updated OpenAIClientSettings.BaseRequest public for easier access when implementing custom proxies.

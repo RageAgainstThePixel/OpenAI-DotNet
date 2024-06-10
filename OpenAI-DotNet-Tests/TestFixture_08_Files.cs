@@ -2,6 +2,7 @@
 
 using NUnit.Framework;
 using OpenAI.Chat;
+using OpenAI.Files;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,7 @@ namespace OpenAI.Tests
             var testData = new Conversation(new List<Message> { new(Role.Assistant, "I'm a learning language model") });
             await File.WriteAllTextAsync("test.jsonl", testData);
             Assert.IsTrue(File.Exists("test.jsonl"));
-            var result = await OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", "fine-tune");
+            var result = await OpenAIClient.FilesEndpoint.UploadFileAsync("test.jsonl", FilePurpose.FineTune);
             Assert.IsNotNull(result);
             Assert.IsTrue(result.FileName == "test.jsonl");
             Console.WriteLine($"{result.Id} -> {result.Object}");
