@@ -35,7 +35,8 @@ namespace OpenAI.Tests
             {
                 Tool.FromFunc("test_func", Function),
                 Tool.FromFunc<string, string, string>("test_func_with_args", FunctionWithArgs),
-                Tool.FromFunc("test_func_weather", () => WeatherService.GetCurrentWeatherAsync("my location", WeatherService.WeatherUnit.Celsius))
+                Tool.FromFunc("test_func_weather", () => WeatherService.GetCurrentWeatherAsync("my location", WeatherService.WeatherUnit.Celsius)),
+                Tool.FromFunc<List<int>, string>("test_func_with_array_args", FunctionWithArrayArgs)
             };
 
             var json = JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
@@ -48,6 +49,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(tool);
             var result = tool.InvokeFunction<string>();
             Assert.AreEqual("success", result);
+
             var toolWithArgs = tools[1];
             Assert.IsNotNull(toolWithArgs);
             toolWithArgs.Function.Arguments = new JsonObject
@@ -63,6 +65,16 @@ namespace OpenAI.Tests
             var resultWeather = await toolWeather.InvokeFunctionAsync();
             Assert.IsFalse(string.IsNullOrWhiteSpace(resultWeather));
             Console.WriteLine(resultWeather);
+
+            var toolWithArrayArgs = tools[3];
+            Assert.IsNotNull(toolWithArrayArgs);
+            toolWithArrayArgs.Function.Arguments = new JsonObject
+            {
+                ["args"] = new JsonArray { 1, 2, 3, 4, 5 }
+            };
+            var resultWithArrayArgs = toolWithArrayArgs.InvokeFunction<string>();
+            Assert.AreEqual("1, 2, 3, 4, 5", resultWithArrayArgs);
+            Console.WriteLine(resultWithArrayArgs);
         }
 
         private string Function()
@@ -73,6 +85,11 @@ namespace OpenAI.Tests
         private string FunctionWithArgs(string arg1, string arg2)
         {
             return $"{arg1} {arg2}";
+        }
+
+        private string FunctionWithArrayArgs(List<int> args)
+        {
+            return string.Join(", ", args);
         }
 
         [Test]
