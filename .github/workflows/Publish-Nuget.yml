@@ -131,6 +131,7 @@ jobs:
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
         path: |
+          ${{ github.workspace }}/test-results
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.nupkg

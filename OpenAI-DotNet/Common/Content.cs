@@ -55,7 +55,7 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("index")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int? Index { get; }
+        public int? Index { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -101,6 +101,11 @@ namespace OpenAI
             if (other.Type > 0)
             {
                 Type = other.Type;
+            }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
             }
 
             if (other.Text is TextContent otherTextContent)

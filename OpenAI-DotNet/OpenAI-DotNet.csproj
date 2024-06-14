@@ -28,8 +28,18 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>8.0.1</Version>
+    <Version>8.0.2</Version>
     <PackageReleaseNotes>
+Version 8.0.2
+- Fixed Thread.Message.Attachement serialization
+- Fixed CreateAssistantRequest to properly copy all override assistant properties
+- Fixed some objects that are chunked, were not properly being appended to the final object
+- Added FileSearchOptions to Tool.FileSearch
+- Added some additional constructor overloads for CodeInterpreterResources
+- Added some additional constructor overloads for VectorStoreRequest
+- Thread.DeleteAsync and Assistant.DeleteAsync now fetch the latest before deleting when deleteToolResources is also requested
+- Refactored the way Function handles reflected invocations for both synchronous and asynchronous calls
+  - Function.InvokeAsync will now properly also call synchronous invocations in the tool call collection
 Version 8.0.1
 - Fixed Thread.Run.Status enum ordering
 Version 8.0.0

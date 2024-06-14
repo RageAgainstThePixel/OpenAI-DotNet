@@ -10,6 +10,8 @@ namespace OpenAI
     /// </summary>
     public sealed class CodeInterpreterResources
     {
+        public CodeInterpreterResources() { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -22,6 +24,12 @@ namespace OpenAI
             FileIds = fileIds;
         }
 
+        /// <inheritdoc />
+        public CodeInterpreterResources(string fileId)
+            : this(new List<string> { fileId })
+        {
+        }
+
         /// <summary>
         /// A list of file IDs made available to the <see cref="Tool.CodeInterpreter"/> tool.
         /// There can be a maximum of 20 files associated with the tool.
@@ -29,6 +37,8 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("file_ids")]
         public IReadOnlyList<string> FileIds { get; private set; }
+
+        public static implicit operator CodeInterpreterResources(string fileId) => new(fileId);
 
         public static implicit operator CodeInterpreterResources(List<string> fileIds) => new(fileIds);
     }

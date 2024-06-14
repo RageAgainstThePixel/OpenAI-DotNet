@@ -13,10 +13,8 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_02_Assistants : AbstractTestFixture
     {
-        private AssistantResponse testAssistant;
-
         [Test]
-        public async Task Test_01_CreateAssistant()
+        public async Task Test_01_Assistants()
         {
             Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
             const string testFilePath = "assistant_test_1.txt";
@@ -53,13 +51,54 @@ namespace OpenAI.Tests
                     tools: new[] { Tool.FileSearch });
                 var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(request);
                 Assert.IsNotNull(assistant);
-                Assert.AreEqual("test-assistant", assistant.Name);
-                Assert.AreEqual("Used for unit testing.", assistant.Description);
-                Assert.AreEqual("You are test assistant", assistant.Instructions);
-                Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
-                Assert.IsNotEmpty(assistant.Metadata);
-                testAssistant = assistant;
-                Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
+
+                try
+                {
+                    Assert.AreEqual("test-assistant", assistant.Name);
+                    Assert.AreEqual("Used for unit testing.", assistant.Description);
+                    Assert.AreEqual("You are test assistant", assistant.Instructions);
+                    Assert.AreEqual(Model.GPT4_Turbo.ToString(), assistant.Model);
+                    Assert.IsNotEmpty(assistant.Metadata);
+                    Console.WriteLine($"{assistant} -> {assistant.Metadata["test"]}");
+
+                    var modifiedAssistant = await assistant.ModifyAsync(new(
+                        model: Model.GPT4o,
+                        name: "Test modified",
+                        description: "Modified description",
+                        instructions: "You are modified test assistant",
+                        metadata: new Dictionary<string, string>
+                        {
+                            ["int"] = "2",
+                            ["test"] = assistant.Metadata["test"]
+                        }));
+                    Assert.IsNotNull(modifiedAssistant);
+                    Assert.AreEqual("Test modified", modifiedAssistant.Name);
+                    Assert.AreEqual("Modified description", modifiedAssistant.Description);
+                    Assert.AreEqual("You are modified test assistant", modifiedAssistant.Instructions);
+                    Assert.AreEqual(Model.GPT4o.ToString(), modifiedAssistant.Model);
+                    Assert.IsTrue(modifiedAssistant.Metadata.ContainsKey("test"));
+                    Assert.AreEqual("2", modifiedAssistant.Metadata["int"]);
+                    Assert.AreEqual(modifiedAssistant.Metadata["test"], assistant.Metadata["test"]);
+                    Console.WriteLine($"modified assistant -> {modifiedAssistant.Id}");
+
+                    var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
+                    Assert.IsNotNull(assistantsList);
+                    Assert.IsNotEmpty(assistantsList.Items);
+
+                    foreach (var asst in assistantsList.Items)
+                    {
+                        var retrievedAsst = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(asst);
+                        Assert.IsNotNull(retrievedAsst);
+
+                        var updatedAsst = await retrievedAsst.UpdateAsync();
+                        Assert.IsNotNull(updatedAsst);
+                    }
+                }
+                finally
+                {
+                    var isDeleted = await assistant.DeleteAsync(deleteToolResources: true);
+                    Assert.IsTrue(isDeleted);
+                }
             }
             finally
             {
@@ -69,51 +108,6 @@ namespace OpenAI.Tests
                     Assert.IsTrue(isDeleted);
                 }
             }
-        }
-
-        [Test]
-        public async Task Test_02_ListAssistants()
-        {
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistantsList = await OpenAIClient.AssistantsEndpoint.ListAssistantsAsync();
-            Assert.IsNotNull(assistantsList);
-            Assert.IsNotEmpty(assistantsList.Items);
-
-            foreach (var assistant in assistantsList.Items)
-            {
-                var retrieved = await OpenAIClient.AssistantsEndpoint.RetrieveAssistantAsync(assistant);
-                Assert.IsNotNull(retrieved);
-                Console.WriteLine($"{retrieved} -> {retrieved.CreatedAt}");
-            }
-        }
-
-        [Test]
-        public async Task Test_03_ModifyAssistants()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var assistant = await testAssistant.ModifyAsync(new(
-                model: Model.GPT4o,
-                name: "Test modified",
-                description: "Modified description",
-                instructions: "You are modified test assistant"));
-            Assert.IsNotNull(assistant);
-            Assert.AreEqual("Test modified", assistant.Name);
-            Assert.AreEqual("Modified description", assistant.Description);
-            Assert.AreEqual("You are modified test assistant", assistant.Instructions);
-            Assert.AreEqual(Model.GPT4o.ToString(), assistant.Model);
-            Assert.IsTrue(assistant.Metadata.ContainsKey("test"));
-            Console.WriteLine($"modified assistant -> {assistant.Id}");
-        }
-
-        [Test]
-        public async Task Test_05_DeleteAssistant()
-        {
-            Assert.IsNotNull(testAssistant);
-            Assert.IsNotNull(OpenAIClient.AssistantsEndpoint);
-            var result = await testAssistant.DeleteAsync(deleteToolResources: true);
-            Assert.IsTrue(result);
-            Console.WriteLine($"deleted assistant -> {testAssistant.Id}");
         }
     }
 }

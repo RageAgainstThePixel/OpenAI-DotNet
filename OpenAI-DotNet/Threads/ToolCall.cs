@@ -9,10 +9,9 @@ namespace OpenAI.Threads
 {
     public sealed class ToolCall : IAppendable<ToolCall>
     {
-        public ToolCall() { }
-
         [JsonInclude]
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Index { get; private set; }
 
         /// <summary>
@@ -61,11 +60,19 @@ namespace OpenAI.Threads
         [Obsolete("Removed")]
         public object Retrieval { get; private set; }
 
+        [JsonIgnore]
+        public bool IsFunction => Type == "function";
+
         public void AppendFrom(ToolCall other)
         {
             if (other == null)
             {
                 return;
+            }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index;
             }
 
             if (!string.IsNullOrWhiteSpace(other.Id))

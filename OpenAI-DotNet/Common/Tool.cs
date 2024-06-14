@@ -23,7 +23,15 @@ namespace OpenAI
             Type = nameof(function);
         }
 
+        public Tool(FileSearchOptions fileSearchOptions)
+        {
+            Type = "file_search";
+            FileSearchOptions = fileSearchOptions;
+        }
+
         public static implicit operator Tool(Function function) => new(function);
+
+        public static implicit operator Tool(FileSearchOptions fileSearchOptions) => new(fileSearchOptions);
 
         [Obsolete("Use FileSearch")]
         public static Tool Retrieval { get; } = new() { Type = "file_search" };
@@ -45,10 +53,18 @@ namespace OpenAI
         [JsonPropertyName("type")]
         public string Type { get; private set; }
 
+        [JsonIgnore]
+        public bool IsFunction => Type == "function";
+
         [JsonInclude]
         [JsonPropertyName("function")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Function Function { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("file_search")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public FileSearchOptions FileSearchOptions { get; private set; }
 
         public void AppendFrom(Tool other)
         {
@@ -59,7 +75,7 @@ namespace OpenAI
                 Id = other.Id;
             }
 
-            if (other is { Index: not null })
+            if (other.Index.HasValue)
             {
                 Index = other.Index.Value;
             }
@@ -80,20 +96,43 @@ namespace OpenAI
                     Function.AppendFrom(other.Function);
                 }
             }
+
+            if (other.FileSearchOptions != null)
+            {
+                FileSearchOptions = other.FileSearchOptions;
+            }
         }
 
         /// <summary>
         /// Invokes the function and returns the result as json.
         /// </summary>
         /// <returns>The result of the function as json.</returns>
-        public string InvokeFunction() => Function.Invoke();
+        /// <remarks>Only call this directly if you know the method is synchronous.</remarks>
+        public string InvokeFunction()
+        {
+            if (!IsFunction)
+            {
+                throw new InvalidOperationException("This tool is not a function.");
+            }
+
+            return Function.Invoke();
+        }
 
         /// <summary>
         /// Invokes the function and returns the result.
         /// </summary>
         /// <typeparam name="T">The type to deserialize the result to.</typeparam>
         /// <returns>The result of the function.</returns>
-        public T InvokeFunction<T>() => Function.Invoke<T>();
+        /// <remarks>Only call this directly if you know the method is synchronous.</remarks>
+        public T InvokeFunction<T>()
+        {
+            if (!IsFunction)
+            {
+                throw new InvalidOperationException("This tool is not a function.");
+            }
+
+            return Function.Invoke<T>();
+        }
 
         /// <summary>
         /// Invokes the function and returns the result as json.
@@ -101,7 +140,14 @@ namespace OpenAI
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function as json.</returns>
         public async Task<string> InvokeFunctionAsync(CancellationToken cancellationToken = default)
-            => await Function.InvokeAsync(cancellationToken).ConfigureAwait(false);
+        {
+            if (!IsFunction)
+            {
+                throw new InvalidOperationException("This tool is not a function.");
+            }
+
+            return await Function.InvokeAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Invokes the function and returns the result.
@@ -110,7 +156,14 @@ namespace OpenAI
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function.</returns>
         public async Task<T> InvokeFunctionAsync<T>(CancellationToken cancellationToken = default)
-            => await Function.InvokeAsync<T>(cancellationToken).ConfigureAwait(false);
+        {
+            if (!IsFunction)
+            {
+                throw new InvalidOperationException("This tool is not a function.");
+            }
+
+            return await Function.InvokeAsync<T>(cancellationToken).ConfigureAwait(false);
+        }
 
         #region Tool Cache
 
@@ -137,7 +190,7 @@ namespace OpenAI
                 ClearRegisteredTools();
             }
 
-            if (forceUpdate || toolCache.All(tool => tool.Type != "function"))
+            if (forceUpdate || toolCache.All(tool => !tool.IsFunction))
             {
                 var tools = new List<Tool>();
                 tools.AddRange(
@@ -147,7 +200,7 @@ namespace OpenAI
                     where method.IsStatic
                     let functionAttribute = method.GetCustomAttribute<FunctionAttribute>()
                     where functionAttribute != null
-                    let name = $"{type.FullName}.{method.Name}".Replace('.', '_')
+                    let name = GetFunctionName(type, method)
                     let description = functionAttribute.Description
                     select Function.GetOrCreateFunction(name, description, method)
                     into function
@@ -155,14 +208,14 @@ namespace OpenAI
 
                 foreach (var newTool in tools.Where(tool =>
                              !toolCache.Any(knownTool =>
-                                 knownTool.Type == "function" && knownTool.Function.Name == tool.Function.Name && knownTool.Function.Instance == null)))
+                                 knownTool.IsFunction && knownTool.Function.Name == tool.Function.Name && knownTool.Function.Instance == null)))
                 {
                     toolCache.Add(newTool);
                 }
             }
 
             return !includeDefaults
-                ? toolCache.Where(tool => tool.Type == "function").ToList()
+                ? toolCache.Where(tool => tool.IsFunction).ToList()
                 : toolCache;
         }
 
@@ -184,7 +237,7 @@ namespace OpenAI
         /// <returns>True, if the tool is already registered in the tool cache.</returns>
         public static bool IsToolRegistered(Tool tool)
             => toolCache.Any(knownTool =>
-                knownTool.Type == "function" &&
+                knownTool.IsFunction &&
                 knownTool.Function.Name == tool.Function.Name &&
                 ReferenceEquals(knownTool.Function.Instance, tool.Function.Instance));
 
@@ -200,7 +253,7 @@ namespace OpenAI
                 return false;
             }
 
-            if (tool.Type != "function")
+            if (!tool.IsFunction)
             {
                 throw new InvalidOperationException("Only function tools can be registered.");
             }
@@ -222,7 +275,7 @@ namespace OpenAI
                 return false;
             }
 
-            if (tool.Type != "function")
+            if (!tool.IsFunction)
             {
                 throw new InvalidOperationException("Only function tools can be unregistered.");
             }
@@ -251,16 +304,7 @@ namespace OpenAI
                 throw new InvalidOperationException($"Method {type.FullName}.{methodName}() must be static. Use GetOrCreateTool(object instance, string methodName) instead.");
             }
 
-            var functionName = $"{type.FullName}.{method.Name}".Replace('.', '_');
-
-            if (TryGetTool(functionName, null, out var tool))
-            {
-                return tool;
-            }
-
-            tool = new Tool(Function.GetOrCreateFunction(functionName, description ?? string.Empty, method));
-            toolCache.Add(tool);
-            return tool;
+            return GetOrCreateToolInternal(type, method, description);
         }
 
         /// <summary>
@@ -279,8 +323,12 @@ namespace OpenAI
             var type = instance.GetType();
             var method = type.GetMethod(methodName) ??
                 throw new InvalidOperationException($"Failed to find a valid method for {type.FullName}.{methodName}()");
+            return GetOrCreateToolInternal(type, method, description, instance);
+        }
 
-            var functionName = $"{type.FullName}.{method.Name}".Replace('.', '_');
+        private static Tool GetOrCreateToolInternal(Type type, MethodInfo method, string description, object instance = null)
+        {
+            var functionName = GetFunctionName(type, method);
 
             if (TryGetTool(functionName, instance, out var tool))
             {
@@ -295,7 +343,7 @@ namespace OpenAI
         private static bool TryGetTool(string name, object instance, out Tool tool)
         {
             foreach (var knownTool in toolCache.Where(knownTool =>
-                         knownTool.Type == "function" && knownTool.Function.Name == name &&
+                         knownTool.IsFunction && knownTool.Function.Name == name &&
                          ReferenceEquals(knownTool.Function.Instance, instance)))
             {
                 tool = knownTool;
@@ -304,6 +352,13 @@ namespace OpenAI
 
             tool = null;
             return false;
+        }
+
+        private static string GetFunctionName(Type type, MethodInfo methodInfo)
+        {
+            // todo possibly use string hash instead to mitigate long names?
+            // todo possibly use AssemblyQualifiedName?
+            return $"{type.FullName}.{methodInfo.Name}".Replace('.', '_');
         }
 
         #endregion Tool Cache

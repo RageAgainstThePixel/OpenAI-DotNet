@@ -32,10 +32,12 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("finish_reason")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FinishReason { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("finish_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FinishDetails FinishDetails { get; private set; }
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Index { get; private set; }
 
         /// <summary>
@@ -50,6 +53,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("logprobs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public LogProbs LogProbs { get; private set; }
 
         public override string ToString() => Message?.Content?.ToString() ?? Delta?.Content ?? string.Empty;
@@ -58,7 +62,10 @@ namespace OpenAI.Chat
 
         public void AppendFrom(Choice other)
         {
-            Index = other?.Index ?? 0;
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
 
             if (other?.Message != null)
             {

@@ -10,6 +10,8 @@ namespace OpenAI
     /// </summary>
     public sealed class ImageFile : IAppendable<ImageFile>
     {
+        public ImageFile() { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -30,7 +32,7 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("index")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int? Index { get; }
+        public int? Index { get; private set; }
 
         /// <summary>
         /// The file ID of the image in the message content.
@@ -55,6 +57,11 @@ namespace OpenAI
         public void AppendFrom(ImageFile other)
         {
             if (other == null) { return; }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
 
             if (!string.IsNullOrWhiteSpace(other.FileId))
             {
