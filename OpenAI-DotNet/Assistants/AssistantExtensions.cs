@@ -111,7 +111,7 @@ namespace OpenAI.Assistants
             }
 
             var tool = assistant.Tools.FirstOrDefault(tool => tool.IsFunction && tool.Function.Name == toolCall.FunctionCall.Name) ??
-                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.Type}");
+                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.FunctionCall.Name}");
             tool.Function.Arguments = toolCall.FunctionCall.Arguments;
             return await tool.InvokeFunctionAsync(cancellationToken).ConfigureAwait(false);
         }

@@ -62,17 +62,19 @@ namespace OpenAI.Chat
 
         public void AppendFrom(Choice other)
         {
+            if (other == null) { return; }
+
             if (other.Index.HasValue)
             {
                 Index = other.Index.Value;
             }
 
-            if (other?.Message != null)
+            if (other.Message != null)
             {
                 Message = other.Message;
             }
 
-            if (other?.Delta != null)
+            if (other.Delta != null)
             {
                 if (Message == null)
                 {
@@ -84,17 +86,17 @@ namespace OpenAI.Chat
                 }
             }
 
-            if (other?.LogProbs != null)
+            if (other.LogProbs != null)
             {
                 LogProbs = other.LogProbs;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.FinishReason))
+            if (!string.IsNullOrWhiteSpace(other.FinishReason))
             {
                 FinishReason = other.FinishReason;
             }
 
-            if (other?.FinishDetails != null)
+            if (other.FinishDetails != null)
             {
                 FinishDetails = other.FinishDetails;
             }

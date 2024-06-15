@@ -44,7 +44,7 @@ namespace OpenAI.Threads
         {
             if (deleteToolResources)
             {
-                thread = await thread.UpdateAsync(cancellationToken: cancellationToken);
+                thread = await thread.UpdateAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
             var deleteTasks = new List<Task<bool>> { thread.Client.ThreadsEndpoint.DeleteThreadAsync(thread, cancellationToken) };

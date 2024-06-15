@@ -84,7 +84,6 @@ namespace OpenAI.Tests
                 {
                     file = await OpenAIClient.FilesEndpoint.UploadFileAsync(testFilePath, FilePurpose.Assistants);
                     Assert.NotNull(file);
-                    await Task.Delay(1000);
                 }
                 finally
                 {
