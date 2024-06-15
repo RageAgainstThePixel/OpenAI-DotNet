@@ -40,6 +40,7 @@ Version 8.0.2
 - Thread.DeleteAsync and Assistant.DeleteAsync now fetch the latest before deleting when deleteToolResources is also requested
 - Refactored the way Function handles reflected invocations for both synchronous and asynchronous calls
   - Function.InvokeAsync will now properly also call synchronous invocations in the tool call collection
+- Refactored Threads/Assistant Unit Tests
 Version 8.0.1
 - Fixed Thread.Run.Status enum ordering
 Version 8.0.0
