@@ -10,6 +10,8 @@ namespace OpenAI
     /// </summary>
     public sealed class ImageUrl : IAppendable<ImageUrl>
     {
+        public ImageUrl() { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -53,6 +55,11 @@ namespace OpenAI
         public void AppendFrom(ImageUrl other)
         {
             if (other == null) { return; }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
 
             if (!string.IsNullOrWhiteSpace(other.Url))
             {

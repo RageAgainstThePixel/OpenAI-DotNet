@@ -9,6 +9,7 @@ namespace OpenAI
     {
         [JsonInclude]
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Index { get; private set; }
 
         [JsonInclude]
@@ -30,6 +31,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_citation")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FileCitation FileCitation { get; private set; }
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_path")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FilePath FilePath { get; private set; }
 
         [JsonInclude]
@@ -50,6 +53,11 @@ namespace OpenAI
         public void AppendFrom(Annotation other)
         {
             if (other == null) { return; }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
 
             if (!string.IsNullOrWhiteSpace(other.Text))
             {

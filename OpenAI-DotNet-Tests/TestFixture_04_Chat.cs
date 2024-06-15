@@ -487,5 +487,38 @@ namespace OpenAI.Tests
             Console.WriteLine(response.ToString());
             response.GetUsage();
         }
+
+        [Test]
+        public async Task Test_05_02_GetChat_Enumerable_TestToolCalls_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You must extract the name from the input"),
+                new(Role.User, "My name is Joe")
+            };
+
+            var tools = new List<Tool>
+            {
+                Tool.FromFunc("extract_first_name", (string name) => name)
+            };
+
+            var request = new ChatRequest(messages, tools);
+
+            await foreach (var streamResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(request))
+            {
+                Console.WriteLine(streamResponse.ToJsonString());
+
+                if (streamResponse.FirstChoice.Message is { } message)
+                {
+                    foreach (var tool in message.ToolCalls)
+                    {
+                        var output = tool.InvokeFunction<string>();
+                        Console.WriteLine($"Output from StreamCompletionEnumerableAsync: {output}");
+                    }
+                }
+            }
+        }
     }
 }

@@ -23,19 +23,17 @@ namespace OpenAI.Assistants
         public static async Task<AssistantResponse> ModifyAsync(this AssistantResponse assistant, CreateAssistantRequest request, CancellationToken cancellationToken = default)
             => await assistant.Client.AssistantsEndpoint.ModifyAssistantAsync(
                 assistantId: assistant.Id,
-                request: new CreateAssistantRequest(
-                    assistant: assistant,
-                    model: request.Model,
-                    name: request.Name,
-                    description: request.Description,
-                    instructions: request.Instructions,
-                    toolResources: request.ToolResources,
-                    tools: request.Tools,
-                    metadata: request.Metadata,
-                    temperature: request.Temperature,
-                    topP: request.TopP,
-                    responseFormat: request.ResponseFormat),
+                request: request ?? new(assistant),
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Get the latest status of the assistant.
+        /// </summary>
+        /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="AssistantResponse"/>.</returns>
+        public static async Task<AssistantResponse> UpdateAsync(this AssistantResponse assistant, CancellationToken cancellationToken = default)
+            => await assistant.Client.AssistantsEndpoint.RetrieveAssistantAsync(assistant, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Delete the assistant.
@@ -46,6 +44,11 @@ namespace OpenAI.Assistants
         /// <returns>True, if the <see cref="assistant"/> was successfully deleted.</returns>
         public static async Task<bool> DeleteAsync(this AssistantResponse assistant, bool deleteToolResources = false, CancellationToken cancellationToken = default)
         {
+            if (deleteToolResources)
+            {
+                assistant = await assistant.UpdateAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             var deleteTasks = new List<Task<bool>> { assistant.Client.AssistantsEndpoint.DeleteAssistantAsync(assistant.Id, cancellationToken) };
 
             if (deleteToolResources && assistant.ToolResources?.FileSearch?.VectorStoreIds is { Count: > 0 })
@@ -79,15 +82,16 @@ namespace OpenAI.Assistants
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCall"><see cref="ToolCall"/>.</param>
         /// <returns>Tool output result as <see cref="string"/>.</returns>
+        /// <remarks>Only call this directly on your <see cref="ToolCall"/> if you know the method is synchronous.</remarks>
         public static string InvokeToolCall(this AssistantResponse assistant, ToolCall toolCall)
         {
-            if (toolCall.Type != "function")
+            if (!toolCall.IsFunction)
             {
                 throw new InvalidOperationException($"Cannot invoke built in tool {toolCall.Type}");
             }
 
-            var tool = assistant.Tools.FirstOrDefault(tool => tool.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
-                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.Type}");
+            var tool = assistant.Tools.FirstOrDefault(tool => tool.IsFunction && tool.Function.Name == toolCall.FunctionCall.Name) ??
+                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.FunctionCall.Name}");
             tool.Function.Arguments = toolCall.FunctionCall.Arguments;
             return tool.InvokeFunction();
         }
@@ -101,13 +105,13 @@ namespace OpenAI.Assistants
         /// <returns>Tool output result as <see cref="string"/>.</returns>
         public static async Task<string> InvokeToolCallAsync(this AssistantResponse assistant, ToolCall toolCall, CancellationToken cancellationToken = default)
         {
-            if (toolCall.Type != "function")
+            if (!toolCall.IsFunction)
             {
                 throw new InvalidOperationException($"Cannot invoke built in tool {toolCall.Type}");
             }
 
-            var tool = assistant.Tools.FirstOrDefault(tool => tool.Type == "function" && tool.Function.Name == toolCall.FunctionCall.Name) ??
-                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.Type}");
+            var tool = assistant.Tools.FirstOrDefault(tool => tool.IsFunction && tool.Function.Name == toolCall.FunctionCall.Name) ??
+                throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.Id}] {toolCall.FunctionCall.Name}");
             tool.Function.Arguments = toolCall.FunctionCall.Arguments;
             return await tool.InvokeFunctionAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -118,6 +122,7 @@ namespace OpenAI.Assistants
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCall"><see cref="ToolCall"/>.</param>
         /// <returns><see cref="ToolOutput"/>.</returns>
+        /// <remarks>Only call this directly on your <see cref="ToolCall"/> if you know the method is synchronous.</remarks>
         public static ToolOutput GetToolOutput(this AssistantResponse assistant, ToolCall toolCall)
             => new(toolCall.Id, assistant.InvokeToolCall(toolCall));
 
@@ -127,6 +132,7 @@ namespace OpenAI.Assistants
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="toolCalls">A collection of <see cref="ToolCall"/>s.</param>
         /// <returns>A collection of <see cref="ToolOutput"/>s.</returns>
+        [Obsolete("Use GetToolOutputsAsync instead.")]
         public static IReadOnlyList<ToolOutput> GetToolOutputs(this AssistantResponse assistant, IEnumerable<ToolCall> toolCalls)
             => toolCalls.Select(assistant.GetToolOutput).ToList();
 

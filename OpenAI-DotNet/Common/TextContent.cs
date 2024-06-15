@@ -54,6 +54,11 @@ namespace OpenAI
         {
             if (other == null) { return; }
 
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
+
             if (!string.IsNullOrWhiteSpace(other.Value))
             {
                 Value += other.Value;

@@ -36,7 +36,9 @@ namespace OpenAI.Tests
                 Tool.FromFunc("test_func", Function),
                 Tool.FromFunc<string, string, string>("test_func_with_args", FunctionWithArgs),
                 Tool.FromFunc("test_func_weather", () => WeatherService.GetCurrentWeatherAsync("my location", WeatherService.WeatherUnit.Celsius)),
-                Tool.FromFunc<List<int>, string>("test_func_with_array_args", FunctionWithArrayArgs)
+                Tool.FromFunc<List<int>, string>("test_func_with_array_args", FunctionWithArrayArgs),
+                Tool.FromFunc<string, string>("test_single_return_arg", arg1 => arg1),
+                Tool.FromFunc("test_no_specifiers", (string arg1) => arg1)
             };
 
             var json = JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
@@ -75,6 +77,26 @@ namespace OpenAI.Tests
             var resultWithArrayArgs = toolWithArrayArgs.InvokeFunction<string>();
             Assert.AreEqual("1, 2, 3, 4, 5", resultWithArrayArgs);
             Console.WriteLine(resultWithArrayArgs);
+
+            var singleReturnArg = tools[4];
+            Assert.IsNotNull(singleReturnArg);
+            singleReturnArg.Function.Arguments = new JsonObject
+            {
+                ["arg1"] = "arg1"
+            };
+            var resultSingleReturnArg = singleReturnArg.InvokeFunction<string>();
+            Assert.AreEqual("arg1", resultSingleReturnArg);
+            Console.WriteLine(resultSingleReturnArg);
+
+            var toolNoSpecifiers = tools[5];
+            Assert.IsNotNull(toolNoSpecifiers);
+            toolNoSpecifiers.Function.Arguments = new JsonObject
+            {
+                ["arg1"] = "arg1"
+            };
+            var resultNoSpecifiers = toolNoSpecifiers.InvokeFunction<string>();
+            Assert.AreEqual("arg1", resultNoSpecifiers);
+            Console.WriteLine(resultNoSpecifiers);
         }
 
         private string Function()

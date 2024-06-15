@@ -32,10 +32,12 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("finish_reason")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FinishReason { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("finish_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FinishDetails FinishDetails { get; private set; }
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Index { get; private set; }
 
         /// <summary>
@@ -50,6 +53,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("logprobs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public LogProbs LogProbs { get; private set; }
 
         public override string ToString() => Message?.Content?.ToString() ?? Delta?.Content ?? string.Empty;
@@ -58,14 +62,19 @@ namespace OpenAI.Chat
 
         public void AppendFrom(Choice other)
         {
-            Index = other?.Index ?? 0;
+            if (other == null) { return; }
 
-            if (other?.Message != null)
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
+
+            if (other.Message != null)
             {
                 Message = other.Message;
             }
 
-            if (other?.Delta != null)
+            if (other.Delta != null)
             {
                 if (Message == null)
                 {
@@ -77,17 +86,17 @@ namespace OpenAI.Chat
                 }
             }
 
-            if (other?.LogProbs != null)
+            if (other.LogProbs != null)
             {
                 LogProbs = other.LogProbs;
             }
 
-            if (!string.IsNullOrWhiteSpace(other?.FinishReason))
+            if (!string.IsNullOrWhiteSpace(other.FinishReason))
             {
                 FinishReason = other.FinishReason;
             }
 
-            if (other?.FinishDetails != null)
+            if (other.FinishDetails != null)
             {
                 FinishDetails = other.FinishDetails;
             }

@@ -11,6 +11,8 @@ namespace OpenAI
     /// </summary>
     public sealed class VectorStoreRequest
     {
+        public VectorStoreRequest() { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -27,6 +29,12 @@ namespace OpenAI
         {
             FileIds = fileIds;
             Metadata = metadata;
+        }
+
+        /// <inheritdoc />
+        public VectorStoreRequest(string fileId, IReadOnlyDictionary<string, string> metadata = null)
+            : this(new List<string> { fileId }, metadata)
+        {
         }
 
         /// <summary>
@@ -46,7 +54,7 @@ namespace OpenAI
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
-        public static implicit operator VectorStoreRequest(string fileId) => new(new List<string> { fileId });
+        public static implicit operator VectorStoreRequest(string fileId) => new(fileId);
 
         public static implicit operator VectorStoreRequest(List<string> fileIds) => new(fileIds);
     }

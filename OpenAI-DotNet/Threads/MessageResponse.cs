@@ -146,7 +146,7 @@ namespace OpenAI.Threads
         /// A list of files attached to the message, and the tools they were added to.
         /// </summary>
         [JsonInclude]
-        [JsonPropertyName("Attachments")]
+        [JsonPropertyName("attachments")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<Attachment> Attachments { get; private set; }
 

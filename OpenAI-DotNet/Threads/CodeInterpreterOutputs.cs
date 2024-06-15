@@ -42,6 +42,11 @@ namespace OpenAI.Threads
                 Type = other.Type;
             }
 
+            if (other.Index.HasValue)
+            {
+                Index = other.Index.Value;
+            }
+
             if (!string.IsNullOrWhiteSpace(other.Logs))
             {
                 Logs += other.Logs;

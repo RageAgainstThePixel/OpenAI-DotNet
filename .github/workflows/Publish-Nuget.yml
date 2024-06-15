@@ -37,11 +37,13 @@ concurrency:
 
 env:
   DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
-  PACKAGE_VERSION: ''
 
 jobs:
   build:
     if: ${{ !github.event_name == 'pull_request' || !github.event.pull_request.draft }}
+    env:
+      PACKAGE_VERSION: ''
+      COVERAGE_FILE_PATH: ''
     runs-on: ubuntu-latest
 
     steps:
@@ -73,11 +75,18 @@ jobs:
         report_individual_runs: true
         compare_to_earlier_commit: false
 
+    - name: Determine Coverage File Path
+      if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
+      shell: bash
+      run: |
+        COVERAGE_FILE_PATH=$(find ./test-results -name 'coverage.cobertura.xml' | head -n 1)
+        echo "COVERAGE_FILE_PATH=$COVERAGE_FILE_PATH" >> $GITHUB_ENV
+
     - name: Code Coverage Summary Report
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: test-results/**/coverage.cobertura.xml
+        filename: ${{ env.COVERAGE_FILE_PATH }}
         badge: true
         format: 'markdown'
         output: 'both'
@@ -131,6 +140,7 @@ jobs:
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
         path: |
+          ${{ github.workspace }}/test-results
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
           ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.nupkg

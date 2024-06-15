@@ -77,7 +77,7 @@ namespace OpenAI.Assistants
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
+            ChatResponseFormat? responseFormat = null)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -86,22 +86,22 @@ namespace OpenAI.Assistants
             tools ?? assistant.Tools,
             toolResources ?? assistant.ToolResources,
             metadata ?? assistant.Metadata,
-            temperature,
-            topP,
-            responseFormat)
+            temperature ?? assistant.Temperature,
+            topP ?? assistant.TopP,
+            responseFormat ?? assistant.ResponseFormat)
         {
         }
 
         [Obsolete("use new .ctr")]
         public CreateAssistantRequest(
             AssistantResponse assistant,
-            string model = null,
-            string name = null,
-            string description = null,
-            string instructions = null,
-            IEnumerable<Tool> tools = null,
-            IEnumerable<string> files = null,
-            IReadOnlyDictionary<string, string> metadata = null)
+            string model,
+            string name,
+            string description,
+            string instructions,
+            IEnumerable<Tool> tools,
+            IEnumerable<string> files,
+            IReadOnlyDictionary<string, string> metadata)
         {
         }
 
