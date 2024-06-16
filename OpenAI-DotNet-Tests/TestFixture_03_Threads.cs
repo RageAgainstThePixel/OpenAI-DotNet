@@ -260,6 +260,51 @@ namespace OpenAI.Tests
                 var run = await thread.CreateRunAsync(assistant, streamEvent =>
                 {
                     Console.WriteLine(streamEvent.ToJsonString());
+
+                    switch (streamEvent)
+                    {
+                        case RunResponse runEvent:
+                            Assert.NotNull(runEvent);
+                            break;
+                        case RunStepResponse runStepEvent:
+                            Assert.NotNull(runStepEvent);
+
+                            switch (runStepEvent.Object)
+                            {
+                                case "thread.run.step.delta":
+                                    Assert.NotNull(runStepEvent.Delta);
+                                    break;
+                                default:
+                                    Assert.IsNull(runStepEvent.Delta);
+                                    break;
+                            }
+                            break;
+                        case ThreadResponse threadEvent:
+                            Assert.NotNull(threadEvent);
+                            break;
+                        case MessageResponse messageEvent:
+                            Assert.NotNull(messageEvent);
+
+                            switch (messageEvent.Object)
+                            {
+                                case "thread.message.delta":
+                                    Assert.NotNull(messageEvent.Delta);
+                                    Console.WriteLine($"{messageEvent.Object}: \"{messageEvent.Delta.PrintContent()}\"");
+                                    break;
+                                default:
+                                    Console.WriteLine($"{messageEvent.Object}: \"{messageEvent.PrintContent()}\"");
+                                    Assert.IsNull(messageEvent.Delta);
+                                    break;
+                            }
+                            break;
+                        case Error errorEvent:
+                            Assert.NotNull(errorEvent);
+                            break;
+                        //default:
+                            // handle event not already processed by library
+                            // var @event = JsonSerializer.Deserialize<T>(streamEvent.ToJsonString());
+                            //break;
+                    }
                 });
 
                 Assert.IsNotNull(run);

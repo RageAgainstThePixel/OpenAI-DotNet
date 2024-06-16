@@ -433,6 +433,7 @@ namespace OpenAI.Threads
                         case "thread.run.cancelled":
                         case "thread.run.expired":
                             var partialRun = sseResponse.Deserialize<RunResponse>(ssEvent, client);
+
                             if (run == null)
                             {
                                 run = partialRun;
@@ -452,6 +453,7 @@ namespace OpenAI.Threads
                         case "thread.run.step.cancelled":
                         case "thread.run.step.expired":
                             var partialRunStep = sseResponse.Deserialize<RunStepResponse>(ssEvent, client);
+
                             if (runStep == null)
                             {
                                 runStep = partialRunStep;
@@ -469,6 +471,7 @@ namespace OpenAI.Threads
                         case "thread.message.completed":
                         case "thread.message.incomplete":
                             var partialMessage = sseResponse.Deserialize<MessageResponse>(ssEvent, client);
+
                             if (message == null)
                             {
                                 message = partialMessage;

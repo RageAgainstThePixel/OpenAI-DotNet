@@ -28,8 +28,12 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>8.0.2</Version>
+    <Version>8.0.3</Version>
     <PackageReleaseNotes>
+Version 8.0.3
+- Fixed Thread.MessageResponse and Thread.RunStepResponse Delta stream event objects not being properly populated
+- Added Thread.MessageDelta.PrintContent()
+- Added additional unit tests for delta objects
 Version 8.0.2
 - Fixed Thread.Message.Attachement serialization
 - Fixed CreateAssistantRequest to properly copy all override assistant properties

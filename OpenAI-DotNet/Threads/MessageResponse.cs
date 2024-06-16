@@ -181,12 +181,29 @@ namespace OpenAI.Threads
         {
             if (other == null) { return; }
 
+            if (!string.IsNullOrWhiteSpace(Id))
+            {
+                if (Id != other.Id)
+                {
+                    throw new InvalidOperationException("Attempting to append a different object than the original!");
+                }
+            }
+            else
+            {
+                Id = other.Id;
+            }
+
+            Object = other.Object;
+
             if (other.Delta != null)
             {
-                if (Role == 0 &&
-                    other.Delta.Role > 0)
+                if (Role == 0 && other.Delta.Role > 0)
                 {
                     Role = other.Delta.Role;
+                }
+                else if (other.Delta.Role == 0 && Role > 0)
+                {
+                    other.Delta.Role = Role;
                 }
 
                 if (other.Delta.Content != null)
@@ -195,9 +212,13 @@ namespace OpenAI.Threads
                     content.AppendFrom(other.Delta.Content);
                 }
 
+                Delta = other.Delta;
+
                 // bail early since we only care about the delta content
                 return;
             }
+
+            Delta = null;
 
             if (Role == 0 &&
                 other.Role > 0)
