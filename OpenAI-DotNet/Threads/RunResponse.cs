@@ -281,6 +281,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ChatResponseFormat ResponseFormat { get; private set; }
 
         public static implicit operator string(RunResponse run) => run?.ToString();
@@ -290,6 +291,20 @@ namespace OpenAI.Threads
         internal void AppendFrom(RunResponse other)
         {
             if (other is null) { return; }
+
+            if (!string.IsNullOrWhiteSpace(Id))
+            {
+                if (Id != other.Id)
+                {
+                    throw new InvalidOperationException("Attempting to append a different object than the original!");
+                }
+            }
+            else
+            {
+                Id = other.Id;
+            }
+
+            Object = other.Object;
 
             if (other.Status > 0)
             {
