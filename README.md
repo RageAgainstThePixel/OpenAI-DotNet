@@ -42,8 +42,7 @@ Install-Package OpenAI-DotNet
 
 ### Table of Contents
 
-- [Authentication](#authentication) :new: :warning: :construction:
-- [OpenAIClient](#handling-openaiclient-and-httpclient-lifecycle)
+- [Authentication](#authentication)
 - [Azure OpenAI](#azure-openai)
   - [Azure Active Directory Authentication](#azure-active-directory-authentication)
 - [OpenAI API Proxy](#openai-api-proxy)
@@ -51,17 +50,17 @@ Install-Package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Assistants](#assistants) :new: :warning: :construction:
+- [Assistants](#assistants) :warning: :construction:
   - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant)
   - [Retrieve Assistant](#retrieve-assistant)
   - [Modify Assistant](#modify-assistant)
   - [Delete Assistant](#delete-assistant)
-  - [Assistant Streaming](#assistant-streaming) :new:
-  - [Threads](#threads) :new: :warning: :construction:
+  - [Assistant Streaming](#assistant-streaming) :warning: :construction:
+  - [Threads](#threads) :warning: :construction:
     - [Create Thread](#create-thread)
     - [Create Thread and Run](#create-thread-and-run)
-      - [Streaming](#create-thread-and-run-streaming) :new:
+      - [Streaming](#create-thread-and-run-streaming) :warning: :construction:
     - [Retrieve Thread](#retrieve-thread)
     - [Modify Thread](#modify-thread)
     - [Delete Thread](#delete-thread)
@@ -73,29 +72,29 @@ Install-Package OpenAI-DotNet
     - [Thread Runs](#thread-runs)
       - [List Runs](#list-thread-runs)
       - [Create Run](#create-thread-run)
-        - [Streaming](#create-thread-run-streaming) :new:
+        - [Streaming](#create-thread-run-streaming) :warning: :construction:
       - [Retrieve Run](#retrieve-thread-run)
       - [Modify Run](#modify-thread-run)
       - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run)
       - [List Run Steps](#list-thread-run-steps)
       - [Retrieve Run Step](#retrieve-thread-run-step)
       - [Cancel Run](#cancel-thread-run)
-  - [Vector Stores](#vector-stores) :new:
-    - [List Vector Stores](#list-vector-stores) :new:
-    - [Create Vector Store](#create-vector-store) :new:
-    - [Retrieve Vector Store](#retrieve-vector-store) :new:
-    - [Modify Vector Store](#modify-vector-store) :new:
-    - [Delete Vector Store](#delete-vector-store) :new:
-    - [Vector Store Files](#vector-store-files) :new:
-      - [List Vector Store Files](#list-vector-store-files) :new:
-      - [Create Vector Store File](#create-vector-store-file) :new:
-      - [Retrieve Vector Store File](#retrieve-vector-store-file) :new:
-      - [Delete Vector Store File](#delete-vector-store-file) :new:
-    - [Vector Store File Batches](#vector-store-file-batches) :new:
-      - [Create Vector Store File Batch](#create-vector-store-file-batch) :new:
-      - [Retrieve Vector Store File Batch](#retrieve-vector-store-file-batch) :new:
-      - [List Files In Vector Store Batch](#list-files-in-vector-store-batch) :new:
-      - [Cancel Vector Store File Batch](#cancel-vector-store-file-batch) :new:
+  - [Vector Stores](#vector-stores)
+    - [List Vector Stores](#list-vector-stores)
+    - [Create Vector Store](#create-vector-store)
+    - [Retrieve Vector Store](#retrieve-vector-store)
+    - [Modify Vector Store](#modify-vector-store)
+    - [Delete Vector Store](#delete-vector-store)
+    - [Vector Store Files](#vector-store-files)
+      - [List Vector Store Files](#list-vector-store-files)
+      - [Create Vector Store File](#create-vector-store-file)
+      - [Retrieve Vector Store File](#retrieve-vector-store-file)
+      - [Delete Vector Store File](#delete-vector-store-file)
+    - [Vector Store File Batches](#vector-store-file-batches)
+      - [Create Vector Store File Batch](#create-vector-store-file-batch)
+      - [Retrieve Vector Store File Batch](#retrieve-vector-store-file-batch)
+      - [List Files In Vector Store Batch](#list-files-in-vector-store-batch)
+      - [Cancel Vector Store File Batch](#cancel-vector-store-file-batch)
 - [Chat](#chat)
   - [Chat Completions](#chat-completions)
   - [Streaming](#chat-streaming)
@@ -104,6 +103,7 @@ Install-Package OpenAI-DotNet
   - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
+    - [Stream Speech](#stream-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
 - [Images](#images) :warning: :construction:
@@ -122,11 +122,11 @@ Install-Package OpenAI-DotNet
   - [Retrieve Fine Tune Job Info](#retrieve-fine-tune-job-info)
   - [Cancel Fine Tune Job](#cancel-fine-tune-job)
   - [List Fine Tune Job Events](#list-fine-tune-job-events)
-- [Batches](#batches) :new:
-  - [List Batches](#list-batches) :new:
-  - [Create Batch](#create-batch) :new:
-  - [Retrieve Batch](#retrieve-batch) :new:
-  - [Cancel Batch](#cancel-batch) :new:
+- [Batches](#batches)
+  - [List Batches](#list-batches)
+  - [Create Batch](#create-batch)
+  - [Retrieve Batch](#retrieve-batch)
+  - [Cancel Batch](#cancel-batch)
 - [Embeddings](#embeddings)
   - [Create Embedding](#create-embeddings)
 - [Moderations](#moderations)
@@ -476,7 +476,7 @@ Assert.IsTrue(isDeleted);
 #### [Assistant Streaming](https://platform.openai.com/docs/api-reference/assistants-streaming)
 
 > [!NOTE]
-> Assistant stream events can be easily added to existing thread calls by passing `Action<IServerSentEvent> streamEventHandler` callback to any existing method that supports streaming.
+> Assistant stream events can be easily added to existing thread calls by passing `Func<IServerSentEvent, Task> streamEventHandler` callback to any existing method that supports streaming.
 
 #### [Threads](https://platform.openai.com/docs/api-reference/threads)
 
@@ -526,7 +526,7 @@ var tools = new List<Tool>
 var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
 var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
 ThreadResponse thread = null;
-async void StreamEventHandler(IServerSentEvent streamEvent)
+async Task StreamEventHandler(IServerSentEvent streamEvent)
 {
     switch (streamEvent)
     {
@@ -720,9 +720,10 @@ var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
         responseFormat: ChatResponseFormat.Json));
 var thread = await api.ThreadsEndpoint.CreateThreadAsync();
 var message = await thread.CreateMessageAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?");
-var run = await thread.CreateRunAsync(assistant, streamEvent =>
+var run = await thread.CreateRunAsync(assistant, async streamEvent =>
 {
     Console.WriteLine(streamEvent.ToJsonString());
+    await Task.CompletedTask;
 });
 var messages = await thread.ListMessagesAsync();
 
@@ -1054,9 +1055,10 @@ var messages = new List<Message>
     new Message(Role.User, "Where was it played?"),
 };
 var chatRequest = new ChatRequest(messages);
-var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+var response = await api.ChatEndpoint.StreamCompletionAsync(chatRequest, async partialResponse =>
 {
     Console.Write(partialResponse.FirstChoice.Delta.ToString());
+    await Task.CompletedTask;
 });
 var choice = response.FirstChoice;
 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice.Message} | Finish Reason: {choice.FinishReason}");

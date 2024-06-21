@@ -21,7 +21,7 @@ namespace OpenAI.Extensions
         /// <summary>
         /// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
         /// </summary>
-        public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Action<HttpResponseMessage, ServerSentEvent> eventCallback, CancellationToken cancellationToken)
+        public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Func<HttpResponseMessage, ServerSentEvent, Task> eventCallback, CancellationToken cancellationToken)
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Content = payload;
@@ -34,7 +34,7 @@ namespace OpenAI.Extensions
 
             try
             {
-                while (await reader.ReadLineAsync() is { } streamData)
+                while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
                 {
                     if (isEndOfStream)
                     {
@@ -56,11 +56,10 @@ namespace OpenAI.Extensions
                         string value;
                         string data;
 
-                        Match match = matches[i];
+                        var match = matches[i];
 
                         // If the field type is not provided, treat it as a comment
                         type = ServerSentEvent.EventMap.GetValueOrDefault(match.Groups[nameof(type)].Value.Trim(), ServerSentEventKind.Comment);
-
                         // The UTF-8 decode algorithm strips one leading UTF-8 Byte Order Mark (BOM), if any.
                         value = match.Groups[nameof(value)].Value.TrimStart(' ');
                         data = match.Groups[nameof(data)].Value;
@@ -104,17 +103,17 @@ namespace OpenAI.Extensions
                         {
                             var previousEvent = events.Pop();
                             previousEvent.Data = @event.Value;
-                            eventCallback?.Invoke(response, previousEvent);
                             events.Push(previousEvent);
+                            await eventCallback.Invoke(response, previousEvent).ConfigureAwait(false);
                         }
                         else
                         {
+                            events.Push(@event);
+
                             if (type != ServerSentEventKind.Event)
                             {
-                                eventCallback?.Invoke(response, @event);
+                                await eventCallback.Invoke(response, @event).ConfigureAwait(false);
                             }
-
-                            events.Push(@event);
                         }
                     }
                 }

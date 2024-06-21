@@ -13,6 +13,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("input")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Input { get; private set; }
 
         private List<CodeInterpreterOutputs> outputs;
@@ -24,6 +25,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("outputs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<CodeInterpreterOutputs> Outputs
         {
             get => outputs;

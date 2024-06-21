@@ -144,7 +144,10 @@ namespace OpenAI.Tests
                 Console.WriteLine($"{message.Role}: {message.Content}");
             }
 
-            var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+            };
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
@@ -211,7 +214,10 @@ namespace OpenAI.Tests
                 Console.WriteLine($"{message.Role}: {message.Content}");
             }
 
-            var tools = Tool.GetAllAvailableTools(false);
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
+            };
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {

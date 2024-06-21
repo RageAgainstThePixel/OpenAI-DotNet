@@ -154,6 +154,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("description")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Description { get; private set; }
 
         private string parametersString;
@@ -166,6 +167,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("parameters")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode Parameters
         {
             get
@@ -190,6 +192,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode Arguments
         {
             get

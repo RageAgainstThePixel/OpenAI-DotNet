@@ -177,26 +177,42 @@ namespace OpenAI.Threads
 
         #region Runs
 
+        [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => await thread.CreateRunAsync(request, async streamEvent =>
+            {
+                streamEventHandler?.Invoke(streamEvent);
+                await Task.CompletedTask;
+            }, cancellationToken);
+
         /// <summary>
         /// Create a run.
         /// </summary>
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>
         /// <param name="request"><see cref="CreateRunRequest"/>.</param>
-        /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request = null, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
             => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
+
+        [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => await thread.CreateRunAsync(assistant, async streamEvent =>
+            {
+                streamEventHandler?.Invoke(streamEvent);
+                await Task.CompletedTask;
+            }, cancellationToken);
 
         /// <summary>
         /// Create a run.
         /// </summary>
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>
         /// <param name="assistant">The <see cref="AssistantResponse"/> to use for the run.</param>
-        /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             var request = new CreateRunRequest(
                 assistant,
@@ -286,6 +302,14 @@ namespace OpenAI.Threads
             return result;
         }
 
+        [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
+        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => await run.SubmitToolOutputsAsync(request, async streamEvent =>
+            {
+                streamEventHandler?.Invoke(streamEvent);
+                await Task.CompletedTask;
+            }, cancellationToken);
+
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
         /// this endpoint can be used to submit the outputs from the tool calls once they're all completed.
@@ -293,11 +317,19 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="run"><see cref="RunResponse"/> to submit outputs for.</param>
         /// <param name="request"><see cref="SubmitToolOutputsRequest"/>.</param>
-        /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
             => await run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run.ThreadId, run.Id, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
+
+        [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
+        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => await run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), async streamEvent =>
+            {
+                streamEventHandler?.Invoke(streamEvent);
+                await Task.CompletedTask;
+            }, cancellationToken);
 
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
@@ -306,10 +338,10 @@ namespace OpenAI.Threads
         /// </summary>
         /// <param name="run"><see cref="RunResponse"/> to submit outputs for.</param>
         /// <param name="outputs"><see cref="ToolOutput"/>s</param>
-        /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
             => await run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), streamEventHandler, cancellationToken).ConfigureAwait(false);
 
         /// <summary>

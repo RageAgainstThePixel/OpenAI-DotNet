@@ -34,6 +34,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("function")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FunctionCall FunctionCall { get; private set; }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("code_interpreter")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public CodeInterpreter CodeInterpreter { get; private set; }
 
         /// <summary>
@@ -51,6 +53,7 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("file_search")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, object> FileSearch { get; private set; }
 
         /// <summary>

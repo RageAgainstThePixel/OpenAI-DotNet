@@ -1,5 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -7,6 +8,15 @@ namespace OpenAI
 {
     public sealed class Error : BaseResponse, IServerSentEvent
     {
+        public Error() { }
+
+        internal Error(Exception e)
+        {
+            Type = e.GetType().Name;
+            Message = e.Message;
+            Exception = e;
+        }
+
         /// <summary>
         /// An error code identifying the error type.
         /// </summary>
@@ -49,6 +59,9 @@ namespace OpenAI
 
         [JsonIgnore]
         public string Object => "error";
+
+        [JsonIgnore]
+        public Exception Exception { get; }
 
         public override string ToString()
         {

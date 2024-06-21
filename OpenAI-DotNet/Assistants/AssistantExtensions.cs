@@ -63,15 +63,23 @@ namespace OpenAI.Assistants
             return deleteTasks.TrueForAll(task => task.Result);
         }
 
+        [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
+        public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CreateThreadRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => await CreateThreadAndRunAsync(assistant, request, streamEventHandler == null ? null : async serverSentEvent =>
+            {
+                streamEventHandler.Invoke(serverSentEvent);
+                await Task.CompletedTask;
+            }, cancellationToken);
+
         /// <summary>
         /// Create a thread and run it.
         /// </summary>
         /// <param name="assistant"><see cref="AssistantResponse"/>.</param>
         /// <param name="request">Optional, <see cref="CreateThreadRequest"/>.</param>
-        /// <param name="streamEventHandler">Optional, <see cref="Action{IStreamEvent}"/> stream callback handler.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CreateThreadRequest request = null, Action<IServerSentEvent> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CreateThreadRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
             => await assistant.Client.ThreadsEndpoint.CreateThreadAndRunAsync(new CreateThreadAndRunRequest(assistant.Id, createThreadRequest: request), streamEventHandler, cancellationToken).ConfigureAwait(false);
 
         #region Tools
