@@ -502,7 +502,11 @@ namespace OpenAI.Tests
         public async Task Test_04_03_CreateThreadAndRun_Streaming_ToolCalls()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var tools = Tool.GetAllAvailableTools();
+
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(DateTimeUtility), nameof(DateTimeUtility.GetDateTime))
+            };
             var assistantRequest = new CreateAssistantRequest(
                 instructions: "You are a helpful assistant.",
                 tools: tools);
