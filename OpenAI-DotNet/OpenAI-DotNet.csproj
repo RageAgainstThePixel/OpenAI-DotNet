@@ -28,8 +28,13 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Version>8.0.3</Version>
+    <Version>8.1.0</Version>
     <PackageReleaseNotes>
+Version 8.1.0
+- Fixed streaming event race conditions where the subscriber to the stream would finish before steam events were executed
+- Refactored streaming events callbacks from Action&lt;IServerSentEvent&gt; to Func&lt;IServerSentEvent, Task&gt;
+- Added Exception data to OpenAI.Error response
+- Added ChatEndpoint.StreamCompletionAsync with Func&lt;ChatResponse, Task&gt; overload
 Version 8.0.3
 - Fixed Thread.MessageResponse and Thread.RunStepResponse Delta stream event objects not being properly populated
 - Added Thread.MessageDelta.PrintContent()

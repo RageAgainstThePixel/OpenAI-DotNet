@@ -77,7 +77,14 @@ namespace OpenAI.Chat
         {
             if (other is null) { return; }
 
-            if (!string.IsNullOrWhiteSpace(other.Id))
+            if (!string.IsNullOrWhiteSpace(Id))
+            {
+                if (Id != other.Id)
+                {
+                    throw new InvalidOperationException($"Attempting to append a different object than the original! {Id} != {other.Id}");
+                }
+            }
+            else
             {
                 Id = other.Id;
             }

@@ -195,7 +195,7 @@ namespace OpenAI.Threads
             {
                 if (Id != other.Id)
                 {
-                    throw new InvalidOperationException("Attempting to append a different object than the original!");
+                    throw new InvalidOperationException($"Attempting to append a different object than the original! {Id} != {other.Id}");
                 }
             }
             else

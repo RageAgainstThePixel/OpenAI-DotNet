@@ -24,6 +24,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("logs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Logs { get; private set; }
 
         /// <summary>
@@ -31,6 +32,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("image")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageFile Image { get; private set; }
 
         public void AppendFrom(CodeInterpreterOutputs other)
