@@ -208,6 +208,20 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => await CreateRunAsync(threadId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken);
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to run.</param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
             {
@@ -245,6 +259,19 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken);
+
+        /// <summary>
+        /// Create a thread and run it in one request.
+        /// </summary>
+        /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
             {
@@ -321,6 +348,23 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => await SubmitToolOutputsAsync(threadId, runId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken);
+
+        /// <summary>
+        /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
+        /// this endpoint can be used to submit the outputs from the tool calls once they're all completed.
+        /// All outputs must be submitted in a single request.
+        /// </summary>
+        /// <param name="threadId">The id of the thread to which this run belongs.</param>
+        /// <param name="runId">The id of the run that requires the tool output submission.</param>
+        /// <param name="request"><see cref="SubmitToolOutputsRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             request.Stream = streamEventHandler != null;
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
@@ -432,7 +476,7 @@ namespace OpenAI.Threads
 
         #endregion Files (Obsolete)
 
-        private async Task<RunResponse> StreamRunAsync(string endpoint, StringContent payload, Func<IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken = default)
+        private async Task<RunResponse> StreamRunAsync(string endpoint, StringContent payload, Func<string, IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken = default)
         {
             RunResponse run = null;
             RunStepResponse runStep = null;
@@ -440,13 +484,16 @@ namespace OpenAI.Threads
 
             using var response = await this.StreamEventsAsync(endpoint, payload, async (sseResponse, ssEvent) =>
             {
+                IServerSentEvent serverSentEvent = default;
+                var @event = ssEvent.Value.GetValue<string>();
+
                 try
                 {
-                    switch (ssEvent.Value.GetValue<string>())
+                    switch (@event)
                     {
                         case "thread.created":
-                            await streamEventHandler.Invoke(sseResponse.Deserialize<ThreadResponse>(ssEvent, client));
-                            return;
+                            serverSentEvent = sseResponse.Deserialize<ThreadResponse>(ssEvent, client);
+                            break;
                         case "thread.run.created":
                         case "thread.run.queued":
                         case "thread.run.in_progress":
@@ -468,8 +515,8 @@ namespace OpenAI.Threads
                                 run.AppendFrom(partialRun);
                             }
 
-                            await streamEventHandler.Invoke(run);
-                            return;
+                            serverSentEvent = run;
+                            break;
                         case "thread.run.step.created":
                         case "thread.run.step.in_progress":
                         case "thread.run.step.delta":
@@ -489,8 +536,8 @@ namespace OpenAI.Threads
                                 runStep.AppendFrom(partialRunStep);
                             }
 
-                            await streamEventHandler.Invoke(runStep);
-                            return;
+                            serverSentEvent = runStep;
+                            break;
                         case "thread.message.created":
                         case "thread.message.in_progress":
                         case "thread.message.delta":
@@ -508,20 +555,25 @@ namespace OpenAI.Threads
                                 message.AppendFrom(partialMessage);
                             }
 
-                            await streamEventHandler.Invoke(message);
-                            return;
+                            serverSentEvent = message;
+                            break;
                         case "error":
-                            await streamEventHandler.Invoke(sseResponse.Deserialize<Error>(ssEvent, client));
-                            return;
+                            serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
+                            break;
                         default:
                             // if not properly handled raise it up to caller to deal with it themselves.
-                            await streamEventHandler.Invoke(ssEvent);
-                            return;
+                            serverSentEvent = ssEvent;
+                            break;
                     }
                 }
                 catch (Exception e)
                 {
-                    await streamEventHandler.Invoke(new Error(e));
+                    @event = "error";
+                    serverSentEvent = new Error(e);
+                }
+                finally
+                {
+                    await streamEventHandler.Invoke(@event, serverSentEvent);
                 }
             }, cancellationToken);
 
