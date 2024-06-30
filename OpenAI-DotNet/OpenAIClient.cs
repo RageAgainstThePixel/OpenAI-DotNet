@@ -114,7 +114,7 @@ namespace OpenAI
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverterFactory() },
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
 
         /// <summary>

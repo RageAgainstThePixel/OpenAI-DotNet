@@ -1,24 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>false</ImplicitUsings>
-        <Nullable>disable</Nullable>
-        <SignAssembly>false</SignAssembly>
-        <Authors>Stephen Hodgson</Authors>
-        <Product>OpenAI-DotNet-Proxy</Product>
-        <Description>A simple Proxy API gateway for OpenAI-DotNet to make authenticated requests from a front end application without exposing your API keys.</Description>
-        <Copyright>2024</Copyright>
-        <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-        <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-turbo, gpt-3, chatGPT, api-proxy, proxy, gateway</PackageTags>
-        <Title>OpenAI API Proxy</Title>
-        <PackageId>OpenAI-DotNet-Proxy</PackageId>
-        <Version>7.7.10</Version>
-        <Company>RageAgainstThePixel</Company>
-        <RootNamespace>OpenAI.Proxy</RootNamespace>
-        <PackageIcon>OpenAI-DotNet-Icon.png</PackageIcon>
-        <PackageReleaseNotes>Version 7.7.10
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <Title>OpenAI API Proxy</Title>
+    <Product>OpenAI-DotNet-Proxy</Product>
+    <PackageId>OpenAI-DotNet-Proxy</PackageId>
+    <RootNamespace>OpenAI.Proxy</RootNamespace>
+    <Authors>Stephen Hodgson</Authors>
+    <Company>RageAgainstThePixel</Company>
+    <Description>A simple Proxy API gateway for OpenAI-DotNet to make authenticated requests from a front end application without exposing your API keys.</Description>
+    <Copyright>2024</Copyright>
+    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
+    <PackageTags>OpenAI, AI, ML, API, gpt, gpt-4, gpt-3.5-turbo, gpt-3, chatGPT, api-proxy, proxy, gateway</PackageTags>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <PackageIcon>OpenAI-DotNet-Icon.png</PackageIcon>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SignAssembly>false</SignAssembly>
+    <ImplicitUsings>false</ImplicitUsings>
+    <Version>8.1.1</Version>
+    <PackageReleaseNotes>
+Version 8.1.1
+- Renamed OpenAIProxyStartup to OpenAIProxy
+Version 7.7.10
 - Updated EndpointRouteBuilder with optional route prefix parameter
 Version 7.7.9
 - Slight refactor of OpenAIProxyStartup to remove duplicate code
@@ -28,26 +36,22 @@ Version 7.7.8
 - Updated OpenAI-DotNet-Test-Proxy to use WebApplication implementation
 Version 7.7.7
 - Added ValidateAuthenticationAsync
-        </PackageReleaseNotes>
-        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageReadmeFile>Readme.md</PackageReadmeFile>
-        <IncludeSymbols>True</IncludeSymbols>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="..\OpenAI-DotNet\Assets\OpenAI-DotNet-Icon.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-    </ItemGroup>
-    <ItemGroup>
-        <None Update="Readme.md">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-    </ItemGroup>
+    </PackageReleaseNotes>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenAI-DotNet\OpenAI-DotNet.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\OpenAI-DotNet\Assets\OpenAI-DotNet-Icon.png">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Readme.md">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

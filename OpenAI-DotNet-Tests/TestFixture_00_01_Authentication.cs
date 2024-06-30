@@ -71,7 +71,7 @@ namespace OpenAI.Tests
         {
             var defaultAuth = OpenAIAuthentication.Default;
             var manualAuth = new OpenAIAuthentication("sk-testAA", "org-testAA", "proj_testProject");
-            var api = new OpenAIClient();
+            using var api = new OpenAIClient();
             var shouldBeDefaultAuth = api.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeDefaultAuth);
             Assert.IsNotNull(shouldBeDefaultAuth.ApiKey);
@@ -81,8 +81,8 @@ namespace OpenAI.Tests
             Assert.AreEqual(defaultAuth.ProjectId, shouldBeDefaultAuth.ProjectId);
 
             OpenAIAuthentication.Default = new OpenAIAuthentication("sk-testAA", "org-testAA", "proj_testProject");
-            api = new OpenAIClient();
-            var shouldBeManualAuth = api.OpenAIAuthentication;
+            using var api2 = new OpenAIClient();
+            var shouldBeManualAuth = api2.OpenAIAuthentication;
             Assert.IsNotNull(shouldBeManualAuth);
             Assert.IsNotNull(shouldBeManualAuth.ApiKey);
             Assert.IsNotNull(shouldBeManualAuth.OrganizationId);

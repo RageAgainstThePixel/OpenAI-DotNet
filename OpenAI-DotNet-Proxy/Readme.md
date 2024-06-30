@@ -44,14 +44,14 @@ This setup allows your front end application to securely communicate with your b
 
 ### Back End Example
 
-In this example, we demonstrate how to set up and use `OpenAIProxyStartup` in a new ASP.NET Core web app. The proxy server will handle authentication and forward requests to the OpenAI API, ensuring that your API keys and other sensitive information remain secure.
+In this example, we demonstrate how to set up and use `OpenAIProxy` in a new ASP.NET Core web app. The proxy server will handle authentication and forward requests to the OpenAI API, ensuring that your API keys and other sensitive information remain secure.
 
 1. Create a new [ASP.NET Core minimal web API](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-6.0) project.
 2. Add the OpenAI-DotNet nuget package to your project.
     - Powershell install: `Install-Package OpenAI-DotNet-Proxy`
     - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
-4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxyStartup.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
+4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxy.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
 5. Create `OpenAIAuthentication` and `OpenAIClientSettings` as you would normally with your API keys, org id, or Azure settings.
 
 ```csharp
@@ -87,7 +87,7 @@ public partial class Program
         var auth = OpenAIAuthentication.LoadFromEnv();
         var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
         using var openAIClient = new OpenAIClient(auth, settings);
-        OpenAIProxyStartup.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
+        OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }
 }
 ```
