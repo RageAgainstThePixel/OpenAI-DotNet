@@ -78,7 +78,7 @@ namespace OpenAI.Models
         /// It is multimodal (accepting text or image inputs and outputting text),
         /// and it has the same high intelligence as GPT-4 Turbo but is much more efficient.
         /// It generates text 2x faster and is 50% cheaper.
-        /// Additionally, GPT-4o Mini has the best vision and performance across non-English languages of our models.
+        /// Additionally, GPT-4o has the best vision and performance across non-English languages of our models.
         /// </summary>
         /// <remarks>
         /// Context Window: 128,000 tokens
