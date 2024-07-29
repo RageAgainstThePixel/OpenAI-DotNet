@@ -73,6 +73,12 @@ namespace OpenAI
             Parameters = JsonNode.Parse(parameters);
         }
 
+        internal Function(string name, JsonNode arguments)
+        {
+            Name = name;
+            Arguments = arguments;
+        }
+
         private Function(string name, string description, MethodInfo method, object instance = null)
         {
             if (!Regex.IsMatch(name, NameRegex))

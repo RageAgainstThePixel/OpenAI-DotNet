@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,13 @@ namespace OpenAI
         {
             Function = function;
             Type = nameof(function);
+        }
+
+        public Tool(string toolCallId, string functionName, JsonNode functionArguments)
+        {
+            Function = new Function(functionName, arguments: functionArguments);
+            Type = "function";
+            Id = toolCallId;
         }
 
         public Tool(FileSearchOptions fileSearchOptions)
