@@ -19,6 +19,7 @@ namespace OpenAI.Threads
         public ThreadsEndpoint(OpenAIClient client) : base(client) { }
 
         protected override string Root => "threads";
+        protected override bool? IsAzureDeployment => false;
 
         /// <summary>
         /// Create a thread.

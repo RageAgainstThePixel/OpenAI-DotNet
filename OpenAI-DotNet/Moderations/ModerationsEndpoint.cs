@@ -22,6 +22,8 @@ namespace OpenAI.Moderations
         /// <inheritdoc />
         protected override string Root => "moderations";
 
+        protected override bool? IsAzureDeployment => null;
+
         /// <summary>
         /// Classifies if text violates OpenAI's Content Policy.
         /// </summary>

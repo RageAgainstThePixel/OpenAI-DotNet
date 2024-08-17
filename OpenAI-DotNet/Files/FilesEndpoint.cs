@@ -31,6 +31,8 @@ namespace OpenAI.Files
         /// <inheritdoc />
         protected override string Root => "files";
 
+        protected override bool? IsAzureDeployment => null;
+
         /// <summary>
         /// Returns a list of files that belong to the user's organization.
         /// </summary>

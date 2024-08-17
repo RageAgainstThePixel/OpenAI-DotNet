@@ -15,6 +15,8 @@ namespace OpenAI.Assistants
 
         protected override string Root => "assistants";
 
+        protected override bool? IsAzureDeployment => false;
+
         /// <summary>
         /// Get list of assistants.
         /// </summary>

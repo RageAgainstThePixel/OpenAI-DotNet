@@ -22,6 +22,8 @@ namespace OpenAI.Images
         /// <inheritdoc />
         protected override string Root => "images";
 
+        protected override bool? IsAzureDeployment => true;
+
         /// <summary>
         /// Creates an image given a prompt.
         /// </summary>

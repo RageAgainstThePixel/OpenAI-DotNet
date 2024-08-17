@@ -33,6 +33,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.1.3
 - Added structured output support
+- Added support for Azure OpenAI assistants
 - Fixed Azure OpenAI Id parsing for events
 Version 8.1.2
 - Added constructor overloads to Tool and Function classes to support manually adding tool calls in the conversation history
