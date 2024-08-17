@@ -37,19 +37,18 @@ namespace OpenAI
         /// <param name="queryParameters">Optional, parameters to add to the endpoint.</param>
         protected string GetUrl(string endpoint = "", Dictionary<string, string> queryParameters = null)
         {
-            string result;
+            string route;
 
-            if (client.OpenAIClientSettings.IsAzureOpenAI)
+            if (client.OpenAIClientSettings.IsAzureOpenAI && IsAzureDeployment == true)
             {
-                var deploymentId = IsAzureDeployment == true
-                    ? $"deployments/{client.OpenAIClientSettings.DeploymentId}/"
-                    : string.Empty;
-                result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{deploymentId}{endpoint}");
+                route = $"{Root}deployments/{client.OpenAIClientSettings.DeploymentId}/{endpoint}";
             }
             else
             {
-                result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{endpoint}");
+                route = $"{Root}{endpoint}";
             }
+
+            var result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, route);
 
             foreach (var defaultQueryParameter in client.OpenAIClientSettings.DefaultQueryParameters)
             {
