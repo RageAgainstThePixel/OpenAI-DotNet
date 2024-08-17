@@ -58,7 +58,7 @@ namespace OpenAI
 
             if (queryParameters is { Count: not 0 })
             {
-                result += $"?{string.Join("&", queryParameters.Select(parameter => $"{parameter.Key}={parameter.Value}"))}";
+                result += $"?{string.Join('&', queryParameters.Select(parameter => $"{parameter.Key}={parameter.Value}"))}";
             }
 
             return result;
