@@ -1,6 +1,5 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -29,7 +28,7 @@ namespace OpenAI
         /// If it is not an Azure deployment, is false.
         /// If it is not an Azure supported Endpoint, is null.
         /// </remarks>
-        protected abstract bool? IsAzureDeployment { get; }
+        protected virtual bool? IsAzureDeployment => null;
 
         /// <summary>
         /// Gets the full formatted url for the API endpoint.
@@ -42,10 +41,10 @@ namespace OpenAI
 
             if (client.OpenAIClientSettings.IsAzureOpenAI)
             {
-                var format = IsAzureDeployment == true
-                    ? client.OpenAIClientSettings.DeploymentUrlFormat
-                    : client.OpenAIClientSettings.BaseRequestUrlFormat;
-                result = string.Format(format, $"{Root}{endpoint}");
+                var deploymentId = IsAzureDeployment == true
+                    ? $"deployments/{client.OpenAIClientSettings.DeploymentId}/"
+                    : string.Empty;
+                result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{deploymentId}{endpoint}");
             }
             else
             {

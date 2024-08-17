@@ -57,9 +57,8 @@ namespace OpenAI.Proxy
             {
                 try
                 {
-                    // ReSharper disable once MethodHasAsyncOverload
-                    // just in case either method is implemented we call it twice.
 #pragma warning disable CS0618 // Type or member is obsolete
+                    // ReSharper disable once MethodHasAsyncOverload
                     authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
 #pragma warning restore CS0618 // Type or member is obsolete
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers);

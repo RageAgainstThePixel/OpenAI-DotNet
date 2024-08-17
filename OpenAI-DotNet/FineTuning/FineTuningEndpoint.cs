@@ -20,8 +20,6 @@ namespace OpenAI.FineTuning
         /// <inheritdoc />
         protected override string Root => "fine_tuning";
 
-        protected override bool? IsAzureDeployment => null;
-
         /// <summary>
         /// Creates a job that fine-tunes a specified model from a given dataset.
         /// Response includes details of the queued job including job status and

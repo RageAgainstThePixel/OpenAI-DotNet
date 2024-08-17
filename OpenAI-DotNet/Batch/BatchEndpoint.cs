@@ -19,8 +19,6 @@ namespace OpenAI.Batch
 
         protected override string Root => "batches";
 
-        protected override bool? IsAzureDeployment => null;
-
         /// <summary>
         /// Creates and executes a batch from an uploaded file of requests.
         /// </summary>

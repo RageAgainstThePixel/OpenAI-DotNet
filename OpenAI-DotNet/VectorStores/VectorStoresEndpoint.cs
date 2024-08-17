@@ -21,8 +21,6 @@ namespace OpenAI.VectorStores
 
         protected override string Root => "vector_stores";
 
-        protected override bool? IsAzureDeployment => null;
-
         /// <summary>
         /// Creates a new Vector Store.
         /// </summary>

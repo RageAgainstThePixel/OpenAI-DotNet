@@ -30,8 +30,6 @@ namespace OpenAI.Models
         /// <inheritdoc />
         protected override string Root => "models";
 
-        protected override bool? IsAzureDeployment => null;
-
         /// <summary>
         /// List all models via the API
         /// </summary>
