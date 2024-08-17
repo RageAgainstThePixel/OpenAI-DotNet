@@ -22,8 +22,10 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.1.1</Version>
+    <Version>8.2.0</Version>
     <PackageReleaseNotes>
+Version 8.2.0
+- Deprecated ValidateAuthentication for ValidateAuthenticationAsync
 Version 8.1.1
 - Renamed OpenAIProxyStartup to OpenAIProxy
 Version 7.7.10

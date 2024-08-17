@@ -59,19 +59,9 @@ public partial class Program
 {
     private class AuthenticationFilter : AbstractAuthenticationFilter
     {
-        public override void ValidateAuthentication(IHeaderDictionary request)
-        {
-            // You will need to implement your own class to properly test
-            // custom issued tokens you've setup for your end users.
-            if (!request.Authorization.ToString().Contains(TestUserToken))
-            {
-                throw new AuthenticationException("User is not authorized");
-            }
-        }
-
         public override async Task ValidateAuthenticationAsync(IHeaderDictionary request)
         {
-            await Task.CompletedTask; // remote resource call
+            await Task.CompletedTask; // remote resource call to verify token
 
             // You will need to implement your own class to properly test
             // custom issued tokens you've setup for your end users.
