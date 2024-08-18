@@ -30,7 +30,6 @@ namespace OpenAI.Threads
                 request?.Metadata,
                 request?.Temperature,
                 request?.TopP,
-                request?.Stream ?? false,
                 request?.MaxPromptTokens,
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
@@ -78,10 +77,6 @@ namespace OpenAI.Threads
         /// where the model considers the results of the tokens with top_p probability mass.
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
-        /// </param>
-        /// <param name="stream">
-        /// If true, returns a stream of events that happen during the Run as server-sent events,
-        /// terminating when the Run enters a terminal state with a 'data: [DONE]' message.
         /// </param>
         /// <param name="maxPromptTokens">
         /// The maximum number of prompt tokens that may be used over the course of the run.
@@ -134,7 +129,6 @@ namespace OpenAI.Threads
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            bool stream = false,
             int? maxPromptTokens = null,
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
@@ -178,7 +172,6 @@ namespace OpenAI.Threads
             Metadata = metadata;
             Temperature = temperature;
             TopP = topP;
-            Stream = stream;
             MaxPromptTokens = maxPromptTokens;
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;

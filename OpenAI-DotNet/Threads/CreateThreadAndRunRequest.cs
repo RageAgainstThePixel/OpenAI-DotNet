@@ -26,7 +26,6 @@ namespace OpenAI.Threads
                 request?.Metadata,
                 request?.Temperature,
                 request?.TopP,
-                request?.Stream ?? false,
                 request?.MaxPromptTokens,
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
@@ -135,7 +134,6 @@ namespace OpenAI.Threads
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            bool stream = false,
             int? maxPromptTokens = null,
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
@@ -179,7 +177,6 @@ namespace OpenAI.Threads
             Metadata = metadata;
             Temperature = temperature;
             TopP = topP;
-            Stream = stream;
             MaxPromptTokens = maxPromptTokens;
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;

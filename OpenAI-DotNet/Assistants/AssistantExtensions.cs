@@ -80,7 +80,21 @@ namespace OpenAI.Assistants
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> CreateThreadAndRunAsync(this AssistantResponse assistant, CreateThreadRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => await assistant.Client.ThreadsEndpoint.CreateThreadAndRunAsync(new CreateThreadAndRunRequest(assistant.Id, createThreadRequest: request), streamEventHandler, cancellationToken).ConfigureAwait(false);
+        {
+            var threadRunRequest = new CreateThreadAndRunRequest(
+                assistant.Id,
+                assistant.Model,
+                assistant.Instructions,
+                assistant.Tools,
+                assistant.ToolResources,
+                assistant.Metadata,
+                assistant.Temperature,
+                assistant.TopP,
+                jsonSchema: assistant.ResponseFormatObject?.JsonSchema,
+                responseFormat: assistant.ResponseFormat,
+                createThreadRequest: request);
+            return await assistant.Client.ThreadsEndpoint.CreateThreadAndRunAsync(threadRunRequest, streamEventHandler, cancellationToken).ConfigureAwait(false);
+        }
 
         #region Tools
 
