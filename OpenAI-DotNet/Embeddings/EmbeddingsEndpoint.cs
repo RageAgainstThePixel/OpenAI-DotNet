@@ -20,6 +20,8 @@ namespace OpenAI.Embeddings
         /// <inheritdoc />
         protected override string Root => "embeddings";
 
+        protected override bool? IsAzureDeployment => true;
+
         /// <summary>
         /// Creates an embedding vector representing the input text.
         /// </summary>

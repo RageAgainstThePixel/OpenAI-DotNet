@@ -57,9 +57,10 @@ namespace OpenAI.Proxy
             {
                 try
                 {
+#pragma warning disable CS0618 // Type or member is obsolete
                     // ReSharper disable once MethodHasAsyncOverload
-                    // just in case either method is implemented we call it twice.
                     authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
+#pragma warning restore CS0618 // Type or member is obsolete
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers);
 
                     var method = new HttpMethod(httpContext.Request.Method);
@@ -80,21 +81,13 @@ namespace OpenAI.Proxy
 
                     foreach (var (key, value) in proxyResponse.Headers)
                     {
-                        if (excludedHeaders.Contains(key))
-                        {
-                            continue;
-                        }
-
+                        if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
 
                     foreach (var (key, value) in proxyResponse.Content.Headers)
                     {
-                        if (excludedHeaders.Contains(key))
-                        {
-                            continue;
-                        }
-
+                        if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
 

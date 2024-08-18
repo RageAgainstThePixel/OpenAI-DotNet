@@ -667,5 +667,85 @@ namespace OpenAI.Tests
                 }
             }
         }
+
+        [Test]
+        public async Task Test_05_01_CreateThreadAndRun_StructuredOutputs_Streaming()
+        {
+            Assert.NotNull(OpenAIClient.ThreadsEndpoint);
+            var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+                new CreateAssistantRequest(
+                    name: "Math Tutor",
+                    instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
+                    model: "gpt-4o-2024-08-06",
+                    jsonSchema: mathSchema));
+            Assert.NotNull(assistant);
+            ThreadResponse thread = null;
+
+            try
+            {
+                var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23",
+                    async @event =>
+                    {
+                        Console.WriteLine(@event.ToJsonString());
+                        await Task.CompletedTask;
+                    });
+                Assert.IsNotNull(run);
+                thread = await run.GetThreadAsync();
+                run = await run.WaitForStatusChangeAsync();
+                Assert.IsNotNull(run);
+                Assert.IsTrue(run.Status == RunStatus.Completed);
+                Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
+                Assert.NotNull(thread);
+                var messages = await thread.ListMessagesAsync();
+
+                foreach (var response in messages.Items)
+                {
+                    Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+                }
+            }
+            finally
+            {
+                await assistant.DeleteAsync(deleteToolResources: thread == null);
+
+                if (thread != null)
+                {
+                    var isDeleted = await thread.DeleteAsync(deleteToolResources: true);
+                    Assert.IsTrue(isDeleted);
+                }
+            }
+        }
     }
 }

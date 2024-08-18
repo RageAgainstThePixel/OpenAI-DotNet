@@ -13,8 +13,6 @@ namespace OpenAI
         // ReSharper disable once InconsistentNaming
         protected readonly OpenAIClient client;
 
-        internal OpenAIClient Client => client;
-
         internal HttpClient HttpClient => client.Client;
 
         /// <summary>
@@ -23,13 +21,34 @@ namespace OpenAI
         protected abstract string Root { get; }
 
         /// <summary>
+        /// Indicates if the endpoint has an Azure Deployment.
+        /// </summary>
+        /// <remarks>
+        /// If the endpoint is an Azure deployment, is true.
+        /// If it is not an Azure deployment, is false.
+        /// If it is not an Azure supported Endpoint, is null.
+        /// </remarks>
+        protected virtual bool? IsAzureDeployment => null;
+
+        /// <summary>
         /// Gets the full formatted url for the API endpoint.
         /// </summary>
         /// <param name="endpoint">The endpoint url.</param>
         /// <param name="queryParameters">Optional, parameters to add to the endpoint.</param>
         protected string GetUrl(string endpoint = "", Dictionary<string, string> queryParameters = null)
         {
-            var result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, $"{Root}{endpoint}");
+            string route;
+
+            if (client.OpenAIClientSettings.IsAzureOpenAI && IsAzureDeployment == true)
+            {
+                route = $"{Root}deployments/{client.OpenAIClientSettings.DeploymentId}/{endpoint}";
+            }
+            else
+            {
+                route = $"{Root}{endpoint}";
+            }
+
+            var result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, route);
 
             foreach (var defaultQueryParameter in client.OpenAIClientSettings.DefaultQueryParameters)
             {
@@ -39,7 +58,7 @@ namespace OpenAI
 
             if (queryParameters is { Count: not 0 })
             {
-                result += $"?{string.Join("&", queryParameters.Select(parameter => $"{parameter.Key}={parameter.Value}"))}";
+                result += $"?{string.Join('&', queryParameters.Select(parameter => $"{parameter.Key}={parameter.Value}"))}";
             }
 
             return result;

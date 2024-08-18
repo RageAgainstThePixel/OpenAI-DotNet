@@ -301,7 +301,7 @@ namespace OpenAI.Tests
             };
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
-            var chatRequest = new ChatRequest(messages, model: Model.GPT4o, tools: tools, toolChoice: "auto");
+            var chatRequest = new ChatRequest(messages, model: Model.GPT4o, tools: tools, toolChoice: "auto", parallelToolCalls: true);
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
@@ -525,6 +525,135 @@ namespace OpenAI.Tests
                     }
                 }
             }
+        }
+
+        [Test]
+        public async Task Test_06_01_GetChat_JsonSchema()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
+                new(Role.User, "how can I solve 8x + 7 = -23")
+            };
+
+            var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+            var chatRequest = new ChatRequest(messages, model: new("gpt-4o-2024-08-06"), jsonSchema: mathSchema);
+            var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+
+            foreach (var choice in response.Choices)
+            {
+                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+            }
+
+            response.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_06_01_GetChat_JsonSchema_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
+                new(Role.User, "how can I solve 8x + 7 = -23")
+            };
+
+            var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+            var chatRequest = new ChatRequest(messages, model: "gpt-4o-2024-08-06", jsonSchema: mathSchema);
+            var cumulativeDelta = string.Empty;
+            var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            {
+                Assert.IsNotNull(partialResponse);
+                if (partialResponse.Usage != null) { return; }
+                Assert.NotNull(partialResponse.Choices);
+                Assert.NotZero(partialResponse.Choices.Count);
+
+                foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
+                {
+                    cumulativeDelta += choice.Delta.Content;
+                }
+            }, true);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            var choice = response.FirstChoice;
+            Assert.IsNotNull(choice);
+            Assert.IsNotNull(choice.Message);
+            Assert.IsFalse(string.IsNullOrEmpty(choice.ToString()));
+            Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+            Assert.IsTrue(choice.Message.Role == Role.Assistant);
+            Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
+            Console.WriteLine(response.ToString());
+            response.GetUsage();
         }
     }
 }

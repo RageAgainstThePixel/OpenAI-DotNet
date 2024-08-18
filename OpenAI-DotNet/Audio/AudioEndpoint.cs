@@ -23,6 +23,8 @@ namespace OpenAI.Audio
         /// <inheritdoc />
         protected override string Root => "audio";
 
+        protected override bool? IsAzureDeployment => true;
+
         /// <summary>
         /// Generates audio from the input text.
         /// </summary>

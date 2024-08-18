@@ -181,7 +181,7 @@ namespace OpenAI.Threads
         {
             if (other == null) { return; }
 
-            if (!string.IsNullOrWhiteSpace(Id))
+            if (!string.IsNullOrWhiteSpace(Id) && !string.IsNullOrWhiteSpace(other.Id))
             {
                 if (Id != other.Id)
                 {

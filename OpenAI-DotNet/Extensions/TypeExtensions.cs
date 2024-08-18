@@ -12,14 +12,9 @@ namespace OpenAI.Extensions
 {
     internal static class TypeExtensions
     {
-        public static JsonObject GenerateJsonSchema(this MethodInfo methodInfo)
+        public static JsonObject GenerateJsonSchema(this MethodInfo methodInfo, JsonSerializerOptions options = null)
         {
             var parameters = methodInfo.GetParameters();
-
-            if (parameters.Length == 0)
-            {
-                return null;
-            }
 
             var schema = new JsonObject
             {
@@ -30,10 +25,7 @@ namespace OpenAI.Extensions
 
             foreach (var parameter in parameters)
             {
-                if (parameter.ParameterType == typeof(CancellationToken))
-                {
-                    continue;
-                }
+                if (parameter.ParameterType == typeof(CancellationToken)) { continue; }
 
                 if (string.IsNullOrWhiteSpace(parameter.Name))
                 {
@@ -45,7 +37,7 @@ namespace OpenAI.Extensions
                     requiredParameters.Add(parameter.Name);
                 }
 
-                schema["properties"]![parameter.Name] = GenerateJsonSchema(parameter.ParameterType, schema);
+                schema["properties"]![parameter.Name] = GenerateJsonSchema(parameter.ParameterType, schema, options);
 
                 var functionParameterAttribute = parameter.GetCustomAttribute<FunctionParameterAttribute>();
 
@@ -60,11 +52,13 @@ namespace OpenAI.Extensions
                 schema["required"] = requiredParameters;
             }
 
+            schema["additionalProperties"] = false;
             return schema;
         }
 
-        public static JsonObject GenerateJsonSchema(this Type type, JsonObject rootSchema)
+        public static JsonObject GenerateJsonSchema(this Type type, JsonObject rootSchema, JsonSerializerOptions options = null)
         {
+            options ??= OpenAIClient.JsonSerializationOptions;
             var schema = new JsonObject();
 
             if (!type.IsPrimitive &&
@@ -72,7 +66,7 @@ namespace OpenAI.Extensions
                 type != typeof(DateTime) &&
                 type != typeof(DateTimeOffset) &&
                 rootSchema["definitions"] != null &&
-                rootSchema["definitions"].AsObject().ContainsKey(type.FullName))
+                rootSchema["definitions"].AsObject().ContainsKey(type.FullName!))
             {
                 return new JsonObject { ["$ref"] = $"#/definitions/{type.FullName}" };
             }
@@ -119,7 +113,7 @@ namespace OpenAI.Extensions
 
                 foreach (var value in Enum.GetValues(type))
                 {
-                    schema["enum"].AsArray().Add(JsonNode.Parse(JsonSerializer.Serialize(value, OpenAIClient.JsonSerializationOptions)));
+                    schema["enum"].AsArray().Add(JsonNode.Parse(JsonSerializer.Serialize(value, options)));
                 }
             }
             else if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
@@ -128,7 +122,7 @@ namespace OpenAI.Extensions
                 var elementType = type.GetElementType() ?? type.GetGenericArguments()[0];
 
                 if (rootSchema["definitions"] != null &&
-                    rootSchema["definitions"].AsObject().ContainsKey(elementType.FullName))
+                    rootSchema["definitions"].AsObject().ContainsKey(elementType.FullName!))
                 {
                     schema["items"] = new JsonObject { ["$ref"] = $"#/definitions/{elementType.FullName}" };
                 }
@@ -141,7 +135,7 @@ namespace OpenAI.Extensions
             {
                 schema["type"] = "object";
                 rootSchema["definitions"] ??= new JsonObject();
-                rootSchema["definitions"][type.FullName] = new JsonObject();
+                rootSchema["definitions"][type.FullName!] = new JsonObject();
 
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
                 var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -163,7 +157,7 @@ namespace OpenAI.Extensions
                     JsonObject propertyInfo;
 
                     if (rootSchema["definitions"] != null &&
-                        rootSchema["definitions"].AsObject().ContainsKey(memberType.FullName))
+                        rootSchema["definitions"].AsObject().ContainsKey(memberType.FullName!))
                     {
                         propertyInfo = new JsonObject { ["$ref"] = $"#/definitions/{memberType.FullName}" };
                     }
@@ -186,7 +180,7 @@ namespace OpenAI.Extensions
 
                         if (functionPropertyAttribute.DefaultValue != null)
                         {
-                            defaultValue = JsonNode.Parse(JsonSerializer.Serialize(functionPropertyAttribute.DefaultValue, OpenAIClient.JsonSerializationOptions));
+                            defaultValue = JsonNode.Parse(JsonSerializer.Serialize(functionPropertyAttribute.DefaultValue, options));
                             propertyInfo["default"] = defaultValue;
                         }
 
@@ -196,7 +190,7 @@ namespace OpenAI.Extensions
 
                             foreach (var value in functionPropertyAttribute.PossibleValues)
                             {
-                                var @enum = JsonNode.Parse(JsonSerializer.Serialize(value, OpenAIClient.JsonSerializationOptions));
+                                var @enum = JsonNode.Parse(JsonSerializer.Serialize(value, options));
 
                                 if (defaultValue == null)
                                 {
@@ -213,7 +207,7 @@ namespace OpenAI.Extensions
 
                             if (defaultValue != null && !enums.Contains(defaultValue))
                             {
-                                enums.Add(JsonNode.Parse(defaultValue.ToJsonString(OpenAIClient.JsonSerializationOptions)));
+                                enums.Add(JsonNode.Parse(defaultValue.ToJsonString(options)));
                             }
 
                             propertyInfo["enum"] = enums;
@@ -250,6 +244,7 @@ namespace OpenAI.Extensions
                     schema["required"] = memberProperties;
                 }
 
+                schema["additionalProperties"] = false;
                 rootSchema["definitions"] ??= new JsonObject();
                 rootSchema["definitions"][type.FullName] = schema;
                 return new JsonObject { ["$ref"] = $"#/definitions/{type.FullName}" };

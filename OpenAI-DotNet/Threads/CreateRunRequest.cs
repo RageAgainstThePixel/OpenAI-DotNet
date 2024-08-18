@@ -1,6 +1,5 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,13 +30,13 @@ namespace OpenAI.Threads
                 request?.Metadata,
                 request?.Temperature,
                 request?.TopP,
-                request?.Stream ?? false,
                 request?.MaxPromptTokens,
                 request?.MaxCompletionTokens,
                 request?.TruncationStrategy,
                 request?.ToolChoice as string ?? ((Tool)request?.ToolChoice)?.Function?.Name,
                 request?.ParallelToolCalls,
-                request?.ResponseFormat ?? ChatResponseFormat.Auto)
+                request?.ResponseFormatObject?.JsonSchema,
+                request?.ResponseFormatObject ?? ChatResponseFormat.Text)
         {
         }
 
@@ -79,10 +78,6 @@ namespace OpenAI.Threads
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
         /// </param>
-        /// <param name="stream">
-        /// If true, returns a stream of events that happen during the Run as server-sent events,
-        /// terminating when the Run enters a terminal state with a 'data: [DONE]' message.
-        /// </param>
         /// <param name="maxPromptTokens">
         /// The maximum number of prompt tokens that may be used over the course of the run.
         /// The run will make a best effort to use only the number of prompt tokens specified,
@@ -110,14 +105,18 @@ namespace OpenAI.Threads
         /// <param name="parallelToolCalls">
         /// Whether to enable parallel function calling during tool use.
         /// </param>
+        /// <param name="jsonSchema">
+        /// The <see cref="JsonSchema"/> to use for structured JSON outputs.<br/>
+        /// <see href="https://platform.openai.com/docs/guides/structured-outputs"/><br/>
+        /// <see href="https://json-schema.org/overview/what-is-jsonschema"/>
+        /// </param>
         /// <param name="responseFormat">
         /// An object specifying the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
-        /// Important: When using JSON mode you must still instruct the model to produce JSON yourself via some conversation message,
-        /// for example via your system message. If you don't do this, the model may generate an unending stream of
-        /// whitespace until the generation reaches the token limit, which may take a lot of time and give the appearance
-        /// of a "stuck" request. Also note that the message content may be partial (i.e. cut off) if finish_reason="length",
+        /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
+        /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
+        /// resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if finish_reason="length",
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </param>
         public CreateRunRequest(
@@ -130,13 +129,13 @@ namespace OpenAI.Threads
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
-            bool stream = false,
             int? maxPromptTokens = null,
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
             string toolChoice = null,
             bool? parallelToolCalls = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
+            JsonSchema jsonSchema = null,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
         {
             AssistantId = assistantId;
             Model = model;
@@ -173,12 +172,19 @@ namespace OpenAI.Threads
             Metadata = metadata;
             Temperature = temperature;
             TopP = topP;
-            Stream = stream;
             MaxPromptTokens = maxPromptTokens;
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;
             ParallelToolCalls = parallelToolCalls;
-            ResponseFormat = responseFormat;
+
+            if (jsonSchema != null)
+            {
+                ResponseFormatObject = jsonSchema;
+            }
+            else
+            {
+                ResponseFormatObject = responseFormat;
+            }
         }
 
         /// <summary>
@@ -299,7 +305,7 @@ namespace OpenAI.Threads
 
         /// <summary>
         /// An object specifying the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -310,8 +316,10 @@ namespace OpenAI.Threads
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ChatResponseFormat ResponseFormat { get; }
+        public ResponseFormatObject ResponseFormatObject { get; }
+
+        [JsonIgnore]
+        public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;
     }
 }

@@ -168,6 +168,7 @@ namespace OpenAI.Tests
             var auth = new OpenAIAuthentication("testKeyAaBbCcDd");
             var settings = new OpenAIClientSettings(resourceName: "test-resource", deploymentId: "deployment-id-test");
             var api = new OpenAIClient(auth, settings);
+            Console.WriteLine(api.OpenAIClientSettings.DeploymentId);
             Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
             Console.WriteLine(api.OpenAIClientSettings.BaseRequestUrlFormat);
         }

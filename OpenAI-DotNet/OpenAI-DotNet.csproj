@@ -29,8 +29,15 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.1.2</Version>
+    <Version>8.2.0</Version>
     <PackageReleaseNotes>
+Version 8.2.0
+- Added structured output support
+- Added support for Azure OpenAI assistants
+- Fixed Azure OpenAI Id parsing for events
+- Fixed Assistant.CreateThreadAndRunAsync to properly copy assistant parameters
+- Removed stream parameter from CreateThreadAndRunRequest and CreateRunRequest
+  - They were overridden by the presence of an IStreamEventHandler anyway
 Version 8.1.2
 - Added constructor overloads to Tool and Function classes to support manually adding tool calls in the conversation history
 Version 8.1.1
