@@ -6,22 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Extensions
 {
+    [Obsolete("no longer works properly with json_schema")]
     internal sealed class ResponseFormatConverter : JsonConverter<ChatResponseFormat>
     {
-        private class ResponseFormatObject
-        {
-            public ResponseFormatObject(ChatResponseFormat type) => Type = type;
-
-            [JsonInclude]
-            [JsonPropertyName("type")]
-            [JsonConverter(typeof(JsonStringEnumConverter<ChatResponseFormat>))]
-            public ChatResponseFormat Type { get; private set; }
-
-            public static implicit operator ResponseFormatObject(ChatResponseFormat type) => new(type);
-
-            public static implicit operator ChatResponseFormat(ResponseFormatObject format) => format.Type;
-        }
-
         public override ChatResponseFormat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
@@ -45,6 +32,8 @@ namespace OpenAI.Extensions
             const string text = nameof(text);
             // ReSharper disable once InconsistentNaming
             const string json_object = nameof(json_object);
+            // ReSharper disable once InconsistentNaming
+            const string json_schema = nameof(json_schema);
 
             switch (value)
             {
@@ -59,6 +48,11 @@ namespace OpenAI.Extensions
                 case ChatResponseFormat.Json:
                     writer.WriteStartObject();
                     writer.WriteString(type, json_object);
+                    writer.WriteEndObject();
+                    break;
+                case ChatResponseFormat.JsonSchema:
+                    writer.WriteStartObject();
+                    writer.WriteString(type, json_schema);
                     writer.WriteEndObject();
                     break;
                 default:

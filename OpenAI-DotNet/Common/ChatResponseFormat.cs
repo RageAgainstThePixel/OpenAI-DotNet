@@ -10,6 +10,8 @@ namespace OpenAI
         [EnumMember(Value = "text")]
         Text,
         [EnumMember(Value = "json_object")]
-        Json
+        Json,
+        [EnumMember(Value = "json_schema")]
+        JsonSchema
     }
 }

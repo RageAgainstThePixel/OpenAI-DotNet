@@ -16,5 +16,12 @@ namespace OpenAI.Chat
         [JsonInclude]
         [JsonPropertyName("content")]
         public IReadOnlyList<LogProbInfo> Content { get; private set; }
+
+        /// <summary>
+        /// A list of message refusal tokens with log probability information.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("refusal")]
+        public IReadOnlyList<LogProbInfo> Refusal { get; private set; }
     }
 }

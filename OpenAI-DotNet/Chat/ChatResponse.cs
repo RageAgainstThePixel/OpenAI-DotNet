@@ -39,6 +39,10 @@ namespace OpenAI.Chat
         [JsonPropertyName("model")]
         public string Model { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("service_tier")]
+        public string ServiceTier { get; private set; }
+
         /// <summary>
         /// This fingerprint represents the backend configuration that the model runs with.
         /// Can be used in conjunction with the seed request parameter to understand when

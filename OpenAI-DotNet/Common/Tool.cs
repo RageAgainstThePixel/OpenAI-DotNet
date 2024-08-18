@@ -210,7 +210,7 @@ namespace OpenAI
                     where functionAttribute != null
                     let name = GetFunctionName(type, method)
                     let description = functionAttribute.Description
-                    select Function.GetOrCreateFunction(name, description, method)
+                    select Function.GetOrCreateFunction(name, description, method, strict: true)
                     into function
                     select new Tool(function));
 
@@ -343,7 +343,7 @@ namespace OpenAI
                 return tool;
             }
 
-            tool = new Tool(Function.GetOrCreateFunction(functionName, description ?? string.Empty, method, instance));
+            tool = new Tool(Function.GetOrCreateFunction(functionName, description, method, instance, strict: true));
             toolCache.Add(tool);
             return tool;
         }
