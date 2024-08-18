@@ -50,17 +50,17 @@ Install-Package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Assistants](#assistants) :warning: :construction:
+- [Assistants](#assistants)
   - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant)
   - [Retrieve Assistant](#retrieve-assistant)
   - [Modify Assistant](#modify-assistant)
   - [Delete Assistant](#delete-assistant)
-  - [Assistant Streaming](#assistant-streaming) :warning: :construction:
-  - [Threads](#threads) :warning: :construction:
+  - [Assistant Streaming](#assistant-streaming)
+  - [Threads](#threads)
     - [Create Thread](#create-thread)
     - [Create Thread and Run](#create-thread-and-run)
-      - [Streaming](#create-thread-and-run-streaming) :warning: :construction:
+      - [Streaming](#create-thread-and-run-streaming)
     - [Retrieve Thread](#retrieve-thread)
     - [Modify Thread](#modify-thread)
     - [Delete Thread](#delete-thread)
@@ -72,10 +72,11 @@ Install-Package OpenAI-DotNet
     - [Thread Runs](#thread-runs)
       - [List Runs](#list-thread-runs)
       - [Create Run](#create-thread-run)
-        - [Streaming](#create-thread-run-streaming) :warning: :construction:
+        - [Streaming](#create-thread-run-streaming)
       - [Retrieve Run](#retrieve-thread-run)
       - [Modify Run](#modify-thread-run)
       - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run)
+      - [Structured Outputs](#thread-structured-outputs) :new:
       - [List Run Steps](#list-thread-run-steps)
       - [Retrieve Run Step](#retrieve-thread-run-step)
       - [Cancel Run](#cancel-thread-run)
@@ -100,12 +101,13 @@ Install-Package OpenAI-DotNet
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools)
   - [Vision](#chat-vision)
+  - [Json Schema](#chat-json-schema) :new:
   - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
   - [Create Transcription](#create-transcription)
   - [Create Translation](#create-translation)
-- [Images](#images) :warning: :construction:
+- [Images](#images)
   - [Create Image](#create-image)
   - [Edit Image](#edit-image)
   - [Create Image Variation](#create-image-variation)
@@ -798,6 +800,92 @@ foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
 }
 ```
 
+##### [Thread Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
+
+Structured Outputs is the evolution of JSON mode. While both ensure valid JSON is produced, only Structured Outputs ensure schema adherance.
+
+> [!IMPORTANT]
+>
+> - When using JSON mode, always instruct the model to produce JSON via some message in the conversation, for example via your system message. If you don't include an explicit instruction to generate JSON, the model may generate an unending stream of whitespace and the request may run continually until it reaches the token limit. To help ensure you don't forget, the API will throw an error if the string "JSON" does not appear somewhere in the context.
+> - The JSON in the message the model returns may be partial (i.e. cut off) if `finish_reason` is length, which indicates the generation exceeded max_tokens or the conversation exceeded the token limit. To guard against this, check `finish_reason` before parsing the response.
+
+```csharp
+var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+    new CreateAssistantRequest(
+        name: "Math Tutor",
+        instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
+        model: "gpt-4o-2024-08-06",
+        jsonSchema: mathSchema));
+Assert.NotNull(assistant);
+ThreadResponse thread = null;
+
+try
+{
+    var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23",
+        async @event =>
+        {
+            Console.WriteLine(@event.ToJsonString());
+            await Task.CompletedTask;
+        });
+    Assert.IsNotNull(run);
+    thread = await run.GetThreadAsync();
+    run = await run.WaitForStatusChangeAsync();
+    Assert.IsNotNull(run);
+    Assert.IsTrue(run.Status == RunStatus.Completed);
+    Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
+    Assert.NotNull(thread);
+    var messages = await thread.ListMessagesAsync();
+
+    foreach (var response in messages.Items)
+    {
+        Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+    }
+}
+finally
+{
+    await assistant.DeleteAsync(deleteToolResources: thread == null);
+
+    if (thread != null)
+    {
+        var isDeleted = await thread.DeleteAsync(deleteToolResources: true);
+        Assert.IsTrue(isDeleted);
+    }
+}
+```
+
 ###### [List Thread Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps)
 
 Returns a list of run steps belonging to a run.
@@ -1169,10 +1257,70 @@ var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
 ```
 
-#### [Chat Json Mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
+#### [Chat Json Schema](https://platform.openai.com/docs/guides/structured-outputs)
 
-> [!WARNING]
-> Beta Feature. API subject to breaking changes.
+The evolution of  [Json Mode](#chat-json-mode). While both ensure valid JSON is produced, only Structured Outputs ensure schema adherance.
+
+> [!IMPORTANT]
+>
+> - When using JSON mode, always instruct the model to produce JSON via some message in the conversation, for example via your system message. If you don't include an explicit instruction to generate JSON, the model may generate an unending stream of whitespace and the request may run continually until it reaches the token limit. To help ensure you don't forget, the API will throw an error if the string "JSON" does not appear somewhere in the context.
+> - The JSON in the message the model returns may be partial (i.e. cut off) if `finish_reason` is length, which indicates the generation exceeded max_tokens or the conversation exceeded the token limit. To guard against this, check `finish_reason` before parsing the response.
+
+```csharp
+var messages = new List<Message>
+{
+    new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
+    new(Role.User, "how can I solve 8x + 7 = -23")
+};
+
+var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+var chatRequest = new ChatRequest(messages, model: new("gpt-4o-2024-08-06"), jsonSchema: mathSchema);
+var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+Assert.IsNotNull(response);
+Assert.IsNotNull(response.Choices);
+Assert.IsNotEmpty(response.Choices);
+
+foreach (var choice in response.Choices)
+{
+    Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+}
+
+response.GetUsage();
+```
+
+#### [Chat Json Mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
 
 > [!IMPORTANT]
 >
