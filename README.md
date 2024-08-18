@@ -12,8 +12,6 @@ An OpenAI API account is required.
 Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
 
-> This repository is available to transfer to the OpenAI organization if they so choose to accept it.
-
 ## Requirements
 
 - This library targets .NET 6.0 and above.
