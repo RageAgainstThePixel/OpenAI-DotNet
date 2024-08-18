@@ -77,10 +77,6 @@ namespace OpenAI.Threads
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
         /// </param>
-        /// <param name="stream">
-        /// If true, returns a stream of events that happen during the Run as server-sent events,
-        /// terminating when the Run enters a terminal state with a 'data: [DONE]' message.
-        /// </param>
         /// <param name="maxPromptTokens">
         /// The maximum number of prompt tokens that may be used over the course of the run.
         /// The run will make a best effort to use only the number of prompt tokens specified,

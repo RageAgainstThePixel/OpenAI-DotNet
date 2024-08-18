@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public class ResponseFormatObject
+    public sealed class ResponseFormatObject
     {
         public ResponseFormatObject() { }
 

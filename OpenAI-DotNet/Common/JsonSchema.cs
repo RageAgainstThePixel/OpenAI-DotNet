@@ -9,7 +9,7 @@ namespace OpenAI
     /// <see href="https://platform.openai.com/docs/guides/structured-outputs"/><br/>
     /// <see href="https://json-schema.org/overview/what-is-jsonschema"/>
     /// </summary>
-    public class JsonSchema
+    public sealed class JsonSchema
     {
         public JsonSchema() { }
 

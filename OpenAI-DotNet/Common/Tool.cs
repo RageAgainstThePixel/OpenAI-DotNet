@@ -24,9 +24,9 @@ namespace OpenAI
             Type = nameof(function);
         }
 
-        public Tool(string toolCallId, string functionName, JsonNode functionArguments)
+        public Tool(string toolCallId, string functionName, JsonNode functionArguments, bool? strict = null)
         {
-            Function = new Function(functionName, arguments: functionArguments);
+            Function = new Function(functionName, arguments: functionArguments, strict);
             Type = "function";
             Id = toolCallId;
         }

@@ -88,7 +88,7 @@ namespace OpenAI
             Strict = strict;
         }
 
-        internal Function(string name, JsonNode arguments)
+        internal Function(string name, JsonNode arguments, bool? strict = null)
         {
             Name = name;
             Arguments = arguments;
