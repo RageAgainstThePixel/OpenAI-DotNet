@@ -417,9 +417,10 @@ namespace OpenAI
 
         private (Function function, object[] invokeArgs) ValidateFunctionArguments(CancellationToken cancellationToken = default)
         {
-            if (Parameters != null && Parameters.AsObject().Count > 0 && Arguments == null)
+            var properties = Parameters?["properties"]?.AsObject();
+            if (properties?.Count > 0 && Arguments == null)
             {
-                throw new ArgumentException($"Function {Name} has parameters but no arguments are set.");
+                throw new ArgumentException($"Function {Name} has {properties.Count} parameters but no arguments are set!");
             }
 
             if (!functionCache.TryGetValue(Name, out var function))

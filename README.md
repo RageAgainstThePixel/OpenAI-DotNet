@@ -811,7 +811,7 @@ foreach (var message in messages.Items.OrderBy(response => response.CreatedAt))
 
 ##### [Thread Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
 
-Structured Outputs is the evolution of JSON mode. While both ensure valid JSON is produced, only Structured Outputs ensure schema adherance.
+Structured Outputs is the evolution of JSON mode. While both ensure valid JSON is produced, only Structured Outputs ensure schema adherence.
 
 > [!IMPORTANT]
 >
@@ -858,7 +858,6 @@ var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
         instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
         model: "gpt-4o-2024-08-06",
         jsonSchema: mathSchema));
-Assert.NotNull(assistant);
 ThreadResponse thread = null;
 
 try
@@ -869,13 +868,9 @@ try
             Console.WriteLine(@event.ToJsonString());
             await Task.CompletedTask;
         });
-    Assert.IsNotNull(run);
     thread = await run.GetThreadAsync();
     run = await run.WaitForStatusChangeAsync();
-    Assert.IsNotNull(run);
-    Assert.IsTrue(run.Status == RunStatus.Completed);
     Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
-    Assert.NotNull(thread);
     var messages = await thread.ListMessagesAsync();
 
     foreach (var response in messages.Items)
@@ -1268,7 +1263,7 @@ Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.M
 
 #### [Chat Json Schema](https://platform.openai.com/docs/guides/structured-outputs)
 
-The evolution of  [Json Mode](#chat-json-mode). While both ensure valid JSON is produced, only Structured Outputs ensure schema adherance.
+The evolution of  [Json Mode](#chat-json-mode). While both ensure valid JSON is produced, only Structured Outputs ensure schema adherence.
 
 > [!IMPORTANT]
 >
@@ -1317,9 +1312,6 @@ var mathSchema = new JsonSchema("math_response", @"
 }");
 var chatRequest = new ChatRequest(messages, model: new("gpt-4o-2024-08-06"), jsonSchema: mathSchema);
 var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
-Assert.IsNotNull(response);
-Assert.IsNotNull(response.Choices);
-Assert.IsNotEmpty(response.Choices);
 
 foreach (var choice in response.Choices)
 {
