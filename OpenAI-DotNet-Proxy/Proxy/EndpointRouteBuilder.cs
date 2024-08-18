@@ -81,21 +81,13 @@ namespace OpenAI.Proxy
 
                     foreach (var (key, value) in proxyResponse.Headers)
                     {
-                        if (excludedHeaders.Contains(key))
-                        {
-                            continue;
-                        }
-
+                        if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
 
                     foreach (var (key, value) in proxyResponse.Content.Headers)
                     {
-                        if (excludedHeaders.Contains(key))
-                        {
-                            continue;
-                        }
-
+                        if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
 
