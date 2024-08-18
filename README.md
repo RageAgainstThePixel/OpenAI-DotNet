@@ -26,8 +26,16 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 
 Install package [`OpenAI-DotNet` from Nuget](https://www.nuget.org/packages/OpenAI-DotNet/).  Here's how via command line:
 
-```powershell
+powershell:
+
+```terminal
 Install-Package OpenAI-DotNet
+```
+
+dotnet:
+
+```terminal
+dotnet add package OpenAI-DotNet
 ```
 
 > Looking to [use OpenAI-DotNet in the Unity Game Engine](https://github.com/RageAgainstThePixel/com.openai.unity)? Check out our unity package on OpenUPM:
@@ -307,6 +315,7 @@ In this example, we demonstrate how to set up and use `OpenAIProxy` in a new ASP
 1. Create a new [ASP.NET Core minimal web API](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-6.0) project.
 2. Add the OpenAI-DotNet nuget package to your project.
     - Powershell install: `Install-Package OpenAI-DotNet-Proxy`
+    - Dotnet install: `dotnet add package OpenAI-DotNet-Proxy`
     - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
 4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxy.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
