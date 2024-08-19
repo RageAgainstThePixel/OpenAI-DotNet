@@ -2,6 +2,7 @@
 
 using NUnit.Framework;
 using OpenAI.Images;
+using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
