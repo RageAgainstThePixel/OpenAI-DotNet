@@ -41,7 +41,7 @@ namespace OpenAI
 
             if (client.OpenAIClientSettings.IsAzureOpenAI && IsAzureDeployment == true)
             {
-                route = $"{Root}deployments/{client.OpenAIClientSettings.DeploymentId}/{endpoint}";
+                route = $"deployments/{client.OpenAIClientSettings.DeploymentId}/{Root}{endpoint}";
             }
             else
             {
