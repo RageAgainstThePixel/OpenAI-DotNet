@@ -282,7 +282,7 @@ namespace OpenAI.Chat
 
         [JsonPropertyName("response_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormatObject { get; }
+        public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         /// <summary>
         /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically,

@@ -276,7 +276,7 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormatObject { get; }
+        public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]
         public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;

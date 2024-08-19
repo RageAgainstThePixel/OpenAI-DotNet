@@ -197,7 +197,7 @@ namespace OpenAI.Threads
             {
                 streamEventHandler.Invoke(serverSentEvent);
                 return Task.CompletedTask;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Create a run.
@@ -211,7 +211,39 @@ namespace OpenAI.Threads
             => await CreateRunAsync(threadId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
             {
                 await streamEventHandler.Invoke(serverSentEvent);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/> to use for structured outputs.</typeparam>
+        /// <param name="threadId">The id of the thread to run.</param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateRunAsync<T>(string threadId, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
+            {
+                var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (request == null)
+                {
+                    request = new CreateRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
+            }
+
+            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            return await CreateRunAsync(threadId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Create a run.
@@ -223,10 +255,18 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
             {
                 var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-                request = new CreateRunRequest(assistant, request);
+
+                if (request == null)
+                {
+                    request = new CreateRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
             }
 
             request.Stream = streamEventHandler != null;
@@ -235,7 +275,7 @@ namespace OpenAI.Threads
 
             if (request.Stream)
             {
-                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken);
+                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken).ConfigureAwait(false);
             }
 
             using var response = await client.Client.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
@@ -249,7 +289,7 @@ namespace OpenAI.Threads
             {
                 streamEventHandler.Invoke(serverSentEvent);
                 return Task.CompletedTask;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Create a thread and run it in one request.
@@ -262,7 +302,38 @@ namespace OpenAI.Threads
             => await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
             {
                 await streamEventHandler.Invoke(serverSentEvent);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Create a thread and run it in one request.
+        /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/> to use for structured outputs.</typeparam>
+        /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateThreadAndRunAsync<T>(CreateThreadAndRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
+            {
+                var assistant = await client.AssistantsEndpoint.CreateAssistantAsync<T>(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (request == null)
+                {
+                    request = new CreateThreadAndRunRequest(assistant, jsonSchema: typeof(T));
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
+            }
+
+            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            return await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent).ConfigureAwait(false);
+            }, cancellationToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Create a thread and run it in one request.
@@ -273,10 +344,18 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
             {
                 var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-                request = new CreateThreadAndRunRequest(assistant, request);
+
+                if (request == null)
+                {
+                    request = new CreateThreadAndRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
             }
 
             request.Stream = streamEventHandler != null;
@@ -285,7 +364,7 @@ namespace OpenAI.Threads
 
             if (request.Stream)
             {
-                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken);
+                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken).ConfigureAwait(false);
             }
 
             using var response = await client.Client.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
@@ -334,7 +413,7 @@ namespace OpenAI.Threads
             {
                 streamEventHandler.Invoke(serverSentEvent);
                 return Task.CompletedTask;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
@@ -351,7 +430,7 @@ namespace OpenAI.Threads
             => await SubmitToolOutputsAsync(threadId, runId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
             {
                 await streamEventHandler.Invoke(serverSentEvent);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
@@ -372,7 +451,7 @@ namespace OpenAI.Threads
 
             if (request.Stream)
             {
-                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken);
+                return await StreamRunAsync(endpoint, payload, streamEventHandler, cancellationToken).ConfigureAwait(false);
             }
 
             using var response = await client.Client.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
@@ -573,12 +652,12 @@ namespace OpenAI.Threads
                 }
                 finally
                 {
-                    await streamEventHandler.Invoke(@event, serverSentEvent);
+                    await streamEventHandler.Invoke(@event, serverSentEvent).ConfigureAwait(false);
                 }
             }, cancellationToken);
 
             if (run == null) { return null; }
-            run = await run.WaitForStatusChangeAsync(timeout: -1, cancellationToken: cancellationToken);
+            run = await run.WaitForStatusChangeAsync(timeout: -1, cancellationToken: cancellationToken).ConfigureAwait(false);
             run.SetResponseData(response.Headers, client);
             return run;
         }

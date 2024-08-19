@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.2.1</Version>
+    <Version>8.2.2</Version>
     <PackageReleaseNotes>
+Version 8.2.2
+- Added generic parameters to methods that support structured output
 Version 8.2.1
 - Fixed a typo in the Azure OpenAI URL base endpoint
 Version 8.2.0

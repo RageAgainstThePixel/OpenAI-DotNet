@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using OpenAI.Chat;
 using OpenAI.Models;
+using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
@@ -537,52 +538,27 @@ namespace OpenAI.Tests
                 new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
                 new(Role.User, "how can I solve 8x + 7 = -23")
             };
+            var chatRequest = new ChatRequest(messages, model: "gpt-4o-2024-08-06");
+            var (mathResponse, chatResponse) = await OpenAIClient.ChatEndpoint.GetCompletionAsync<MathResponse>(chatRequest);
+            Assert.IsNotNull(chatResponse);
+            Assert.IsNotNull(mathResponse);
+            Assert.IsNotEmpty(mathResponse.Steps);
+            Assert.IsNotNull(chatResponse.Choices);
+            Assert.IsNotEmpty(chatResponse.Choices);
 
-            var mathSchema = new JsonSchema("math_response", @"
-{
-  ""type"": ""object"",
-  ""properties"": {
-    ""steps"": {
-      ""type"": ""array"",
-      ""items"": {
-        ""type"": ""object"",
-        ""properties"": {
-          ""explanation"": {
-            ""type"": ""string""
-          },
-          ""output"": {
-            ""type"": ""string""
-          }
-        },
-        ""required"": [
-          ""explanation"",
-          ""output""
-        ],
-        ""additionalProperties"": false
-      }
-    },
-    ""final_answer"": {
-      ""type"": ""string""
-    }
-  },
-  ""required"": [
-    ""steps"",
-    ""final_answer""
-  ],
-  ""additionalProperties"": false
-}");
-            var chatRequest = new ChatRequest(messages, model: new("gpt-4o-2024-08-06"), jsonSchema: mathSchema);
-            var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
-            Assert.IsNotNull(response);
-            Assert.IsNotNull(response.Choices);
-            Assert.IsNotEmpty(response.Choices);
-
-            foreach (var choice in response.Choices)
+            for (var i = 0; i < mathResponse.Steps.Count; i++)
             {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
+                var step = mathResponse.Steps[i];
+                Assert.IsNotNull(step.Explanation);
+                Console.WriteLine($"Step {i}: {step.Explanation}");
+                Assert.IsNotNull(step.Output);
+                Console.WriteLine($"Result: {step.Output}");
             }
 
-            response.GetUsage();
+            Assert.IsNotNull(mathResponse.FinalAnswer);
+            Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
+
+            chatResponse.GetUsage();
         }
 
         [Test]
@@ -595,43 +571,9 @@ namespace OpenAI.Tests
                 new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
                 new(Role.User, "how can I solve 8x + 7 = -23")
             };
-
-            var mathSchema = new JsonSchema("math_response", @"
-{
-  ""type"": ""object"",
-  ""properties"": {
-    ""steps"": {
-      ""type"": ""array"",
-      ""items"": {
-        ""type"": ""object"",
-        ""properties"": {
-          ""explanation"": {
-            ""type"": ""string""
-          },
-          ""output"": {
-            ""type"": ""string""
-          }
-        },
-        ""required"": [
-          ""explanation"",
-          ""output""
-        ],
-        ""additionalProperties"": false
-      }
-    },
-    ""final_answer"": {
-      ""type"": ""string""
-    }
-  },
-  ""required"": [
-    ""steps"",
-    ""final_answer""
-  ],
-  ""additionalProperties"": false
-}");
-            var chatRequest = new ChatRequest(messages, model: "gpt-4o-2024-08-06", jsonSchema: mathSchema);
+            var chatRequest = new ChatRequest(messages, model: "gpt-4o-2024-08-06");
             var cumulativeDelta = string.Empty;
-            var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
+            var (mathResponse, chatResponse) = await OpenAIClient.ChatEndpoint.StreamCompletionAsync<MathResponse>(chatRequest, partialResponse =>
             {
                 Assert.IsNotNull(partialResponse);
                 if (partialResponse.Usage != null) { return; }
@@ -643,17 +585,29 @@ namespace OpenAI.Tests
                     cumulativeDelta += choice.Delta.Content;
                 }
             }, true);
-            Assert.IsNotNull(response);
-            Assert.IsNotNull(response.Choices);
-            var choice = response.FirstChoice;
+            Assert.IsNotNull(chatResponse);
+            Assert.IsNotNull(mathResponse);
+            Assert.IsNotNull(chatResponse.Choices);
+            var choice = chatResponse.FirstChoice;
             Assert.IsNotNull(choice);
             Assert.IsNotNull(choice.Message);
             Assert.IsFalse(string.IsNullOrEmpty(choice.ToString()));
-            Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
             Assert.IsTrue(choice.Message.Role == Role.Assistant);
             Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
-            Console.WriteLine(response.ToString());
-            response.GetUsage();
+
+            for (var i = 0; i < mathResponse.Steps.Count; i++)
+            {
+                var step = mathResponse.Steps[i];
+                Assert.IsNotNull(step.Explanation);
+                Console.WriteLine($"Step {i}: {step.Explanation}");
+                Assert.IsNotNull(step.Output);
+                Console.WriteLine($"Result: {step.Output}");
+            }
+
+            Assert.IsNotNull(mathResponse.FinalAnswer);
+            Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
+
+            chatResponse.GetUsage();
         }
     }
 }

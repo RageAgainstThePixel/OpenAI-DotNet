@@ -1,5 +1,8 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
+using System;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -65,7 +68,7 @@ namespace OpenAI
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("strict")]
-        public bool Strict { get; private set; }
+        public bool Strict { get; private set; } = true;
 
         /// <summary>
         /// The schema for the response format, described as a JSON Schema object.
@@ -75,5 +78,11 @@ namespace OpenAI
         public JsonNode Schema { get; private set; }
 
         public static implicit operator ResponseFormatObject(JsonSchema jsonSchema) => new(jsonSchema);
+
+        public static implicit operator JsonSchema(Type type) => new(type.Name, type.GenerateJsonSchema());
+
+        /// <inheritdoc />
+        public override string ToString()
+            => JsonSerializer.Serialize(this, ResponseExtensions.DebugJsonOptions);
     }
 }

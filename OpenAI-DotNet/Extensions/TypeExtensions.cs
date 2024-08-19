@@ -14,14 +14,13 @@ namespace OpenAI.Extensions
     {
         public static JsonObject GenerateJsonSchema(this MethodInfo methodInfo, JsonSerializerOptions options = null)
         {
-            var parameters = methodInfo.GetParameters();
-
             var schema = new JsonObject
             {
                 ["type"] = "object",
                 ["properties"] = new JsonObject()
             };
             var requiredParameters = new JsonArray();
+            var parameters = methodInfo.GetParameters();
 
             foreach (var parameter in parameters)
             {
@@ -50,6 +49,34 @@ namespace OpenAI.Extensions
             if (requiredParameters.Count > 0)
             {
                 schema["required"] = requiredParameters;
+            }
+
+            schema["additionalProperties"] = false;
+            return schema;
+        }
+
+        public static JsonObject GenerateJsonSchema(this Type type, JsonSerializerOptions options = null)
+        {
+            var schema = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject()
+            };
+
+            var requiredProperties = new JsonArray();
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+            foreach (var property in properties)
+            {
+                var propertyNameAttribute = property.GetCustomAttribute<JsonPropertyNameAttribute>();
+                var propertyName = propertyNameAttribute?.Name ?? property.Name;
+                requiredProperties.Add(propertyName);
+                schema["properties"]![propertyName] = GenerateJsonSchema(property.PropertyType, schema, options);
+            }
+
+            if (requiredProperties.Count > 0)
+            {
+                schema["required"] = requiredProperties;
             }
 
             schema["additionalProperties"] = false;
@@ -116,7 +143,9 @@ namespace OpenAI.Extensions
                     schema["enum"].AsArray().Add(JsonNode.Parse(JsonSerializer.Serialize(value, options)));
                 }
             }
-            else if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
+            else if (type.IsArray ||
+                     type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>) ||
+                                            type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>)))
             {
                 schema["type"] = "array";
                 var elementType = type.GetElementType() ?? type.GetGenericArguments()[0];
