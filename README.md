@@ -107,7 +107,7 @@ dotnet add package OpenAI-DotNet
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools)
   - [Vision](#chat-vision)
-  - [Json Schema](#chat-json-schema) :new:
+  - [Json Schema](#chat-structured-outputs) :new:
   - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
@@ -1286,7 +1286,7 @@ var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
 Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice.Message.Content} | Finish Reason: {response.FirstChoice.FinishDetails}");
 ```
 
-#### [Chat Json Schema](https://platform.openai.com/docs/guides/structured-outputs)
+#### [Chat Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
 
 The evolution of  [Json Mode](#chat-json-mode). While both ensure valid JSON is produced, only Structured Outputs ensure schema adherence.
 
