@@ -31,11 +31,4 @@ namespace OpenAI.Tests.Weather
 
         public static int CelsiusToFahrenheit(int celsius) => (celsius * 9 / 5) + 32;
     }
-
-    internal static class DateTimeUtility
-    {
-        [Function("Get the current date and time.")]
-        public static async Task<string> GetDateTime()
-            => await Task.FromResult(DateTimeOffset.Now.ToString());
-    }
 }

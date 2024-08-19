@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.Models;
+using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using OpenAI.Threads;
 using System;
@@ -672,66 +673,75 @@ namespace OpenAI.Tests
         public async Task Test_05_01_CreateThreadAndRun_StructuredOutputs_Streaming()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-            var mathSchema = new JsonSchema("math_response", @"
-{
-  ""type"": ""object"",
-  ""properties"": {
-    ""steps"": {
-      ""type"": ""array"",
-      ""items"": {
-        ""type"": ""object"",
-        ""properties"": {
-          ""explanation"": {
-            ""type"": ""string""
-          },
-          ""output"": {
-            ""type"": ""string""
-          }
-        },
-        ""required"": [
-          ""explanation"",
-          ""output""
-        ],
-        ""additionalProperties"": false
-      }
-    },
-    ""final_answer"": {
-      ""type"": ""string""
-    }
-  },
-  ""required"": [
-    ""steps"",
-    ""final_answer""
-  ],
-  ""additionalProperties"": false
-}");
-            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
+            var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync<MathResponse>(
                 new CreateAssistantRequest(
                     name: "Math Tutor",
                     instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
-                    model: "gpt-4o-2024-08-06",
-                    jsonSchema: mathSchema));
+                    model: "gpt-4o-2024-08-06"));
             Assert.NotNull(assistant);
             ThreadResponse thread = null;
 
+            // check if any exceptions thrown in stream event handler
+            var exceptionThrown = false;
+
             try
             {
-                var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23",
-                    async @event =>
+                async Task StreamEventHandler(IServerSentEvent @event)
+                {
+                    try
                     {
-                        Console.WriteLine(@event.ToJsonString());
-                        await Task.CompletedTask;
-                    });
+                        switch (@event)
+                        {
+                            case MessageResponse message:
+                                if (message.Status != MessageStatus.Completed)
+                                {
+                                    Console.WriteLine(@event.ToJsonString());
+                                    break;
+                                }
+
+                                var mathResponse = message.FromSchema<MathResponse>();
+                                Assert.IsNotNull(mathResponse);
+                                Assert.IsNotNull(mathResponse.Steps);
+                                Assert.IsNotEmpty(mathResponse.Steps);
+
+                                for (var i = 0; i < mathResponse.Steps.Count; i++)
+                                {
+                                    var step = mathResponse.Steps[i];
+                                    Assert.IsNotNull(step.Explanation);
+                                    Console.WriteLine($"Step {i}: {step.Explanation}");
+                                    Assert.IsNotNull(step.Output);
+                                    Console.WriteLine($"Result: {step.Output}");
+                                }
+
+                                Assert.IsNotNull(mathResponse.FinalAnswer);
+                                Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
+                                break;
+                            default:
+                                Console.WriteLine(@event.ToJsonString());
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        exceptionThrown = true;
+                        throw;
+                    }
+
+                    await Task.CompletedTask;
+                }
+
+                var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23", StreamEventHandler);
                 Assert.IsNotNull(run);
+                Assert.IsFalse(exceptionThrown);
                 thread = await run.GetThreadAsync();
                 run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
-                Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
                 Assert.NotNull(thread);
                 var messages = await thread.ListMessagesAsync();
 
-                foreach (var response in messages.Items)
+                foreach (var response in messages.Items.OrderBy(response => response.CreatedAt))
                 {
                     Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }

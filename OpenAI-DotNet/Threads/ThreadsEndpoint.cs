@@ -216,6 +216,39 @@ namespace OpenAI.Threads
         /// <summary>
         /// Create a run.
         /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/> to use for structured outputs.</typeparam>
+        /// <param name="threadId">The id of the thread to run.</param>
+        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateRunAsync<T>(string threadId, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        {
+
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
+            {
+                var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (request == null)
+                {
+                    request = new CreateRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
+            }
+
+            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            return await CreateRunAsync(threadId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a run.
+        /// </summary>
         /// <param name="threadId">The id of the thread to run.</param>
         /// <param name="request"><see cref="CreateRunRequest"/>.</param>
         /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
@@ -223,10 +256,18 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
             {
                 var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-                request = new CreateRunRequest(assistant, request);
+
+                if (request == null)
+                {
+                    request = new CreateRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
             }
 
             request.Stream = streamEventHandler != null;
@@ -267,16 +308,55 @@ namespace OpenAI.Threads
         /// <summary>
         /// Create a thread and run it in one request.
         /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/> to use for structured outputs.</typeparam>
+        /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RunResponse"/>.</returns>
+        public async Task<RunResponse> CreateThreadAndRunAsync<T>(CreateThreadAndRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
+            {
+                var assistant = await client.AssistantsEndpoint.CreateAssistantAsync<T>(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (request == null)
+                {
+                    request = new CreateThreadAndRunRequest(assistant, jsonSchema: typeof(T));
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
+            }
+
+            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            return await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
+            {
+                await streamEventHandler.Invoke(serverSentEvent);
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a thread and run it in one request.
+        /// </summary>
         /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
         /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public async Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.AssistantId))
+            if (string.IsNullOrWhiteSpace(request?.AssistantId))
             {
                 var assistant = await client.AssistantsEndpoint.CreateAssistantAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-                request = new CreateThreadAndRunRequest(assistant, request);
+
+                if (request == null)
+                {
+                    request = new CreateThreadAndRunRequest(assistant);
+                }
+                else
+                {
+                    request.AssistantId = assistant.Id;
+                }
             }
 
             request.Stream = streamEventHandler != null;

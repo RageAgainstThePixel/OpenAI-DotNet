@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
-    internal class TestFixture_00_02_Tools : AbstractTestFixture
+    internal class TestFixture_00_02_Extensions : AbstractTestFixture
     {
         [Test]
-        public void Test_01_GetTools()
+        public void Test_01_01_GetTools()
         {
             var tools = Tool.GetAllAvailableTools(forceUpdate: true, clearCache: true).ToList();
             Assert.IsNotNull(tools);
@@ -29,7 +29,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_02_Tool_Funcs()
+        public async Task Test_01_02_Tool_Funcs()
         {
             var tools = new List<Tool>
             {
@@ -115,7 +115,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public void Test_03_Tool_works_when_called_concurrently()
+        public void Test_01_03_Tool_works_when_called_concurrently()
         {
             Assert.Multiple(async () =>
             {
@@ -137,6 +137,13 @@ namespace OpenAI.Tests
                 var result = tool.InvokeFunction<int>();
                 Assert.AreEqual(id, result);
             }
+        }
+
+        [Test]
+        public void Test_02_01_GenerateJsonSchema()
+        {
+            JsonSchema mathSchema = typeof(MathResponse);
+            Console.WriteLine(mathSchema.ToString());
         }
     }
 }

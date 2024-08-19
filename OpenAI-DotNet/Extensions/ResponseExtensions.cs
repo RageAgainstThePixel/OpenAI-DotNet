@@ -36,7 +36,7 @@ namespace OpenAI.Extensions
             NumberDecimalSeparator = "."
         };
 
-        private static readonly JsonSerializerOptions debugJsonOptions = new()
+        public static readonly JsonSerializerOptions DebugJsonOptions = new()
         {
             WriteIndented = true,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -274,7 +274,7 @@ namespace OpenAI.Extensions
                     }
                 }
 
-                debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, debugJsonOptions));
+                debugMessage.Append(JsonSerializer.Serialize(debugMessageObject, DebugJsonOptions));
                 Console.WriteLine(debugMessage.ToString());
             }
 
@@ -307,7 +307,7 @@ namespace OpenAI.Extensions
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {jNode.ToJsonString(debugJsonOptions)}\n{e}");
+                Console.WriteLine($"Failed to parse {typeof(T).Name} -> {jNode.ToJsonString(DebugJsonOptions)}\n{e}");
                 throw;
             }
 
