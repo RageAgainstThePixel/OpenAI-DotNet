@@ -52,7 +52,7 @@ namespace OpenAI.Chat
         public async Task<(T, ChatResponse)> GetCompletionAsync<T>(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
             chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
-            var response = await GetCompletionAsync(chatRequest, cancellationToken);
+            var response = await GetCompletionAsync(chatRequest, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);
         }
@@ -75,7 +75,7 @@ namespace OpenAI.Chat
             {
                 resultHandler.Invoke(response);
                 await Task.CompletedTask;
-            }, streamUsage, cancellationToken);
+            }, streamUsage, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Created a completion for the chat message and stream the results to the <paramref name="resultHandler"/> as they come in.
@@ -115,7 +115,7 @@ namespace OpenAI.Chat
         public async Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Func<ChatResponse, Task> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
         {
             chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
-            var response = await StreamCompletionAsync(chatRequest, resultHandler, streamUsage, cancellationToken);
+            var response = await StreamCompletionAsync(chatRequest, resultHandler, streamUsage, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);
         }
@@ -154,12 +154,12 @@ namespace OpenAI.Chat
                     chatResponse.AppendFrom(partialResponse);
                 }
 
-                await resultHandler.Invoke(partialResponse);
+                await resultHandler.Invoke(partialResponse).ConfigureAwait(false);
             }, cancellationToken);
 
             if (chatResponse == null) { return null; }
             chatResponse.SetResponseData(response.Headers, client);
-            await resultHandler.Invoke(chatResponse);
+            await resultHandler.Invoke(chatResponse).ConfigureAwait(false);
             return chatResponse;
         }
 

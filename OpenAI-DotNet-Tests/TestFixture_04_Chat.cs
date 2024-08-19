@@ -598,10 +598,13 @@ namespace OpenAI.Tests
             for (var i = 0; i < mathResponse.Steps.Count; i++)
             {
                 var step = mathResponse.Steps[i];
+                Assert.IsNotNull(step.Explanation);
                 Console.WriteLine($"Step {i}: {step.Explanation}");
+                Assert.IsNotNull(step.Output);
                 Console.WriteLine($"Result: {step.Output}");
             }
 
+            Assert.IsNotNull(mathResponse.FinalAnswer);
             Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
 
             chatResponse.GetUsage();

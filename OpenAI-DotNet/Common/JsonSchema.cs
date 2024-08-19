@@ -79,12 +79,7 @@ namespace OpenAI
 
         public static implicit operator ResponseFormatObject(JsonSchema jsonSchema) => new(jsonSchema);
 
-        public static implicit operator JsonSchema(Type type) => new()
-        {
-            Name = type.Name,
-            Schema = type.GenerateJsonSchema(),
-            Strict = true
-        };
+        public static implicit operator JsonSchema(Type type) => new(type.Name, type.GenerateJsonSchema());
 
         /// <inheritdoc />
         public override string ToString()

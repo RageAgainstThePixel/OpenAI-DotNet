@@ -680,7 +680,6 @@ namespace OpenAI.Tests
                     model: "gpt-4o-2024-08-06"));
             Assert.NotNull(assistant);
             ThreadResponse thread = null;
-
             // check if any exceptions thrown in stream event handler
             var exceptionThrown = false;
 
