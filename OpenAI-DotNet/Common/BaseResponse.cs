@@ -9,6 +9,7 @@ namespace OpenAI
 {
     public abstract class BaseResponse
     {
+
         /// <summary>
         /// The <see cref="OpenAIClient"/> this response was generated from.
         /// </summary>
@@ -73,7 +74,7 @@ namespace OpenAI
         /// The time until the rate limit (based on requests) resets to its initial state represented as a TimeSpan.
         /// </summary>
         [JsonIgnore]
-        public TimeSpan ResetRequestsTimespan { get => ConvertTimestampToTimespan(ResetRequests); }
+        public TimeSpan ResetRequestsTimespan => ConvertTimestampToTimespan(ResetTokens);
 
         /// <summary>
         /// The time until the rate limit (based on tokens) resets to its initial state.
@@ -85,7 +86,27 @@ namespace OpenAI
         /// The time until the rate limit (based on tokens) resets to its initial state represented as a TimeSpan.
         /// </summary>
         [JsonIgnore]
-        public TimeSpan ResetTokensTimespan { get => ConvertTimestampToTimespan(ResetTokens); }
+        public TimeSpan ResetTokensTimespan => ConvertTimestampToTimespan(ResetTokens);
+
+
+
+        /*
+        * Regex Notes: 
+        *  The gist of this regex is that it is searching for "timestamp segments", eg 1m or 144ms.
+        *  Each segment gets matched into its respective named capture group, from which we further parse out the 
+        *  digits. This allows us to take the string 6m45s99ms and insert the integers into a 
+        *  TimeSpan object for easier use.
+        *  
+        *  Regex Performance Notes, against 100k randomly generated timestamps:
+        *  Average performance: 0.0003ms
+        *  Best case: 0ms
+        *  Worst Case: 15ms
+        *  Total Time: 30ms
+        *  
+        *  Inconsequential compute time
+        */
+        private readonly Regex timestampRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m(?!s))?(?<secs>\d+s)?(?<ms>\d+ms)?");
+
 
         /// <summary>
         /// Takes a timestamp recieved from a OpenAI response header and converts to a TimeSpan
@@ -95,23 +116,7 @@ namespace OpenAI
         /// <exception cref="ArgumentException">Thrown if the provided timestamp is not in the expected format, or if the match is not successful.</exception>
         private TimeSpan ConvertTimestampToTimespan(string timestamp)
         {
-            /*
-             * Regex Notes: 
-             *  The gist of this regex is that it is searching for "timestamp segments", eg 1m or 144ms.
-             *  Each segment gets matched into its respective named capture group, from which we further parse out the 
-             *  digits. This allows us to take the string 6m45s99ms and insert the integers into a 
-             *  TimeSpan object for easier use.
-             *  
-             *  Regex Performance Notes, against 100k randomly generated timestamps:
-             *  Average performance: 0.0003ms
-             *  Best case: 0ms
-             *  Worst Case: 15ms
-             *  Total Time: 30ms
-             *  
-             *  Inconsequential compute time
-             */
-            Regex tsRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m(?!s))?(?<secs>\d+s)?(?<ms>\d+ms)?");
-            Match match = tsRegex.Match(timestamp);
+            Match match = timestampRegex.Match(timestamp);
             if (!match.Success)
             {
                 throw new ArgumentException($"Could not parse timestamp header. '{timestamp}'.");
