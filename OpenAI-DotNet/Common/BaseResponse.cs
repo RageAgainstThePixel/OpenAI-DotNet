@@ -102,14 +102,14 @@ namespace OpenAI
              *  TimeSpan object for easier use.
              *  
              *  Regex Performance Notes, against 100k randomly generated timestamps:
-             *  Average performance: 0.0001ms
+             *  Average performance: 0.0003ms
              *  Best case: 0ms
-             *  Worst Case: 8ms
-             *  Total Time: 10ms
+             *  Worst Case: 15ms
+             *  Total Time: 30ms
              *  
              *  Inconsequential compute time
              */
-            Regex tsRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m)?(?<secs>\d+s)?(?<ms>\d+ms)?");
+            Regex tsRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m(?!s))?(?<secs>\d+s)?(?<ms>\d+ms)?");
             Match match = tsRegex.Match(timestamp);
             if (!match.Success)
             {
