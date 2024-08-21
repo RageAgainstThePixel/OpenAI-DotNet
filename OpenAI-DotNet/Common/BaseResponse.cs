@@ -72,6 +72,7 @@ namespace OpenAI
         /// <summary>
         /// The time until the rate limit (based on requests) resets to its initial state represented as a TimeSpan.
         /// </summary>
+        [JsonIgnore]
         public TimeSpan ResetRequestsTimespan { get => ConvertTimestampToTimespan(ResetRequests); }
 
         /// <summary>
