@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace OpenAI
 {
@@ -69,10 +70,83 @@ namespace OpenAI
         public string ResetRequests { get; internal set; }
 
         /// <summary>
+        /// The time until the rate limit (based on requests) resets to its initial state represented as a TimeSpan.
+        /// </summary>
+        public TimeSpan ResetRequestsTimespan { get => ConvertTimestampToTimespan(ResetRequests); }
+
+        /// <summary>
         /// The time until the rate limit (based on tokens) resets to its initial state.
         /// </summary>
         [JsonIgnore]
         public string ResetTokens { get; internal set; }
+
+        /// <summary>
+        /// The time until the rate limit (based on tokens) resets to its initial state represented as a TimeSpan.
+        /// </summary>
+        [JsonIgnore]
+        public TimeSpan ResetTokensTimespan { get => ConvertTimestampToTimespan(ResetTokens); }
+
+        /// <summary>
+        /// Takes a timestamp recieved from a OpenAI response header and converts to a TimeSpan
+        /// </summary>
+        /// <param name="timestamp">The timestamp received from an OpenAI header, eg x-ratelimit-reset-tokens</param>
+        /// <returns>A TimeSpan that represents the timestamp provided</returns>
+        /// <exception cref="ArgumentException">Thrown if the provided timestamp is not in the expected format, or if the match is not successful.</exception>
+        private TimeSpan ConvertTimestampToTimespan(string timestamp)
+        {
+            /*
+             * Regex Notes: 
+             *  The gist of this regex is that it is searching for "timestamp segments", eg 1m or 144ms.
+             *  Each segment gets matched into its respective named capture group, from which we further parse out the 
+             *  digits. This allows us to take the string 6m45s99ms and insert the integers into a 
+             *  TimeSpan object for easier use.
+             *  
+             *  Regex Performance Notes, against 100k randomly generated timestamps:
+             *  Average performance: 0.0001ms
+             *  Best case: 0ms
+             *  Worst Case: 8ms
+             *  Total Time: 10ms
+             *  
+             *  Inconsequential compute time
+             */
+            Regex tsRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m)?(?<secs>\d+s)?(?<ms>\d+ms)?");
+            Match match = tsRegex.Match(timestamp);
+            if (!match.Success)
+            {
+                throw new ArgumentException($"Could not parse timestamp header. '{timestamp}'.");
+            }
+
+            /*
+             * Note about Hours in timestamps:
+             *  I have not personally observed a timestamp with an hours segment (eg. 1h30m15s1ms).
+             *  Although their presense may not actually exist, we can still have this section in the parser, there is no
+             *  negative impact for a missing hours segment because the capture groups are flagged as optional.
+             */
+            int hours = 0;
+            if (match.Groups.ContainsKey("hour"))
+            {
+                hours = int.Parse(match.Groups["hour"].Value.Replace("h", string.Empty));
+            }
+
+            int minutes = 0;
+            if (match.Groups.ContainsKey("mins"))
+            {
+                minutes = int.Parse(match.Groups["mins"].Value.Replace("m", string.Empty));
+            }
+
+            int seconds = 0;
+            if (match.Groups.ContainsKey("secs"))
+            {
+                seconds = int.Parse(match.Groups["secs"].Value.Replace("s", string.Empty));
+            }
+            int ms = 0;
+            if (match.Groups.ContainsKey("ms"))
+            {
+                ms = int.Parse(match.Groups["ms"].Value.Replace("ms", string.Empty));
+            }
+
+            return new TimeSpan(hours, minutes, seconds) + TimeSpan.FromMilliseconds(ms);
+        }
 
         public string ToJsonString()
             => this.ToEscapedJsonString<object>();
