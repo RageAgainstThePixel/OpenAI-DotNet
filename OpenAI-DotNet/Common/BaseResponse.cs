@@ -113,6 +113,7 @@ namespace OpenAI
         private TimeSpan ConvertTimestampToTimespan(string timestamp)
         {
             Match match = timestampRegex.Match(timestamp);
+
             if (!match.Success)
             {
                 throw new ArgumentException($"Could not parse timestamp header. '{timestamp}'.");
@@ -125,23 +126,27 @@ namespace OpenAI
              *  negative impact for a missing hours segment because the capture groups are flagged as optional.
              */
             int hours = 0;
+
             if (match.Groups.ContainsKey("hour"))
             {
                 hours = int.Parse(match.Groups["hour"].Value.Replace("h", string.Empty));
             }
 
             int minutes = 0;
+
             if (match.Groups.ContainsKey("mins"))
             {
                 minutes = int.Parse(match.Groups["mins"].Value.Replace("m", string.Empty));
             }
 
             int seconds = 0;
+
             if (match.Groups.ContainsKey("secs"))
             {
                 seconds = int.Parse(match.Groups["secs"].Value.Replace("s", string.Empty));
             }
             int ms = 0;
+
             if (match.Groups.ContainsKey("ms"))
             {
                 ms = int.Parse(match.Groups["ms"].Value.Replace("ms", string.Empty));
