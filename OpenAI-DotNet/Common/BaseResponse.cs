@@ -104,7 +104,6 @@ namespace OpenAI
         */
         private readonly Regex timestampRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m(?!s))?(?<secs>\d+s)?(?<ms>\d+ms)?");
 
-
         /// <summary>
         /// Takes a timestamp recieved from a OpenAI response header and converts to a TimeSpan
         /// </summary>
