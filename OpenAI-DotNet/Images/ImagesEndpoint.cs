@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -45,31 +46,38 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageEditAsync(ImageEditRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var imageData = new MemoryStream();
-            await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-            content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
+            using var payload = new MultipartFormDataContent();
 
-            if (request.Mask != null)
+            try
             {
-                using var maskData = new MemoryStream();
-                await request.Mask.CopyToAsync(maskData, cancellationToken).ConfigureAwait(false);
-                content.Add(new ByteArrayContent(maskData.ToArray()), "mask", request.MaskName);
+                using var imageData = new MemoryStream();
+                await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+                payload.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
+
+                if (request.Mask != null)
+                {
+                    using var maskData = new MemoryStream();
+                    await request.Mask.CopyToAsync(maskData, cancellationToken).ConfigureAwait(false);
+                    payload.Add(new ByteArrayContent(maskData.ToArray()), "mask", request.MaskName);
+                }
+
+                payload.Add(new StringContent(request.Prompt), "prompt");
+                payload.Add(new StringContent(request.Number.ToString()), "n");
+                payload.Add(new StringContent(request.Size), "size");
+                payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+
+                if (!string.IsNullOrWhiteSpace(request.User))
+                {
+                    payload.Add(new StringContent(request.User), "user");
+                }
+            }
+            finally
+            {
+                request.Dispose();
             }
 
-            content.Add(new StringContent(request.Prompt), "prompt");
-            content.Add(new StringContent(request.Number.ToString()), "n");
-            content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
-
-            if (!string.IsNullOrWhiteSpace(request.User))
-            {
-                content.Add(new StringContent(request.User), "user");
-            }
-
-            request.Dispose();
-            using var response = await client.Client.PostAsync(GetUrl("/edits"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, content, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl("/edits"), payload, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -80,22 +88,29 @@ namespace OpenAI.Images
         /// <returns>A list of generated texture urls to download.</returns>
         public async Task<IReadOnlyList<ImageResult>> CreateImageVariationAsync(ImageVariationRequest request, CancellationToken cancellationToken = default)
         {
-            using var content = new MultipartFormDataContent();
-            using var imageData = new MemoryStream();
-            await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-            content.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
-            content.Add(new StringContent(request.Number.ToString()), "n");
-            content.Add(new StringContent(request.Size), "size");
-            content.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+            using var payload = new MultipartFormDataContent();
 
-            if (!string.IsNullOrWhiteSpace(request.User))
+            try
             {
-                content.Add(new StringContent(request.User), "user");
+                using var imageData = new MemoryStream();
+                await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+                payload.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
+                payload.Add(new StringContent(request.Number.ToString()), "n");
+                payload.Add(new StringContent(request.Size), "size");
+                payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+
+                if (!string.IsNullOrWhiteSpace(request.User))
+                {
+                    payload.Add(new StringContent(request.User), "user");
+                }
+            }
+            finally
+            {
+                request.Dispose();
             }
 
-            request.Dispose();
-            using var response = await client.Client.PostAsync(GetUrl("/variations"), content, cancellationToken).ConfigureAwait(false);
-            return await DeserializeResponseAsync(response, content, cancellationToken).ConfigureAwait(false);
+            using var response = await client.Client.PostAsync(GetUrl("/variations"), payload, cancellationToken).ConfigureAwait(false);
+            return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<IReadOnlyList<ImageResult>> DeserializeResponseAsync(HttpResponseMessage response, HttpContent requestContent, CancellationToken cancellationToken = default)
