@@ -28,7 +28,8 @@ namespace OpenAI
         public string Organization { get; internal set; }
 
         /// <summary>
-        /// The request id of this API call, as reported in the response headers.  This may be useful for troubleshooting or when contacting OpenAI support in reference to a specific request.
+        /// The request id of this API call, as reported in the response headers.
+        /// This may be useful for troubleshooting or when contacting OpenAI support in reference to a specific request.
         /// </summary>
         [JsonIgnore]
         public string RequestId { get; internal set; }
@@ -88,31 +89,31 @@ namespace OpenAI
         public TimeSpan ResetTokensTimespan => ConvertTimestampToTimespan(ResetTokens);
 
         /*
-        * Regex Notes: 
-        *  The gist of this regex is that it is searching for "timestamp segments", eg 1m or 144ms.
+        * Regex Notes:
+        *  The gist of this regex is that it is searching for "timestamp segments", e.g. 1m or 144ms.
         *  Each segment gets matched into its respective named capture group, from which we further parse out the 
         *  digits. This allows us to take the string 6m45s99ms and insert the integers into a 
         *  TimeSpan object for easier use.
-        *  
+        *
         *  Regex Performance Notes, against 100k randomly generated timestamps:
         *  Average performance: 0.0003ms
         *  Best case: 0ms
         *  Worst Case: 15ms
         *  Total Time: 30ms
-        *  
+        *
         *  Inconsequential compute time
         */
-        private readonly Regex timestampRegex = new Regex(@"^(?<hour>\d+h)?(?<mins>\d+m(?!s))?(?<secs>\d+s)?(?<ms>\d+ms)?");
+        private readonly Regex timestampRegex = new Regex(@"^(?<h>\d+h)?(?<m>\d+m(?!s))?(?<s>\d+s)?(?<ms>\d+ms)?");
 
         /// <summary>
-        /// Takes a timestamp recieved from a OpenAI response header and converts to a TimeSpan
+        /// Takes a timestamp received from a OpenAI response header and converts to a TimeSpan
         /// </summary>
-        /// <param name="timestamp">The timestamp received from an OpenAI header, eg x-ratelimit-reset-tokens</param>
+        /// <param name="timestamp">The timestamp received from an OpenAI header, e.g. x-ratelimit-reset-tokens</param>
         /// <returns>A TimeSpan that represents the timestamp provided</returns>
         /// <exception cref="ArgumentException">Thrown if the provided timestamp is not in the expected format, or if the match is not successful.</exception>
         private TimeSpan ConvertTimestampToTimespan(string timestamp)
         {
-            Match match = timestampRegex.Match(timestamp);
+            var match = timestampRegex.Match(timestamp);
 
             if (!match.Success)
             {
@@ -121,38 +122,15 @@ namespace OpenAI
 
             /*
              * Note about Hours in timestamps:
-             *  I have not personally observed a timestamp with an hours segment (eg. 1h30m15s1ms).
-             *  Although their presense may not actually exist, we can still have this section in the parser, there is no
+             *  I have not personally observed a timestamp with an hours segment (e.g. 1h30m15s1ms).
+             *  Although their presence may not actually exist, we can still have this section in the parser, there is no
              *  negative impact for a missing hours segment because the capture groups are flagged as optional.
              */
-            int hours = 0;
-
-            if (match.Groups.ContainsKey("hour"))
-            {
-                hours = int.Parse(match.Groups["hour"].Value.Replace("h", string.Empty));
-            }
-
-            int minutes = 0;
-
-            if (match.Groups.ContainsKey("mins"))
-            {
-                minutes = int.Parse(match.Groups["mins"].Value.Replace("m", string.Empty));
-            }
-
-            int seconds = 0;
-
-            if (match.Groups.ContainsKey("secs"))
-            {
-                seconds = int.Parse(match.Groups["secs"].Value.Replace("s", string.Empty));
-            }
-            int ms = 0;
-
-            if (match.Groups.ContainsKey("ms"))
-            {
-                ms = int.Parse(match.Groups["ms"].Value.Replace("ms", string.Empty));
-            }
-
-            return new TimeSpan(hours, minutes, seconds) + TimeSpan.FromMilliseconds(ms);
+            int.TryParse(match.Groups["h"].Value.Replace("h", string.Empty), out var h);
+            int.TryParse(match.Groups["m"].Value.Replace("m", string.Empty), out var m);
+            int.TryParse(match.Groups["s"].Value.Replace("s", string.Empty), out var s);
+            int.TryParse(match.Groups["ms"].Value.Replace("ms", string.Empty), out var ms);
+            return new TimeSpan(h, m, s) + TimeSpan.FromMilliseconds(ms);
         }
 
         public string ToJsonString()
