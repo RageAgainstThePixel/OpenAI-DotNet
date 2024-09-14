@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.2.4</Version>
+    <Version>8.2.5</Version>
     <PackageReleaseNotes>
+Version 8.2.5
+- Fixed ResponseObjectFormat deserialization when maxNumberOfResults is null
 Version 8.2.4
 - Fixed ResponseObjectFormat deserialization when set to auto
 - Added RankingOptions to FileSearchOptions
