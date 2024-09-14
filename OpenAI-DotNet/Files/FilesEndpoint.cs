@@ -87,14 +87,22 @@ namespace OpenAI.Files
         /// <returns><see cref="FileResponse"/>.</returns>
         public async Task<FileResponse> UploadFileAsync(FileUploadRequest request, CancellationToken cancellationToken = default)
         {
-            using var fileData = new MemoryStream();
-            using var content = new MultipartFormDataContent();
-            await request.File.CopyToAsync(fileData, cancellationToken).ConfigureAwait(false);
-            content.Add(new StringContent(request.Purpose), "purpose");
-            content.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
-            request.Dispose();
-            using var response = await client.Client.PostAsync(GetUrl(), content, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, content, cancellationToken).ConfigureAwait(false);
+            using var payload = new MultipartFormDataContent();
+
+            try
+            {
+                using var fileData = new MemoryStream();
+                await request.File.CopyToAsync(fileData, cancellationToken).ConfigureAwait(false);
+                payload.Add(new StringContent(request.Purpose), "purpose");
+                payload.Add(new ByteArrayContent(fileData.ToArray()), "file", request.FileName);
+            }
+            finally
+            {
+                request.Dispose();
+            }
+
+            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return response.Deserialize<FileResponse>(responseAsString, client);
         }
 
