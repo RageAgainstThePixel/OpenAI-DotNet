@@ -9,7 +9,6 @@ namespace OpenAI
 {
     public abstract class BaseResponse
     {
-
         /// <summary>
         /// The <see cref="OpenAIClient"/> this response was generated from.
         /// </summary>
@@ -87,8 +86,6 @@ namespace OpenAI
         /// </summary>
         [JsonIgnore]
         public TimeSpan ResetTokensTimespan => ConvertTimestampToTimespan(ResetTokens);
-
-
 
         /*
         * Regex Notes: 
