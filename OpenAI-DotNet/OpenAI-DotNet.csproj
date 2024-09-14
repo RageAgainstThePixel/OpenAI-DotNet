@@ -35,6 +35,7 @@ Version 8.2.3
 - Fixed ResponseObjectFormat deserialization when set to auto
 - Added RankingOptions to FileSearchOptions
 - Fixed potential memory leaks when uploading files to various endpoints
+- Added timestamp values to BaseResponse to calculate rate limits
 Version 8.2.2
 - Added generic parameters to methods that support structured output
 Version 8.2.1
