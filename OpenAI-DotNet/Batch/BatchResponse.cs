@@ -53,7 +53,7 @@ namespace OpenAI.Batch
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<BatchStatus>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<BatchStatus>))]
         public BatchStatus Status { get; private set; }
 
         /// <summary>

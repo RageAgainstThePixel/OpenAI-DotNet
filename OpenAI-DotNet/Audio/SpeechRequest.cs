@@ -49,7 +49,7 @@ namespace OpenAI.Audio
         /// </summary>
         [JsonPropertyName("response_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        [JsonConverter(typeof(JsonStringEnumConverter<SpeechResponseFormat>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<SpeechResponseFormat>))]
         public SpeechResponseFormat ResponseFormat { get; }
 
         /// <summary>

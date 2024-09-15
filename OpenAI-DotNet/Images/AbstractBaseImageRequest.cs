@@ -68,7 +68,7 @@ namespace OpenAI.Images
         /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </summary>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ImageResponseFormat>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ImageResponseFormat>))]
         [FunctionProperty("The format in which the generated images are returned. Must be one of url or b64_json.")]
         public ImageResponseFormat ResponseFormat { get; }
 

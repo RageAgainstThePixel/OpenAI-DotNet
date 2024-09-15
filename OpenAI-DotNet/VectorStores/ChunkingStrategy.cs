@@ -23,7 +23,7 @@ namespace OpenAI.VectorStores
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ChunkingStrategyType>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ChunkingStrategyType>))]
         public ChunkingStrategyType Type { get; private set; }
 
         [JsonInclude]

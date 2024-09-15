@@ -59,7 +59,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ContentType>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ContentType>))]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public ContentType Type { get; private set; }
 

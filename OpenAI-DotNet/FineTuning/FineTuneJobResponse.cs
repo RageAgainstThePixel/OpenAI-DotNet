@@ -56,7 +56,7 @@ namespace OpenAI.FineTuning
 
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<JobStatus>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<JobStatus>))]
         public JobStatus Status { get; private set; }
 
         [JsonInclude]

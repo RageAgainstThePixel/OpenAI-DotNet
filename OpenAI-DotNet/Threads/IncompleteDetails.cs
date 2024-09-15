@@ -7,7 +7,7 @@ namespace OpenAI.Threads
     {
         [JsonInclude]
         [JsonPropertyName("reason")]
-        [JsonConverter(typeof(JsonStringEnumConverter<IncompleteMessageReason>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<IncompleteMessageReason>))]
         public IncompleteMessageReason Reason { get; private set; }
     }
 }
