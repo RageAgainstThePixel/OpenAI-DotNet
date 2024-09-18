@@ -315,10 +315,6 @@ namespace OpenAI
                 Console.WriteLine(e);
                 return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
-            finally
-            {
-                Arguments = null;
-            }
         }
 
         /// <summary>
@@ -343,10 +339,6 @@ namespace OpenAI
             {
                 Console.WriteLine(e);
                 throw;
-            }
-            finally
-            {
-                Arguments = null;
             }
         }
 
@@ -374,10 +366,6 @@ namespace OpenAI
                 Console.WriteLine(e);
                 return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
-            finally
-            {
-                Arguments = null;
-            }
         }
 
         /// <summary>
@@ -403,10 +391,6 @@ namespace OpenAI
             {
                 Console.WriteLine(e);
                 throw;
-            }
-            finally
-            {
-                Arguments = null;
             }
         }
 

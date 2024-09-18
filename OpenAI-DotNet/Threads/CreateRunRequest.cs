@@ -169,9 +169,7 @@ namespace OpenAI.Threads
                     }
                 }
 
-                Tools = toolList.ToList();
-
-                foreach (var tool in Tools)
+                foreach (var tool in toolList)
                 {
                     if (tool?.Function?.Arguments != null)
                     {
@@ -181,6 +179,7 @@ namespace OpenAI.Threads
                 }
             }
 
+            Tools = toolList?.ToList();
             Metadata = metadata;
             Temperature = temperature;
             TopP = topP;
