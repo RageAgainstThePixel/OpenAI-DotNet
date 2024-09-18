@@ -147,7 +147,7 @@ namespace OpenAI.Threads
 
             var toolList = tools?.ToList();
 
-            if (toolList != null && toolList.Any())
+            if (toolList is { Count: > 0 })
             {
                 if (string.IsNullOrWhiteSpace(toolChoice))
                 {
@@ -168,14 +168,14 @@ namespace OpenAI.Threads
                         ToolChoice = toolChoice;
                     }
                 }
-            }
 
-            Tools = toolList?.ToList();
+                Tools = toolList?.ToList();
 
-            foreach (var tool in Tools)
-            {
-                // just in case clear any lingering func args.
-                tool.Function.Arguments = null;
+                foreach (var tool in Tools)
+                {
+                    // just in case clear any lingering func args.
+                    tool.Function.Arguments = null;
+                }
             }
 
             ToolResources = toolResources;
