@@ -15,7 +15,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
 
 ## Requirements
 
-- This library targets .NET 6.0 and above.
+- This library targets .NET 8.0 and above.
 - It should work across console apps, winforms, wpf, asp.net, etc.
 - It should also work across Windows, Linux, and Mac.
 
