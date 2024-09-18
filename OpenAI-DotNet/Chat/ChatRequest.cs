@@ -60,6 +60,12 @@ namespace OpenAI.Chat
             }
 
             Tools = toolList?.ToList();
+
+            foreach (var tool in Tools)
+            {
+                // just in case clear any lingering func args.
+                tool.Function.Arguments = null;
+            }
         }
 
         /// <summary>
