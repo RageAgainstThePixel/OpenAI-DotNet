@@ -175,11 +175,11 @@ namespace OpenAI
 
         #region Tool Cache
 
-        private static readonly List<Tool> toolCache = new()
-        {
+        private static readonly List<Tool> toolCache =
+        [
             FileSearch,
             CodeInterpreter
-        };
+        ];
 
         /// <summary>
         /// Gets a list of all available tools.
