@@ -169,12 +169,15 @@ namespace OpenAI.Threads
                     }
                 }
 
-                Tools = toolList?.ToList();
+                Tools = toolList.ToList();
 
                 foreach (var tool in Tools)
                 {
-                    // just in case clear any lingering func args.
-                    tool.Function.Arguments = null;
+                    if (tool?.Function?.Arguments != null)
+                    {
+                        // just in case clear any lingering func args.
+                        tool.Function.Arguments = null;
+                    }
                 }
             }
 
