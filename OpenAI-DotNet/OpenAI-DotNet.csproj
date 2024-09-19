@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Title>OpenAI-DotNet</Title>
     <Product>OpenAI-DotNet</Product>
@@ -29,8 +29,14 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.2.5</Version>
+    <Version>8.3.0</Version>
     <PackageReleaseNotes>
+Version 8.3.0
+- Updated library to .net 8
+- Refactored TypeExtensions and JsonSchema generation
+  - Improved JsonSchema generation for enums and dictionaries
+  - Ensured JsonSchema properly handles nullable types
+- Ensure that function args are not re-serialized and passed back into tool function for future calls
 Version 8.2.5
 - Fixed ResponseObjectFormat deserialization when maxNumberOfResults is null
 Version 8.2.4

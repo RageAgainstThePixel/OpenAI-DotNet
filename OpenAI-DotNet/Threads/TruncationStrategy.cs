@@ -1,4 +1,5 @@
-using OpenAI.Extensions;
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -13,7 +14,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<TruncationStrategies>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<TruncationStrategies>))]
         public TruncationStrategies Type { get; private set; }
 
         /// <summary>

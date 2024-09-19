@@ -1,6 +1,5 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +55,7 @@ namespace OpenAI.FineTuning
 
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<JobStatus>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<JobStatus>))]
         public JobStatus Status { get; private set; }
 
         [JsonInclude]

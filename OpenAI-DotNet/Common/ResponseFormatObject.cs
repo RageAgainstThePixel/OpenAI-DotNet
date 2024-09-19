@@ -1,6 +1,5 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
@@ -26,7 +25,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ChatResponseFormat>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ChatResponseFormat>))]
         public ChatResponseFormat Type { get; private set; }
 
         [JsonInclude]

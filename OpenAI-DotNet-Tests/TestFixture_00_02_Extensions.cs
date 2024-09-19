@@ -146,5 +146,51 @@ namespace OpenAI.Tests
             JsonSchema mathSchema = typeof(MathResponse);
             Console.WriteLine(mathSchema.ToString());
         }
+
+        [Test]
+        public void Test_02_02_GenerateJsonSchema_PrimitiveTypes()
+        {
+            JsonSchema schema = typeof(TestSchema);
+            Console.WriteLine(schema.ToString());
+        }
+
+        private class TestSchema
+        {
+            // test all primitive types can be serialized
+            public bool Bool { get; set; }
+            public byte Byte { get; set; }
+            public sbyte SByte { get; set; }
+            public short Short { get; set; }
+            public ushort UShort { get; set; }
+            public int Integer { get; set; }
+            public uint UInteger { get; set; }
+            public long Long { get; set; }
+            public ulong ULong { get; set; }
+            public float Float { get; set; }
+            public double Double { get; set; }
+            public decimal Decimal { get; set; }
+            public char Char { get; set; }
+            public string String { get; set; }
+            public DateTime DateTime { get; set; }
+            public DateTimeOffset DateTimeOffset { get; set; }
+            public Guid Guid { get; set; }
+            // test nullables
+            public int? NullInt { get; set; }
+            public DateTime? NullDateTime { get; set; }
+            public TestEnum TestEnum { get; set; }
+            public TestEnum? NullEnum { get; set; }
+            public Dictionary<string, object> Dictionary { get; set; }
+            public IDictionary<string, int> IntDictionary { get; set; }
+            public IReadOnlyDictionary<string, string> StringDictionary { get; set; }
+            public Dictionary<string, MathResponse> CustomDictionary { get; set; }
+        }
+
+        private enum TestEnum
+        {
+            Enum1,
+            Enum2,
+            Enum3,
+            Enum4
+        }
     }
 }

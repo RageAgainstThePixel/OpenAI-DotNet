@@ -1,6 +1,5 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using OpenAI.Models;
 using System;
 using System.Text.Json.Serialization;
@@ -49,7 +48,7 @@ namespace OpenAI.Audio
         /// </summary>
         [JsonPropertyName("response_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        [JsonConverter(typeof(JsonStringEnumConverter<SpeechResponseFormat>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<SpeechResponseFormat>))]
         public SpeechResponseFormat ResponseFormat { get; }
 
         /// <summary>

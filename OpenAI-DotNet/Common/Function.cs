@@ -92,6 +92,7 @@ namespace OpenAI
         {
             Name = name;
             Arguments = arguments;
+            Strict = strict;
         }
 
         private Function(string name, string description, MethodInfo method, object instance = null, bool? strict = null)

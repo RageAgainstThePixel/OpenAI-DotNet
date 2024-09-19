@@ -1,6 +1,5 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.VectorStores
@@ -23,7 +22,7 @@ namespace OpenAI.VectorStores
 
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<ChunkingStrategyType>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ChunkingStrategyType>))]
         public ChunkingStrategyType Type { get; private set; }
 
         [JsonInclude]

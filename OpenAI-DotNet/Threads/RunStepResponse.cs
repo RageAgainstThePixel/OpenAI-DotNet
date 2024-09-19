@@ -1,6 +1,5 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -74,7 +73,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        [JsonConverter(typeof(JsonStringEnumConverter<RunStepType>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RunStepType>))]
         public RunStepType Type { get; private set; }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<RunStatus>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RunStatus>))]
         public RunStatus Status { get; private set; }
 
         /// <summary>

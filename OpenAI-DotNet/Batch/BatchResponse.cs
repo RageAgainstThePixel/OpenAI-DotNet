@@ -1,6 +1,5 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -53,7 +52,7 @@ namespace OpenAI.Batch
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
-        [JsonConverter(typeof(JsonStringEnumConverter<BatchStatus>))]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<BatchStatus>))]
         public BatchStatus Status { get; private set; }
 
         /// <summary>
