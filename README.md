@@ -10,7 +10,7 @@ A simple C# .NET client library for [OpenAI](https://openai.com/) to use though 
 Independently developed, this is not an official library and I am not affiliated with OpenAI.
 An OpenAI API account is required.
 
-Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
+Originally Forked from [OpenAI-API-dotnet](https://github.com/OkGoDoIt/OpenAI-API-dotnet).
 More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-api).
 
 ## Requirements
@@ -45,7 +45,7 @@ dotnet add package OpenAI-DotNet
 
 > Check out our new api docs!
 
-<https://rageagainstthepixel.github.io/OpenAI-DotNet> :new:
+<https://rageagainstthepixel.github.io/OpenAI-DotNet>
 
 ### Table of Contents
 
@@ -83,7 +83,7 @@ dotnet add package OpenAI-DotNet
       - [Retrieve Run](#retrieve-thread-run)
       - [Modify Run](#modify-thread-run)
       - [Submit Tool Outputs to Run](#thread-submit-tool-outputs-to-run)
-      - [Structured Outputs](#thread-structured-outputs) :new:
+      - [Structured Outputs](#thread-structured-outputs)
       - [List Run Steps](#list-thread-run-steps)
       - [Retrieve Run Step](#retrieve-thread-run-step)
       - [Cancel Run](#cancel-thread-run)
@@ -108,7 +108,7 @@ dotnet add package OpenAI-DotNet
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools)
   - [Vision](#chat-vision)
-  - [Json Schema](#chat-structured-outputs) :new:
+  - [Json Schema](#chat-structured-outputs)
   - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
   - [Create Speech](#create-speech)
@@ -847,7 +847,8 @@ public class MathStep
 To use, simply specify the `MathResponse` type as a generic constraint in either `CreateAssistantAsync`, `CreateRunAsync`, or `CreateThreadAndRunAsync`.
 
 ```csharp
-var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync<MathResponse>(
+using var api = new OpenAIClient();
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync<MathResponse>(
     new CreateAssistantRequest(
         name: "Math Tutor",
         instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
@@ -916,6 +917,81 @@ finally
 }
 ```
 
+You can also manually create json schema json string as well, but you will be responsible for deserializing your response data:
+
+```csharp
+using var api = new OpenAIClient();
+var mathSchema = new JsonSchema("math_response", @"
+{
+  ""type"": ""object"",
+  ""properties"": {
+    ""steps"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""explanation"": {
+            ""type"": ""string""
+          },
+          ""output"": {
+            ""type"": ""string""
+          }
+        },
+        ""required"": [
+          ""explanation"",
+          ""output""
+        ],
+        ""additionalProperties"": false
+      }
+    },
+    ""final_answer"": {
+      ""type"": ""string""
+    }
+  },
+  ""required"": [
+    ""steps"",
+    ""final_answer""
+  ],
+  ""additionalProperties"": false
+}");
+var assistant = await api.AssistantsEndpoint.CreateAssistantAsync(
+    new CreateAssistantRequest(
+        name: "Math Tutor",
+        instructions: "You are a helpful math tutor. Guide the user through the solution step by step.",
+        model: "gpt-4o-2024-08-06",
+        jsonSchema: mathSchema));
+ThreadResponse thread = null;
+
+try
+{
+    var run = await assistant.CreateThreadAndRunAsync("how can I solve 8x + 7 = -23",
+        async @event =>
+        {
+            Console.WriteLine(@event.ToJsonString());
+            await Task.CompletedTask;
+        });
+    thread = await run.GetThreadAsync();
+    run = await run.WaitForStatusChangeAsync();
+    Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
+    var messages = await thread.ListMessagesAsync();
+
+    foreach (var response in messages.Items)
+    {
+        Console.WriteLine($"{response.Role}: {response.PrintContent()}");
+    }
+}
+finally
+{
+    await assistant.DeleteAsync(deleteToolResources: thread == null);
+
+    if (thread != null)
+    {
+        var isDeleted = await thread.DeleteAsync(deleteToolResources: true);
+        Assert.IsTrue(isDeleted);
+    }
+}
+```
+
 ###### [List Thread Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps)
 
 Returns a list of run steps belonging to a run.
@@ -971,7 +1047,7 @@ Returns a list of vector stores.
 
 ```csharp
 using var api = new OpenAIClient();
-var vectorStores = await OpenAIClient.VectorStoresEndpoint.ListVectorStoresAsync();
+var vectorStores = await api.VectorStoresEndpoint.ListVectorStoresAsync();
 
 foreach (var vectorStore in vectorStores.Items)
 {
@@ -1182,7 +1258,7 @@ var messages = new List<Message>
 };
 var cumulativeDelta = string.Empty;
 var chatRequest = new ChatRequest(messages);
-await foreach (var partialResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
+await foreach (var partialResponse in api.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
 {
     foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
     {
@@ -1326,6 +1402,7 @@ public class MathStep
 To use, simply specify the `MathResponse` type as a generic constraint when requesting a completion.
 
 ```csharp
+using var api = new OpenAIClient();
 var messages = new List<Message>
 {
     new(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
@@ -1333,7 +1410,7 @@ var messages = new List<Message>
 };
 
 var chatRequest = new ChatRequest<MathResponse>(messages, model: new("gpt-4o-2024-08-06"));
-var (mathResponse, chatResponse) = await OpenAIClient.ChatEndpoint.GetCompletionAsync<MathResponse>(chatRequest);
+var (mathResponse, chatResponse) = await api.ChatEndpoint.GetCompletionAsync<MathResponse>(chatRequest);
 
 for (var i = 0; i < mathResponse.Steps.Count; i++)
 {
@@ -1531,7 +1608,7 @@ Returns information about a specific file.
 
 ```csharp
 using var api = new OpenAIClient();
-var file = await  api.FilesEndpoint.GetFileInfoAsync(fileId);
+var file = await api.FilesEndpoint.GetFileInfoAsync(fileId);
 Console.WriteLine($"{file.Id} -> {file.Object}: {file.FileName} | {file.Size} bytes");
 ```
 
@@ -1631,7 +1708,7 @@ List your organization's batches.
 
 ```csharp
 using var api = new OpenAIClient();
-var batches = await api.await OpenAIClient.BatchEndpoint.ListBatchesAsync();
+var batches = await api.BatchEndpoint.ListBatchesAsync();
 
 foreach (var batch in listResponse.Items)
 {
