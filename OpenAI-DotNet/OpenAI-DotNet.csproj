@@ -36,6 +36,7 @@ Version 8.3.0
 - Refactored TypeExtensions and JsonSchema generation
   - Improved JsonSchema generation for enums and dictionaries
   - Ensured JsonSchema properly handles nullable types
+- Ensure that function args are not re-serialized and passed back into tool function for future calls
 Version 8.2.5
 - Fixed ResponseObjectFormat deserialization when maxNumberOfResults is null
 Version 8.2.4
