@@ -1409,7 +1409,7 @@ var messages = new List<Message>
     new(Role.User, "how can I solve 8x + 7 = -23")
 };
 
-var chatRequest = new ChatRequest<MathResponse>(messages, model: new("gpt-4o-2024-08-06"));
+var chatRequest = new ChatRequest(messages, model: "gpt-4o-2024-08-06");
 var (mathResponse, chatResponse) = await api.ChatEndpoint.GetCompletionAsync<MathResponse>(chatRequest);
 
 for (var i = 0; i < mathResponse.Steps.Count; i++)
