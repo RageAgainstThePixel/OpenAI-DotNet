@@ -11,9 +11,11 @@ using OpenAI.FineTuning;
 using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
+using OpenAI.Realtime;
 using OpenAI.Threads;
 using OpenAI.VectorStores;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -53,12 +55,12 @@ namespace OpenAI
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
             OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
 
-            if (OpenAIAuthentication?.ApiKey is null)
+            if (string.IsNullOrWhiteSpace(OpenAIAuthentication?.ApiKey))
             {
                 throw new AuthenticationException("You must provide API authentication.  Please refer to https://github.com/RageAgainstThePixel/OpenAI-DotNet#authentication for details.");
             }
 
-            Client = SetupClient(client);
+            Client = SetupHttpClient(client);
             ModelsEndpoint = new ModelsEndpoint(this);
             ChatEndpoint = new ChatEndpoint(this);
             ImagesEndPoint = new ImagesEndpoint(this);
@@ -71,6 +73,7 @@ namespace OpenAI
             AssistantsEndpoint = new AssistantsEndpoint(this);
             BatchEndpoint = new BatchEndpoint(this);
             VectorStoresEndpoint = new VectorStoresEndpoint(this);
+            RealtimeEndpoint = new RealtimeEndpoint(this);
         }
 
         ~OpenAIClient() => Dispose(false);
@@ -210,9 +213,11 @@ namespace OpenAI
         /// </summary>
         public VectorStoresEndpoint VectorStoresEndpoint { get; }
 
+        public RealtimeEndpoint RealtimeEndpoint { get; }
+
         #endregion Endpoints
 
-        private HttpClient SetupClient(HttpClient client = null)
+        private HttpClient SetupHttpClient(HttpClient client = null)
         {
             if (client == null)
             {
@@ -258,5 +263,16 @@ namespace OpenAI
 
             return client;
         }
+
+        internal WebSocket CreateWebSocket(string url)
+            => new(url, new Dictionary<string, string>
+            {
+                { "User-Agent", "OpenAI-DotNet" },
+                { "OpenAI-Beta", "realtime=v1" },
+                { "Authorization", $"Bearer {OpenAIAuthentication.ApiKey}" }
+            }, new List<string>
+            {
+                "realtime"
+            });
     }
 }

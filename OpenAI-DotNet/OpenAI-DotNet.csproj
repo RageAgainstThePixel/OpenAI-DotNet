@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.3.0</Version>
+    <Version>8.4.0</Version>
     <PackageReleaseNotes>
+Version 8.4.0
+- Added Realtime API support
 Version 8.3.0
 - Updated library to .net 8
 - Refactored TypeExtensions and JsonSchema generation

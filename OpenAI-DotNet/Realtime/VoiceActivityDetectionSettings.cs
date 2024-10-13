@@ -1,0 +1,41 @@
+﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System.Text.Json.Serialization;
+
+namespace OpenAI.Realtime
+{
+    public sealed class VoiceActivityDetectionSettings
+    {
+        public VoiceActivityDetectionSettings(
+            TurnDetectionType type = TurnDetectionType.Server_VAD,
+            float? detectionThreshold = null,
+            int? prefixPadding = null,
+            int? silenceDuration = null)
+        {
+            switch (type)
+            {
+                case TurnDetectionType.Server_VAD:
+                    Type = TurnDetectionType.Server_VAD;
+                    DetectionThreshold = detectionThreshold;
+                    PrefixPadding = prefixPadding;
+                    SilenceDuration = silenceDuration;
+                    break;
+            }
+        }
+
+        [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public TurnDetectionType Type { get; }
+
+        [JsonPropertyName("threshold")]
+        public float? DetectionThreshold { get; }
+
+        [JsonPropertyName("prefix_padding_ms")]
+        public int? PrefixPadding { get; }
+
+        [JsonPropertyName("silence_duration_ms")]
+        public int? SilenceDuration { get; }
+
+        public static VoiceActivityDetectionSettings Disabled() => new(TurnDetectionType.Disabled);
+    }
+}
