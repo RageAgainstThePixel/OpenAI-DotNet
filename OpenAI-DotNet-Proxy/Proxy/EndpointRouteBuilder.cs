@@ -84,7 +84,7 @@ namespace OpenAI.Proxy
                         request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
                     }
 
-                    var proxyResponse = await openAIClient.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                    var proxyResponse = await openAIClient.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted).ConfigureAwait(false);
                     httpContext.Response.StatusCode = (int)proxyResponse.StatusCode;
 
                     foreach (var (key, value) in proxyResponse.Headers)
@@ -109,7 +109,7 @@ namespace OpenAI.Proxy
                     }
                     else
                     {
-                        await proxyResponse.Content.CopyToAsync(httpContext.Response.Body).ConfigureAwait(false);
+                        await proxyResponse.Content.CopyToAsync(httpContext.Response.Body, httpContext.RequestAborted).ConfigureAwait(false);
                     }
                 }
                 catch (AuthenticationException authenticationException)
