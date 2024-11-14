@@ -27,7 +27,6 @@ namespace OpenAI.Extensions
 
         public override void Write(Utf8JsonWriter writer, ResponseFormatObject value, JsonSerializerOptions options)
         {
-            // serialize the object normally
             JsonSerializer.Serialize(writer, value, options);
         }
     }

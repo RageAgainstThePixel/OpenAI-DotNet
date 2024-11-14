@@ -1,10 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,9 +13,17 @@ namespace OpenAI.Realtime
 
         protected override string Root => "realtime";
 
-        public async Task<RealtimeSession> CreateSessionAsync(RealtimeSessionOptions options, CancellationToken cancellationToken = default)
+        protected override bool? IsWebSocketEndpoint => true;
+
+        /// <summary>
+        /// Creates a new realtime session with the provided <see cref="Options"/> options.
+        /// </summary>
+        /// <param name="options"><see cref="Options"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="RealtimeSession"/>.</returns>
+        public async Task<RealtimeSession> CreateSessionAsync(Options options = null, CancellationToken cancellationToken = default)
         {
-            var model = options.Model;
+            string model = string.IsNullOrWhiteSpace(options?.Model) ? Models.Model.GPT4oRealtime : options!.Model;
             var queryParameters = new Dictionary<string, string>();
 
             if (client.OpenAIClientSettings.IsAzureOpenAI)
@@ -30,93 +35,54 @@ namespace OpenAI.Realtime
                 queryParameters["model"] = model;
             }
 
-            var session = new RealtimeSession(client.CreateWebSocket(GetUrl(queryParameters: queryParameters)));
-            await session.ConnectAsync(cancellationToken);
+            var session = new RealtimeSession(client.CreateWebSocket(GetUrl(queryParameters: queryParameters)), EnableDebug);
+            var sessionCreatedTcs = new TaskCompletionSource<SessionResponse>();
+
+            try
+            {
+                session.OnEventReceived += OnEventReceived;
+                session.OnError += OnError;
+                await session.ConnectAsync(cancellationToken).ConfigureAwait(true);
+                var sessionResponse = await sessionCreatedTcs.Task; // TODO .WithCancellation(cancellationToken).ConfigureAwait(true);
+                session.Options = sessionResponse.Options;
+                await session.SendAsync(new UpdateSessionRequest(options), cancellationToken: cancellationToken).ConfigureAwait(true);
+            }
+            finally
+            {
+                session.OnError -= OnError;
+                session.OnEventReceived -= OnEventReceived;
+            }
+
             return session;
-        }
-    }
 
-    public sealed class RealtimeSession : IDisposable
-    {
-        public event Action<IRealtimeEvent> OnEventReceived;
-
-        private readonly WebSocket websocketClient;
-
-        internal RealtimeSession(WebSocket wsClient)
-        {
-            websocketClient = wsClient;
-            websocketClient.OnMessage += OnMessage;
-        }
-
-        private void OnMessage(DataFrame dataFrame)
-        {
-            if (dataFrame.Type == OpCode.Text)
+            void OnError(Exception e)
             {
-                var message = JsonSerializer.Deserialize<IRealtimeEvent>(dataFrame.Text);
-                OnEventReceived?.Invoke(message);
+                sessionCreatedTcs.SetException(e);
+            }
+
+            void OnEventReceived(IRealtimeEvent @event)
+            {
+                try
+                {
+                    switch (@event)
+                    {
+                        case SessionResponse sessionResponse:
+                            if (sessionResponse.Type == "session.created")
+                            {
+                                sessionCreatedTcs.TrySetResult(sessionResponse);
+                            }
+                            break;
+                        case RealtimeEventError realtimeEventError:
+                            sessionCreatedTcs.TrySetException(new Exception(realtimeEventError.Error.Message));
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    sessionCreatedTcs.TrySetException(e);
+                }
             }
         }
-
-        ~RealtimeSession() => Dispose(false);
-
-        #region IDisposable
-
-        private bool isDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!isDisposed && disposing)
-            {
-                websocketClient.Dispose();
-                isDisposed = true;
-            }
-        }
-
-        #endregion IDisposable
-
-        #region Session Properties
-
-        public string Id { get; private set; }
-
-        #endregion Session Properties
-
-        #region Internal Websockets
-
-        internal Task ConnectAsync(CancellationToken cancellationToken)
-        {
-            return websocketClient.ConnectAsync(cancellationToken);
-        }
-
-        #endregion Internal Websockets
-    }
-
-    public interface IRealtimeEvent
-    {
-        public string EventId { get; }
-        public string Type { get; }
-        public string ToJsonString();
-    }
-
-    public sealed class SessionResponse : IRealtimeEvent
-    {
-        [JsonInclude]
-        [JsonPropertyName("event_id")]
-        public string EventId { get; }
-
-        [JsonInclude]
-        [JsonPropertyName("type")]
-        public string Type { get; }
-
-        [JsonInclude]
-        [JsonPropertyName("session")]
-        public RealtimeSessionOptions Session { get; }
-
-        public string ToJsonString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
     }
 }

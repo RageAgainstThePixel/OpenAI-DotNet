@@ -116,7 +116,12 @@ namespace OpenAI
         internal static JsonSerializerOptions JsonSerializationOptions { get; } = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters = { new JsonStringEnumConverterFactory() },
+            Converters =
+            {
+                new JsonStringEnumConverterFactory(),
+                new RealtimeClientEventConverter(),
+                new RealtimeServerEventConverter()
+            },
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
 
@@ -139,7 +144,7 @@ namespace OpenAI
 
         /// <summary>
         /// List and describe the various models available in the API.
-        /// You can refer to the Models documentation to understand what <see href="https://platform.openai.com/docs/models"/> are available and the differences between them.<br/>
+        /// You can refer to the Models documentation to understand which models are available for certain endpoints: <see href="https://platform.openai.com/docs/models/model-endpoint-compatibility"/>.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/models"/>
         /// </summary>
         public ModelsEndpoint ModelsEndpoint { get; }
@@ -176,8 +181,7 @@ namespace OpenAI
 
         /// <summary>
         /// Manage fine-tuning jobs to tailor a model to your specific training data.<br/>
-        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/><br/>
-        /// <see href="https://platform.openai.com/docs/api-reference/fine-tuning"/>
+        /// <see href="https://platform.openai.com/docs/guides/fine-tuning"/>
         /// </summary>
         public FineTuningEndpoint FineTuningEndpoint { get; }
 
@@ -189,16 +193,16 @@ namespace OpenAI
         public ModerationsEndpoint ModerationsEndpoint { get; }
 
         /// <summary>
-        /// Build assistants that can call models and use tools to perform tasks.<br/>
-        /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
-        /// </summary>
-        public AssistantsEndpoint AssistantsEndpoint { get; }
-
-        /// <summary>
         /// Create threads that assistants can interact with.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/threads"/>
         /// </summary>
         public ThreadsEndpoint ThreadsEndpoint { get; }
+
+        /// <summary>
+        /// Build assistants that can call models and use tools to perform tasks.<br/>
+        /// <see href="https://platform.openai.com/docs/api-reference/assistants"/>
+        /// </summary>
+        public AssistantsEndpoint AssistantsEndpoint { get; }
 
         /// <summary>
         /// Create large batches of API requests for asynchronous processing.
@@ -265,14 +269,13 @@ namespace OpenAI
         }
 
         internal WebSocket CreateWebSocket(string url)
-            => new(url, new Dictionary<string, string>
-            {
-                { "User-Agent", "OpenAI-DotNet" },
-                { "OpenAI-Beta", "realtime=v1" },
-                { "Authorization", $"Bearer {OpenAIAuthentication.ApiKey}" }
-            }, new List<string>
-            {
-                "realtime"
-            });
+            => new(url, WebsocketHeaders);
+
+        internal IReadOnlyDictionary<string, string> WebsocketHeaders => new Dictionary<string, string>
+        {
+            { "User-Agent", "OpenAI-DotNet" },
+            { "OpenAI-Beta", "realtime=v1" },
+            { "Authorization", $"Bearer {OpenAIAuthentication.ApiKey}" }
+        };
     }
 }

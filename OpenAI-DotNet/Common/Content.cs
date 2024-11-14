@@ -33,6 +33,12 @@ namespace OpenAI
             ImageFile = imageFile;
         }
 
+        public Content(InputAudio inputAudio)
+        {
+            Type = ContentType.InputAudio;
+            InputAudio = inputAudio;
+        }
+
         public Content(ContentType type, string input)
         {
             Type = type;
@@ -47,6 +53,8 @@ namespace OpenAI
                     break;
                 case ContentType.ImageFile:
                     throw new ArgumentException("Use the ImageFile constructor for ImageFile content.");
+                case ContentType.InputAudio:
+                    throw new ArgumentException("Use the InputAudio constructor for InputAudio content.");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
@@ -79,11 +87,18 @@ namespace OpenAI
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ImageFile ImageFile { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("input_audio")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public InputAudio InputAudio { get; private set; }
+
         public static implicit operator Content(string input) => new(ContentType.Text, input);
 
         public static implicit operator Content(ImageUrl imageUrl) => new(imageUrl);
 
         public static implicit operator Content(ImageFile imageFile) => new(imageFile);
+
+        public static implicit operator Content(InputAudio inputAudio) => new(inputAudio);
 
         public override string ToString()
             => Type switch
@@ -91,7 +106,7 @@ namespace OpenAI
                 ContentType.Text => Text?.ToString(),
                 ContentType.ImageUrl => ImageUrl?.ToString(),
                 ContentType.ImageFile => ImageFile?.ToString(),
-                _ => throw new ArgumentOutOfRangeException(nameof(Type))
+                _ => string.Empty,
             } ?? string.Empty;
 
         public void AppendFrom(Content other)
@@ -148,6 +163,18 @@ namespace OpenAI
                 else
                 {
                     ImageFile.AppendFrom(other.ImageFile);
+                }
+            }
+
+            if (other.InputAudio != null)
+            {
+                if (InputAudio == null)
+                {
+                    InputAudio = other.InputAudio;
+                }
+                else
+                {
+                    InputAudio.AppendFrom(other.InputAudio);
                 }
             }
         }

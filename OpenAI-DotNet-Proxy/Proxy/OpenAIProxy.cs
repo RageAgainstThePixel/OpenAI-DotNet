@@ -41,6 +41,7 @@ namespace OpenAI.Proxy
             SetupServices(app.ApplicationServices);
 
             app.UseHttpsRedirection();
+            app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

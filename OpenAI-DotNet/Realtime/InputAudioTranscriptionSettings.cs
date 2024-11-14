@@ -13,6 +13,6 @@ namespace OpenAI.Realtime
         }
 
         [JsonPropertyName("model")]
-        public Model Model { get; }
+        public string Model { get; }
     }
 }

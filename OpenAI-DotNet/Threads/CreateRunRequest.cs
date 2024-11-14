@@ -19,35 +19,6 @@ namespace OpenAI.Threads
         /// <param name="assistantId">
         /// The ID of the assistant used for execution of this run.
         /// </param>
-        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
-        [Obsolete("removed")]
-        public CreateRunRequest(string assistantId, CreateRunRequest request)
-            : this(
-                assistantId,
-                request?.Model,
-                request?.Instructions,
-                request?.AdditionalInstructions,
-                request?.AdditionalMessages,
-                request?.Tools,
-                request?.Metadata,
-                request?.Temperature,
-                request?.TopP,
-                request?.MaxPromptTokens,
-                request?.MaxCompletionTokens,
-                request?.TruncationStrategy,
-                request?.ToolChoice as string ?? ((Tool)request?.ToolChoice)?.Function?.Name,
-                request?.ParallelToolCalls,
-                request?.ResponseFormatObject?.JsonSchema,
-                request?.ResponseFormatObject ?? ChatResponseFormat.Text)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="assistantId">
-        /// The ID of the assistant used for execution of this run.
-        /// </param>
         /// <param name="model">
         /// The model that the assistant used for this run.
         /// </param>

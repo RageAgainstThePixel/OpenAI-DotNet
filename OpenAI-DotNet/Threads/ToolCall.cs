@@ -1,7 +1,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
-using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -56,13 +55,6 @@ namespace OpenAI.Threads
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyDictionary<string, object> FileSearch { get; private set; }
 
-        /// <summary>
-        /// For now, this is always going to be an empty object.
-        /// </summary>
-        [JsonIgnore]
-        [Obsolete("Removed")]
-        public object Retrieval { get; private set; }
-
         [JsonIgnore]
         public bool IsFunction => Type == "function";
 
@@ -73,14 +65,14 @@ namespace OpenAI.Threads
                 return;
             }
 
-            if (other.Index.HasValue)
-            {
-                Index = other.Index;
-            }
-
             if (!string.IsNullOrWhiteSpace(other.Id))
             {
                 Id = other.Id;
+            }
+
+            if (other.Index.HasValue)
+            {
+                Index = other.Index;
             }
 
             if (other.FunctionCall != null)
@@ -112,5 +104,8 @@ namespace OpenAI.Threads
                 FileSearch = other.FileSearch;
             }
         }
+
+        public static implicit operator OpenAI.ToolCall(ToolCall toolCall)
+            => new(toolCall.Id, toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments);
     }
 }

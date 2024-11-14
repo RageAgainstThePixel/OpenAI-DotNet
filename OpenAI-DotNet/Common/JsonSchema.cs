@@ -68,7 +68,7 @@ namespace OpenAI
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("strict")]
-        public bool Strict { get; private set; } = true;
+        public bool Strict { get; private set; }
 
         /// <summary>
         /// The schema for the response format, described as a JSON Schema object.

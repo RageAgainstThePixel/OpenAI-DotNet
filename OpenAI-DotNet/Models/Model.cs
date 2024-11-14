@@ -73,6 +73,12 @@ namespace OpenAI.Models
         [JsonPropertyName("parent")]
         public string Parent { get; private set; }
 
+        public static Model O1 { get; } = new("o1-preview", "openai");
+
+        public static Model O1Mini { get; } = new("o1-mini", "openai");
+
+        public static Model GPT4oRealtime { get; } = new("gpt-4o-realtime-preview", "openai");
+
         /// <summary>
         /// GPT-4o (“o” for “omni”) is our most advanced model.
         /// It is multimodal (accepting text or image inputs and outputting text),
@@ -83,7 +89,11 @@ namespace OpenAI.Models
         /// <remarks>
         /// Context Window: 128,000 tokens
         /// </remarks>
-        public static Model GPT4o { get; } = new Model("gpt-4o", "openai");
+        public static Model GPT4o { get; } = new("gpt-4o", "openai");
+
+        public static Model GPT4oMini { get; } = new("gpt-4o-mini", "openai");
+
+        public static Model GPT4oAudio { get; } = new("gpt-4o-audio-preview", "openai");
 
         /// <summary>
         /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
@@ -188,29 +198,5 @@ namespace OpenAI.Models
         public static Model DallE_2 { get; } = new("dall-e-2", "openai");
 
         public static Model DallE_3 { get; } = new("dall-e-3", "openai");
-
-        #region Obsolete
-
-        /// <summary>
-        /// For edit requests.
-        /// </summary>
-        [Obsolete("Removed")]
-        public static Model DavinciEdit { get; } = new("text-davinci-edit-001", "openai");
-
-        /// <summary>
-        /// The 2nd most powerful engine, a bit faster than <see cref="Davinci"/>, and a bit faster.<para/>
-        /// Good at: Language translation, complex classification, text sentiment, summarization.
-        /// </summary>
-        [Obsolete("Removed")]
-        public static Model Curie { get; } = new("text-curie-001", "openai");
-
-        /// <summary>
-        /// The smallest, fastest engine available, although the quality of results may be poor.<para/>
-        /// Good at: Parsing text, simple classification, address correction, keywords
-        /// </summary>
-        [Obsolete("Removed")]
-        public static Model Ada { get; } = new("text-ada-001", "openai");
-
-        #endregion Obsolete
     }
 }

@@ -31,6 +31,11 @@ namespace OpenAI
         protected virtual bool? IsAzureDeployment => null;
 
         /// <summary>
+        /// Indicates if the endpoint is for a WebSocket.
+        /// </summary>
+        protected virtual bool? IsWebSocketEndpoint => null;
+
+        /// <summary>
         /// Gets the full formatted url for the API endpoint.
         /// </summary>
         /// <param name="endpoint">The endpoint url.</param>
@@ -48,7 +53,10 @@ namespace OpenAI
                 route = $"{Root}{endpoint}";
             }
 
-            var result = string.Format(client.OpenAIClientSettings.BaseRequestUrlFormat, route);
+            var baseUrlFormat = IsWebSocketEndpoint == true
+                ? client.OpenAIClientSettings.BaseWebSocketUrlFormat
+                : client.OpenAIClientSettings.BaseRequestUrlFormat;
+            var result = string.Format(baseUrlFormat, route);
 
             foreach (var defaultQueryParameter in client.OpenAIClientSettings.DefaultQueryParameters)
             {

@@ -9,11 +9,18 @@ namespace OpenAI
     {
         public Usage() { }
 
-        private Usage(int? promptTokens, int? completionTokens, int? totalTokens)
+        private Usage(
+            int? completionTokens,
+            int? promptTokens,
+            int? totalTokens,
+            CompletionTokensDetails completionTokensDetails,
+            PromptTokensDetails promptTokensDetails)
         {
             PromptTokens = promptTokens;
             CompletionTokens = completionTokens;
             TotalTokens = totalTokens;
+            CompletionTokensDetails = completionTokensDetails;
+            PromptTokensDetails = promptTokensDetails;
         }
 
         [JsonInclude]
@@ -31,6 +38,16 @@ namespace OpenAI
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? TotalTokens { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("completion_tokens_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public CompletionTokensDetails CompletionTokensDetails { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("prompt_tokens_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public PromptTokensDetails PromptTokensDetails { get; private set; }
+
         internal void AppendFrom(Usage other)
         {
             if (other?.PromptTokens != null)
@@ -47,14 +64,27 @@ namespace OpenAI
             {
                 TotalTokens = other.TotalTokens.Value;
             }
+
+            if (other?.CompletionTokensDetails != null)
+            {
+                CompletionTokensDetails = other.CompletionTokensDetails;
+            }
+
+            if (other?.PromptTokensDetails != null)
+            {
+                PromptTokensDetails = other.PromptTokensDetails;
+            }
         }
 
-        public override string ToString() => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
+        public override string ToString()
+            => JsonSerializer.Serialize(this, OpenAIClient.JsonSerializationOptions);
 
         public static Usage operator +(Usage a, Usage b)
             => new(
                 (a.PromptTokens ?? 0) + (b.PromptTokens ?? 0),
                 (a.CompletionTokens ?? 0) + (b.CompletionTokens ?? 0),
-                (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0));
+                (a.TotalTokens ?? 0) + (b.TotalTokens ?? 0),
+                a.CompletionTokensDetails + b.CompletionTokensDetails,
+                a.PromptTokensDetails + b.PromptTokensDetails);
     }
 }

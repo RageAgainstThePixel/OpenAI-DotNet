@@ -6,6 +6,8 @@ namespace OpenAI.Realtime
 {
     public sealed class VoiceActivityDetectionSettings
     {
+        public VoiceActivityDetectionSettings() { }
+
         public VoiceActivityDetectionSettings(
             TurnDetectionType type = TurnDetectionType.Server_VAD,
             float? detectionThreshold = null,
@@ -23,18 +25,22 @@ namespace OpenAI.Realtime
             }
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TurnDetectionType Type { get; }
+        public TurnDetectionType Type { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("threshold")]
-        public float? DetectionThreshold { get; }
+        public float? DetectionThreshold { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("prefix_padding_ms")]
-        public int? PrefixPadding { get; }
+        public int? PrefixPadding { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("silence_duration_ms")]
-        public int? SilenceDuration { get; }
+        public int? SilenceDuration { get; private set; }
 
         public static VoiceActivityDetectionSettings Disabled() => new(TurnDetectionType.Disabled);
     }

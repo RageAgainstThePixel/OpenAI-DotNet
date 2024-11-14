@@ -6,7 +6,7 @@ namespace OpenAI.Realtime
 {
     public enum TurnDetectionType
     {
-        Disabled,
+        Disabled = 0,
         [EnumMember(Value = "server_vad")]
         Server_VAD,
     }

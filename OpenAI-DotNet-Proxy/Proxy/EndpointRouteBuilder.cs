@@ -9,8 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Security.Authentication;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Proxy
@@ -24,6 +26,9 @@ namespace OpenAI.Proxy
             HeaderNames.TransferEncoding,
             HeaderNames.KeepAlive,
             HeaderNames.Upgrade,
+            HeaderNames.Host,
+            HeaderNames.SecWebSocketKey,
+            HeaderNames.SecWebSocketVersion,
             "Proxy-Connection",
             "Proxy-Authenticate",
             "Proxy-Authentication-Info",
@@ -52,22 +57,25 @@ namespace OpenAI.Proxy
         public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter, string routePrefix = "")
         {
             endpoints.Map($"{routePrefix}{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
+            return;
 
             async Task HandleRequest(HttpContext httpContext, string endpoint)
             {
                 try
                 {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    // ReSharper disable once MethodHasAsyncOverload
-                    authenticationFilter.ValidateAuthentication(httpContext.Request.Headers);
-#pragma warning restore CS0618 // Type or member is obsolete
-                    await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers);
+                    if (httpContext.WebSockets.IsWebSocketRequest)
+                    {
+                        await ProcessWebSocketRequest(httpContext, endpoint).ConfigureAwait(false);
+                        return;
+                    }
 
+                    await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
                     var method = new HttpMethod(httpContext.Request.Method);
+
                     var uri = new Uri(string.Format(
-                            openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
-                            $"{endpoint}{httpContext.Request.QueryString}"
-                        ));
+                        openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
+                        $"{endpoint}{httpContext.Request.QueryString}"
+                    ));
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
@@ -76,7 +84,7 @@ namespace OpenAI.Proxy
                         request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
                     }
 
-                    var proxyResponse = await openAIClient.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                    var proxyResponse = await openAIClient.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                     httpContext.Response.StatusCode = (int)proxyResponse.StatusCode;
 
                     foreach (var (key, value) in proxyResponse.Headers)
@@ -96,31 +104,99 @@ namespace OpenAI.Proxy
 
                     if (httpContext.Response.ContentType.Equals(streamingContent))
                     {
-                        var stream = await proxyResponse.Content.ReadAsStreamAsync();
-                        await WriteServerStreamEventsAsync(httpContext, stream);
+                        var stream = await proxyResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        await WriteServerStreamEventsAsync(httpContext, stream).ConfigureAwait(false);
                     }
                     else
                     {
-                        await proxyResponse.Content.CopyToAsync(httpContext.Response.Body);
+                        await proxyResponse.Content.CopyToAsync(httpContext.Response.Body).ConfigureAwait(false);
                     }
                 }
                 catch (AuthenticationException authenticationException)
                 {
                     httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await httpContext.Response.WriteAsync(authenticationException.Message);
+                    await httpContext.Response.WriteAsync(authenticationException.Message).ConfigureAwait(false);
+                }
+                catch (WebSocketException)
+                {
+                    // ignore
+                    throw;
                 }
                 catch (Exception e)
                 {
+                    if (httpContext.Response.HasStarted) { throw; }
                     httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     var response = JsonSerializer.Serialize(new { error = new { e.Message, e.StackTrace } });
-                    await httpContext.Response.WriteAsync(response);
+                    await httpContext.Response.WriteAsync(response).ConfigureAwait(false);
                 }
 
                 static async Task WriteServerStreamEventsAsync(HttpContext httpContext, Stream contentStream)
                 {
                     var responseStream = httpContext.Response.Body;
-                    await contentStream.CopyToAsync(responseStream, httpContext.RequestAborted);
-                    await responseStream.FlushAsync(httpContext.RequestAborted);
+                    await contentStream.CopyToAsync(responseStream, httpContext.RequestAborted).ConfigureAwait(false);
+                    await responseStream.FlushAsync(httpContext.RequestAborted).ConfigureAwait(false);
+                }
+            }
+
+            async Task ProcessWebSocketRequest(HttpContext httpContext, string endpoint)
+            {
+                using var clientWebsocket = await httpContext.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
+
+                try
+                {
+                    await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
+                }
+                catch (AuthenticationException authenticationException)
+                {
+                    var message = JsonSerializer.Serialize(new
+                    {
+                        type = "error",
+                        error = new
+                        {
+                            type = "invalid_request_error",
+                            code = "invalid_session_token",
+                            message = authenticationException.Message
+                        }
+                    });
+                    await clientWebsocket.SendAsync(System.Text.Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, httpContext.RequestAborted).ConfigureAwait(false);
+                    await clientWebsocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, authenticationException.Message, httpContext.RequestAborted).ConfigureAwait(false);
+                    return;
+                }
+
+                var uri = new Uri(string.Format(
+                    openAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat,
+                    $"{endpoint}{httpContext.Request.QueryString}"
+                ));
+                using var hostWebsocket = new ClientWebSocket();
+
+                foreach (var header in openAIClient.WebsocketHeaders)
+                {
+                    hostWebsocket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+
+                await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);
+                var receive = ProxyWebSocketMessages(clientWebsocket, hostWebsocket, httpContext.RequestAborted);
+                var send = ProxyWebSocketMessages(hostWebsocket, clientWebsocket, httpContext.RequestAborted);
+                await Task.WhenAll(receive, send).ConfigureAwait(false);
+                return;
+
+                async Task ProxyWebSocketMessages(WebSocket fromSocket, WebSocket toSocket, CancellationToken cancellationToken)
+                {
+                    var buffer = new byte[1024 * 4];
+                    var memoryBuffer = buffer.AsMemory();
+
+                    while (fromSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
+                    {
+                        var result = await fromSocket.ReceiveAsync(memoryBuffer, cancellationToken).ConfigureAwait(false);
+
+                        if (fromSocket.CloseStatus.HasValue || result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await toSocket.CloseOutputAsync(fromSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, fromSocket.CloseStatusDescription ?? "Closing", cancellationToken).ConfigureAwait(false);
+                            break;
+                        }
+
+                        await toSocket.SendAsync(memoryBuffer[..result.Count], result.MessageType, result.EndOfMessage, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
         }

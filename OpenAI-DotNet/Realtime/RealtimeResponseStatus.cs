@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace OpenAI.Realtime
 {
-    public enum ResponseStatus
+    public enum RealtimeResponseStatus
     {
         [EnumMember(Value = "in_progress")]
         InProgress = 1,
@@ -12,9 +12,9 @@ namespace OpenAI.Realtime
         Completed,
         [EnumMember(Value = "cancelled")]
         Cancelled,
-        [EnumMember(Value = "incomplete")]
-        Incomplete,
         [EnumMember(Value = "failed")]
-        Failed
+        Failed,
+        [EnumMember(Value = "incomplete")]
+        Incomplete
     }
 }

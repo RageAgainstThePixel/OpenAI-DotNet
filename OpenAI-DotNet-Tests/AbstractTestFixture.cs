@@ -2,7 +2,10 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
 using System;
+using System.IO;
 using System.Net.Http;
 
 namespace OpenAI.Tests
@@ -27,15 +30,33 @@ namespace OpenAI.Tests
         protected AbstractTestFixture()
         {
             var webApplicationFactory = new TestProxyFactory();
-            HttpClient = webApplicationFactory.CreateClient();
-            var domain = $"{HttpClient.BaseAddress?.Authority}:{HttpClient.BaseAddress?.Port}";
-            var settings = new OpenAIClientSettings(domain: domain);
+            HttpClient = webApplicationFactory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                BaseAddress = GetBaseAddressFromLaunchSettings()
+            });
+            var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication(TestUserToken);
             HttpClient.Timeout = TimeSpan.FromMinutes(3);
             OpenAIClient = new OpenAIClient(auth, settings, HttpClient)
             {
                 EnableDebug = true
             };
+        }
+
+        private Uri GetBaseAddressFromLaunchSettings()
+        {
+            var projectDir = Directory.GetCurrentDirectory();
+            var launchSettings = Path.Combine(projectDir, "Properties", "launchSettings.json");
+            var config = new ConfigurationBuilder()
+                .AddJsonFile(launchSettings, optional: false)
+                .Build();
+            var applicationUrl = config["profiles:OpenAI_DotNet_Tests_Proxy:applicationUrl"];
+            if (string.IsNullOrEmpty(applicationUrl))
+            {
+                throw new InvalidOperationException("Base address not found in launchSettings.json");
+            }
+            var hosts = applicationUrl.Split(";");
+            return new Uri(hosts[0]);
         }
     }
 }

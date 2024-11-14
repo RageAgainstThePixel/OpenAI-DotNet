@@ -25,7 +25,7 @@ namespace OpenAI
         public OpenAIClientSettings()
         {
             ResourceName = OpenAIDomain;
-            ApiVersion = "v1";
+            ApiVersion = DefaultOpenAIApiVersion;
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"{Https}{ResourceName}{BaseRequest}{{0}}";
@@ -59,13 +59,20 @@ namespace OpenAI
             ResourceName = domain.Contains(Http)
                 ? domain
                 : $"{Https}{domain}";
+
+            if (domain.Contains(Http))
+            {
+                domain = domain.Replace(Http, string.Empty);
+                domain = domain.Replace(Https, string.Empty);
+            }
+
             ApiVersion = apiVersion;
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"{ResourceName}{BaseRequest}{{0}}";
             BaseWebSocketUrlFormat = ResourceName.Contains(Https)
-                ? $"{WSS}{ResourceName}{BaseRequest}{{0}}"
-                : $"{WS}{ResourceName}{BaseRequest}{{0}}";
+                ? $"{WSS}{domain}{BaseRequest}{{0}}"
+                : $"{WS}{domain}{BaseRequest}{{0}}";
             UseOAuthAuthentication = true;
         }
 
@@ -115,9 +122,9 @@ namespace OpenAI
 
         public string ResourceName { get; }
 
-        public string ApiVersion { get; }
-
         public string DeploymentId { get; }
+
+        public string ApiVersion { get; }
 
         public string BaseRequest { get; }
 
@@ -126,9 +133,6 @@ namespace OpenAI
         internal string BaseWebSocketUrlFormat { get; }
 
         internal bool UseOAuthAuthentication { get; }
-
-        [Obsolete("Use IsAzureOpenAI")]
-        public bool IsAzureDeployment => IsAzureOpenAI;
 
         public bool IsAzureOpenAI => BaseRequestUrlFormat.Contains(AzureOpenAIDomain);
 

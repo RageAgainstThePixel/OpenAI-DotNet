@@ -8,15 +8,12 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
 {
-    public sealed class RealtimeSessionOptions
+    public sealed class Options
     {
-        [JsonConstructor]
-        public RealtimeSessionOptions() { }
-
-        public RealtimeSessionOptions(
+        public Options(
             Model model,
-            RealtimeModality modalities = RealtimeModality.Text & RealtimeModality.Audio,
-            string voice = "alloy",
+            Modality modalities = Modality.Text | Modality.Audio,
+            Voice voice = null,
             string instructions = null,
             RealtimeAudioFormat inputAudioFormat = RealtimeAudioFormat.PCM16,
             RealtimeAudioFormat outputAudioFormat = RealtimeAudioFormat.PCM16,
@@ -27,9 +24,11 @@ namespace OpenAI.Realtime
             float? temperature = null,
             int? maxResponseOutputTokens = null)
         {
-            Model = string.IsNullOrWhiteSpace(model.Id) ? "gpt-4o-realtime" : model;
+            Model = string.IsNullOrWhiteSpace(model.Id)
+                ? "gpt-4o-realtime-preview"
+                : model;
             Modalities = modalities;
-            Voice = voice;
+            Voice = voice ?? OpenAI.Voice.Alloy;
             Instructions = string.IsNullOrWhiteSpace(instructions)
                 ? "Your knowledge cutoff is 2023-10. You are a helpful, witty, and friendly AI. Act like a human, " +
                   "but remember that you aren't a human and that you can't do human things in the real world. " +
@@ -40,7 +39,9 @@ namespace OpenAI.Realtime
                 : instructions;
             InputAudioFormat = inputAudioFormat;
             OutputAudioFormat = outputAudioFormat;
-            InputAudioTranscriptionSettings = new(transcriptionModel);
+            InputAudioTranscriptionSettings = new(string.IsNullOrWhiteSpace(transcriptionModel)
+                ? "whisper-1"
+                : transcriptionModel);
             VoiceActivityDetectionSettings = turnDetectionSettings ?? new();
 
             var toolList = tools?.ToList();
@@ -67,17 +68,18 @@ namespace OpenAI.Realtime
                     }
                 }
 
-                foreach (var tool in toolList)
+                foreach (var tool in toolList.Where(tool => tool?.Function?.Arguments != null))
                 {
-                    if (tool?.Function?.Arguments != null)
-                    {
-                        // just in case clear any lingering func args.
-                        tool.Function.Arguments = null;
-                    }
+                    // just in case clear any lingering func args.
+                    tool.Function.Arguments = null;
                 }
             }
 
-            Tools = toolList?.ToList();
+            Tools = toolList?.Select(tool =>
+            {
+                tool.Function.Type = "function";
+                return tool.Function;
+            }).ToList();
             Temperature = temperature;
 
             if (maxResponseOutputTokens.HasValue)
@@ -93,54 +95,72 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("object")]
+        public string Object { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("model")]
-        public Model Model { get; }
+        public string Model { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("expires_at")]
+        public int? ExpiresAtTimeUnixSeconds;
+
+        [JsonInclude]
+        [JsonIgnore]
+        public DateTime? ExpiresAt =>
+            ExpiresAtTimeUnixSeconds.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(ExpiresAtTimeUnixSeconds.Value).DateTime
+                : null;
 
         [JsonInclude]
         [JsonPropertyName("modalities")]
-        public RealtimeModality Modalities { get; }
+        [JsonConverter(typeof(ModalityConverter))]
+        public Modality Modalities { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("voice")]
-        public string Voice { get; }
+        public string Voice { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("instructions")]
-        public string Instructions { get; }
+        public string Instructions { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_audio_format")]
-        public RealtimeAudioFormat InputAudioFormat { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public RealtimeAudioFormat InputAudioFormat { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("output_audio_format")]
-        public RealtimeAudioFormat OutputAudioFormat { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public RealtimeAudioFormat OutputAudioFormat { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_audio_transcription")]
-        public InputAudioTranscriptionSettings InputAudioTranscriptionSettings { get; }
+        public InputAudioTranscriptionSettings InputAudioTranscriptionSettings { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("turn_detection")]
-        public VoiceActivityDetectionSettings VoiceActivityDetectionSettings { get; }
+        public VoiceActivityDetectionSettings VoiceActivityDetectionSettings { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<Tool> Tools { get; }
+        public IReadOnlyList<Function> Tools { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("tool_choice")]
-        public dynamic ToolChoice { get; }
+        public object ToolChoice { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("temperature")]
-        public float? Temperature { get; }
+        public float? Temperature { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("max_response_output_tokens")]
-        public dynamic MaxResponseOutputTokens { get; }
+        public object MaxResponseOutputTokens { get; private set; }
     }
 }

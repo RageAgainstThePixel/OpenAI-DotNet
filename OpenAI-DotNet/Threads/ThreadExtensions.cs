@@ -137,44 +137,6 @@ namespace OpenAI.Threads
 
         #endregion Messages
 
-        #region Files (Obsolete)
-
-        /// <summary>
-        /// Returns a list of message files.
-        /// </summary>
-        /// <param name="thread"><see cref="ThreadResponse"/>.</param>
-        /// <param name="messageId">The id of the message that the files belongs to.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
-        public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this ThreadResponse thread, string messageId, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.ListFilesAsync(thread.Id, messageId, query, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Returns a list of message files.
-        /// </summary>
-        /// <param name="message"><see cref="MessageFileResponse"/>.</param>
-        /// <param name="query"><see cref="ListQuery"/>.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="ListResponse{ThreadMessageFile}"/>.</returns>
-        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
-        public static async Task<ListResponse<MessageFileResponse>> ListFilesAsync(this MessageResponse message, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.ListFilesAsync(message.ThreadId, message.Id, query, cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Retrieve message file.
-        /// </summary>
-        /// <param name="message"><see cref="MessageResponse"/>.</param>
-        /// <param name="fileId">The id of the file being retrieved.</param>
-        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
-        /// <returns><see cref="MessageFileResponse"/>.</returns>
-        [Obsolete("MessageFiles removed from Threads. Files now belong to ToolResources.")]
-        public static async Task<MessageFileResponse> RetrieveFileAsync(this MessageResponse message, string fileId, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.RetrieveFileAsync(message.ThreadId, message.Id, fileId, cancellationToken).ConfigureAwait(false);
-
-        #endregion Files (Obsolete)
-
         #region Runs
 
         [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]

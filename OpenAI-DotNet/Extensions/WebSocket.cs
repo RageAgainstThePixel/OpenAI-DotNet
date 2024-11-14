@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI.Extensions
 {
-    internal class WebSocket
+    internal class WebSocket : IDisposable
     {
         public WebSocket(string url, IReadOnlyDictionary<string, string> requestHeaders = null, IReadOnlyList<string> subProtocols = null)
             : this(new Uri(url), requestHeaders, subProtocols)
