@@ -1,12 +1,13 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -68,14 +69,9 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_03_Client_Unauthenticated()
         {
-            var webApplicationFactory = new TestProxyFactory();
-            var httpClient = webApplicationFactory.CreateClient(new WebApplicationFactoryClientOptions
-            {
-                BaseAddress = new("https://localhost:7777")
-            });
-            var settings = new OpenAIClientSettings(domain: httpClient.BaseAddress?.Authority);
+            var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication("sess-invalid-token");
-            var openAIClient = new OpenAIClient(auth, settings, httpClient);
+            var openAIClient = new OpenAIClient(auth, settings, HttpClient);
 
             try
             {
@@ -83,13 +79,38 @@ namespace OpenAI.Tests
             }
             catch (HttpRequestException httpRequestException)
             {
+                Console.WriteLine(httpRequestException);
                 // System.Net.Http.HttpRequestException : GetModelsAsync Failed! HTTP status code: Unauthorized | Response body: User is not authorized
-                Assert.IsTrue(httpRequestException.StatusCode == HttpStatusCode.Unauthorized);
+                Assert.AreEqual(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+        }
+
+        [Test]
+        public async Task Test_04_Client_Websocket_Authentication()
+        {
+            using var websocket = new ClientWebSocket();
+
+            foreach (var (key, value) in OpenAIClient.WebsocketHeaders)
+            {
+                websocket.Options.SetRequestHeader(key, value);
+            }
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var realtimeUri = new Uri(string.Format(OpenAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat, "/realtime"));
+            _ = websocket.ConnectAsync(realtimeUri, cts.Token);
+
+            while (websocket.State != WebSocketState.Open)
+            {
+                cts.Token.ThrowIfCancellationRequested();
+                await Task.Yield();
+            }
+
+            await Task.Delay(1000, cts.Token);
+            await websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, cts.Token);
         }
     }
 }

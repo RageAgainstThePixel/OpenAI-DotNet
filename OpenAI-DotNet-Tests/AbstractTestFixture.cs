@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -36,14 +35,13 @@ namespace OpenAI.Tests
             });
             var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication(TestUserToken);
-            HttpClient.Timeout = TimeSpan.FromMinutes(3);
             OpenAIClient = new OpenAIClient(auth, settings, HttpClient)
             {
                 EnableDebug = true
             };
         }
 
-        private Uri GetBaseAddressFromLaunchSettings()
+        private static Uri GetBaseAddressFromLaunchSettings()
         {
             var projectDir = Directory.GetCurrentDirectory();
             var launchSettings = Path.Combine(projectDir, "Properties", "launchSettings.json");
