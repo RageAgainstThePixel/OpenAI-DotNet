@@ -30,12 +30,9 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
             Assert.IsNotEmpty(response.Choices);
-
-            foreach (var choice in response.Choices)
-            {
-                Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
-            }
-
+            Assert.AreEqual(1, response.Choices.Count);
+            Assert.IsNotNull(response.FirstChoice);
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
             response.GetUsage();
         }
 
@@ -78,7 +75,56 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_03_JsonMode()
+        public async Task Test_01_03_GetChatCompletion_Modalities()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You are a helpful assistant."),
+                new(Role.User, "Is a golden retriever a good family dog?"),
+            };
+
+            var chatRequest = new ChatRequest(messages, Model.GPT4oAudio, audioConfig: Voice.Alloy);
+            Assert.IsNotNull(chatRequest);
+            Assert.IsNotNull(chatRequest.AudioConfig);
+            Assert.AreEqual(Model.GPT4oAudio.Id, chatRequest.Model);
+            Assert.AreEqual(Voice.Alloy.Id, chatRequest.AudioConfig.Voice);
+            Assert.AreEqual(AudioFormat.Pcm16, chatRequest.AudioConfig.Format);
+            Assert.AreEqual(Modality.Text | Modality.Audio, chatRequest.Modalities);
+            var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+            Assert.AreEqual(1, response.Choices.Count);
+            Assert.IsNotNull(response.FirstChoice);
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Data);
+            response.GetUsage();
+
+            messages.Add(response.FirstChoice.Message);
+            messages.Add(new(Role.User, "What are some other good family dog breeds?"));
+
+            chatRequest = new ChatRequest(messages, Model.GPT4oAudio, audioConfig: Voice.Alloy);
+            Assert.IsNotNull(chatRequest);
+            Assert.IsNotNull(messages[2]);
+            Assert.AreEqual(Role.Assistant, messages[2].Role);
+            Assert.IsNotNull(messages[2].AudioOutput);
+            response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+            Assert.AreEqual(1, response.Choices.Count);
+            Assert.IsNotNull(response.FirstChoice);
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Data);
+            response.GetUsage();
+        }
+
+        [Test]
+        public async Task Test_01_04_JsonMode()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -101,7 +147,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_04_GetChatStreamingCompletionEnumerableAsync()
+        public async Task Test_01_05_GetChatStreamingCompletionEnumerableAsync()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -149,6 +195,7 @@ namespace OpenAI.Tests
             {
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null));
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
@@ -219,6 +266,7 @@ namespace OpenAI.Tests
             {
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null));
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
@@ -302,6 +350,7 @@ namespace OpenAI.Tests
             };
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null));
             var chatRequest = new ChatRequest(messages, model: Model.GPT4o, tools: tools, toolChoice: "auto", parallelToolCalls: true);
             var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, partialResponse =>
             {
@@ -309,7 +358,7 @@ namespace OpenAI.Tests
                 if (partialResponse.Usage != null) { return; }
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-            });
+            }, true);
 
             Assert.IsTrue(response.FirstChoice.FinishReason == "tool_calls");
             messages.Add(response.FirstChoice.Message);
@@ -347,6 +396,7 @@ namespace OpenAI.Tests
             }
 
             var tools = Tool.GetAllAvailableTools(false, forceUpdate: true, clearCache: true);
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null));
             var chatRequest = new ChatRequest(messages, tools: tools, toolChoice: "none");
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
@@ -382,6 +432,39 @@ namespace OpenAI.Tests
             Assert.IsNotNull(functionResult);
             messages.Add(new Message(usedTool, functionResult));
             Console.WriteLine($"{Role.Tool}: {functionResult}");
+        }
+
+        [Test]
+        public async Task Test_02_05_GetChat_Enumerable_TestToolCalls_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You must extract the name from the input"),
+                new(Role.User, "My name is Joe")
+            };
+
+            var tools = new List<Tool>
+            {
+                Tool.FromFunc("extract_first_name", (string name) => name)
+            };
+
+            var request = new ChatRequest(messages, tools);
+
+            await foreach (var streamResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(request))
+            {
+                Console.WriteLine(streamResponse.ToJsonString());
+
+                if (streamResponse.FirstChoice.Message is { } message)
+                {
+                    foreach (var tool in message.ToolCalls)
+                    {
+                        var output = tool.InvokeFunction<string>();
+                        Console.WriteLine($"Output from StreamCompletionEnumerableAsync: {output}");
+                    }
+                }
+            }
         }
 
         [Test]
@@ -425,7 +508,7 @@ namespace OpenAI.Tests
                 if (partialResponse.Usage != null) { return; }
                 Assert.NotNull(partialResponse.Choices);
                 Assert.NotZero(partialResponse.Choices.Count);
-            });
+            }, true);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
@@ -496,40 +579,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_05_02_GetChat_Enumerable_TestToolCalls_Streaming()
-        {
-            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
-
-            var messages = new List<Message>
-            {
-                new(Role.System, "You must extract the name from the input"),
-                new(Role.User, "My name is Joe")
-            };
-
-            var tools = new List<Tool>
-            {
-                Tool.FromFunc("extract_first_name", (string name) => name)
-            };
-
-            var request = new ChatRequest(messages, tools);
-
-            await foreach (var streamResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(request))
-            {
-                Console.WriteLine(streamResponse.ToJsonString());
-
-                if (streamResponse.FirstChoice.Message is { } message)
-                {
-                    foreach (var tool in message.ToolCalls)
-                    {
-                        var output = tool.InvokeFunction<string>();
-                        Console.WriteLine($"Output from StreamCompletionEnumerableAsync: {output}");
-                    }
-                }
-            }
-        }
-
-        [Test]
-        public async Task Test_06_01_GetChat_JsonSchema()
+        public async Task Test_05_01_GetChat_JsonSchema()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
 
@@ -562,7 +612,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_06_01_GetChat_JsonSchema_Streaming()
+        public async Task Test_05_02_GetChat_JsonSchema_Streaming()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
 
