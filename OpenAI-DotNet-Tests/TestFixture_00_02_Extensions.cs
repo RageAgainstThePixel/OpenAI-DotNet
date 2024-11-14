@@ -104,7 +104,7 @@ namespace OpenAI.Tests
 
         private string FunctionWithArrayArgs(List<int> list)
         {
-            return JsonSerializer.Serialize(new { args = list }, OpenAIClient.JsonSerializationOptions);
+            return JsonSerializer.Serialize(new { list }, OpenAIClient.JsonSerializationOptions);
         }
 
         [Test]
