@@ -13,10 +13,19 @@ namespace OpenAI.Realtime
 {
     public sealed class RealtimeSession : IDisposable
     {
+        /// <summary>
+        /// Enable or disable logging.
+        /// </summary>
         public bool EnableDebug { get; set; }
 
+        /// <summary>
+        /// The timeout in seconds to wait for a response from the server.
+        /// </summary>
         public int EventTimeout { get; set; } = 30;
 
+        /// <summary>
+        /// The options for the session.
+        /// </summary>
         public Options Options { get; internal set; }
 
         #region Internal
@@ -72,6 +81,7 @@ namespace OpenAI.Realtime
 
         private bool isDisposed;
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -128,9 +138,10 @@ namespace OpenAI.Realtime
         /// Receive callback updates from the server
         /// </summary>
         /// <typeparam name="T"><see cref="IRealtimeEvent"/> to subscribe for updates to.</typeparam>
-        /// <param name="sessionEvent"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="sessionEvent">The event to receive updates for.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="Task"/>.</returns>
+        /// <exception cref="Exception">If <see cref="ReceiveUpdatesAsync{T}"/> is already running.</exception>
         public async Task ReceiveUpdatesAsync<T>(Action<T> sessionEvent, CancellationToken cancellationToken) where T : IRealtimeEvent
         {
             try
@@ -139,8 +150,7 @@ namespace OpenAI.Realtime
                 {
                     if (isCollectingEvents)
                     {
-                        Console.WriteLine($"{nameof(ReceiveUpdatesAsync)} is already running!");
-                        return;
+                        throw new Exception($"{nameof(ReceiveUpdatesAsync)} is already running!");
                     }
 
                     isCollectingEvents = true;
@@ -183,6 +193,13 @@ namespace OpenAI.Realtime
             }
         }
 
+        /// <summary>
+        /// Receive callback updates from the server
+        /// </summary>
+        /// <typeparam name="T"><see cref="IRealtimeEvent"/> to subscribe for updates to.</typeparam>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="IAsyncEnumerable{T}"/>.</returns>
+        /// <exception cref="Exception">If <see cref="ReceiveUpdatesAsync{T}"/> is already running.</exception>
         public async IAsyncEnumerable<T> ReceiveUpdatesAsync<T>([EnumeratorCancellation] CancellationToken cancellationToken) where T : IRealtimeEvent
         {
             try
@@ -227,12 +244,33 @@ namespace OpenAI.Realtime
             }
         }
 
+        /// <summary>
+        /// Send a client event to the server.
+        /// </summary>
+        /// <typeparam name="T"><see cref="IClientEvent"/> to send to the server.</typeparam>
+        /// <param name="event">The event to send.</param>
         public async void Send<T>(T @event) where T : IClientEvent
             => await SendAsync(@event).ConfigureAwait(false);
 
+        /// <summary>
+        /// Send a client event to the server.
+        /// </summary>
+        /// <typeparam name="T"><see cref="IClientEvent"/> to send to the server.</typeparam>
+        /// <param name="event">The event to send.</param>
+        /// <param name="sessionEvents">Optional, <see cref="Action{IServerEvent}"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="Task{IServerEvent}"/>.</returns>
         public async Task<IServerEvent> SendAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IClientEvent
             => await SendAsync(@event, null, cancellationToken).ConfigureAwait(false);
 
+        /// <summary>
+        /// Send a client event to the server.
+        /// </summary>
+        /// <typeparam name="T"><see cref="IClientEvent"/> to send to the server.</typeparam>
+        /// <param name="event">The event to send.</param>
+        /// <param name="sessionEvents">Optional, <see cref="Action{IServerEvent}"/>.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="Task{IServerEvent}"/>.</returns>
         public async Task<IServerEvent> SendAsync<T>(T @event, Action<IServerEvent> sessionEvents, CancellationToken cancellationToken = default) where T : IClientEvent
         {
             if (websocketClient.State != State.Open)
@@ -324,23 +362,23 @@ namespace OpenAI.Realtime
                             Complete();
                             return;
                         case CreateResponseRequest when serverEvent is RealtimeResponse serverResponse:
-                        {
-                            if (serverResponse.Response.Status == RealtimeResponseStatus.InProgress)
                             {
-                                return;
-                            }
+                                if (serverResponse.Response.Status == RealtimeResponseStatus.InProgress)
+                                {
+                                    return;
+                                }
 
-                            if (serverResponse.Response.Status != RealtimeResponseStatus.Completed)
-                            {
-                                tcs.TrySetException(new Exception(serverResponse.Response.StatusDetails.Error?.ToString() ?? serverResponse.Response.StatusDetails.Reason));
-                            }
-                            else
-                            {
-                                Complete();
-                            }
+                                if (serverResponse.Response.Status != RealtimeResponseStatus.Completed)
+                                {
+                                    tcs.TrySetException(new Exception(serverResponse.Response.StatusDetails.Error?.ToString() ?? serverResponse.Response.StatusDetails.Reason));
+                                }
+                                else
+                                {
+                                    Complete();
+                                }
 
-                            break;
-                        }
+                                break;
+                            }
                     }
                 }
                 catch (Exception e)

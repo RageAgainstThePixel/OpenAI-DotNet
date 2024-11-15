@@ -60,7 +60,6 @@ namespace OpenAI.Realtime
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Text { get; private set; }
 
-        [JsonInclude]
         [JsonIgnore]
         public bool IsDelta => Type.EndsWith("delta");
 

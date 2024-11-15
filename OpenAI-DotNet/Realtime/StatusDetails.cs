@@ -11,7 +11,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type { get; }
+        public string Type { get; private set; }
 
         /// <summary>
         /// The reason the Response did not complete.
@@ -22,7 +22,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("reason")]
-        public string Reason { get; }
+        public string Reason { get; private set; }
 
         /// <summary>
         /// A description of the error that caused the response to fail, populated when the status is failed.
@@ -30,6 +30,6 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("error")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Error Error { get; }
+        public Error Error { get; private set; }
     }
 }

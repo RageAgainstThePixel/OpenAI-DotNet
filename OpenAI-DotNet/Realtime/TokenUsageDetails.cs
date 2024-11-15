@@ -18,17 +18,17 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text_tokens")]
-        public int? Text { get; private set; }
+        public int? TextTokens { get; private set; }
 
         /// <summary>
         /// The number of audio tokens used in the Response.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("audio_tokens")]
-        public int? Audio { get; private set; }
+        public int? AudioTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("image_tokens")]
-        public int? Image { get; private set; }
+        public int? ImageTokens { get; private set; }
     }
 }

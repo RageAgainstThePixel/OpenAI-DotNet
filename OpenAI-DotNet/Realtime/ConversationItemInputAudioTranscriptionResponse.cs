@@ -44,11 +44,10 @@ namespace OpenAI.Realtime
         [JsonPropertyName("error")]
         public Error Error { get; private set; }
 
-        [JsonInclude]
         [JsonIgnore]
         public bool IsCompleted => Type.Contains("completed");
 
-        [JsonInclude]
+        [JsonIgnore]
         public bool IsFailed => Type.Contains("failed");
     }
 }

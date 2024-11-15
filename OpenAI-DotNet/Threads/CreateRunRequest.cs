@@ -108,7 +108,7 @@ namespace OpenAI.Threads
             string toolChoice = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
         {
             AssistantId = assistantId;
             Model = model;
@@ -165,7 +165,11 @@ namespace OpenAI.Threads
             }
             else
             {
-                ResponseFormatObject = responseFormat;
+                ResponseFormatObject = responseFormat switch
+                {
+                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
+                    _ => null
+                };
             }
         }
 
@@ -299,7 +303,7 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]

@@ -112,7 +112,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("expires_at")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int? ExpiresAtTimeUnixSeconds;
+        public int? ExpiresAtTimeUnixSeconds { get; private set; }
 
         [JsonInclude]
         [JsonIgnore]

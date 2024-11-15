@@ -25,6 +25,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ChatResponseFormat>))]
         public ChatResponseFormat Type { get; private set; }
 

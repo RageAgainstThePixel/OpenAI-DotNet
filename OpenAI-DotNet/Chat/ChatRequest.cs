@@ -207,7 +207,7 @@ namespace OpenAI.Chat
             {
                 ResponseFormatObject = responseFormat switch
                 {
-                    ChatResponseFormat.Text or ChatResponseFormat.Json or ChatResponseFormat.JsonSchema => responseFormat,
+                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
                     _ => null
                 };
             }
@@ -339,7 +339,7 @@ namespace OpenAI.Chat
 
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         /// <summary>

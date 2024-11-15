@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
@@ -48,6 +49,11 @@ namespace OpenAI.Realtime
         [JsonPropertyName("delta")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Delta { get; private set; }
+
+        [JsonIgnore]
+        public ReadOnlyMemory<byte> DeltaBytes => !string.IsNullOrWhiteSpace(Delta)
+            ? Convert.FromBase64String(Delta)
+            : ReadOnlyMemory<byte>.Empty;
 
         [JsonIgnore]
         public bool IsDelta => Type.EndsWith("delta");

@@ -6,7 +6,6 @@ namespace OpenAI.Realtime
 {
     public sealed class ResponseOutputItemResponse : BaseRealtimeEvent, IServerEvent
     {
-
         /// <inheritdoc />
         [JsonInclude]
         [JsonPropertyName("event_id")]
