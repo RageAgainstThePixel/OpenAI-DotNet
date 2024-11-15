@@ -7,6 +7,18 @@ namespace OpenAI
 {
     public sealed class InputAudio
     {
+        public InputAudio() { }
+
+        public InputAudio(ReadOnlyMemory<byte> memory, InputAudioFormat format)
+            : this(memory.Span, format)
+        {
+        }
+
+        public InputAudio(ReadOnlySpan<byte> span, InputAudioFormat format)
+            : this($"data:audio/{format};base64,{Convert.ToBase64String(span)}", format)
+        {
+        }
+
         public InputAudio(byte[] data, InputAudioFormat format)
             : this($"data:audio/{format};base64,{Convert.ToBase64String(data)}", format)
         {
