@@ -71,9 +71,11 @@ namespace OpenAI.Chat
         }
 
         [JsonIgnore]
-        public Choice FirstChoice => Choices?.FirstOrDefault(choice => choice.Index == 0);
+        public Choice FirstChoice
+            => Choices?.FirstOrDefault(choice => choice.Index == 0);
 
-        public override string ToString() => FirstChoice?.ToString() ?? string.Empty;
+        public override string ToString()
+            => FirstChoice?.ToString() ?? string.Empty;
 
         public static implicit operator string(ChatResponse response) => response?.ToString();
 

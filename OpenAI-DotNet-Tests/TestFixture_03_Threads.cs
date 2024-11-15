@@ -240,7 +240,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_03_03_01_CreateRun_Streaming()
+        public async Task Test_03_02_01_CreateRun_Streaming()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(
@@ -269,7 +269,6 @@ namespace OpenAI.Tests
                             break;
                         case RunStepResponse runStepEvent:
                             Assert.NotNull(runStepEvent);
-
                             switch (runStepEvent.Object)
                             {
                                 case "thread.run.step.delta":
@@ -285,7 +284,6 @@ namespace OpenAI.Tests
                             break;
                         case MessageResponse messageEvent:
                             Assert.NotNull(messageEvent);
-
                             switch (messageEvent.Object)
                             {
                                 case "thread.message.delta":
@@ -328,13 +326,14 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_03_03_02_CreateRun_Streaming_ToolCalls()
+        public async Task Test_03_02_02_CreateRun_Streaming_ToolCalls()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
             var tools = new List<Tool>
             {
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null), "Expected all tool function arguments to be null");
             var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
             Assert.NotNull(assistant);
@@ -468,9 +467,9 @@ namespace OpenAI.Tests
             try
             {
                 var run = await assistant.CreateThreadAndRunAsync("I need to solve the equation `3x + 11 = 14`. Can you help me?",
-                    async @event =>
+                    async streamEvent =>
                     {
-                        Console.WriteLine(@event.ToJsonString());
+                        Console.WriteLine(streamEvent.ToJsonString());
                         await Task.CompletedTask;
                     });
                 Assert.IsNotNull(run);
@@ -503,11 +502,11 @@ namespace OpenAI.Tests
         public async Task Test_04_03_CreateThreadAndRun_Streaming_ToolCalls()
         {
             Assert.NotNull(OpenAIClient.ThreadsEndpoint);
-
             var tools = new List<Tool>
             {
                 Tool.GetOrCreateTool(typeof(DateTimeUtility), nameof(DateTimeUtility.GetDateTime))
             };
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null), "Expected all tool function arguments to be null");
             var assistantRequest = new CreateAssistantRequest(
                 instructions: "You are a helpful assistant.",
                 tools: tools);
@@ -516,11 +515,13 @@ namespace OpenAI.Tests
             ThreadResponse thread = null;
             // check if any exceptions thrown in stream event handler
             var exceptionThrown = false;
+            var hasInvokedCallback = false;
 
             try
             {
                 async Task StreamEventHandler(IServerSentEvent streamEvent)
                 {
+                    hasInvokedCallback = true;
                     Console.WriteLine($"{streamEvent.ToJsonString()}");
 
                     try
@@ -536,8 +537,9 @@ namespace OpenAI.Tests
                                     var toolOutputs = await assistant.GetToolOutputsAsync(runResponse);
                                     var toolRun = await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
                                     Assert.NotNull(toolRun);
-                                    Assert.IsTrue(toolRun.Status == RunStatus.Completed);
+                                    Assert.IsTrue(toolRun.Status == RunStatus.Completed, $"Failed to complete submit tool outputs! {toolRun.Status}");
                                 }
+
                                 break;
                             case Error errorResponse:
                                 throw errorResponse.Exception ?? new Exception(errorResponse.Message);
@@ -551,10 +553,11 @@ namespace OpenAI.Tests
                 }
 
                 var run = await assistant.CreateThreadAndRunAsync("What date is it?", StreamEventHandler);
-                Assert.NotNull(thread);
                 Assert.IsNotNull(run);
+                Assert.IsTrue(hasInvokedCallback);
+                Assert.NotNull(thread);
                 Assert.IsFalse(exceptionThrown);
-                Assert.IsTrue(run.Status == RunStatus.Completed);
+                Assert.IsTrue(run.Status == RunStatus.Completed, $"Failed to complete run! {run.Status}");
             }
             finally
             {
@@ -576,6 +579,7 @@ namespace OpenAI.Tests
                 Tool.CodeInterpreter,
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
+            Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null), "Expected all tool function arguments to be null");
             var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
             Assert.IsNotNull(assistant);
@@ -737,10 +741,11 @@ namespace OpenAI.Tests
                 run = await run.WaitForStatusChangeAsync();
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
+                Console.WriteLine($"Created thread and run: {run.ThreadId} -> {run.Id} -> {run.CreatedAt}");
                 Assert.NotNull(thread);
                 var messages = await thread.ListMessagesAsync();
 
-                foreach (var response in messages.Items.OrderBy(response => response.CreatedAt))
+                foreach (var response in messages.Items)
                 {
                     Console.WriteLine($"{response.Role}: {response.PrintContent()}");
                 }

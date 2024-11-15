@@ -126,10 +126,10 @@ namespace OpenAI
              *  Although their presence may not actually exist, we can still have this section in the parser, there is no
              *  negative impact for a missing hours segment because the capture groups are flagged as optional.
              */
-            int.TryParse(match.Groups["h"].Value.Replace("h", string.Empty), out var h);
-            int.TryParse(match.Groups["m"].Value.Replace("m", string.Empty), out var m);
-            int.TryParse(match.Groups["s"].Value.Replace("s", string.Empty), out var s);
-            int.TryParse(match.Groups["ms"].Value.Replace("ms", string.Empty), out var ms);
+            int.TryParse(match.Groups["h"]?.Value.Replace("h", string.Empty), out var h);
+            int.TryParse(match.Groups["m"]?.Value.Replace("m", string.Empty), out var m);
+            int.TryParse(match.Groups["s"]?.Value.Replace("s", string.Empty), out var s);
+            int.TryParse(match.Groups["ms"]?.Value.Replace("ms", string.Empty), out var ms);
             return new TimeSpan(h, m, s) + TimeSpan.FromMilliseconds(ms);
         }
 

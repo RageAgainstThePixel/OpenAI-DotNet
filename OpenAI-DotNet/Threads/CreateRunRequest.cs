@@ -19,35 +19,6 @@ namespace OpenAI.Threads
         /// <param name="assistantId">
         /// The ID of the assistant used for execution of this run.
         /// </param>
-        /// <param name="request"><see cref="CreateRunRequest"/>.</param>
-        [Obsolete("removed")]
-        public CreateRunRequest(string assistantId, CreateRunRequest request)
-            : this(
-                assistantId,
-                request?.Model,
-                request?.Instructions,
-                request?.AdditionalInstructions,
-                request?.AdditionalMessages,
-                request?.Tools,
-                request?.Metadata,
-                request?.Temperature,
-                request?.TopP,
-                request?.MaxPromptTokens,
-                request?.MaxCompletionTokens,
-                request?.TruncationStrategy,
-                request?.ToolChoice as string ?? ((Tool)request?.ToolChoice)?.Function?.Name,
-                request?.ParallelToolCalls,
-                request?.ResponseFormatObject?.JsonSchema,
-                request?.ResponseFormatObject ?? ChatResponseFormat.Text)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="assistantId">
-        /// The ID of the assistant used for execution of this run.
-        /// </param>
         /// <param name="model">
         /// The model that the assistant used for this run.
         /// </param>
@@ -137,7 +108,7 @@ namespace OpenAI.Threads
             string toolChoice = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto)
         {
             AssistantId = assistantId;
             Model = model;
@@ -194,7 +165,11 @@ namespace OpenAI.Threads
             }
             else
             {
-                ResponseFormatObject = responseFormat;
+                ResponseFormatObject = responseFormat switch
+                {
+                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
+                    _ => null
+                };
             }
         }
 
@@ -328,7 +303,7 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]

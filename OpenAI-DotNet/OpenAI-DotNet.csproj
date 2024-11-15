@@ -29,8 +29,17 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.3.0</Version>
+    <Version>8.4.0</Version>
     <PackageReleaseNotes>
+Version 8.4.0
+- Add realtime support
+- Added o1, o1-mini, gpt-4o-mini, and gpt-4o-realtime, gpt-4o-audio model convenience properties
+- Fixed some bugs with function invocations
+- Fixed strict for built in FunctionAttribute defined tools
+- Fixed FunctionAttribute tool generated names so they aren't too long
+- Refactored Tools and ToolCalls. There is more of a distinction now in ChatResponses
+- Refactored SpeechRequest, and deprecated SpeechVoice enum in favor of new Voice class
+- Refactored OpenAI.Chat to support new audio modalities and output audio
 Version 8.3.0
 - Updated library to .net 8
 - Refactored TypeExtensions and JsonSchema generation

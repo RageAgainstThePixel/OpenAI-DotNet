@@ -281,7 +281,7 @@ namespace OpenAI.Threads
         [JsonInclude]
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormatObject ResponseFormatObject { get; private set; }
 
         [JsonIgnore]

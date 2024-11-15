@@ -135,15 +135,6 @@ namespace OpenAI.Threads
         public string RunId { get; private set; }
 
         /// <summary>
-        /// A list of file IDs that the assistant should use.
-        /// Useful for tools like 'retrieval' and 'code_interpreter' that can access files.
-        /// A maximum of 10 files can be attached to a message.
-        /// </summary>
-        [JsonIgnore]
-        [Obsolete("Use Attachments instead.")]
-        public IReadOnlyList<string> FileIds => Attachments?.Select(attachment => attachment.FileId).ToList();
-
-        /// <summary>
         /// A list of files attached to the message, and the tools they were added to.
         /// </summary>
         [JsonInclude]
@@ -174,9 +165,13 @@ namespace OpenAI.Threads
         /// </summary>
         /// <returns><see cref="string"/> of all <see cref="Content"/>.</returns>
         public string PrintContent()
-            => content == null
-                ? string.Empty
-                : string.Join("\n", content.Select(c => c?.ToString()));
+        {
+            return Delta != null
+                ? Delta.PrintContent()
+                : content == null
+                    ? string.Empty
+                    : string.Join("\n", content.Select(c => c?.ToString()));
+        }
 
         /// <summary>
         /// Converts the <see cref="Content"/> to the specified <see cref="JsonSchema"/>.

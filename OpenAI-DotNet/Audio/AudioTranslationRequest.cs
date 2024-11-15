@@ -70,7 +70,7 @@ namespace OpenAI.Audio
             Stream audio,
             string audioName,
             string model = null,
-            string prompt = "response should be in english.",
+            string prompt = null,
             AudioResponseFormat responseFormat = AudioResponseFormat.Json,
             float? temperature = null)
         {

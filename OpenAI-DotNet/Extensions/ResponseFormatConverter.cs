@@ -27,8 +27,15 @@ namespace OpenAI.Extensions
 
         public override void Write(Utf8JsonWriter writer, ResponseFormatObject value, JsonSerializerOptions options)
         {
-            // serialize the object normally
-            JsonSerializer.Serialize(writer, value, options);
+            switch (value.Type)
+            {
+                case ChatResponseFormat.Auto:
+                    // ignore
+                    break;
+                default:
+                    JsonSerializer.Serialize(writer, value, options);
+                    break;
+            }
         }
     }
 }

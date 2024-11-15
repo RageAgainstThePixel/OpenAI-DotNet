@@ -46,7 +46,7 @@ namespace OpenAI
         {
             if (!Regex.IsMatch(name, NameRegex))
             {
-                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
+                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex} \"{name}\"");
             }
 
             Name = name;
@@ -69,17 +69,16 @@ namespace OpenAI
         /// An optional JSON describing the parameters of the function that the model can generate.
         /// </param>
         /// <param name="strict">
-        /// Whether to enable strict schema adherence when generating the function call.<br/>
-        /// If set to true, the model will follow the exact schema defined in the parameters field.<br/>
-        /// Only a subset of JSON Schema is supported when strict is true.<br/>
-        /// Learn more about Structured Outputs in the function calling guide.<br/>
+        /// Whether to enable strict schema adherence when generating the function call.
+        /// If set to true, the model will follow the exact schema defined in the parameters field.
+        /// Only a subset of JSON Schema is supported when strict is true. Learn more about Structured Outputs in the function calling guide.<br/>
         /// <see href="https://platform.openai.com/docs/api-reference/assistants/docs/guides/function-calling"/>
         /// </param>
         public Function(string name, string description, string parameters, bool? strict = null)
         {
             if (!Regex.IsMatch(name, NameRegex))
             {
-                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
+                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex} \"{name}\"");
             }
 
             Name = name;
@@ -99,7 +98,7 @@ namespace OpenAI
         {
             if (!Regex.IsMatch(name, NameRegex))
             {
-                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex}");
+                throw new ArgumentException($"The name of the function does not conform to naming standards: {NameRegex} \"{name}\"");
             }
 
             if (functionCache.ContainsKey(name))
@@ -172,6 +171,10 @@ namespace OpenAI
         [JsonPropertyName("name")]
         public string Name { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("type")]
+        public string Type { get; internal set; }
+
         /// <summary>
         /// The optional description of the function.
         /// </summary>
@@ -240,7 +243,7 @@ namespace OpenAI
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("strict")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public bool? Strict { get; private set; }
 
         /// <summary>
@@ -296,7 +299,8 @@ namespace OpenAI
             {
                 var (function, invokeArgs) = ValidateFunctionArguments();
 
-                if (function.MethodInfo.ReturnType == typeof(Task))
+                if (function.MethodInfo.ReturnType == typeof(Task) ||
+                    function.MethodInfo.ReturnType == typeof(Task<>))
                 {
                     throw new InvalidOperationException("Cannot invoke an async function synchronously. Use InvokeAsync() instead.");
                 }
@@ -315,6 +319,10 @@ namespace OpenAI
                 Console.WriteLine(e);
                 return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
+            finally
+            {
+                Arguments = null;
+            }
         }
 
         /// <summary>
@@ -328,7 +336,8 @@ namespace OpenAI
             {
                 var (function, invokeArgs) = ValidateFunctionArguments();
 
-                if (function.MethodInfo.ReturnType == typeof(Task))
+                if (function.MethodInfo.ReturnType == typeof(Task) ||
+                    function.MethodInfo.ReturnType == typeof(Task<>))
                 {
                     throw new InvalidOperationException("Cannot invoke an async function synchronously. Use InvokeAsync() instead.");
                 }
@@ -339,6 +348,10 @@ namespace OpenAI
             {
                 Console.WriteLine(e);
                 throw;
+            }
+            finally
+            {
+                Arguments = null;
             }
         }
 
@@ -366,6 +379,10 @@ namespace OpenAI
                 Console.WriteLine(e);
                 return JsonSerializer.Serialize(new { error = e.Message }, OpenAIClient.JsonSerializationOptions);
             }
+            finally
+            {
+                Arguments = null;
+            }
         }
 
         /// <summary>
@@ -392,6 +409,10 @@ namespace OpenAI
                 Console.WriteLine(e);
                 throw;
             }
+            finally
+            {
+                Arguments = null;
+            }
         }
 
         private static T InvokeInternal<T>(Function function, object[] invokeArgs)
@@ -402,11 +423,11 @@ namespace OpenAI
 
         private static async Task<T> InvokeInternalAsync<T>(Function function, object[] invokeArgs)
         {
-            var result = InvokeInternal<T>(function, invokeArgs);
+            var result = function.MethodInfo.Invoke(function.Instance, invokeArgs);
 
             if (result is not Task task)
             {
-                return result;
+                return result == null ? default : (T)result;
             }
 
             await task;
@@ -434,7 +455,7 @@ namespace OpenAI
                 throw new InvalidOperationException($"Failed to find a valid method to invoke for {Name}");
             }
 
-            var requestedArgs = arguments != null
+            var requestedArgs = Arguments != null
                 ? JsonSerializer.Deserialize<Dictionary<string, object>>(Arguments.ToString(), OpenAIClient.JsonSerializationOptions)
                 : new();
             var methodParams = function.MethodInfo.GetParameters();

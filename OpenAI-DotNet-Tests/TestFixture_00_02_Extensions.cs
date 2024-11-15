@@ -7,8 +7,8 @@ using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace OpenAI.Tests
@@ -35,7 +35,7 @@ namespace OpenAI.Tests
             var tools = new List<Tool>
             {
                 Tool.FromFunc("test_func", Function),
-                Tool.FromFunc<string, string, string>("test_func_with_args", FunctionWithArgs),
+                Tool.FromFunc<DateTime, Vector3, string>("test_func_with_args", FunctionWithArgs),
                 Tool.FromFunc("test_func_weather", () => WeatherService.GetCurrentWeatherAsync("my location", WeatherService.WeatherUnit.Celsius)),
                 Tool.FromFunc<List<int>, string>("test_func_with_array_args", FunctionWithArrayArgs),
                 Tool.FromFunc<string, string>("test_single_return_arg", arg1 => arg1),
@@ -50,52 +50,44 @@ namespace OpenAI.Tests
             Assert.IsNotNull(tools);
             var tool = tools[0];
             Assert.IsNotNull(tool);
-            var result = tool.InvokeFunction<string>();
+            var toolCall = new ToolCall("toolCall_0", tool.Function.Name);
+            var result = tool.InvokeFunction<string>(toolCall);
             Assert.AreEqual("success", result);
 
             var toolWithArgs = tools[1];
             Assert.IsNotNull(toolWithArgs);
-            toolWithArgs.Function.Arguments = new JsonObject
-            {
-                ["arg1"] = "arg1",
-                ["arg2"] = "arg2"
-            };
-            var resultWithArgs = toolWithArgs.InvokeFunction<string>();
-            Assert.AreEqual("arg1 arg2", resultWithArgs);
+            var testValue = new { arg1 = DateTime.UtcNow, arg2 = Vector3.One };
+            toolCall = new ToolCall("toolCall_1", toolWithArgs.Function.Name, JsonSerializer.Serialize(testValue, OpenAIClient.JsonSerializationOptions));
+            var resultWithArgs = toolWithArgs.InvokeFunction<string>(toolCall);
+            Console.WriteLine(resultWithArgs);
 
             var toolWeather = tools[2];
             Assert.IsNotNull(toolWeather);
-            var resultWeather = await toolWeather.InvokeFunctionAsync();
+            toolCall = new ToolCall("toolCall_2", toolWeather.Function.Name);
+            var resultWeather = await toolWeather.InvokeFunctionAsync(toolCall);
             Assert.IsFalse(string.IsNullOrWhiteSpace(resultWeather));
             Console.WriteLine(resultWeather);
 
             var toolWithArrayArgs = tools[3];
             Assert.IsNotNull(toolWithArrayArgs);
-            toolWithArrayArgs.Function.Arguments = new JsonObject
-            {
-                ["args"] = new JsonArray { 1, 2, 3, 4, 5 }
-            };
-            var resultWithArrayArgs = toolWithArrayArgs.InvokeFunction<string>();
-            Assert.AreEqual("1, 2, 3, 4, 5", resultWithArrayArgs);
+            var arrayTestValue = new { list = new List<int> { 1, 2, 3, 4, 5 } };
+            toolCall = new ToolCall("toolCall_3", toolWithArrayArgs.Function.Name, JsonSerializer.Serialize(arrayTestValue, OpenAIClient.JsonSerializationOptions));
+            var resultWithArrayArgs = toolWithArrayArgs.InvokeFunction<string>(toolCall);
+            Assert.AreEqual("{\"list\":[1,2,3,4,5]}", resultWithArrayArgs);
             Console.WriteLine(resultWithArrayArgs);
 
-            var singleReturnArg = tools[4];
-            Assert.IsNotNull(singleReturnArg);
-            singleReturnArg.Function.Arguments = new JsonObject
-            {
-                ["arg1"] = "arg1"
-            };
-            var resultSingleReturnArg = singleReturnArg.InvokeFunction<string>();
+            var toolSingleReturnArg = tools[4];
+            Assert.IsNotNull(toolSingleReturnArg);
+            var singleReturnArgTestValue = new Dictionary<string, string> { { "arg1", "arg1" } };
+            toolCall = new ToolCall("toolCall_4", toolSingleReturnArg.Function.Name, JsonSerializer.Serialize(singleReturnArgTestValue, OpenAIClient.JsonSerializationOptions));
+            var resultSingleReturnArg = toolSingleReturnArg.InvokeFunction<string>(toolCall);
             Assert.AreEqual("arg1", resultSingleReturnArg);
             Console.WriteLine(resultSingleReturnArg);
 
             var toolNoSpecifiers = tools[5];
             Assert.IsNotNull(toolNoSpecifiers);
-            toolNoSpecifiers.Function.Arguments = new JsonObject
-            {
-                ["arg1"] = "arg1"
-            };
-            var resultNoSpecifiers = toolNoSpecifiers.InvokeFunction<string>();
+            toolCall = new ToolCall("toolCall_5", toolNoSpecifiers.Function.Name, JsonSerializer.Serialize(singleReturnArgTestValue, OpenAIClient.JsonSerializationOptions));
+            var resultNoSpecifiers = toolNoSpecifiers.InvokeFunction<string>(toolCall);
             Assert.AreEqual("arg1", resultNoSpecifiers);
             Console.WriteLine(resultNoSpecifiers);
         }
@@ -105,14 +97,14 @@ namespace OpenAI.Tests
             return "success";
         }
 
-        private string FunctionWithArgs(string arg1, string arg2)
+        private string FunctionWithArgs(DateTime arg1, Vector3 arg2)
         {
-            return $"{arg1} {arg2}";
+            return JsonSerializer.Serialize(new { arg1, arg2 }, OpenAIClient.JsonSerializationOptions);
         }
 
-        private string FunctionWithArrayArgs(List<int> args)
+        private string FunctionWithArrayArgs(List<int> list)
         {
-            return string.Join(", ", args);
+            return JsonSerializer.Serialize(new { list }, OpenAIClient.JsonSerializationOptions);
         }
 
         [Test]
@@ -134,8 +126,8 @@ namespace OpenAI.Tests
 
                 // Delay a little bit to simulate calling OpenAi API:
                 await Task.Delay(50);
-
-                var result = tool.InvokeFunction<int>();
+                var toolCall = new ToolCall($"toolCall_{id}", tool.Function.Name);
+                var result = tool.InvokeFunction<int>(toolCall);
                 Assert.AreEqual(id, result);
             }
         }

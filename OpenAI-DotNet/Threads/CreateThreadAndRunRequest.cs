@@ -16,34 +16,6 @@ namespace OpenAI.Threads
         /// <param name="assistantId">
         /// The ID of the assistant to use to execute this run.
         /// </param>
-        /// <param name="request"><see cref="CreateThreadAndRunRequest"/>.</param>
-        [Obsolete("removed")]
-        public CreateThreadAndRunRequest(string assistantId, CreateThreadAndRunRequest request)
-            : this(
-                assistantId,
-                request?.Model,
-                request?.Instructions,
-                request?.Tools,
-                request?.ToolResources,
-                request?.Metadata,
-                request?.Temperature,
-                request?.TopP,
-                request?.MaxPromptTokens,
-                request?.MaxCompletionTokens,
-                request?.TruncationStrategy,
-                request?.ToolChoice as string ?? ((Tool)request?.ToolChoice)?.Function?.Name,
-                request?.ParallelToolCalls,
-                request?.ResponseFormatObject?.JsonSchema,
-                request?.ResponseFormat ?? ChatResponseFormat.Text)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="assistantId">
-        /// The ID of the assistant to use to execute this run.
-        /// </param>
         /// <param name="model">
         /// The ID of the Model to be used to execute this run.
         /// If a value is provided here, it will override the model associated with the assistant.
@@ -138,7 +110,7 @@ namespace OpenAI.Threads
             string toolChoice = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             CreateThreadRequest createThreadRequest = null)
         {
             AssistantId = assistantId;
@@ -187,6 +159,7 @@ namespace OpenAI.Threads
             MaxPromptTokens = maxPromptTokens;
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;
+            ParallelToolCalls = parallelToolCalls;
 
             if (jsonSchema != null)
             {
@@ -194,10 +167,13 @@ namespace OpenAI.Threads
             }
             else
             {
-                ResponseFormatObject = responseFormat;
+                ResponseFormatObject = responseFormat switch
+                {
+                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
+                    _ => null
+                };
             }
 
-            ParallelToolCalls = parallelToolCalls;
             ThreadRequest = createThreadRequest;
         }
 
@@ -330,7 +306,7 @@ namespace OpenAI.Threads
         /// </remarks>
         [JsonPropertyName("response_format")]
         [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]

@@ -22,7 +22,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -30,9 +30,10 @@ namespace OpenAI.Chat
             int? topLogProbs = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
+            AudioConfig audioConfig = null,
             string user = null)
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty,
-                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, user)
+                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, user)
         {
             var toolList = tools?.ToList();
 
@@ -103,8 +104,7 @@ namespace OpenAI.Chat
         /// Up to 4 sequences where the API will stop generating further tokens.
         /// </param>
         /// <param name="maxTokens">
-        /// The maximum number of tokens allowed for the generated answer.
-        /// By default, the number of tokens the model can return will be (4096 - prompt tokens).
+        /// An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens.
         /// </param>
         /// <param name="presencePenalty">
         /// Number between -2.0 and 2.0.
@@ -136,13 +136,16 @@ namespace OpenAI.Chat
         /// An integer between 0 and 5 specifying the number of most likely tokens to return at each token position,
         /// each with an associated log probability.
         /// </param>
-        /// <param name="parallelToolCalls">
-        /// Whether to enable parallel function calling during tool use.
-        /// </param>
         /// <param name="jsonSchema">
         /// The <see cref="JsonSchema"/> to use for structured JSON outputs.<br/>
         /// <see href="https://platform.openai.com/docs/guides/structured-outputs"/><br/>
         /// <see href="https://json-schema.org/overview/what-is-jsonschema"/>
+        /// </param>
+        /// <param name="parallelToolCalls">
+        /// Whether to enable parallel function calling during tool use.
+        /// </param>
+        /// <param name="audioConfig">
+        /// Parameters for audio output. <see cref="Chat.AudioConfig"/>.
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
@@ -155,7 +158,7 @@ namespace OpenAI.Chat
             int? maxTokens = null,
             int? number = null,
             double? presencePenalty = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
             int? seed = null,
             string[] stops = null,
             double? temperature = null,
@@ -163,6 +166,7 @@ namespace OpenAI.Chat
             int? topLogProbs = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
+            AudioConfig audioConfig = null,
             string user = null)
         {
             Messages = messages?.ToList();
@@ -173,9 +177,25 @@ namespace OpenAI.Chat
             }
 
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
+
+            if (audioConfig != null && !Model.Contains("audio"))
+            {
+                throw new ArgumentException("Audio settings are only valid for models that support audio output", nameof(audioConfig));
+            }
+
+            if (Model.Contains("audio"))
+            {
+                Modalities = Modality.Text | Modality.Audio;
+                AudioConfig = audioConfig ?? new(Voice.Alloy);
+            }
+            else
+            {
+                Modalities = Modality.Text;
+            }
+
             FrequencyPenalty = frequencyPenalty;
             LogitBias = logitBias;
-            MaxTokens = maxTokens;
+            MaxCompletionTokens = maxTokens;
             Number = number;
             PresencePenalty = presencePenalty;
 
@@ -185,7 +205,11 @@ namespace OpenAI.Chat
             }
             else
             {
-                ResponseFormatObject = responseFormat;
+                ResponseFormatObject = responseFormat switch
+                {
+                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
+                    _ => null
+                };
             }
 
             Seed = seed;
@@ -209,6 +233,18 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("model")]
         public string Model { get; }
+
+        /// <summary>
+        /// Whether or not to store the output of this chat completion request for use in our model distillation or evals products.
+        /// </summary>
+        [JsonPropertyName("store")]
+        public bool? Store { get; set; }
+
+        /// <summary>
+        /// Developer-defined tags and values used for filtering completions in the dashboard.
+        /// </summary>
+        [JsonPropertyName("metadata")]
+        public IReadOnlyDictionary<string, object> Metadata { get; set; }
 
         /// <summary>
         /// Number between -2.0 and 2.0.
@@ -258,7 +294,14 @@ namespace OpenAI.Chat
         /// By default, the number of tokens the model can return will be (4096 - prompt tokens).
         /// </summary>
         [JsonPropertyName("max_tokens")]
+        [Obsolete("Use MaxCompletionTokens instead")]
         public int? MaxTokens { get; }
+
+        /// <summary>
+        /// An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens.
+        /// </summary>
+        [JsonPropertyName("max_completion_tokens")]
+        public int? MaxCompletionTokens { get; }
 
         /// <summary>
         /// How many chat completion choices to generate for each input message.<br/>
@@ -266,6 +309,24 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("n")]
         public int? Number { get; }
+
+        [JsonPropertyName("modalities")]
+        [JsonConverter(typeof(ModalityConverter))]
+        public Modality Modalities { get; }
+
+        /// <summary>
+        /// Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time.
+        /// This is most common when you are regenerating a file with only minor changes to most of the content.
+        /// </summary>
+        [JsonPropertyName("prediction")]
+        public object Prediction { get; set; }
+
+        /// <summary>
+        /// Parameters for audio output.
+        /// Required when audio output is requested with modalities: ["audio"].
+        /// </summary>
+        [JsonPropertyName("audio")]
+        public AudioConfig AudioConfig { get; }
 
         /// <summary>
         /// Number between -2.0 and 2.0.
@@ -275,6 +336,11 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("presence_penalty")]
         public double? PresencePenalty { get; }
+
+        [JsonPropertyName("response_format")]
+        [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ResponseFormatObject ResponseFormatObject { get; internal set; }
 
         /// <summary>
         /// An object specifying the format that the model must output.
@@ -290,11 +356,6 @@ namespace OpenAI.Chat
         [JsonIgnore]
         public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;
 
-        [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormatObject { get; internal set; }
-
         /// <summary>
         /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically,
         /// such that repeated requests with the same seed and parameters should return the same result.
@@ -303,6 +364,17 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonPropertyName("seed")]
         public int? Seed { get; }
+
+        /// <summary>
+        /// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service:<br/>
+        /// - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted.<br/>
+        /// - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarantee.<br/>
+        /// - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarantee.<br/>
+        /// - When not set, the default behavior is 'auto'.<br/>
+        /// When this parameter is set, the response body will include the service_tier utilized.
+        /// </summary>
+        [JsonPropertyName("service_tier")]
+        public string ServiceTier { get; set; }
 
         /// <summary>
         /// Up to 4 sequences where the API will stop generating further tokens.

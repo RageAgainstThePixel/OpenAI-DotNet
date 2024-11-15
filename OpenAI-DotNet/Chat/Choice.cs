@@ -56,7 +56,8 @@ namespace OpenAI.Chat
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public LogProbs LogProbs { get; private set; }
 
-        public override string ToString() => Message?.Content?.ToString() ?? Delta?.Content ?? string.Empty;
+        public override string ToString()
+            => Message?.ToString() ?? Delta?.Content ?? string.Empty;
 
         public static implicit operator string(Choice choice) => choice?.ToString();
 

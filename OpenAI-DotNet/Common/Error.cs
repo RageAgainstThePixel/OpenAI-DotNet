@@ -90,5 +90,8 @@ namespace OpenAI
 
             return builder.ToString();
         }
+
+        public static implicit operator Exception(Error error)
+            => error.Exception ?? new Exception(error.ToString());
     }
 }

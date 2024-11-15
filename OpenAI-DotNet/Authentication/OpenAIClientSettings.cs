@@ -10,6 +10,9 @@ namespace OpenAI
     /// </summary>
     public sealed class OpenAIClientSettings
     {
+        internal const string WS = "ws://";
+        internal const string WSS = "wss://";
+        internal const string Http = "http://";
         internal const string Https = "https://";
         internal const string OpenAIDomain = "api.openai.com";
         internal const string DefaultOpenAIApiVersion = "v1";
@@ -22,10 +25,11 @@ namespace OpenAI
         public OpenAIClientSettings()
         {
             ResourceName = OpenAIDomain;
-            ApiVersion = "v1";
+            ApiVersion = DefaultOpenAIApiVersion;
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"{Https}{ResourceName}{BaseRequest}{{0}}";
+            BaseWebSocketUrlFormat = $"{WSS}{ResourceName}{BaseRequest}{{0}}";
             UseOAuthAuthentication = true;
         }
 
@@ -52,11 +56,23 @@ namespace OpenAI
                 apiVersion = DefaultOpenAIApiVersion;
             }
 
-            ResourceName = domain.Contains("http") ? domain : $"{Https}{domain}";
+            ResourceName = domain.Contains(Http)
+                ? domain
+                : $"{Https}{domain}";
+
+            if (domain.Contains(Http))
+            {
+                domain = domain.Replace(Http, string.Empty);
+                domain = domain.Replace(Https, string.Empty);
+            }
+
             ApiVersion = apiVersion;
             DeploymentId = string.Empty;
             BaseRequest = $"/{ApiVersion}/";
             BaseRequestUrlFormat = $"{ResourceName}{BaseRequest}{{0}}";
+            BaseWebSocketUrlFormat = ResourceName.Contains(Https)
+                ? $"{WSS}{domain}{BaseRequest}{{0}}"
+                : $"{WS}{domain}{BaseRequest}{{0}}";
             UseOAuthAuthentication = true;
         }
 
@@ -99,24 +115,24 @@ namespace OpenAI
             ApiVersion = apiVersion;
             BaseRequest = "/openai/";
             BaseRequestUrlFormat = $"{Https}{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}";
+            BaseWebSocketUrlFormat = $"{WSS}{ResourceName}.{AzureOpenAIDomain}{BaseRequest}{{0}}";
             defaultQueryParameters.Add("api-version", ApiVersion);
             UseOAuthAuthentication = useActiveDirectoryAuthentication;
         }
 
         public string ResourceName { get; }
 
-        public string ApiVersion { get; }
-
         public string DeploymentId { get; }
+
+        public string ApiVersion { get; }
 
         public string BaseRequest { get; }
 
         internal string BaseRequestUrlFormat { get; }
 
-        internal bool UseOAuthAuthentication { get; }
+        internal string BaseWebSocketUrlFormat { get; }
 
-        [Obsolete("Use IsAzureOpenAI")]
-        public bool IsAzureDeployment => IsAzureOpenAI;
+        internal bool UseOAuthAuthentication { get; }
 
         public bool IsAzureOpenAI => BaseRequestUrlFormat.Contains(AzureOpenAIDomain);
 
