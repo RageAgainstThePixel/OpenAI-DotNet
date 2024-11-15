@@ -190,7 +190,7 @@ namespace OpenAI.Chat
             }
             else
             {
-                Modalities = Modality.Text;
+                Modalities = Modality.Text & Modality.Audio;
             }
 
             FrequencyPenalty = frequencyPenalty;
@@ -238,12 +238,14 @@ namespace OpenAI.Chat
         /// Whether or not to store the output of this chat completion request for use in our model distillation or evals products.
         /// </summary>
         [JsonPropertyName("store")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Store { get; set; }
 
         /// <summary>
         /// Developer-defined tags and values used for filtering completions in the dashboard.
         /// </summary>
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, object> Metadata { get; set; }
 
         /// <summary>
@@ -253,6 +255,7 @@ namespace OpenAI.Chat
         /// Defaults to 0
         /// </summary>
         [JsonPropertyName("frequency_penalty")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? FrequencyPenalty { get; }
 
         /// <summary>
@@ -275,7 +278,7 @@ namespace OpenAI.Chat
         /// This option is currently not available on the gpt-4-vision-preview model.
         /// </remarks>
         [JsonPropertyName("logprobs")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? LogProbs { get; }
 
         /// <summary>
@@ -286,21 +289,21 @@ namespace OpenAI.Chat
         /// <see cref="LogProbs"/> must be set to true if this parameter is used.
         /// </remarks>
         [JsonPropertyName("top_logprobs")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? TopLogProbs { get; }
 
         /// <summary>
         /// The maximum number of tokens allowed for the generated answer.
         /// By default, the number of tokens the model can return will be (4096 - prompt tokens).
         /// </summary>
-        [JsonPropertyName("max_tokens")]
-        [Obsolete("Use MaxCompletionTokens instead")]
-        public int? MaxTokens { get; }
+        [JsonIgnore]
+        public int? MaxTokens => MaxCompletionTokens;
 
         /// <summary>
         /// An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens.
         /// </summary>
         [JsonPropertyName("max_completion_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxCompletionTokens { get; }
 
         /// <summary>
@@ -312,6 +315,7 @@ namespace OpenAI.Chat
 
         [JsonPropertyName("modalities")]
         [JsonConverter(typeof(ModalityConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Modality Modalities { get; }
 
         /// <summary>
@@ -319,6 +323,7 @@ namespace OpenAI.Chat
         /// This is most common when you are regenerating a file with only minor changes to most of the content.
         /// </summary>
         [JsonPropertyName("prediction")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object Prediction { get; set; }
 
         /// <summary>
@@ -326,6 +331,7 @@ namespace OpenAI.Chat
         /// Required when audio output is requested with modalities: ["audio"].
         /// </summary>
         [JsonPropertyName("audio")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public AudioConfig AudioConfig { get; }
 
         /// <summary>
@@ -335,6 +341,7 @@ namespace OpenAI.Chat
         /// Defaults to 0
         /// </summary>
         [JsonPropertyName("presence_penalty")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? PresencePenalty { get; }
 
         [JsonPropertyName("response_format")]
@@ -363,6 +370,7 @@ namespace OpenAI.Chat
         /// monitor changes in the backend.
         /// </summary>
         [JsonPropertyName("seed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Seed { get; }
 
         /// <summary>
@@ -374,12 +382,14 @@ namespace OpenAI.Chat
         /// When this parameter is set, the response body will include the service_tier utilized.
         /// </summary>
         [JsonPropertyName("service_tier")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string ServiceTier { get; set; }
 
         /// <summary>
         /// Up to 4 sequences where the API will stop generating further tokens.
         /// </summary>
         [JsonPropertyName("stop")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string[] Stops { get; }
 
         /// <summary>
@@ -403,6 +413,7 @@ namespace OpenAI.Chat
         /// Defaults to 1
         /// </summary>
         [JsonPropertyName("temperature")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? Temperature { get; }
 
         /// <summary>
@@ -413,6 +424,7 @@ namespace OpenAI.Chat
         /// Defaults to 1
         /// </summary>
         [JsonPropertyName("top_p")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TopP { get; }
 
         /// <summary>
@@ -420,6 +432,7 @@ namespace OpenAI.Chat
         /// Use this to provide a list of functions the model may generate JSON inputs for.
         /// </summary>
         [JsonPropertyName("tools")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Tool> Tools { get; }
 
         /// <summary>
@@ -432,18 +445,21 @@ namespace OpenAI.Chat
         /// 'auto' is the default if functions are present.<br/>
         /// </summary>
         [JsonPropertyName("tool_choice")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public dynamic ToolChoice { get; }
 
         /// <summary>
         /// Whether to enable parallel function calling during tool use.
         /// </summary>
         [JsonPropertyName("parallel_tool_calls")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? ParallelToolCalls { get; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         [JsonPropertyName("user")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string User { get; }
 
         /// <inheritdoc />

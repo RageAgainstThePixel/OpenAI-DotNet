@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.4.0</Version>
+    <Version>8.4.1</Version>
     <PackageReleaseNotes>
+Version 8.4.1
+- Fix ChatRequest serialization for Azure OpenAI
 Version 8.4.0
 - Add realtime support
 - Added o1, o1-mini, gpt-4o-mini, and gpt-4o-realtime, gpt-4o-audio model convenience properties
