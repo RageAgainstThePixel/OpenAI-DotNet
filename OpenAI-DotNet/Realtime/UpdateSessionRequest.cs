@@ -13,6 +13,8 @@ namespace OpenAI.Realtime
     /// </summary>
     public sealed class UpdateSessionRequest : BaseRealtimeEvent, IClientEvent
     {
+        public UpdateSessionRequest() { }
+
         public UpdateSessionRequest(Options options)
         {
             Session = options;

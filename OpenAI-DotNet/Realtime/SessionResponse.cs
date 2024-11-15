@@ -6,6 +6,8 @@ namespace OpenAI.Realtime
 {
     public sealed class SessionResponse : BaseRealtimeEvent, IServerEvent
     {
+        public SessionResponse() { }
+
         /// <inheritdoc />
         [JsonInclude]
         [JsonPropertyName("event_id")]

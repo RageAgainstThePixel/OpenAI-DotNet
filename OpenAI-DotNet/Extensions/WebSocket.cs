@@ -30,7 +30,7 @@ namespace OpenAI.Extensions
             Address = uri;
             RequestHeaders = requestHeaders ?? new Dictionary<string, string>();
             SubProtocols = subProtocols ?? new List<string>();
-            _socket = new ClientWebSocket();
+            CreateWebsocketAsync = (_, _) => Task.FromResult<System.Net.WebSockets.WebSocket>(new ClientWebSocket());
             RunMessageQueue();
         }
 
@@ -114,13 +114,16 @@ namespace OpenAI.Extensions
         };
 
         private readonly object _lock = new();
-        private ClientWebSocket _socket;
+        private System.Net.WebSockets.WebSocket _socket;
         private SemaphoreSlim _semaphore = new(1, 1);
         private CancellationTokenSource _lifetimeCts;
         private readonly ConcurrentQueue<Action> _events = new();
 
         public async void Connect()
-            => await ConnectAsync();
+            => await ConnectAsync().ConfigureAwait(false);
+
+        // used for unit testing websocket server
+        internal Func<Uri, CancellationToken, Task<System.Net.WebSockets.WebSocket>> CreateWebsocketAsync;
 
         public async Task ConnectAsync(CancellationToken cancellationToken = default)
         {
@@ -132,22 +135,29 @@ namespace OpenAI.Extensions
                     return;
                 }
 
+                // ReSharper disable once MethodHasAsyncOverload
                 _lifetimeCts?.Cancel();
                 _lifetimeCts?.Dispose();
                 _lifetimeCts = new CancellationTokenSource();
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token, cancellationToken);
 
-                foreach (var requestHeader in RequestHeaders)
+                _socket = await CreateWebsocketAsync.Invoke(Address, cts.Token).ConfigureAwait(false);
+
+                if (_socket is ClientWebSocket clientWebSocket)
                 {
-                    _socket.Options.SetRequestHeader(requestHeader.Key, requestHeader.Value);
+                    foreach (var requestHeader in RequestHeaders)
+                    {
+                        clientWebSocket.Options.SetRequestHeader(requestHeader.Key, requestHeader.Value);
+                    }
+
+                    foreach (var subProtocol in SubProtocols)
+                    {
+                        clientWebSocket.Options.AddSubProtocol(subProtocol);
+                    }
+
+                    await clientWebSocket.ConnectAsync(Address, cts.Token).ConfigureAwait(false);
                 }
 
-                foreach (var subProtocol in SubProtocols)
-                {
-                    _socket.Options.AddSubProtocol(subProtocol);
-                }
-
-                await _socket.ConnectAsync(Address, cts.Token).ConfigureAwait(false);
                 _events.Enqueue(() => OnOpen?.Invoke());
                 var buffer = new Memory<byte>(new byte[8192]);
 
@@ -202,10 +212,10 @@ namespace OpenAI.Extensions
         }
 
         public async Task SendAsync(string text, CancellationToken cancellationToken = default)
-            => await Internal_SendAsync(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text, cancellationToken);
+            => await Internal_SendAsync(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text, cancellationToken).ConfigureAwait(false);
 
         public async Task SendAsync(ArraySegment<byte> data, CancellationToken cancellationToken = default)
-            => await Internal_SendAsync(data, WebSocketMessageType.Binary, cancellationToken);
+            => await Internal_SendAsync(data, WebSocketMessageType.Binary, cancellationToken).ConfigureAwait(false);
 
         private async Task Internal_SendAsync(ArraySegment<byte> data, WebSocketMessageType opCode, CancellationToken cancellationToken)
         {
@@ -257,8 +267,10 @@ namespace OpenAI.Extensions
             {
                 switch (e)
                 {
+                    case ObjectDisposedException:
                     case TaskCanceledException:
                     case OperationCanceledException:
+                        _events.Enqueue(() => OnClose?.Invoke(code, reason));
                         break;
                     default:
                         Console.WriteLine(e);

@@ -157,7 +157,7 @@ namespace OpenAI.Chat
                 return AudioOutput?.ToString() ?? string.Empty;
             }
 
-            return Content.ToString();
+            return Content?.ToString() ?? string.Empty;
         }
 
         public static implicit operator string(Message message) => message?.ToString();

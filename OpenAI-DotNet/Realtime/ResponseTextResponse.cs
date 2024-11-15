@@ -35,20 +35,21 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("output_index")]
-        public string OutputIndex { get; private set; }
+        public int OutputIndex { get; private set; }
 
         /// <summary>
         /// The index of the content part in the item's content array.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content_index")]
-        public string ContentIndex { get; private set; }
+        public int ContentIndex { get; private set; }
 
         /// <summary>
         /// The text delta.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Delta { get; private set; }
 
         /// <summary>
@@ -56,6 +57,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Text { get; private set; }
 
         [JsonInclude]

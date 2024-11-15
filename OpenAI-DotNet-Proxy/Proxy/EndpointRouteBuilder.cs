@@ -163,10 +163,12 @@ namespace OpenAI.Proxy
                     return;
                 }
 
-                var uri = new Uri(string.Format(
-                    openAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat,
-                    $"{endpoint}{httpContext.Request.QueryString}"
-                ));
+                if (endpoint.EndsWith("echo"))
+                {
+                    await EchoAsync(clientWebsocket, httpContext.RequestAborted);
+                    return;
+                }
+
                 using var hostWebsocket = new ClientWebSocket();
 
                 foreach (var header in openAIClient.WebsocketHeaders)
@@ -174,6 +176,10 @@ namespace OpenAI.Proxy
                     hostWebsocket.Options.SetRequestHeader(header.Key, header.Value);
                 }
 
+                var uri = new Uri(string.Format(
+                    openAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat,
+                    $"{endpoint}{httpContext.Request.QueryString}"
+                ));
                 await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);
                 var receive = ProxyWebSocketMessages(clientWebsocket, hostWebsocket, httpContext.RequestAborted);
                 var send = ProxyWebSocketMessages(hostWebsocket, clientWebsocket, httpContext.RequestAborted);
@@ -198,6 +204,20 @@ namespace OpenAI.Proxy
                         await toSocket.SendAsync(memoryBuffer[..result.Count], result.MessageType, result.EndOfMessage, cancellationToken).ConfigureAwait(false);
                     }
                 }
+            }
+
+            static async Task EchoAsync(WebSocket webSocket, CancellationToken cancellationToken)
+            {
+                var buffer = new byte[1024 * 4];
+                var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+
+                while (!receiveResult.CloseStatus.HasValue)
+                {
+                    await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Count), receiveResult.MessageType, receiveResult.EndOfMessage, cancellationToken);
+                    receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+                }
+
+                await webSocket.CloseAsync(receiveResult.CloseStatus.Value, receiveResult.CloseStatusDescription, cancellationToken);
             }
         }
     }

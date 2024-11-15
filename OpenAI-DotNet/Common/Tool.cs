@@ -123,6 +123,7 @@ namespace OpenAI
                 throw new InvalidOperationException("Tool does not match tool call!");
             }
         }
+
         [Obsolete("Use overload with ToolCall parameter")]
         public string InvokeFunction()
             => IsFunction
@@ -391,7 +392,7 @@ namespace OpenAI
                 return tool;
             }
 
-            tool = new Tool(Function.GetOrCreateFunction(functionName, description, method, instance, strict: false));
+            tool = new Tool(Function.GetOrCreateFunction(functionName, description, method, instance));
             toolCache.Add(tool);
             return tool;
         }

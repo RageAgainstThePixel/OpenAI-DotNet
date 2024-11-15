@@ -42,6 +42,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("part")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public RealtimeContent ContentPart { get; private set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -42,10 +43,10 @@ namespace OpenAI.Realtime
             {
                 session.OnEventReceived += OnEventReceived;
                 session.OnError += OnError;
-                await session.ConnectAsync(cancellationToken).ConfigureAwait(true);
-                var sessionResponse = await sessionCreatedTcs.Task; // TODO .WithCancellation(cancellationToken).ConfigureAwait(true);
+                await session.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                var sessionResponse = await sessionCreatedTcs.Task.WithCancellation(cancellationToken).ConfigureAwait(false);
                 session.Options = sessionResponse.Options;
-                await session.SendAsync(new UpdateSessionRequest(options), cancellationToken: cancellationToken).ConfigureAwait(true);
+                await session.SendAsync(new UpdateSessionRequest(options), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -66,6 +67,9 @@ namespace OpenAI.Realtime
                 {
                     switch (@event)
                     {
+                        case RealtimeConversationResponse:
+                            Console.WriteLine("[conversation.created]");
+                            break;
                         case SessionResponse sessionResponse:
                             if (sessionResponse.Type == "session.created")
                             {

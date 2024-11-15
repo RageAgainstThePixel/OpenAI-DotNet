@@ -52,7 +52,7 @@ namespace OpenAI
             Name = name;
             Description = description;
             Parameters = parameters;
-            Strict = strict ?? false;
+            Strict = strict;
         }
 
         /// <summary>
@@ -84,14 +84,14 @@ namespace OpenAI
             Name = name;
             Description = description;
             Parameters = JsonNode.Parse(parameters);
-            Strict = strict ?? false;
+            Strict = strict;
         }
 
         internal Function(string name, JsonNode arguments, bool? strict = null)
         {
             Name = name;
             Arguments = arguments;
-            Strict = strict ?? false;
+            Strict = strict;
         }
 
         private Function(string name, string description, MethodInfo method, object instance = null, bool? strict = null)
@@ -111,7 +111,7 @@ namespace OpenAI
             MethodInfo = method;
             Parameters = method.GenerateJsonSchema();
             Instance = instance;
-            Strict = strict ?? false;
+            Strict = strict;
             functionCache[Name] = this;
         }
 
@@ -243,7 +243,7 @@ namespace OpenAI
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("strict")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public bool? Strict { get; private set; }
 
         /// <summary>

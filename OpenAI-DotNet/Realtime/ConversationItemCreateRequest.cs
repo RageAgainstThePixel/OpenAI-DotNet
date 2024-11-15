@@ -12,6 +12,8 @@ namespace OpenAI.Realtime
     /// </summary>
     public sealed class ConversationItemCreateRequest : BaseRealtimeEvent, IClientEvent
     {
+        public ConversationItemCreateRequest() { }
+
         public ConversationItemCreateRequest(ConversationItem item, string previousItemId = null)
         {
             PreviousItemId = previousItemId;

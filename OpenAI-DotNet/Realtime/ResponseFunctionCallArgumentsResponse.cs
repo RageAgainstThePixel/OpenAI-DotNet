@@ -36,7 +36,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("output_index")]
-        public string OutputIndex { get; private set; }
+        public int OutputIndex { get; private set; }
 
         /// <summary>
         /// The ID of the function call.
@@ -50,10 +50,12 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Delta { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; private set; }
 
         /// <summary>
@@ -61,6 +63,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public JsonNode Arguments { get; private set; }
 
         [JsonIgnore]

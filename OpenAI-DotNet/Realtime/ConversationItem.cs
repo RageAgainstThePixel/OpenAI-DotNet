@@ -64,6 +64,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Id { get; private set; }
 
         /// <summary>
@@ -71,6 +72,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("object")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Object { get; private set; }
 
         /// <summary>
@@ -79,6 +81,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ConversationItemType>))]
         public ConversationItemType Type { get; private set; }
 
         /// <summary>
@@ -86,6 +89,8 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("status")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeResponseStatus>))]
         public RealtimeResponseStatus Status { get; private set; }
 
         /// <summary>
@@ -93,6 +98,8 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("role")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<Role>))]
         public Role Role { get; private set; }
 
         /// <summary>
@@ -100,6 +107,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IReadOnlyList<RealtimeContent> Content { get; private set; }
 
         /// <summary>
@@ -107,6 +115,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("call_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FunctionCallId { get; private set; }
 
         /// <summary>
@@ -114,6 +123,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FunctionName { get; private set; }
 
         /// <summary>
@@ -121,6 +131,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public JsonNode FunctionArguments { get; private set; }
 
         /// <summary>
@@ -128,6 +139,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("output")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FunctionOutput { get; private set; }
     }
 }

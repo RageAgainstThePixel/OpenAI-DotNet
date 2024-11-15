@@ -27,19 +27,23 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("type")]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<TurnDetectionType>))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TurnDetectionType Type { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("threshold")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public float? DetectionThreshold { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("prefix_padding_ms")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? PrefixPadding { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("silence_duration_ms")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? SilenceDuration { get; private set; }
 
         public static VoiceActivityDetectionSettings Disabled() => new(TurnDetectionType.Disabled);

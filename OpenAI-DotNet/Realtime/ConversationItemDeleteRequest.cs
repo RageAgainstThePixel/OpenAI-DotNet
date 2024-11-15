@@ -12,6 +12,8 @@ namespace OpenAI.Realtime
     /// </summary>
     public sealed class ConversationItemDeleteRequest : BaseRealtimeEvent, IClientEvent
     {
+        public ConversationItemDeleteRequest() { }
+
         public ConversationItemDeleteRequest(string itemId)
         {
             ItemId = itemId;

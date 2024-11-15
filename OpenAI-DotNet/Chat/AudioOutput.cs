@@ -5,27 +5,25 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Chat
 {
+    [JsonConverter(typeof(AudioOutputConverter))]
     public sealed class AudioOutput
     {
-        // TODO set data
-        [JsonInclude]
-        [JsonPropertyName("id")]
+        internal AudioOutput(string id, int expiresAtUnixSeconds, ReadOnlyMemory<byte> data, string transcript)
+        {
+            Id = id;
+            ExpiresAtUnixSeconds = expiresAtUnixSeconds;
+            Data = data;
+            Transcript = transcript;
+        }
+
         public string Id { get; }
 
-        [JsonInclude]
-        [JsonIgnore]
         public int ExpiresAtUnixSeconds { get; }
 
-        [JsonInclude]
-        [JsonIgnore]
         public DateTime ExpiresAt => DateTimeOffset.FromUnixTimeSeconds(ExpiresAtUnixSeconds).DateTime;
 
-        [JsonInclude]
-        [JsonIgnore]
-        public string Data { get; }
+        public ReadOnlyMemory<byte> Data { get; }
 
-        [JsonInclude]
-        [JsonIgnore]
         public string Transcript { get; }
 
         public override string ToString() => Transcript ?? string.Empty;

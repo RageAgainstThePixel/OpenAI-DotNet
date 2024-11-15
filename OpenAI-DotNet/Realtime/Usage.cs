@@ -11,22 +11,27 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("total_tokens")]
-        public int? TotalTokens { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? TotalTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_tokens")]
-        public int? InputTokens { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? InputTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("output_tokens")]
-        public int? OutputTokens { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? OutputTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_token_details")]
-        public TokenUsageDetails InputTokenDetails { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public TokenUsageDetails InputTokenDetails { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("output_token_details")]
-        public TokenUsageDetails OutputTokenDetails { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public TokenUsageDetails OutputTokenDetails { get; private set; }
     }
 }

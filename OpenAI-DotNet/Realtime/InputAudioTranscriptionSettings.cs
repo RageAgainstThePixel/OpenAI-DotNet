@@ -7,12 +7,15 @@ namespace OpenAI.Realtime
 {
     public sealed class InputAudioTranscriptionSettings
     {
+        public InputAudioTranscriptionSettings() { }
+
         public InputAudioTranscriptionSettings(Model model)
         {
             Model = string.IsNullOrWhiteSpace(model.Id) ? "whisper-1" : model;
         }
 
+        [JsonInclude]
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; private set; }
     }
 }

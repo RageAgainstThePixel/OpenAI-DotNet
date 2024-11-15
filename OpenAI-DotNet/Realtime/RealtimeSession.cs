@@ -3,6 +3,8 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,13 +29,13 @@ namespace OpenAI.Realtime
         private readonly ConcurrentQueue<IRealtimeEvent> events = new();
         private readonly object eventLock = new();
 
-        private bool collectEvents;
+        private bool isCollectingEvents;
 
         internal RealtimeSession(WebSocket wsClient, bool enableDebug)
         {
             websocketClient = wsClient;
-            EnableDebug = enableDebug;
             websocketClient.OnMessage += OnMessage;
+            EnableDebug = enableDebug;
         }
 
         private void OnMessage(DataFrame dataFrame)
@@ -51,10 +53,7 @@ namespace OpenAI.Realtime
 
                     lock (eventLock)
                     {
-                        if (collectEvents)
-                        {
-                            events.Enqueue(@event);
-                        }
+                        events.Enqueue(@event);
                     }
 
                     OnEventReceived?.Invoke(@event);
@@ -94,15 +93,15 @@ namespace OpenAI.Realtime
         internal async Task ConnectAsync(CancellationToken cancellationToken = default)
         {
             var connectTcs = new TaskCompletionSource<State>();
-            websocketClient.OnOpen += OnWebsocketClientOnOnOpen;
-            websocketClient.OnError += OnWebsocketClientOnOnError;
+            websocketClient.OnOpen += OnWebsocketClientOnOpen;
+            websocketClient.OnError += OnWebsocketClientOnError;
 
             try
             {
                 // ReSharper disable once MethodHasAsyncOverloadWithCancellation
                 // don't call async because it is blocking until connection is closed.
                 websocketClient.Connect();
-                await connectTcs.Task; // TODO .WithCancellation(cancellationToken).ConfigureAwait(true);
+                await connectTcs.Task.WithCancellation(cancellationToken).ConfigureAwait(false);
 
                 if (websocketClient.State != State.Open)
                 {
@@ -111,33 +110,40 @@ namespace OpenAI.Realtime
             }
             finally
             {
-                websocketClient.OnOpen -= OnWebsocketClientOnOnOpen;
-                websocketClient.OnError -= OnWebsocketClientOnOnError;
+                websocketClient.OnOpen -= OnWebsocketClientOnOpen;
+                websocketClient.OnError -= OnWebsocketClientOnError;
             }
 
             return;
 
-            void OnWebsocketClientOnOnError(Exception e)
+            void OnWebsocketClientOnError(Exception e)
                 => connectTcs.TrySetException(e);
-            void OnWebsocketClientOnOnOpen()
+            void OnWebsocketClientOnOpen()
                 => connectTcs.TrySetResult(websocketClient.State);
         }
 
         #endregion Internal
 
+        /// <summary>
+        /// Receive callback updates from the server
+        /// </summary>
+        /// <typeparam name="T"><see cref="IRealtimeEvent"/> to subscribe for updates to.</typeparam>
+        /// <param name="sessionEvent"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task ReceiveUpdatesAsync<T>(Action<T> sessionEvent, CancellationToken cancellationToken) where T : IRealtimeEvent
         {
             try
             {
                 lock (eventLock)
                 {
-                    if (collectEvents)
+                    if (isCollectingEvents)
                     {
                         Console.WriteLine($"{nameof(ReceiveUpdatesAsync)} is already running!");
                         return;
                     }
 
-                    collectEvents = true;
+                    isCollectingEvents = true;
                 }
 
                 do
@@ -172,16 +178,60 @@ namespace OpenAI.Realtime
             {
                 lock (eventLock)
                 {
-                    collectEvents = false;
+                    isCollectingEvents = false;
+                }
+            }
+        }
+
+        public async IAsyncEnumerable<T> ReceiveUpdatesAsync<T>([EnumeratorCancellation] CancellationToken cancellationToken) where T : IRealtimeEvent
+        {
+            try
+            {
+                lock (eventLock)
+                {
+                    if (isCollectingEvents)
+                    {
+                        throw new Exception($"{nameof(ReceiveUpdatesAsync)} is already running!");
+                    }
+
+                    isCollectingEvents = true;
+                }
+
+                do
+                {
+                    T @event = default;
+
+                    lock (eventLock)
+                    {
+                        if (events.TryDequeue(out var dequeuedEvent) &&
+                            dequeuedEvent is T typedEvent)
+                        {
+                            @event = typedEvent;
+                        }
+                    }
+
+                    if (@event != null)
+                    {
+                        yield return @event;
+                    }
+
+                    await Task.Yield();
+                } while (!cancellationToken.IsCancellationRequested && websocketClient.State == State.Open);
+            }
+            finally
+            {
+                lock (eventLock)
+                {
+                    isCollectingEvents = false;
                 }
             }
         }
 
         public async void Send<T>(T @event) where T : IClientEvent
-            => await SendAsync(@event);
+            => await SendAsync(@event).ConfigureAwait(false);
 
         public async Task<IServerEvent> SendAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IClientEvent
-            => await SendAsync(@event, null, cancellationToken);
+            => await SendAsync(@event, null, cancellationToken).ConfigureAwait(false);
 
         public async Task<IServerEvent> SendAsync<T>(T @event, Action<IServerEvent> sessionEvents, CancellationToken cancellationToken = default) where T : IClientEvent
         {
@@ -209,10 +259,7 @@ namespace OpenAI.Realtime
 
             lock (eventLock)
             {
-                if (collectEvents)
-                {
-                    events.Enqueue(clientEvent);
-                }
+                events.Enqueue(clientEvent);
             }
 
             var eventId = Guid.NewGuid().ToString("N");
@@ -225,7 +272,7 @@ namespace OpenAI.Realtime
                 }
             }
 
-            await websocketClient.SendAsync(payload, cancellationToken);
+            await websocketClient.SendAsync(payload, cancellationToken).ConfigureAwait(false);
 
             if (EnableDebug)
             {
@@ -241,7 +288,7 @@ namespace OpenAI.Realtime
                 return default;
             }
 
-            var response = await tcs.Task; // TODO .WithCancellation(eventCts.Token);
+            var response = await tcs.Task.WithCancellation(eventCts.Token).ConfigureAwait(false);
 
             if (EnableDebug)
             {
@@ -285,7 +332,7 @@ namespace OpenAI.Realtime
 
                             if (serverResponse.Response.Status != RealtimeResponseStatus.Completed)
                             {
-                                tcs.TrySetException(new Exception(serverResponse.Response.StatusDetails.Error.ToString()));
+                                tcs.TrySetException(new Exception(serverResponse.Response.StatusDetails.Error?.ToString() ?? serverResponse.Response.StatusDetails.Reason));
                             }
                             else
                             {

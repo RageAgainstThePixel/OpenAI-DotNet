@@ -7,6 +7,7 @@ namespace OpenAI.Realtime
 {
     public sealed class RealtimeContent
     {
+        public RealtimeContent() { }
 
         public RealtimeContent(string text, RealtimeContentType type)
         {
@@ -35,28 +36,32 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public RealtimeContentType Type { get; }
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeContentType>))]
+        public RealtimeContentType Type { get; private set; }
 
         /// <summary>
         /// The text content.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text")]
-        public string Text { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Text { get; private set; }
 
         /// <summary>
         /// Base64-encoded audio data.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("audio")]
-        public string Audio { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Audio { get; private set; }
 
         /// <summary>
         /// The transcript of the audio.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("transcript")]
-        public string Transcript { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Transcript { get; private set; }
 
         public static implicit operator RealtimeContent(string text) => new(text, RealtimeContentType.InputText);
 

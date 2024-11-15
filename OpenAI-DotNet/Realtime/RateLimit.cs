@@ -8,18 +8,22 @@ namespace OpenAI.Realtime
     {
         [JsonInclude]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("limit")]
-        public int Limit { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Limit { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("remaining")]
-        public int Remaining { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Remaining { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("reset_seconds")]
-        public int ResetSeconds { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public float? ResetSeconds { get; private set; }
     }
 }

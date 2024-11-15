@@ -29,7 +29,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("output_index")]
-        public string OutputIndex { get; private set; }
+        public int OutputIndex { get; private set; }
 
         /// <summary>
         /// The item that was added.

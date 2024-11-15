@@ -100,7 +100,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response.FirstChoice);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
             Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
-            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
             response.GetUsage();
 
             messages.Add(response.FirstChoice.Message);
@@ -116,10 +116,10 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response.Choices);
             Assert.IsNotEmpty(response.Choices);
             Assert.AreEqual(1, response.Choices.Count);
-            Assert.IsNotNull(response.FirstChoice);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(response.FirstChoice));
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
             Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
-            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
             response.GetUsage();
         }
 

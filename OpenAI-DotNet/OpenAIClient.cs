@@ -21,6 +21,8 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenAI
 {
@@ -269,7 +271,19 @@ namespace OpenAI
         }
 
         internal WebSocket CreateWebSocket(string url)
-            => new(url, WebsocketHeaders);
+        {
+            var websocket = new WebSocket(url, WebsocketHeaders);
+
+            if (CreateWebsocketAsync != null)
+            {
+                websocket.CreateWebsocketAsync = CreateWebsocketAsync;
+            }
+
+            return websocket;
+        }
+
+        // used to create unit test proxy server
+        internal Func<Uri, CancellationToken, Task<System.Net.WebSockets.WebSocket>> CreateWebsocketAsync = null;
 
         internal IReadOnlyDictionary<string, string> WebsocketHeaders => new Dictionary<string, string>
         {

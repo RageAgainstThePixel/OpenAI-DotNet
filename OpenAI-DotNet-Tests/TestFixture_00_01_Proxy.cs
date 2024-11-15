@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -92,25 +93,45 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_04_Client_Websocket_Authentication()
         {
-            using var websocket = new ClientWebSocket();
-
-            foreach (var (key, value) in OpenAIClient.WebsocketHeaders)
+            try
             {
-                websocket.Options.SetRequestHeader(key, value);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                var realtimeUri = new Uri(string.Format(OpenAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat, "echo"));
+                Console.WriteLine(realtimeUri);
+                using var websocket = await OpenAIClient.CreateWebsocketAsync.Invoke(realtimeUri, cts.Token);
+
+                if (websocket.State != WebSocketState.Open)
+                {
+                    throw new Exception($"Failed to open WebSocket connection. Current state: {websocket.State}");
+                }
+
+                var data = new byte[1024];
+                var buffer = new byte[1024 * 4];
+                var random = new Random();
+                random.NextBytes(data);
+                await websocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, cts.Token);
+                var receiveResult = await websocket.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
+                Assert.AreEqual(WebSocketMessageType.Binary, receiveResult.MessageType);
+                Assert.AreEqual(data.Length, receiveResult.Count);
+                var receivedData = buffer[..receiveResult.Count];
+                Assert.AreEqual(data.Length, receivedData.Length);
+                Assert.AreEqual(data, receivedData);
+                var message = $"hello world! {DateTime.UtcNow}";
+                var messageData = Encoding.UTF8.GetBytes(message);
+                await websocket.SendAsync(new ArraySegment<byte>(messageData), WebSocketMessageType.Text, true, cts.Token);
+                receiveResult = await websocket.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
+                Assert.AreEqual(WebSocketMessageType.Text, receiveResult.MessageType);
+                Assert.AreEqual(messageData.Length, receiveResult.Count);
+                Assert.AreEqual(messageData, buffer[..receiveResult.Count]);
+                var decodedMessage = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
+                Assert.AreEqual(message, decodedMessage);
+                await websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", cts.Token);
             }
-
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var realtimeUri = new Uri(string.Format(OpenAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat, "/realtime"));
-            _ = websocket.ConnectAsync(realtimeUri, cts.Token);
-
-            while (websocket.State != WebSocketState.Open)
+            catch (Exception e)
             {
-                cts.Token.ThrowIfCancellationRequested();
-                await Task.Yield();
+                Console.WriteLine(e);
+                throw;
             }
-
-            await Task.Delay(1000, cts.Token);
-            await websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, cts.Token);
         }
     }
 }

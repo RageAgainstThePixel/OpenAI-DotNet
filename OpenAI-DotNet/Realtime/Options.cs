@@ -10,6 +10,8 @@ namespace OpenAI.Realtime
 {
     public sealed class Options
     {
+        public Options() { }
+
         public Options(
             Model model,
             Modality modalities = Modality.Text | Modality.Audio,
@@ -42,7 +44,7 @@ namespace OpenAI.Realtime
             InputAudioTranscriptionSettings = new(string.IsNullOrWhiteSpace(transcriptionModel)
                 ? "whisper-1"
                 : transcriptionModel);
-            VoiceActivityDetectionSettings = turnDetectionSettings ?? new();
+            VoiceActivityDetectionSettings = turnDetectionSettings ?? new(TurnDetectionType.Server_VAD);
 
             var toolList = tools?.ToList();
 
@@ -95,10 +97,12 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Id { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("object")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Object { get; private set; }
 
         [JsonInclude]
@@ -107,6 +111,7 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("expires_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? ExpiresAtTimeUnixSeconds;
 
         [JsonInclude]
@@ -119,24 +124,29 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("modalities")]
         [JsonConverter(typeof(ModalityConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Modality Modalities { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("voice")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Voice { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("instructions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Instructions { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_audio_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeAudioFormat>))]
         public RealtimeAudioFormat InputAudioFormat { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("output_audio_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeAudioFormat>))]
         public RealtimeAudioFormat OutputAudioFormat { get; private set; }
 
         [JsonInclude]
@@ -157,10 +167,12 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("temperature")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public float? Temperature { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("max_response_output_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public object MaxResponseOutputTokens { get; private set; }
     }
 }
