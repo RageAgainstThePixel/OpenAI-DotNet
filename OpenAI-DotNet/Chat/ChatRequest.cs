@@ -331,6 +331,7 @@ namespace OpenAI.Chat
         /// Required when audio output is requested with modalities: ["audio"].
         /// </summary>
         [JsonPropertyName("audio")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public AudioConfig AudioConfig { get; }
 
         /// <summary>
