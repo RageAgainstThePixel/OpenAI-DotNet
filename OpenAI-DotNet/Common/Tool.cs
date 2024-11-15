@@ -421,9 +421,10 @@ namespace OpenAI
 
         private static string GetFunctionName(Type type, MethodInfo methodInfo)
         {
-            // todo possibly use string hash instead to mitigate long names?
-            // todo possibly use AssemblyQualifiedName?
-            return $"{type.FullName}.{methodInfo.Name}".Replace('.', '_');
+            var baseName = methodInfo.Name.Replace('.', '_');
+            var hashedFullyQualifiedName = $"{type.AssemblyQualifiedName}".GenerateGuid().ToString("N");
+            var nameLength = baseName.Length <= 32 ? baseName.Length : 32;
+            return $"{baseName[..nameLength]}_{hashedFullyQualifiedName}";
         }
 
         #endregion Tool Cache
