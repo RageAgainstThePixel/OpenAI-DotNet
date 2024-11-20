@@ -440,7 +440,7 @@ using var session = await api.RealtimeEndpoint.CreateSessionAsync(options);
 var responseTask = await session.ReceiveUpdatesAsync<IServerEvent>(ServerEvents, cancellationTokenSource.Token);
 await session.SendAsync(new ConversationItemCreateRequest("Hello!"));
 await session.SendAsync(new CreateResponseRequest());
-await session.SendAsync(new InputAudioBufferAppendRequest(new ReadOnlyMemory<byte>(new byte[1024 * 4])), cts.Token);
+await session.SendAsync(new InputAudioBufferAppendRequest(new ReadOnlyMemory<byte>(new byte[1024 * 4])), cancellationTokenSource.Token);
 await session.SendAsync(new ConversationItemCreateRequest("GoodBye!"));
 await session.SendAsync(new CreateResponseRequest());
 await responseTask;
