@@ -267,6 +267,8 @@ namespace OpenAI
                 client.DefaultRequestHeaders.Add("OpenAI-Project", OpenAIAuthentication.ProjectId);
             }
 
+            client.Timeout = OpenAIClientSettings.Timeout;
+
             return client;
         }
 

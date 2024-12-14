@@ -18,6 +18,8 @@ namespace OpenAI
         internal const string DefaultOpenAIApiVersion = "v1";
         internal const string AzureOpenAIDomain = "openai.azure.com";
         internal const string DefaultAzureApiVersion = "2023-05-01";
+        private TimeSpan DefaultTimeout = TimeSpan.FromSeconds(100);
+        private TimeSpan? TimeoutOverride = null;
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenAIClientSettings"/> for use with OpenAI.
@@ -120,6 +122,12 @@ namespace OpenAI
             UseOAuthAuthentication = useActiveDirectoryAuthentication;
         }
 
+        public OpenAIClientSettings OverrideClientTimeout(TimeSpan timeout)
+        {
+            TimeoutOverride = timeout;
+            return this;
+        }
+
         public string ResourceName { get; }
 
         public string DeploymentId { get; }
@@ -133,6 +141,18 @@ namespace OpenAI
         internal string BaseWebSocketUrlFormat { get; }
 
         internal bool UseOAuthAuthentication { get; }
+
+        internal TimeSpan Timeout
+        {
+            get
+            {
+                if (TimeoutOverride.HasValue)
+                {
+                    return TimeoutOverride.Value;
+                }
+                return DefaultTimeout;
+            }
+        }
 
         public bool IsAzureOpenAI => BaseRequestUrlFormat.Contains(AzureOpenAIDomain);
 
