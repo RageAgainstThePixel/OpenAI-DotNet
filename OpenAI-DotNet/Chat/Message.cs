@@ -41,11 +41,13 @@ namespace OpenAI.Chat
         /// The contents of the message.
         /// </param>
         /// <param name="name"></param>
-        public Message(Role role, string content, string name = null)
+        /// <param name="toolCalls"></param>
+        public Message(Role role, string content, string name = null, List<Tool> toolCalls = null)
         {
             Role = role;
             Content = content;
             Name = name;
+            ToolCalls = toolCalls;            
         }
 
         /// <inheritdoc />
