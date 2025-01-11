@@ -56,15 +56,19 @@ namespace OpenAI
                 apiVersion = DefaultOpenAIApiVersion;
             }
 
-            ResourceName = domain.Contains(Http)
-                ? domain
-                : $"{Https}{domain}";
-
-            if (domain.Contains(Http))
+            var httpSchema = Https;
+            if (domain.StartsWith(Http))
             {
+                httpSchema = Http;
                 domain = domain.Replace(Http, string.Empty);
+            }
+            else if (domain.StartsWith(Https))
+            {
+                httpSchema = Https;
                 domain = domain.Replace(Https, string.Empty);
             }
+
+            ResourceName = $"{httpSchema}{domain}";
 
             ApiVersion = apiVersion;
             DeploymentId = string.Empty;
