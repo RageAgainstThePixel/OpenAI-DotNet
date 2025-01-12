@@ -7,6 +7,7 @@ using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -75,7 +76,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_03_GetChatCompletion_Modalities()
+        public async Task Test_01_03_01_GetChatCompletion_Modalities()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
 
@@ -124,6 +125,51 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        public async Task Test_01_03_01_GetChatCompletion_Modalities_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+            var messages = new List<Message>
+            {
+                new(Role.System, "You are a helpful assistant."),
+                new(Role.User, "Is a golden retriever a good family dog?"),
+            };
+            var chatRequest = new ChatRequest(messages, Model.GPT4oAudio, audioConfig: Voice.Alloy);
+            Assert.IsNotNull(chatRequest);
+            Assert.IsNotNull(chatRequest.AudioConfig);
+            Assert.AreEqual(Model.GPT4oAudio.Id, chatRequest.Model);
+            Assert.AreEqual(Voice.Alloy.Id, chatRequest.AudioConfig.Voice);
+            Assert.AreEqual(AudioFormat.Pcm16, chatRequest.AudioConfig.Format);
+            Assert.AreEqual(Modality.Text | Modality.Audio, chatRequest.Modalities);
+            var response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, Assert.IsNotNull, true);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+            Assert.AreEqual(1, response.Choices.Count);
+            Assert.IsNotNull(response.FirstChoice);
+            Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
+            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Transcript);
+            Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
+            response.GetUsage();
+            messages.Add(response.FirstChoice.Message);
+            messages.Add(new(Role.User, "What are some other good family dog breeds?"));
+            chatRequest = new ChatRequest(messages, Model.GPT4oAudio, audioConfig: Voice.Alloy);
+            Assert.IsNotNull(chatRequest);
+            Assert.IsNotNull(messages[2]);
+            Assert.AreEqual(Role.Assistant, messages[2].Role);
+            Assert.IsNotNull(messages[2].AudioOutput);
+            response = await OpenAIClient.ChatEndpoint.StreamCompletionAsync(chatRequest, Assert.IsNotNull, true);
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(response.Choices);
+            Assert.IsNotEmpty(response.Choices);
+            Assert.AreEqual(1, response.Choices.Count);
+            Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Transcript);
+            Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
+            Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(response.FirstChoice));
+        }
+
+        [Test]
         public async Task Test_01_04_JsonMode()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
@@ -147,7 +193,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_05_GetChatStreamingCompletionEnumerableAsync()
+        public async Task Test_01_05_01_GetChatStreamingCompletionEnumerableAsync()
         {
             Assert.IsNotNull(OpenAIClient.ChatEndpoint);
             var messages = new List<Message>
@@ -159,19 +205,77 @@ namespace OpenAI.Tests
             };
             var cumulativeDelta = string.Empty;
             var chatRequest = new ChatRequest(messages);
+            var didThrowException = false;
+
             await foreach (var partialResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, true))
             {
-                Assert.IsNotNull(partialResponse);
-                if (partialResponse.Usage != null) { return; }
-                Assert.NotNull(partialResponse.Choices);
-                Assert.NotZero(partialResponse.Choices.Count);
-
-                foreach (var choice in partialResponse.Choices.Where(choice => choice.Delta?.Content != null))
+                try
                 {
-                    cumulativeDelta += choice.Delta.Content;
+                    Assert.IsNotNull(partialResponse);
+                    if (partialResponse.Usage != null) { continue; }
+                    Assert.NotNull(partialResponse.Choices);
+                    Assert.NotZero(partialResponse.Choices.Count);
+
+                    if (partialResponse.FirstChoice?.Delta?.Content is not null)
+                    {
+                        cumulativeDelta += partialResponse.FirstChoice.Delta.Content;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    didThrowException = true;
                 }
             }
 
+            Assert.IsFalse(didThrowException);
+            Assert.IsNotEmpty(cumulativeDelta);
+            Console.WriteLine(cumulativeDelta);
+        }
+
+        [Test]
+        public async Task Test_01_05_02_GetChatStreamingModalitiesEnumerableAsync()
+        {
+            Assert.IsNotNull(OpenAIClient.ChatEndpoint);
+
+            var messages = new List<Message>
+            {
+                new(Role.System, "You are a helpful assistant."),
+                new(Role.User, "Count from 1 to 10. Whisper please.")
+            };
+
+            var cumulativeDelta = string.Empty;
+            using var audioStream = new MemoryStream();
+            var chatRequest = new ChatRequest(messages, audioConfig: new AudioConfig(Voice.Nova), model: Model.GPT4oAudio);
+            Assert.IsNotNull(chatRequest);
+            Assert.IsNotNull(chatRequest.AudioConfig);
+            Assert.AreEqual(Model.GPT4oAudio.Id, chatRequest.Model);
+            Assert.AreEqual(Voice.Nova.Id, chatRequest.AudioConfig.Voice);
+            Assert.AreEqual(AudioFormat.Pcm16, chatRequest.AudioConfig.Format);
+            Assert.AreEqual(Modality.Text | Modality.Audio, chatRequest.Modalities);
+            var didThrowException = false;
+
+            await foreach (var partialResponse in OpenAIClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, true))
+            {
+                try
+                {
+                    Assert.IsNotNull(partialResponse);
+                    if (partialResponse.Usage != null || partialResponse.Choices == null) { continue; }
+
+                    if (partialResponse.FirstChoice?.Delta?.AudioOutput is not null)
+                    {
+                        await audioStream.WriteAsync(partialResponse.FirstChoice.Delta.AudioOutput.Data);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    didThrowException = true;
+                }
+            }
+
+            Assert.IsFalse(didThrowException);
+            Assert.IsTrue(audioStream.Length > 0);
             Console.WriteLine(cumulativeDelta);
         }
 

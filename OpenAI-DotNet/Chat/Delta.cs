@@ -36,6 +36,13 @@ namespace OpenAI.Chat
         public IReadOnlyList<ToolCall> ToolCalls { get; private set; }
 
         /// <summary>
+        /// If the audio output modality is requested, this object contains data about the audio response from the model. 
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("audio")]
+        public AudioOutput AudioOutput { get; private set; }
+
+        /// <summary>
         /// Optional, The name of the author of this message.<br/>
         /// May contain a-z, A-Z, 0-9, and underscores, with a maximum length of 64 characters.
         /// </summary>
@@ -43,7 +50,15 @@ namespace OpenAI.Chat
         [JsonPropertyName("name")]
         public string Name { get; private set; }
 
-        public override string ToString() => Content ?? string.Empty;
+        public override string ToString()
+        {
+            if (string.IsNullOrWhiteSpace(Content))
+            {
+                return AudioOutput?.ToString() ?? string.Empty;
+            }
+
+            return Content ?? string.Empty;
+        }
 
         public static implicit operator string(Delta delta) => delta?.ToString();
     }
