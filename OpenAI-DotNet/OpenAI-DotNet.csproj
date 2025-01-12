@@ -33,7 +33,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.4.2
 - Fix http/https protocol in client settings
-- Fix audio modality support in StreamCompletionEnumerableAsync
+- Fix audio modality support in chat streaming completions
 Version 8.4.1
 - Fix ChatRequest serialization for Azure OpenAI
 Version 8.4.0
