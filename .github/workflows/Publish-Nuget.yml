@@ -22,7 +22,7 @@ on:
       dotnet-version:
         description: ".NET version to use"
         required: false
-        default: "6.0.x"
+        default: "8.0.x"
 
 permissions:
   contents: read
@@ -36,7 +36,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '6.0.x' }}
+  DOTNET_VERSION: ${{ github.event.inputs.dotnet-version || '8.0.x' }}
 
 jobs:
   build:

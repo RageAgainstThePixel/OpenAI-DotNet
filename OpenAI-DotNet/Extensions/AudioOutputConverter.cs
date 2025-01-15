@@ -12,10 +12,10 @@ namespace OpenAI
         public override AudioOutput Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string id = null;
-            var expiresAt = 0;
+            int? expiresAt = null;
             string b64Data = null;
             string transcript = null;
-            ReadOnlyMemory<byte> data = null;
+            Memory<byte> data = null;
 
             while (reader.Read())
             {

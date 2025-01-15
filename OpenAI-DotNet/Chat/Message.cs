@@ -190,6 +190,18 @@ namespace OpenAI.Chat
                 toolCalls ??= new List<ToolCall>();
                 toolCalls.AppendFrom(other.ToolCalls);
             }
+
+            if (other is { AudioOutput: not null })
+            {
+                if (AudioOutput == null)
+                {
+                    AudioOutput = other.AudioOutput;
+                }
+                else
+                {
+                    AudioOutput.AppendFrom(other.AudioOutput);
+                }
+            }
         }
     }
 }
