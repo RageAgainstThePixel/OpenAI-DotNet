@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,9 +32,10 @@ namespace OpenAI.Chat
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
             AudioConfig audioConfig = null,
-            string user = null)
+            string user = null,
+            string reasoningEffort = null)
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty,
-                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, user)
+                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, user, reasoningEffort)
         {
             var toolList = tools?.ToList();
 
@@ -150,6 +152,10 @@ namespace OpenAI.Chat
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
+        /// <param name="reasoningEffort">
+        /// o1 models only
+        /// Constrains effort on reasoning for reasoning models.Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+        /// </param>
         public ChatRequest(
             IEnumerable<Message> messages,
             string model = null,
@@ -167,7 +173,8 @@ namespace OpenAI.Chat
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
             AudioConfig audioConfig = null,
-            string user = null)
+            string user = null,
+            string reasoningEffort = null)
         {
             Messages = messages?.ToList();
 
@@ -220,6 +227,7 @@ namespace OpenAI.Chat
             TopLogProbs = topLogProbs;
             ParallelToolCalls = parallelToolCalls;
             User = user;
+            ReasoningEffort = reasoningEffort;
         }
 
         /// <summary>
@@ -240,6 +248,13 @@ namespace OpenAI.Chat
         [JsonPropertyName("store")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Store { get; set; }
+
+        /// <summary>
+        /// Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+        /// </summary>
+        [JsonPropertyName("reasoning_effort")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ReasoningEffort { get; set; }
 
         /// <summary>
         /// Developer-defined tags and values used for filtering completions in the dashboard.

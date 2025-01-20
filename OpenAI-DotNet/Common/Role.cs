@@ -11,6 +11,7 @@ namespace OpenAI
         User,
         [Obsolete("Use Tool")]
         Function,
-        Tool
+        Tool,
+        Developer,
     }
 }
