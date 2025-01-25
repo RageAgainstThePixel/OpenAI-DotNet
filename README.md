@@ -57,12 +57,12 @@ dotnet add package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
-- [Realtime](#realtime) :new:
-  - [Create Realtime Session](#create-realtime-session) :new:
-  - [Client Events](#client-events) :new:
-    - [Sending Client Events](#sending-client-events) :new:
-  - [Server Events](#server-events) :new:
-    - [Receiving Server Events](#receiving-server-events) :new:
+- [Realtime](#realtime)
+  - [Create Realtime Session](#create-realtime-session)
+  - [Client Events](#client-events)
+    - [Sending Client Events](#sending-client-events)
+  - [Server Events](#server-events)
+    - [Receiving Server Events](#receiving-server-events)
 - [Assistants](#assistants)
   - [List Assistants](#list-assistants)
   - [Create Assistant](#create-assistant)
@@ -114,7 +114,7 @@ dotnet add package OpenAI-DotNet
   - [Streaming](#chat-streaming)
   - [Tools](#chat-tools)
   - [Vision](#chat-vision)
-  - [Audio](#chat-audio) :new:
+  - [Audio](#chat-audio)
   - [Structured Outputs](#chat-structured-outputs)
   - [Json Mode](#chat-json-mode)
 - [Audio](#audio)
