@@ -185,11 +185,6 @@ namespace OpenAI.Chat
 
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
 
-            if (audioConfig != null && !Model.Contains("audio"))
-            {
-                throw new ArgumentException("Audio settings are only valid for models that support audio output", nameof(audioConfig));
-            }
-
             if (reasoningEffort.HasValue)
             {
                 if (!Model.Contains("o1"))
@@ -197,7 +192,12 @@ namespace OpenAI.Chat
                     throw new ArgumentException("Only o1 series models support reasoning effort", nameof(reasoningEffort));
                 }
 
+                ReasoningEffort = reasoningEffort.Value;
+            }
 
+            if (audioConfig != null && !Model.Contains("audio"))
+            {
+                throw new ArgumentException("Audio settings are only valid for models that support audio output", nameof(audioConfig));
             }
 
             if (Model.Contains("audio"))

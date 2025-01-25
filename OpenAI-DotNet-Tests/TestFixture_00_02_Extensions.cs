@@ -1,6 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
+using OpenAI.Audio;
 using OpenAI.Images;
 using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
@@ -22,11 +23,17 @@ namespace OpenAI.Tests
             Assert.IsNotNull(tools);
             Assert.IsNotEmpty(tools);
             tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
-            var json = JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
+            tools.Add(Tool.GetOrCreateTool(OpenAIClient.AudioEndpoint, nameof(AudioEndpoint.CreateTranscriptionTextAsync)));
+
+            foreach (var tool in tools)
+            {
+                Console.WriteLine(tool.Function?.Name ?? tool.Type);
+            }
+
+            Console.WriteLine(JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
             {
                 WriteIndented = true
-            });
-            Console.WriteLine(json);
+            }));
         }
 
         [Test]
