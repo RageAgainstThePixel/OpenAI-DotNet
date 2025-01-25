@@ -486,6 +486,12 @@ namespace OpenAI
                     }
                     else
                     {
+                        // check that the value assigned type matches the parameter type. If not then attempt to change it.
+                        if (value.GetType() != parameter.ParameterType)
+                        {
+                            value = Convert.ChangeType(value, parameter.ParameterType);
+                        }
+
                         invokeArgs[i] = value;
                     }
                 }
