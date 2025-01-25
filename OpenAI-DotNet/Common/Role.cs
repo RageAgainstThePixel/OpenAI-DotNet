@@ -7,10 +7,11 @@ namespace OpenAI
     public enum Role
     {
         System = 1,
-        Assistant,
-        User,
+        Developer = 1,
+        Assistant = 2,
+        User = 3,
         [Obsolete("Use Tool")]
-        Function,
-        Tool
+        Function = 4,
+        Tool = 4
     }
 }

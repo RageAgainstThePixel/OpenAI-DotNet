@@ -31,9 +31,10 @@ namespace OpenAI.Chat
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
             AudioConfig audioConfig = null,
+            ReasoningEffort? reasoningEffort = null,
             string user = null)
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty,
-                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, user)
+                responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, reasoningEffort, user)
         {
             var toolList = tools?.ToList();
 
@@ -147,6 +148,11 @@ namespace OpenAI.Chat
         /// <param name="audioConfig">
         /// Parameters for audio output. <see cref="Chat.AudioConfig"/>.
         /// </param>
+        /// <param name="reasoningEffort">
+        /// Constrains the effort of reasoning for <see href="https://platform.openai.com/docs/guides/reasoning">Reasoning Models</see>.<br/>
+        /// Currently supported values are: Low, Medium, High. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning response.<br/>
+        /// <b>o1 models only!</b>
+        /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </param>
@@ -167,6 +173,7 @@ namespace OpenAI.Chat
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
             AudioConfig audioConfig = null,
+            ReasoningEffort? reasoningEffort = null,
             string user = null)
         {
             Messages = messages?.ToList();
@@ -181,6 +188,16 @@ namespace OpenAI.Chat
             if (audioConfig != null && !Model.Contains("audio"))
             {
                 throw new ArgumentException("Audio settings are only valid for models that support audio output", nameof(audioConfig));
+            }
+
+            if (reasoningEffort.HasValue)
+            {
+                if (!Model.Contains("o1"))
+                {
+                    throw new ArgumentException("Only o1 series models support reasoning effort", nameof(reasoningEffort));
+                }
+
+
             }
 
             if (Model.Contains("audio"))
@@ -242,6 +259,17 @@ namespace OpenAI.Chat
         public bool? Store { get; set; }
 
         /// <summary>
+        /// Constrains the effort of reasoning for <see href="https://platform.openai.com/docs/guides/reasoning">Reasoning Models</see>.<br/>
+        /// Currently supported values are: Low, Medium, High. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning response.
+        /// </summary>
+        /// <remarks>
+        /// <b>o1 models only!</b>
+        /// </remarks>
+        [JsonPropertyName("reasoning_effort")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ReasoningEffort ReasoningEffort { get; }
+
+        /// <summary>
         /// Developer-defined tags and values used for filtering completions in the dashboard.
         /// </summary>
         [JsonPropertyName("metadata")]
@@ -297,6 +325,7 @@ namespace OpenAI.Chat
         /// By default, the number of tokens the model can return will be (4096 - prompt tokens).
         /// </summary>
         [JsonIgnore]
+        [Obsolete("use MaxCompletionTokens instead")]
         public int? MaxTokens => MaxCompletionTokens;
 
         /// <summary>

@@ -29,8 +29,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.4.2</Version>
+    <Version>8.5.0</Version>
     <PackageReleaseNotes>
+Version 8.5.0
+- Added Role.Developer for reasoning model messages
+- Added reasoning effort parameter for o1 series models in ChatRequest
 Version 8.4.2
 - Fix http/https protocol in client settings
 - Fix audio modality support in chat streaming completions
