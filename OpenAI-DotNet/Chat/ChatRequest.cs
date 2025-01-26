@@ -267,7 +267,7 @@ namespace OpenAI.Chat
         /// </remarks>
         [JsonPropertyName("reasoning_effort")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ReasoningEffort ReasoningEffort { get; }
+        public ReasoningEffort? ReasoningEffort { get; }
 
         /// <summary>
         /// Developer-defined tags and values used for filtering completions in the dashboard.
