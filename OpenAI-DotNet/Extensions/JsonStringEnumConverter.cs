@@ -46,7 +46,6 @@ namespace OpenAI.Extensions
                         ? namingPolicy.ConvertName(value.ToString())
                         : value.ToString();
                     numberToEnum.TryAdd(index, value);
-                    numberToEnum.TryAdd(index, value);
                     enumToString.TryAdd(value, convertedName);
                     stringToEnum.TryAdd(convertedName, value);
                 }
