@@ -1,17 +1,24 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Runtime.Serialization;
 
 namespace OpenAI
 {
     public enum Role
     {
+        [EnumMember(Value = "system")]
         System = 1,
-        Developer = 1,
-        Assistant = 2,
-        User = 3,
+        [EnumMember(Value = "developer")]
+        Developer,
+        [EnumMember(Value = "assistant")]
+        Assistant,
+        [EnumMember(Value = "user")]
+        User,
         [Obsolete("Use Tool")]
-        Function = 4,
-        Tool = 4
+        [EnumMember(Value = "function")]
+        Function,
+        [EnumMember(Value = "tool")]
+        Tool
     }
 }

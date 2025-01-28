@@ -1,5 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Runtime.Serialization;
+
 namespace OpenAI
 {
     /// <summary>
@@ -11,8 +13,11 @@ namespace OpenAI
     /// </remarks>
     public enum ReasoningEffort
     {
+        [EnumMember(Value = "low")]
         Low = 1,
+        [EnumMember(Value = "medium")]
         Medium,
+        [EnumMember(Value = "high")]
         High
     }
 }
