@@ -14,6 +14,7 @@ namespace OpenAI.Extensions
     /// </summary>
     internal sealed class JsonStringEnumConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
     {
+        private const string ValueField = "value__";
         private readonly JsonNamingPolicy namingPolicy;
         private readonly Dictionary<int, TEnum> numberToEnum = new();
         private readonly Dictionary<TEnum, string> enumToString = new();
@@ -31,59 +32,58 @@ namespace OpenAI.Extensions
                 var attribute = enumMember.GetCustomAttributes(typeof(EnumMemberAttribute), false)
                     .Cast<EnumMemberAttribute>()
                     .FirstOrDefault();
-                var index = Convert.ToInt32(type.GetField("value__")?.GetValue(value));
+                var index = Convert.ToInt32(type.GetField(ValueField)?.GetValue(value));
 
                 if (attribute?.Value != null)
                 {
-                    numberToEnum.Add(index, value);
-                    enumToString.Add(value, attribute.Value);
-                    stringToEnum.Add(attribute.Value, value);
+                    numberToEnum.TryAdd(index, value);
+                    enumToString.TryAdd(value, attribute.Value);
+                    stringToEnum.TryAdd(attribute.Value, value);
                 }
                 else
                 {
                     var convertedName = namingPolicy != null
                         ? namingPolicy.ConvertName(value.ToString())
                         : value.ToString();
-                    numberToEnum.Add(index, value);
-                    enumToString.Add(value, convertedName);
-                    stringToEnum.Add(convertedName, value);
+                    numberToEnum.TryAdd(index, value);
+                    numberToEnum.TryAdd(index, value);
+                    enumToString.TryAdd(value, convertedName);
+                    stringToEnum.TryAdd(convertedName, value);
                 }
             }
         }
 
         public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var type = reader.TokenType;
-
-            switch (type)
+            switch (reader.TokenType)
             {
                 case JsonTokenType.String:
-                    {
-                        var stringValue = reader.GetString();
+                {
+                    var stringValue = reader.GetString();
 
-                        if (stringValue != null)
+                    if (stringValue != null)
+                    {
+                        var value = namingPolicy != null
+                            ? namingPolicy.ConvertName(stringValue)
+                            : stringValue;
+
+                        if (stringToEnum.TryGetValue(value, out var enumValue))
                         {
-                            var value = namingPolicy != null
-                                ? namingPolicy.ConvertName(stringValue)
-                                : stringValue;
-
-                            if (stringToEnum.TryGetValue(value, out var enumValue))
-                            {
-                                return enumValue;
-                            }
+                            return enumValue;
                         }
-
-                        break;
                     }
+
+                    return default;
+                }
                 case JsonTokenType.Number:
-                    {
-                        var numValue = reader.GetInt32();
-                        numberToEnum.TryGetValue(numValue, out var enumValue);
-                        return enumValue;
-                    }
+                {
+                    var numValue = reader.GetInt32();
+                    numberToEnum.TryGetValue(numValue, out var enumValue);
+                    return enumValue;
+                }
+                default:
+                    return default;
             }
-
-            return default;
         }
 
         public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
