@@ -187,11 +187,6 @@ namespace OpenAI.Chat
 
             if (reasoningEffort.HasValue)
             {
-                if (!Model.Contains("o1"))
-                {
-                    throw new ArgumentException("Only o1 series models support reasoning effort", nameof(reasoningEffort));
-                }
-
                 ReasoningEffort = reasoningEffort.Value;
             }
 

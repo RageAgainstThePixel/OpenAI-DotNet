@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.5.3</Version>
+    <Version>8.5.4</Version>
     <PackageReleaseNotes>
+Version 8.5.4
+- Update ChatRequest to support 03 series reasoning models
 Version 8.5.3
 - Fix JsonStringEnumConverter for ChatRequests
 Version 8.5.1
