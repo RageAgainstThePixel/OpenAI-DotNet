@@ -19,7 +19,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/RageAgainstThePixel/OpenAI-DotNet</RepositoryUrl>
-    <PackageTags>OpenAI, AI, ML, API, gpt-4, gpt-3.5-tubo, gpt-3, chatGPT, chat-gpt, gpt-2, gpt, dall-e-2, dall-e-3</PackageTags>
+    <PackageTags>OpenAI, AI, ML, API, o1, o3, gpt-4o, gpt-4-turbo, dall-e-3</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
