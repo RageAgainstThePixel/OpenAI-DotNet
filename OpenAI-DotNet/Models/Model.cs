@@ -77,6 +77,8 @@ namespace OpenAI.Models
 
         public static Model O1Mini { get; } = new("o1-mini", "openai");
 
+        public static Model O3Mini { get; } = new("o3-mini", "openai");
+
         public static Model GPT4oRealtime { get; } = new("gpt-4o-realtime-preview", "openai");
 
         /// <summary>
