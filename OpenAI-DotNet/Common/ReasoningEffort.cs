@@ -9,7 +9,7 @@ namespace OpenAI
     /// Currently supported values are: Low, Medium, High. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning response.
     /// </summary>
     /// <remarks>
-    /// <b>o1 models only!</b>
+    /// <b>Reasoning models only!</b>
     /// </remarks>
     public enum ReasoningEffort
     {

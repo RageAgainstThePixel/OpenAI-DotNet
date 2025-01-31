@@ -151,7 +151,7 @@ namespace OpenAI.Chat
         /// <param name="reasoningEffort">
         /// Constrains the effort of reasoning for <see href="https://platform.openai.com/docs/guides/reasoning">Reasoning Models</see>.<br/>
         /// Currently supported values are: Low, Medium, High. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning response.<br/>
-        /// <b>o1 models only!</b>
+        /// <b>Reasoning models only!</b>
         /// </param>
         /// <param name="user">
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
@@ -187,11 +187,6 @@ namespace OpenAI.Chat
 
             if (reasoningEffort.HasValue)
             {
-                if (!Model.Contains("o1"))
-                {
-                    throw new ArgumentException("Only o1 series models support reasoning effort", nameof(reasoningEffort));
-                }
-
                 ReasoningEffort = reasoningEffort.Value;
             }
 
@@ -263,7 +258,7 @@ namespace OpenAI.Chat
         /// Currently supported values are: Low, Medium, High. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning response.
         /// </summary>
         /// <remarks>
-        /// <b>o1 models only!</b>
+        /// <b>Reasoning models only!</b>
         /// </remarks>
         [JsonPropertyName("reasoning_effort")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
