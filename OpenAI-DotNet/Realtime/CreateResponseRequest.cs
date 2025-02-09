@@ -21,6 +21,7 @@ namespace OpenAI.Realtime
         [Obsolete("Use the constructor that takes RealtimeResponseCreateParams.")]
         public CreateResponseRequest(Options options)
         {
+            Options = options;
         }
 
         /// <summary>

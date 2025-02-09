@@ -84,6 +84,26 @@ namespace OpenAI.Realtime
             }
         }
 
+        internal RealtimeResponseCreateParams(
+            Modality modalities,
+            string instructions,
+            string voice,
+            RealtimeAudioFormat outputAudioFormat,
+            IReadOnlyList<Function> tools,
+            object toolChoice,
+            float? temperature,
+            object maxResponseOutputTokens)
+        {
+            Modalities = modalities;
+            Instructions = instructions;
+            Voice = voice;
+            OutputAudioFormat = outputAudioFormat;
+            Tools = tools?.ToList();
+            ToolChoice = toolChoice;
+            Temperature = temperature;
+            MaxResponseOutputTokens = maxResponseOutputTokens;
+        }
+
         /// <summary>
         /// The set of modalities the model can respond with. To disable audio, set this to ["text"].
         /// </summary>
