@@ -19,12 +19,12 @@ namespace OpenAI.Realtime
         /// <summary>
         /// Creates a new realtime session with the provided <see cref="SessionConfiguration"/> options.
         /// </summary>
-        /// <param name="options"><see cref="SessionConfiguration"/>.</param>
+        /// <param name="configuration"><see cref="SessionConfiguration"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RealtimeSession"/>.</returns>
-        public async Task<RealtimeSession> CreateSessionAsync(SessionConfiguration options = null, CancellationToken cancellationToken = default)
+        public async Task<RealtimeSession> CreateSessionAsync(SessionConfiguration configuration = null, CancellationToken cancellationToken = default)
         {
-            string model = string.IsNullOrWhiteSpace(options?.Model) ? Models.Model.GPT4oRealtime : options!.Model;
+            string model = string.IsNullOrWhiteSpace(configuration?.Model) ? Models.Model.GPT4oRealtime : configuration!.Model;
             var queryParameters = new Dictionary<string, string>();
 
             if (client.OpenAIClientSettings.IsAzureOpenAI)
@@ -46,7 +46,7 @@ namespace OpenAI.Realtime
                 await session.ConnectAsync(cancellationToken).ConfigureAwait(false);
                 var sessionResponse = await sessionCreatedTcs.Task.WithCancellation(cancellationToken).ConfigureAwait(false);
                 session.Options = sessionResponse.Options;
-                await session.SendAsync(new UpdateSessionRequest(options), cancellationToken: cancellationToken).ConfigureAwait(false);
+                await session.SendAsync(new UpdateSessionRequest(configuration), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             finally
             {

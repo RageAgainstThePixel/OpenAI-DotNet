@@ -16,9 +16,9 @@ namespace OpenAI.Realtime
     {
         public UpdateSessionRequest() { }
 
-        public UpdateSessionRequest(SessionConfiguration options)
+        public UpdateSessionRequest(SessionConfiguration configuration)
         {
-            Options = options;
+            Configuration = configuration;
         }
 
         /// <inheritdoc />
@@ -36,10 +36,10 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("session")]
-        public SessionConfiguration Options { get; private set; }
+        public SessionConfiguration Configuration { get; private set; }
 
         [JsonIgnore]
-        [Obsolete("use UpdateSessionRequest.Options")]
-        public SessionConfiguration Session => Options;
+        [Obsolete("use UpdateSessionRequest.Configuration")]
+        public SessionConfiguration Session => Configuration;
     }
 }
