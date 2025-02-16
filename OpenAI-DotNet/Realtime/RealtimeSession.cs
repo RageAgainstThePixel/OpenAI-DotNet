@@ -23,7 +23,7 @@ namespace OpenAI.Realtime
         /// </summary>
         public int EventTimeout { get; set; } = 30;
 
-        [Obsolete("Use Configuration")]
+        [Obsolete("Use RealtimeSession.Configuration")]
         public SessionConfiguration Options => Configuration;
 
         /// <summary>

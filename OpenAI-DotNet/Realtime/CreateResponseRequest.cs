@@ -18,15 +18,12 @@ namespace OpenAI.Realtime
     {
         public CreateResponseRequest() { }
 
-        [Obsolete("Use the constructor that takes RealtimeResponseCreateParams.")]
-        public CreateResponseRequest(Options options)
-        {
-            Options = options;
-        }
-
         /// <summary>
+        /// Constructor.
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">
+        /// Create a new Realtime response with these parameters.
+        /// </param>
         public CreateResponseRequest(RealtimeResponseCreateParams options)
         {
             Options = options;
