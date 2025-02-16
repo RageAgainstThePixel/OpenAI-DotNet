@@ -20,7 +20,7 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var wasGoodbyeCalled = false;
                 var tools = new List<Tool>
                 {
@@ -100,7 +100,7 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var wasGoodbyeCalled = false;
                 var tools = new List<Tool>
                 {
@@ -184,7 +184,7 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var wasGoodbyeCalled = false;
                 var tools = new List<Tool>
                 {
