@@ -435,8 +435,8 @@ var tools = new List<Tool>
         return "Goodbye!";
     })
 };
-var options = new Options(Model.GPT4oRealtime, tools: tools);
-using var session = await api.RealtimeEndpoint.CreateSessionAsync(options);
+var configuration = new SessionConfiguration(Model.GPT4oRealtime, tools: tools);
+using var session = await api.RealtimeEndpoint.CreateSessionAsync(configuration);
 var responseTask = session.ReceiveUpdatesAsync<IServerEvent>(ServerEvents, cancellationTokenSource.Token);
 await session.SendAsync(new ConversationItemCreateRequest("Hello!"));
 await session.SendAsync(new CreateResponseRequest());
@@ -769,7 +769,8 @@ Console.WriteLine($"Retrieve thread {thread.Id} -> {thread.CreatedAt}");
 
 Modifies a thread.
 
-> Note: Only the metadata can be modified.
+> [!NOTE]
+> Only the metadata can be modified.
 
 ```csharp
 using var api = new OpenAIClient();
@@ -847,7 +848,8 @@ Console.WriteLine($"{message.Id}: {message.Role}: {message.PrintContent()}");
 
 Modify a message.
 
-> Note: Only the message metadata can be modified.
+> [!NOTE]
+> Only the metadata can be modified.
 
 ```csharp
 using var api = new OpenAIClient();
@@ -942,7 +944,8 @@ Console.WriteLine($"[{run.Id}] {run.Status} | {run.CreatedAt}");
 
 Modifies a run.
 
-> Note: Only the metadata can be modified.
+> [!NOTE]
+> Only the metadata can be modified.
 
 ```csharp
 using var api = new OpenAIClient();
