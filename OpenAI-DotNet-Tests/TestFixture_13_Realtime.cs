@@ -26,8 +26,8 @@ namespace OpenAI.Tests
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        cts.Cancel();
                         wasGoodbyeCalled = true;
+                        cts.Cancel();
                         return "Goodbye!";
                     })
                 };
@@ -190,8 +190,8 @@ namespace OpenAI.Tests
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        cts.Cancel();
                         wasGoodbyeCalled = true;
+                        cts.Cancel();
                         return "Goodbye!";
                     })
                 };
@@ -241,7 +241,6 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                await Task.Delay(500, CancellationToken.None);
                 Assert.IsTrue(wasGoodbyeCalled);
             }
             catch (Exception e)
