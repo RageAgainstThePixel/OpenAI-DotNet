@@ -212,6 +212,7 @@ namespace OpenAI.Tests
                 Assert.AreEqual(configuration.Tools[0].Name, session.Configuration.Tools[0].Name);
                 Assert.AreEqual(Modality.Audio | Modality.Text, configuration.Modalities);
                 Assert.AreEqual(Modality.Audio | Modality.Text, session.Configuration.Modalities);
+                Assert.AreEqual(TurnDetectionType.Disabled, session.Configuration.VoiceActivityDetectionSettings.Type);
                 var responseTask = session.ReceiveUpdatesAsync<IServerEvent>(SessionEvents, cts.Token);
 
                 await session.SendAsync(new ConversationItemCreateRequest("Hello!"), cts.Token);
@@ -240,6 +241,7 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
+                await Task.Delay(500, cts.Token);
                 Assert.IsTrue(wasGoodbyeCalled);
             }
             catch (Exception e)
