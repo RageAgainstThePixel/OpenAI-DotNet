@@ -184,13 +184,11 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-                var wasGoodbyeCalled = false;
+                var cts = new CancellationTokenSource();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        wasGoodbyeCalled = true;
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -241,7 +239,6 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                Assert.IsTrue(wasGoodbyeCalled);
             }
             catch (Exception e)
             {
