@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
 {
+    /// <summary>
+    /// Create a new Realtime response with these parameters.
+    /// </summary>
     public sealed class RealtimeResponseCreateParams
     {
         public RealtimeResponseCreateParams() { }
@@ -85,7 +88,7 @@ namespace OpenAI.Realtime
             int? maxResponseOutputTokens = null,
             ConversationResponseType conversation = ConversationResponseType.Auto,
             IReadOnlyDictionary<string, string> metadata = null,
-            object[] input = null)
+            IEnumerable<ConversationItem> input = null)
         {
             Modalities = modalities;
             Voice = voice;
@@ -149,7 +152,16 @@ namespace OpenAI.Realtime
 
             Conversation = conversation;
             Metadata = metadata;
-            Input = input;
+
+            if (input != null)
+            {
+                Input = input.ToList();
+
+                foreach (var item in Input)
+                {
+                    item.Type = ConversationItemType.ItemReference;
+                }
+            }
         }
 
         internal RealtimeResponseCreateParams(
@@ -284,6 +296,6 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("input")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public object[] Input { get; private set; }
+        public IReadOnlyList<ConversationItem> Input { get; private set; }
     }
 }

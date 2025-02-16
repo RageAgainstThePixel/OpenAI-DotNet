@@ -23,10 +23,13 @@ namespace OpenAI.Realtime
         /// </summary>
         public int EventTimeout { get; set; } = 30;
 
+        [Obsolete("Use Configuration")]
+        public SessionConfiguration Options => Configuration;
+
         /// <summary>
         /// The configuration options for the session.
         /// </summary>
-        public SessionConfiguration Options { get; internal set; }
+        public SessionConfiguration Configuration { get; internal set; }
 
         #region Internal
 
@@ -351,7 +354,7 @@ namespace OpenAI.Realtime
                     switch (clientEvent)
                     {
                         case UpdateSessionRequest when serverEvent is SessionResponse sessionResponse:
-                            Options = sessionResponse.Options;
+                            Configuration = sessionResponse.SessionConfiguration;
                             Complete();
                             return;
                         case InputAudioBufferCommitRequest when serverEvent is InputAudioBufferCommittedResponse:

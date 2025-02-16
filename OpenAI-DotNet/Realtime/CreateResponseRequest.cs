@@ -25,8 +25,8 @@ namespace OpenAI.Realtime
         }
 
         /// <summary>
-        /// Constructor.
         /// </summary>
+        /// <param name="options"></param>
         public CreateResponseRequest(RealtimeResponseCreateParams options)
         {
             Options = options;
