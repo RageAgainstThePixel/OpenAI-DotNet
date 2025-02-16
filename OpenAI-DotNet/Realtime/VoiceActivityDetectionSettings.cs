@@ -17,6 +17,7 @@ namespace OpenAI.Realtime
         {
             switch (type)
             {
+                default:
                 case TurnDetectionType.Server_VAD:
                     Type = TurnDetectionType.Server_VAD;
                     DetectionThreshold = detectionThreshold;

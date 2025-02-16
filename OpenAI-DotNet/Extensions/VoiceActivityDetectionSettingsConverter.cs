@@ -12,7 +12,7 @@ namespace OpenAI
         public override VoiceActivityDetectionSettings Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             return reader.TokenType == JsonTokenType.Null
-                ? new VoiceActivityDetectionSettings(TurnDetectionType.Disabled)
+                ? VoiceActivityDetectionSettings.Disabled()
                 : JsonSerializer.Deserialize<VoiceActivityDetectionSettings>(ref reader, options);
         }
 
@@ -23,11 +23,10 @@ namespace OpenAI
                 case TurnDetectionType.Disabled:
                     writer.WriteNullValue();
                     break;
+                default:
                 case TurnDetectionType.Server_VAD:
                     JsonSerializer.Serialize(writer, value, options);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }
