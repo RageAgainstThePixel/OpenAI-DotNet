@@ -11,7 +11,8 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type { get; private set; }
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeResponseStatus>))]
+        public RealtimeResponseStatus Type { get; private set; }
 
         /// <summary>
         /// The reason the Response did not complete.
