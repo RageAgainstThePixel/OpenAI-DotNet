@@ -161,6 +161,7 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("turn_detection")]
+        [JsonConverter(typeof(VoiceActivityDetectionSettingsConverter))]
         public VoiceActivityDetectionSettings VoiceActivityDetectionSettings { get; private set; }
 
         [JsonInclude]

@@ -12,7 +12,8 @@ namespace OpenAI.Realtime
             TurnDetectionType type = TurnDetectionType.Server_VAD,
             float? detectionThreshold = null,
             int? prefixPadding = null,
-            int? silenceDuration = null)
+            int? silenceDuration = null,
+            bool createResponse = true)
         {
             switch (type)
             {
@@ -21,6 +22,14 @@ namespace OpenAI.Realtime
                     DetectionThreshold = detectionThreshold;
                     PrefixPadding = prefixPadding;
                     SilenceDuration = silenceDuration;
+                    CreateResponse = createResponse;
+                    break;
+                case TurnDetectionType.Disabled:
+                    Type = TurnDetectionType.Disabled;
+                    DetectionThreshold = null;
+                    PrefixPadding = null;
+                    SilenceDuration = null;
+                    CreateResponse = false;
                     break;
             }
         }
@@ -33,18 +42,23 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("threshold")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public float? DetectionThreshold { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("prefix_padding_ms")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? PrefixPadding { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("silence_duration_ms")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? SilenceDuration { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("create_response")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public bool CreateResponse { get; private set; }
 
         public static VoiceActivityDetectionSettings Disabled() => new(TurnDetectionType.Disabled);
     }
