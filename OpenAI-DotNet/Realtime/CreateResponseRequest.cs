@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
@@ -20,8 +21,10 @@ namespace OpenAI.Realtime
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="options">Inference configuration <see cref="Realtime.Options"/> to override the <see cref="RealtimeSession.Options"/> for this response only.</param>
-        public CreateResponseRequest(Options options)
+        /// <param name="options">
+        /// Create a new Realtime response with these parameters.
+        /// </param>
+        public CreateResponseRequest(RealtimeResponseCreateParams options)
         {
             Options = options;
         }
@@ -38,6 +41,6 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("response")]
-        public Options Options { get; private set; }
+        public RealtimeResponseCreateParams Options { get; private set; }
     }
 }

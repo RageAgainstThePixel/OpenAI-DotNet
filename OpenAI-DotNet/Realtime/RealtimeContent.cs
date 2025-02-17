@@ -12,11 +12,20 @@ namespace OpenAI.Realtime
         public RealtimeContent(string text, RealtimeContentType type)
         {
             Type = type;
-            Text = type switch
+            switch (type)
             {
-                RealtimeContentType.InputText or RealtimeContentType.Text => text,
-                _ => throw new ArgumentException($"Invalid content type {type} for text content")
-            };
+                case RealtimeContentType.InputText or RealtimeContentType.Text:
+                    Text = text;
+                    break;
+                case RealtimeContentType.InputAudio or RealtimeContentType.Audio:
+                    Audio = text;
+                    break;
+                case RealtimeContentType.ItemReference:
+                    Id = text;
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid content type {type} for text content");
+            }
         }
 
         public RealtimeContent(ReadOnlyMemory<byte> audioData, RealtimeContentType type, string transcript = null)
@@ -47,7 +56,16 @@ namespace OpenAI.Realtime
         }
 
         /// <summary>
-        /// The content type ("text", "audio", "input_text", "input_audio").
+        /// ID of a previous conversation item to reference (for `item_reference` content types in `response.create` events).
+        /// These can reference both client and server created items.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Id { get; private set; }
+
+        /// <summary>
+        /// The content type (`input_text`, `input_audio`, `item_reference`, `text`).
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
@@ -56,7 +74,7 @@ namespace OpenAI.Realtime
         public RealtimeContentType Type { get; private set; }
 
         /// <summary>
-        /// The text content.
+        /// The text content, used for `input_text` and `text` content types.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text")]
@@ -64,7 +82,7 @@ namespace OpenAI.Realtime
         public string Text { get; private set; }
 
         /// <summary>
-        /// Base64-encoded audio data.
+        /// Base64-encoded audio bytes, used for `input_audio` content type.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("audio")]
@@ -72,7 +90,7 @@ namespace OpenAI.Realtime
         public string Audio { get; private set; }
 
         /// <summary>
-        /// The transcript of the audio.
+        /// The transcript of the audio, used for `input_audio` content type.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("transcript")]

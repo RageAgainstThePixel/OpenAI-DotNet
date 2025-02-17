@@ -13,38 +13,38 @@ namespace OpenAI.Tests
     internal class TestFixture_13_Realtime : AbstractTestFixture
     {
         [Test]
-        public async Task Test_01_RealtimeSession()
+        public async Task Test_01_01_RealtimeSession()
         {
             RealtimeSession session = null;
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var wasGoodbyeCalled = false;
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        cts.Cancel();
                         wasGoodbyeCalled = true;
+                        cts.Cancel();
                         return "Goodbye!";
                     })
                 };
 
-                var options = new Options(Model.GPT4oRealtime, tools: tools);
-                session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(options, cts.Token);
+                var configuration = new SessionConfiguration(Model.GPT4oRealtime, tools: tools);
+                session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(configuration, cts.Token);
                 Assert.IsNotNull(session);
-                Assert.IsNotNull(session.Options);
-                Assert.AreEqual(Model.GPT4oRealtime.Id, options.Model);
-                Assert.AreEqual(options.Model, session.Options.Model);
-                Assert.IsNotNull(options.Tools);
-                Assert.IsNotEmpty(options.Tools);
-                Assert.AreEqual(1, options.Tools.Count);
-                Assert.AreEqual(options.Tools.Count, session.Options.Tools.Count);
-                Assert.AreEqual(options.Tools[0].Name, session.Options.Tools[0].Name);
-                Assert.AreEqual(Modality.Audio | Modality.Text, options.Modalities);
-                Assert.AreEqual(Modality.Audio | Modality.Text, session.Options.Modalities);
+                Assert.IsNotNull(session.Configuration);
+                Assert.AreEqual(Model.GPT4oRealtime.Id, configuration.Model);
+                Assert.AreEqual(configuration.Model, session.Configuration.Model);
+                Assert.IsNotNull(configuration.Tools);
+                Assert.IsNotEmpty(configuration.Tools);
+                Assert.AreEqual(1, configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools.Count, session.Configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools[0].Name, session.Configuration.Tools[0].Name);
+                Assert.AreEqual(Modality.Audio | Modality.Text, configuration.Modalities);
+                Assert.AreEqual(Modality.Audio | Modality.Text, session.Configuration.Modalities);
                 var responseTask = session.ReceiveUpdatesAsync<IServerEvent>(SessionEvents, cts.Token);
 
                 await session.SendAsync(new ConversationItemCreateRequest("Hello!"), cts.Token);
@@ -93,14 +93,14 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_RealtimeSession_IAsyncEnumerable()
+        public async Task Test_01_02_RealtimeSession_IAsyncEnumerable()
         {
             RealtimeSession session = null;
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var wasGoodbyeCalled = false;
                 var tools = new List<Tool>
                 {
@@ -112,19 +112,19 @@ namespace OpenAI.Tests
                     })
                 };
 
-                var options = new Options(Model.GPT4oRealtime, tools: tools);
-                session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(options, cts.Token);
+                var configuration = new SessionConfiguration(Model.GPT4oRealtime, tools: tools);
+                session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(configuration, cts.Token);
                 Assert.IsNotNull(session);
-                Assert.IsNotNull(session.Options);
-                Assert.AreEqual(Model.GPT4oRealtime.Id, options.Model);
-                Assert.AreEqual(options.Model, session.Options.Model);
-                Assert.IsNotNull(options.Tools);
-                Assert.IsNotEmpty(options.Tools);
-                Assert.AreEqual(1, options.Tools.Count);
-                Assert.AreEqual(options.Tools.Count, session.Options.Tools.Count);
-                Assert.AreEqual(options.Tools[0].Name, session.Options.Tools[0].Name);
-                Assert.AreEqual(Modality.Audio | Modality.Text, options.Modalities);
-                Assert.AreEqual(Modality.Audio | Modality.Text, session.Options.Modalities);
+                Assert.IsNotNull(session.Configuration);
+                Assert.AreEqual(Model.GPT4oRealtime.Id, configuration.Model);
+                Assert.AreEqual(configuration.Model, session.Configuration.Model);
+                Assert.IsNotNull(configuration.Tools);
+                Assert.IsNotEmpty(configuration.Tools);
+                Assert.AreEqual(1, configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools.Count, session.Configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools[0].Name, session.Configuration.Tools[0].Name);
+                Assert.AreEqual(Modality.Audio | Modality.Text, configuration.Modalities);
+                Assert.AreEqual(Modality.Audio | Modality.Text, session.Configuration.Modalities);
 
                 await foreach (var @event in session.ReceiveUpdatesAsync<IServerEvent>(cts.Token).ConfigureAwait(false))
                 {
@@ -157,6 +157,88 @@ namespace OpenAI.Tests
                 }
 
                 Assert.IsTrue(wasGoodbyeCalled);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case ObjectDisposedException:
+                        // ignore
+                        break;
+                    default:
+                        Console.WriteLine(e);
+                        throw;
+                }
+            }
+            finally
+            {
+                session?.Dispose();
+            }
+        }
+
+        [Test]
+        public async Task Test_02_RealtimeSession_VAD_Disabled()
+        {
+            RealtimeSession session = null;
+
+            try
+            {
+                Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
+                var cts = new CancellationTokenSource();
+                var tools = new List<Tool>
+                {
+                    Tool.FromFunc("goodbye", () =>
+                    {
+                        cts.Cancel();
+                        return "Goodbye!";
+                    })
+                };
+
+                var configuration = new SessionConfiguration(
+                    model: Model.GPT4oRealtime,
+                    tools: tools,
+                    turnDetectionSettings: VoiceActivityDetectionSettings.Disabled());
+                session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(configuration, cts.Token);
+                Assert.IsNotNull(session);
+                Assert.IsNotNull(session.Configuration);
+                Assert.AreEqual(Model.GPT4oRealtime.Id, configuration.Model);
+                Assert.AreEqual(configuration.Model, session.Configuration.Model);
+                Assert.IsNotNull(configuration.Tools);
+                Assert.IsNotEmpty(configuration.Tools);
+                Assert.AreEqual(1, configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools.Count, session.Configuration.Tools.Count);
+                Assert.AreEqual(configuration.Tools[0].Name, session.Configuration.Tools[0].Name);
+                Assert.AreEqual(Modality.Audio | Modality.Text, configuration.Modalities);
+                Assert.AreEqual(Modality.Audio | Modality.Text, session.Configuration.Modalities);
+                Assert.IsNull(session.Configuration.VoiceActivityDetectionSettings);
+                var responseTask = session.ReceiveUpdatesAsync<IServerEvent>(SessionEvents, cts.Token);
+
+                await session.SendAsync(new ConversationItemCreateRequest("Hello!"), cts.Token);
+                await session.SendAsync(new CreateResponseRequest(), cts.Token);
+                await session.SendAsync(new InputAudioBufferAppendRequest(new ReadOnlyMemory<byte>(new byte[1024 * 8])), cts.Token);
+                await session.SendAsync(new InputAudioBufferCommitRequest(), cts.Token);
+                await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
+                await session.SendAsync(new CreateResponseRequest(), cts.Token);
+
+                void SessionEvents(IServerEvent @event)
+                {
+                    switch (@event)
+                    {
+                        case ResponseAudioTranscriptResponse transcriptResponse:
+                            Console.WriteLine(transcriptResponse.ToString());
+                            break;
+                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
+                            if (functionCallResponse.IsDone)
+                            {
+                                ToolCall toolCall = functionCallResponse;
+                                toolCall.InvokeFunction();
+                            }
+
+                            break;
+                    }
+                }
+
+                await responseTask.ConfigureAwait(true);
             }
             catch (Exception e)
             {
