@@ -29,8 +29,15 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.6.0</Version>
+    <Version>8.6.1</Version>
     <PackageReleaseNotes>
+Version 8.6.1
+- Updated Models list
+  - Added gpt-4.5
+  - Updated moderation models
+    - removed text-moderation-stable
+    - added omni-moderation-latest
+    - deprecated text-moderation-latest, use omni-moderation-latest
 Version 8.6.0
 - Deprecated OpenAI.Realtime.Options
 - Added OpenAI.Realtime.SessionConfiguration to specify the options of the RealtimeSession when creating a new session

@@ -73,6 +73,8 @@ namespace OpenAI.Models
         [JsonPropertyName("parent")]
         public string Parent { get; private set; }
 
+        public static Model GPT4_5 { get; } = new("gpt-4.5-preview", "openai");
+
         public static Model O1 { get; } = new("o1-preview", "openai");
 
         public static Model O1Mini { get; } = new("o1-mini", "openai");
@@ -169,11 +171,12 @@ namespace OpenAI.Models
         /// </remarks>
         public static Model Embedding_3_Large { get; } = new("text-embedding-3-large", "openai");
 
-        /// <summary>
-        /// The default model for <see cref="Moderations.ModerationsEndpoint"/>.
-        /// </summary>
+        public static Model OmniModerationLatest { get; } = new("omni-moderation-latest", "openai");
+
+        [Obsolete("use OmniModerationLatest")]
         public static Model Moderation_Latest { get; } = new("text-moderation-latest", "openai");
 
+        [Obsolete("Removed")]
         public static Model Moderation_Stable { get; } = new("text-moderation-stable", "openai");
 
         /// <summary>
