@@ -76,6 +76,7 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Tool> Tools { get; private set; }
 
         /// <summary>
@@ -86,6 +87,7 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_resources")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ToolResources ToolResources { get; private set; }
 
         /// <summary>
@@ -95,6 +97,7 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         /// <summary>
@@ -104,7 +107,8 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("temperature")]
-        public double Temperature { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? Temperature { get; private set; }
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling,
@@ -113,7 +117,13 @@ namespace OpenAI.Assistants
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("top_p")]
-        public double TopP { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? TopP { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("reasoning_effort")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ReasoningEffort ReasoningEffort { get; private set; }
 
         /// <summary>
         /// Specifies the format that the model must output.

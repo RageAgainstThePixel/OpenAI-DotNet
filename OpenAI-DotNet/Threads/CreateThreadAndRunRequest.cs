@@ -10,6 +10,28 @@ namespace OpenAI.Threads
 {
     public sealed class CreateThreadAndRunRequest
     {
+        [Obsolete("use new .ctr")]
+        public CreateThreadAndRunRequest(
+            string assistantId,
+            string model,
+            string instructions,
+            IReadOnlyList<Tool> tools,
+            ToolResources toolResources,
+            IReadOnlyDictionary<string, string> metadata,
+            double? temperature,
+            double? topP,
+            int? maxPromptTokens,
+            int? maxCompletionTokens,
+            TruncationStrategy truncationStrategy,
+            string toolChoice,
+            bool? parallelToolCalls,
+            JsonSchema jsonSchema,
+            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
+            CreateThreadRequest createThreadRequest = null)
+            : this(assistantId, model, instructions, tools, toolResources, metadata, temperature, topP, 0, maxPromptTokens, maxCompletionTokens, truncationStrategy, toolChoice, parallelToolCalls, jsonSchema, responseFormat, createThreadRequest)
+        {
+        }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -50,6 +72,11 @@ namespace OpenAI.Threads
         /// where the model considers the results of the tokens with top_p probability mass.
         /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
         /// We generally recommend altering this or temperature but not both.
+        /// </param>
+        /// <param name="reasoningEffort">
+        /// Constrains effort on reasoning for reasoning models.
+        /// Currently supported values are low, medium, and high.
+        /// Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
         /// </param>
         /// <param name="maxPromptTokens">
         /// The maximum number of prompt tokens that may be used over the course of the run.
@@ -104,6 +131,7 @@ namespace OpenAI.Threads
             IReadOnlyDictionary<string, string> metadata = null,
             double? temperature = null,
             double? topP = null,
+            ReasoningEffort reasoningEffort = 0,
             int? maxPromptTokens = null,
             int? maxCompletionTokens = null,
             TruncationStrategy truncationStrategy = null,
@@ -154,8 +182,9 @@ namespace OpenAI.Threads
             Tools = toolList?.ToList();
             ToolResources = toolResources;
             Metadata = metadata;
-            Temperature = temperature;
-            TopP = topP;
+            Temperature = reasoningEffort > 0 ? null : temperature;
+            TopP = reasoningEffort > 0 ? null : topP;
+            ReasoningEffort = reasoningEffort;
             MaxPromptTokens = maxPromptTokens;
             MaxCompletionTokens = maxCompletionTokens;
             TruncationStrategy = truncationStrategy;
@@ -202,6 +231,7 @@ namespace OpenAI.Threads
         /// The list of tools that the assistant used for this run.
         /// </summary>
         [JsonPropertyName("tools")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Tool> Tools { get; }
 
         /// <summary>
@@ -211,6 +241,7 @@ namespace OpenAI.Threads
         /// while the 'file_search' tool requires a list of vector store IDs.
         /// </summary>
         [JsonPropertyName("tool_resources")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ToolResources ToolResources { get; }
 
         /// <summary>
@@ -219,6 +250,7 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, string> Metadata { get; }
 
         /// <summary>
@@ -239,6 +271,16 @@ namespace OpenAI.Threads
         [JsonPropertyName("top_p")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TopP { get; }
+
+        /// <summary>
+        /// Constrains effort on reasoning for reasoning models.
+        /// Currently supported values are low, medium, and high.
+        /// Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("reasoning_effort")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ReasoningEffort ReasoningEffort { get; }
 
         /// <summary>
         /// If true, returns a stream of events that happen during the Run as server-sent events,
@@ -290,6 +332,7 @@ namespace OpenAI.Threads
         /// Whether to enable parallel function calling during tool use.
         /// </summary>
         [JsonPropertyName("parallel_tool_calls")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? ParallelToolCalls { get; }
 
         /// <summary>
