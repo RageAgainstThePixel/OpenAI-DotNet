@@ -33,7 +33,7 @@ namespace OpenAI.Threads
         }
 
         /// <inheritdoc />
-        public CreateThreadRequest(string message) : this(new[] { new Message(message) })
+        public CreateThreadRequest(string message) : this([new Message(message)])
         {
         }
 
@@ -41,6 +41,7 @@ namespace OpenAI.Threads
         /// A list of messages to start the thread with.
         /// </summary>
         [JsonPropertyName("messages")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Message> Messages { get; }
 
         /// <summary>
@@ -50,6 +51,7 @@ namespace OpenAI.Threads
         /// while the file_search tool requires a list of vector store IDs.
         /// </summary>
         [JsonPropertyName("tool_resources")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ToolResources ToolResources { get; }
 
         /// <summary>
@@ -58,6 +60,7 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.
         /// </summary>
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, string> Metadata { get; }
 
         public static implicit operator CreateThreadRequest(string message) => new(message);

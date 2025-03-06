@@ -120,6 +120,11 @@ namespace OpenAI.Assistants
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TopP { get; private set; }
 
+        /// <summary>
+        /// Constrains effort on reasoning for reasoning models.
+        /// Currently supported values are low, medium, and high.
+        /// Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("reasoning_effort")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
