@@ -73,8 +73,6 @@ namespace OpenAI.Models
         [JsonPropertyName("parent")]
         public string Parent { get; private set; }
 
-        public static Model GPT4_5 { get; } = new("gpt-4.5-preview", "openai");
-
         public static Model O1 { get; } = new("o1-preview", "openai");
 
         public static Model O1Mini { get; } = new("o1-mini", "openai");
@@ -82,6 +80,8 @@ namespace OpenAI.Models
         public static Model O3Mini { get; } = new("o3-mini", "openai");
 
         public static Model GPT4oRealtime { get; } = new("gpt-4o-realtime-preview", "openai");
+
+        public static Model GPT4oRealtimeMini { get; } = new("gpt-4o-realtime-mini", "openai");
 
         /// <summary>
         /// GPT-4o ("o" for "omni") is our most advanced model.
@@ -107,6 +107,8 @@ namespace OpenAI.Models
         /// Context Window: 8,192 tokens
         /// </remarks>
         public static Model GPT4 { get; } = new("gpt-4", "openai");
+
+        public static Model GPT4_5 { get; } = new("gpt-4.5-preview", "openai");
 
         /// <summary>
         /// The latest GPT-4 Turbo model with vision capabilities. Vision requests can now use JSON mode and function calling.
