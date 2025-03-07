@@ -319,9 +319,13 @@ namespace OpenAI.Chat
         /// The maximum number of tokens allowed for the generated answer.
         /// By default, the number of tokens the model can return will be (4096 - prompt tokens).
         /// </summary>
-        [JsonIgnore]
+        /// <remarks>
+        /// Still used for older models that support it.
+        /// </remarks>
+        [JsonPropertyName("max_tokens")]
         [Obsolete("use MaxCompletionTokens instead")]
-        public int? MaxTokens => MaxCompletionTokens;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? MaxTokens { get; set; }
 
         /// <summary>
         /// An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens.

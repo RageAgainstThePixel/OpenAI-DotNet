@@ -78,8 +78,8 @@ namespace OpenAI.Assistants
                 assistant.Tools,
                 assistant.ToolResources,
                 assistant.Metadata,
-                assistant.Temperature,
-                assistant.TopP,
+                assistant.ReasoningEffort > 0 ? null : assistant.Temperature,
+                assistant.ReasoningEffort > 0 ? null : assistant.TopP,
                 jsonSchema: assistant.ResponseFormatObject?.JsonSchema,
                 responseFormat: assistant.ResponseFormat,
                 createThreadRequest: request);
