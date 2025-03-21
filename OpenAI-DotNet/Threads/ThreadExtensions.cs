@@ -182,7 +182,7 @@ namespace OpenAI.Threads
                 instructions: assistant.Instructions,
                 tools: assistant.Tools,
                 temperature: assistant.ReasoningEffort > 0 ? null : assistant.Temperature,
-                topP: assistant.ReasoningEffort > 0 ? assistant.TopP : assistant.Temperature,
+                topP: assistant.ReasoningEffort > 0 ? null : assistant.Temperature,
                 reasoningEffort: assistant.ReasoningEffort,
                 responseFormat: assistant.ResponseFormat);
             return await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
