@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.6.2</Version>
+    <Version>8.6.3</Version>
     <PackageReleaseNotes>
+Version 8.6.3
+- Fixed Assistant Reasoning Model request serialization when using thread.CreateRunAsync
 Version 8.6.2
 - Fixed Assistant Reasoning Model request serialization
 - Added a way to set max_tokens on chat request to support older azure api
