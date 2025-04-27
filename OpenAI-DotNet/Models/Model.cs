@@ -181,27 +181,18 @@ namespace OpenAI.Models
         [Obsolete("Removed")]
         public static Model Moderation_Stable { get; } = new("text-moderation-stable", "openai");
 
-        /// <summary>
-        /// The latest text to speech model, optimized for speed.
-        /// </summary>
-        /// <remarks>
-        /// The default model for <see cref="Audio.SpeechRequest"/>s.
-        /// </remarks>
         public static Model TTS_1 { get; } = new("tts-1", "openai");
 
-        /// <summary>
-        /// The latest text to speech model, optimized for quality.
-        /// </summary>
         public static Model TTS_1HD { get; } = new("tts-1-hd", "openai");
 
-        /// <summary>
-        /// The default model for <see cref="Audio.AudioEndpoint"/>.
-        /// </summary>
+        public static Model TTS_GPT_4o_Mini { get; } = new("gpt-4o-mini-tts", "openai");
+
         public static Model Whisper1 { get; } = new("whisper-1", "openai");
 
-        /// <summary>
-        /// The default model for <see cref="Images.ImagesEndpoint"/>.
-        /// </summary>
+        public static Model Transcribe_GPT_4o { get; } = new("gpt-4o-transcribe", "openai");
+
+        public static Model Transcribe_GPT_4o_Mini { get; } = new("gpt-4o-mini-transcribe", "openai");
+
         public static Model DallE_2 { get; } = new("dall-e-2", "openai");
 
         public static Model DallE_3 { get; } = new("dall-e-3", "openai");

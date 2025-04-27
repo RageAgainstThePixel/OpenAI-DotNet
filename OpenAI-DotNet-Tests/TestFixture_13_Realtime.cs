@@ -197,7 +197,8 @@ namespace OpenAI.Tests
                 var configuration = new SessionConfiguration(
                     model: Model.GPT4oRealtime,
                     tools: tools,
-                    turnDetectionSettings: VoiceActivityDetectionSettings.Disabled());
+                    modalities: Modality.Text,
+                    turnDetectionSettings: new DisabledVAD());
                 session = await OpenAIClient.RealtimeEndpoint.CreateSessionAsync(configuration, cts.Token);
                 Assert.IsNotNull(session);
                 Assert.IsNotNull(session.Configuration);
@@ -208,8 +209,8 @@ namespace OpenAI.Tests
                 Assert.AreEqual(1, configuration.Tools.Count);
                 Assert.AreEqual(configuration.Tools.Count, session.Configuration.Tools.Count);
                 Assert.AreEqual(configuration.Tools[0].Name, session.Configuration.Tools[0].Name);
-                Assert.AreEqual(Modality.Audio | Modality.Text, configuration.Modalities);
-                Assert.AreEqual(Modality.Audio | Modality.Text, session.Configuration.Modalities);
+                Assert.AreEqual(Modality.Text, configuration.Modalities);
+                Assert.AreEqual(Modality.Text, session.Configuration.Modalities);
                 Assert.IsNull(session.Configuration.VoiceActivityDetectionSettings);
                 var responseTask = session.ReceiveUpdatesAsync<IServerEvent>(SessionEvents, cts.Token);
 
