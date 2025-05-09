@@ -459,4 +459,7 @@ Version 4.4.0
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\sipsorcery\src\SIPSorcery.csproj" />
+  </ItemGroup>
 </Project>

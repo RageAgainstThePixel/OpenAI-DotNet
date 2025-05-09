@@ -76,6 +76,7 @@ namespace OpenAI
             BatchEndpoint = new BatchEndpoint(this);
             VectorStoresEndpoint = new VectorStoresEndpoint(this);
             RealtimeEndpoint = new RealtimeEndpoint(this);
+            RealtimeEndpointWebRTC = new RealtimeEndpointWebRTC(this);
         }
 
         ~OpenAIClient() => Dispose(false);
@@ -220,6 +221,8 @@ namespace OpenAI
         public VectorStoresEndpoint VectorStoresEndpoint { get; }
 
         public RealtimeEndpoint RealtimeEndpoint { get; }
+
+        public RealtimeEndpointWebRTC RealtimeEndpointWebRTC { get; }
 
         #endregion Endpoints
 

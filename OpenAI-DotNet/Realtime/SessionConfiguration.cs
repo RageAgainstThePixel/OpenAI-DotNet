@@ -48,13 +48,14 @@ namespace OpenAI.Realtime
 
             var toolList = tools?.ToList();
 
+            if (string.IsNullOrWhiteSpace(toolChoice))
+            {
+                ToolChoice = "auto";
+            }
+
             if (toolList is { Count: > 0 })
             {
-                if (string.IsNullOrWhiteSpace(toolChoice))
-                {
-                    ToolChoice = "auto";
-                }
-                else
+                if (!string.IsNullOrWhiteSpace(toolChoice))
                 {
                     if (!toolChoice.Equals("none") &&
                         !toolChoice.Equals("required") &&
