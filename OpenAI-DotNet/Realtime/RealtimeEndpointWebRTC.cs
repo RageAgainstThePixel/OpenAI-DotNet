@@ -25,8 +25,7 @@ namespace OpenAI.Realtime
 
         public readonly AudioFormat AudioFormat;
 
-        internal RealtimeEndpointWebRTC(OpenAIClient client) : base(client)
-        {
+        internal RealtimeEndpointWebRTC(OpenAIClient client) : base(client)        {
             AudioEncoder = new AudioEncoder(includeOpus: true);
             AudioFormat = AudioEncoder.SupportedFormats.Single(x => x.FormatName == AudioCodecsEnum.OPUS.ToString());
         }
@@ -36,7 +35,6 @@ namespace OpenAI.Realtime
         protected override bool? IsWebSocketEndpoint => false;
 
         private RTCPeerConnection rtcPeerConnection;
-        public RTCPeerConnection RTCPeerConnection => rtcPeerConnection;
 
         public event Action<IPEndPoint, SDPMediaTypesEnum, RTPPacket> OnRtpPacketReceived;
 
