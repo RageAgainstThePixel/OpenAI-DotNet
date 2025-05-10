@@ -1,7 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
-using Org.BouncyCastle.Ocsp;
 using SIPSorcery.Media;
 using SIPSorcery.Net;
 using SIPSorceryMedia.Abstractions;
@@ -25,7 +24,7 @@ namespace OpenAI.Realtime
 
         public readonly AudioFormat AudioFormat;
 
-        internal RealtimeEndpointWebRTC(OpenAIClient client) : base(client)        {
+        internal RealtimeEndpointWebRTC(OpenAIClient client) : base(client) {
             AudioEncoder = new AudioEncoder(includeOpus: true);
             AudioFormat = AudioEncoder.SupportedFormats.Single(x => x.FormatName == AudioCodecsEnum.OPUS.ToString());
         }
@@ -132,11 +131,11 @@ namespace OpenAI.Realtime
                 {
                     if (peerConnection.signalingState == RTCSignalingState.have_local_offer)
                     {
-                        Console.WriteLine("Local SDP:\n{sdp}", peerConnection.localDescription.sdp);
+                        Console.WriteLine($"Local SDP:\n{peerConnection.localDescription.sdp}");
                     }
                     else if (peerConnection.signalingState is RTCSignalingState.have_remote_offer or RTCSignalingState.stable)
                     {
-                        //Console.WriteLine("Remote SDP:\n{sdp}", peerConnection.remoteDescription?.sdp);
+                        Console.WriteLine($"Remote SDP:\n{peerConnection.remoteDescription?.sdp}");
                     }
                 };
             }
