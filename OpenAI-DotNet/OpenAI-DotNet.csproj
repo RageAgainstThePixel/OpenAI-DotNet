@@ -458,5 +458,6 @@ Version 4.4.0
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SIPSorcery" Version="8.0.14" />
   </ItemGroup>
 </Project>

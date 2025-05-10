@@ -30,6 +30,7 @@ namespace OpenAI
                 "input_audio_buffer.cleared" => root.Deserialize<InputAudioBufferClearedResponse>(options),
                 "input_audio_buffer.speech_started" => root.Deserialize<InputAudioBufferStartedResponse>(options),
                 "input_audio_buffer.speech_stopped" => root.Deserialize<InputAudioBufferStoppedResponse>(options),
+                "output_audio_buffer.started" => root.Deserialize<OutputAudioBufferStartedResponse>(options),
                 _ when type.StartsWith("response.audio_transcript") => root.Deserialize<ResponseAudioTranscriptResponse>(options),
                 _ when type.StartsWith("response.audio") => root.Deserialize<ResponseAudioResponse>(),
                 _ when type.StartsWith("response.content_part") => root.Deserialize<ResponseContentPartResponse>(options),
