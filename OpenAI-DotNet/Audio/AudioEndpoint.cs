@@ -109,6 +109,22 @@ namespace OpenAI.Audio
                 payload.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
                 payload.Add(new StringContent(request.Model), "model");
 
+                if (request.ChunkingStrategy != null)
+                {
+                    var stringContent = request.ChunkingStrategy.Type == "auto"
+                        ? "auto"
+                        : JsonSerializer.Serialize(request.ChunkingStrategy, OpenAIClient.JsonSerializationOptions);
+                    payload.Add(new StringContent(stringContent), "chunking_strategy");
+                }
+
+                if (request.Include is { Length: > 0 })
+                {
+                    foreach (var include in request.Include)
+                    {
+                        payload.Add(new StringContent(include), "include[]");
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.Language))
                 {
                     payload.Add(new StringContent(request.Language), "language");
