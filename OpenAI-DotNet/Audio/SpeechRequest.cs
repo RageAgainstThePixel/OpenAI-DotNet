@@ -58,6 +58,9 @@ namespace OpenAI.Audio
         [FunctionProperty("The voice to use when generating the audio.", true, "alloy", "echo", "fable", "onyx", "nova", "shimmer")]
         public string Voice { get; }
 
+        /// <summary>
+        /// Control the voice of your generated audio with additional instructions. Does not work with tts-1 or tts-1-hd.
+        /// </summary>
         [JsonPropertyName("instructions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [FunctionProperty("Control the voice of your generated audio with additional instructions. Does not work with tts-1 or tts-1-hd.")]

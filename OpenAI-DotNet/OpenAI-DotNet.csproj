@@ -33,6 +33,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.7.0
 - Added support for Responses API
+- Added SemanticVAD options to Realtime API
 - Updated speech requests with instructions input
 - Updated audio transcription requests with ChunkingStrategy and includes
 Version 8.6.4
