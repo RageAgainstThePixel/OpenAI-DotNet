@@ -42,7 +42,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_01_02_02_Transcription_Json_ChunkingStrategy_Specific()
+        public async Task Test_01_02_03_Transcription_Json_ChunkingStrategy_Specific()
         {
             Assert.IsNotNull(OpenAIClient.AudioEndpoint);
             var transcriptionAudio = Path.GetFullPath("../../../Assets/T3mt39YrlyLoq8laHSdf.mp3");
