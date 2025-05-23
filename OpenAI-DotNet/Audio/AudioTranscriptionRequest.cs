@@ -204,7 +204,7 @@ namespace OpenAI.Audio
 
             if (include != null && responseFormat is not (AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json))
             {
-                throw new ArgumentException($"{nameof(responseFormat)} must be set {AudioResponseFormat.Json} or {AudioResponseFormat.Verbose_Json} to use include.");
+                throw new ArgumentException("responseFormat must be either AudioResponseFormat.Json or AudioResponseFormat.Verbose_Json when using the include parameter.");
             }
 
             Include = include;
