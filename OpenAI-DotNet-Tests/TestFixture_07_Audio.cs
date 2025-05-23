@@ -37,7 +37,7 @@ namespace OpenAI.Tests
                 temperature: 0.1f,
                 language: "en",
                 include: ["logprobs"]);
-            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
+            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
             Assert.IsNotNull(response);
         }
 
@@ -53,7 +53,7 @@ namespace OpenAI.Tests
                 temperature: 0.1f,
                 language: "en",
                 chunkingStrategy: ChunkingStrategy.Auto);
-            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
+            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
             Assert.IsNotNull(response);
         }
 
@@ -70,7 +70,7 @@ namespace OpenAI.Tests
                 temperature: 0.1f,
                 language: "en",
                 chunkingStrategy: chunkStrategy);
-            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionTextAsync(request);
+            var response = await OpenAIClient.AudioEndpoint.CreateTranscriptionJsonAsync(request);
             Assert.IsNotNull(response);
         }
 
