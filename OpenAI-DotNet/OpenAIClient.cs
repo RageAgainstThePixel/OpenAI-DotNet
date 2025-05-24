@@ -12,6 +12,7 @@ using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
 using OpenAI.Realtime;
+using OpenAI.Responses;
 using OpenAI.Threads;
 using OpenAI.VectorStores;
 using System;
@@ -76,6 +77,7 @@ namespace OpenAI
             BatchEndpoint = new BatchEndpoint(this);
             VectorStoresEndpoint = new VectorStoresEndpoint(this);
             RealtimeEndpoint = new RealtimeEndpoint(this);
+            ResponsesEndpoint = new ResponsesEndpoint(this);
         }
 
         ~OpenAIClient() => Dispose(false);
@@ -219,7 +221,20 @@ namespace OpenAI
         /// </summary>
         public VectorStoresEndpoint VectorStoresEndpoint { get; }
 
+        /// <summary>
+        /// Communicate with a GPT-4o class model in real time using WebSockets.
+        /// Supports text and audio inputs and outputs, along with audio transcriptions.
+        /// <see href="https://platform.openai.com/docs/api-reference/realtime"/>
+        /// </summary>
         public RealtimeEndpoint RealtimeEndpoint { get; }
+
+        /// <summary>
+        /// Creates a model response.
+        /// Provide text or image inputs to generate text or JSON outputs.
+        /// Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+        /// <see href="https://platform.openai.com/docs/api-reference/responses"/>
+        /// </summary>
+        public ResponsesEndpoint ResponsesEndpoint { get; }
 
         #endregion Endpoints
 
