@@ -22,8 +22,10 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.4.0</Version>
+    <Version>8.7.0</Version>
     <PackageReleaseNotes>
+Version 8.7.0
+- Fix Azure OpenAI api-version query parameter not being forwarded correctly
 Version 8.4.0
 - Added support for Realtime Websocket proxy forwarding
 Version 8.2.0
