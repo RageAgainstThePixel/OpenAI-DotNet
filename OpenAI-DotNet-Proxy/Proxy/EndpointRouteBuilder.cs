@@ -72,10 +72,30 @@ namespace OpenAI.Proxy
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
                     var method = new HttpMethod(httpContext.Request.Method);
 
+                    var originalQuery =
+                        Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(
+                            httpContext.Request.QueryString.Value ?? "");
+
+                    var modifiedQuery = new Dictionary<string, string>(originalQuery.Count);
+
+                    foreach (var pair in originalQuery)
+                    {
+                        modifiedQuery[pair.Key] = pair.Value.FirstOrDefault();
+                    }
+
+                    if (openAIClient.OpenAIClientSettings.IsAzureOpenAI)
+                    {
+                        modifiedQuery["api-version"] = openAIClient.OpenAIClientSettings.ApiVersion;
+                    }
+
+                    var finalEndpointWithQueries =
+                        Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(endpoint, modifiedQuery);
+
                     var uri = new Uri(string.Format(
                         openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
-                        $"{endpoint}{httpContext.Request.QueryString}"
+                        finalEndpointWithQueries
                     ));
+
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
