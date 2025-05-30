@@ -4,6 +4,8 @@ namespace OpenAI.Realtime
 {
     public sealed class ServerVAD : IVoiceActivityDetectionSettings
     {
+        public ServerVAD() { }
+
         public ServerVAD(
             bool createResponse = true,
             bool interruptResponse = true,

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace OpenAI
 {
-    public abstract class BaseResponse
+    public abstract class BaseResponse : IListItem
     {
         /// <summary>
         /// The <see cref="OpenAIClient"/> this response was generated from.

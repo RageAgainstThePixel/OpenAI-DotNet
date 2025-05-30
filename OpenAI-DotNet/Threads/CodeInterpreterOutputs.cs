@@ -1,6 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
@@ -9,6 +10,7 @@ namespace OpenAI.Threads
     {
         [JsonInclude]
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Index { get; private set; }
 
         /// <summary>
@@ -32,8 +34,16 @@ namespace OpenAI.Threads
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("image")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ImageFile Image { get; private set; }
+
+        /// <summary>
+        /// Code interpreter file output.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("files")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyList<FilePath> Files { get; private set; }
 
         public void AppendFrom(CodeInterpreterOutputs other)
         {
@@ -64,6 +74,11 @@ namespace OpenAI.Threads
                 {
                     Image.AppendFrom(other.Image);
                 }
+            }
+
+            if (other.Files is { Count: > 0 })
+            {
+                Files ??= other.Files;
             }
         }
     }

@@ -230,7 +230,7 @@ namespace OpenAI.Threads
                 }
             }
 
-            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            request.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             return await CreateRunAsync(threadId, request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
             {
                 await streamEventHandler.Invoke(serverSentEvent);
@@ -312,7 +312,7 @@ namespace OpenAI.Threads
                 }
             }
 
-            request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            request.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             return await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : async (_, serverSentEvent) =>
             {
                 await streamEventHandler.Invoke(serverSentEvent).ConfigureAwait(false);

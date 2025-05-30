@@ -44,11 +44,14 @@ namespace OpenAI.Extensions
 
         internal static void SetResponseData(this BaseResponse response, HttpResponseHeaders headers, OpenAIClient client)
         {
-            if (response is IListResponse<BaseResponse> listResponse)
+            if (response is IListResponse<IListItem> listResponse)
             {
                 foreach (var item in listResponse.Items)
                 {
-                    SetResponseData(item, headers, client);
+                    if (item is BaseResponse baseResponse)
+                    {
+                        SetResponseData(baseResponse, headers, client);
+                    }
                 }
             }
 

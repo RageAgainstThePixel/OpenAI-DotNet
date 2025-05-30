@@ -6,30 +6,30 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Extensions
 {
-    internal sealed class ResponseFormatConverter : JsonConverter<ResponseFormatObject>
+    internal sealed class TextResponseFormatConverter : JsonConverter<TextResponseFormatConfiguration>
     {
-        public override ResponseFormatObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override TextResponseFormatConfiguration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
             {
                 if (reader.TokenType is JsonTokenType.Null or JsonTokenType.String)
                 {
-                    return ChatResponseFormat.Auto;
+                    return TextResponseFormat.Auto;
                 }
 
-                return JsonSerializer.Deserialize<ResponseFormatObject>(ref reader, options);
+                return JsonSerializer.Deserialize<TextResponseFormatConfiguration>(ref reader, options);
             }
             catch (Exception e)
             {
-                throw new Exception($"Error reading {typeof(ChatResponseFormat)} from JSON.", e);
+                throw new Exception($"Error reading {typeof(TextResponseFormat)} from JSON.", e);
             }
         }
 
-        public override void Write(Utf8JsonWriter writer, ResponseFormatObject value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, TextResponseFormatConfiguration value, JsonSerializerOptions options)
         {
             switch (value.Type)
             {
-                case ChatResponseFormat.Auto:
+                case TextResponseFormat.Auto:
                     // ignore
                     break;
                 default:

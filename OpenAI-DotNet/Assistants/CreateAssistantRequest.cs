@@ -23,7 +23,7 @@ namespace OpenAI.Assistants
             double? temperature,
             double? topP,
             JsonSchema jsonSchema,
-            ChatResponseFormat? responseFormat = null)
+            TextResponseFormat? responseFormat = null)
             : this(
                 string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
                 string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -98,7 +98,7 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> enables JSON mode,
+        /// Setting to <see cref="TextResponseFormat.Json"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
         /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
         /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
@@ -118,7 +118,7 @@ namespace OpenAI.Assistants
             double? topP = null,
             ReasoningEffort reasoningEffort = 0,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat? responseFormat = null)
+            TextResponseFormat? responseFormat = null)
         : this(
             string.IsNullOrWhiteSpace(model) ? assistant.Model : model,
             string.IsNullOrWhiteSpace(name) ? assistant.Name : name,
@@ -192,7 +192,7 @@ namespace OpenAI.Assistants
         /// </param>
         /// <param name="responseFormat">
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
+        /// Setting to <see cref="TextResponseFormat.Json"/> or <see cref="TextResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
         /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
         /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
@@ -211,7 +211,7 @@ namespace OpenAI.Assistants
             double? topP = null,
             ReasoningEffort reasoningEffort = 0,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Text)
+            TextResponseFormat responseFormat = TextResponseFormat.Text)
         {
             Model = string.IsNullOrWhiteSpace(model) ? Models.Model.GPT4o : model;
             Name = name;
@@ -311,7 +311,7 @@ namespace OpenAI.Assistants
 
         /// <summary>
         /// Specifies the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
+        /// Setting to <see cref="TextResponseFormat.Json"/> or <see cref="TextResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -322,12 +322,12 @@ namespace OpenAI.Assistants
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonConverter(typeof(TextResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ResponseFormatObject ResponseFormatObject { get; internal set; }
+        public TextResponseFormatConfiguration ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]
-        public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;
+        public TextResponseFormat ResponseFormat => ResponseFormatObject ?? TextResponseFormat.Auto;
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.

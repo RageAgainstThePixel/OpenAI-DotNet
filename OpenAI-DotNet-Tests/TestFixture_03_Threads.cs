@@ -176,7 +176,10 @@ namespace OpenAI.Tests
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
                     model: Model.GPT4o,
-                    responseFormat: ChatResponseFormat.Json));
+#pragma warning disable CS0618 // Type or member is obsolete
+                    responseFormat: TextResponseFormat.Json
+#pragma warning restore CS0618 // Type or member is obsolete
+                ));
             ThreadResponse thread = null;
 
             try

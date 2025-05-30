@@ -51,7 +51,7 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<(T, ChatResponse)> GetCompletionAsync<T>(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            chatRequest.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             var response = await GetCompletionAsync(chatRequest, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);
@@ -114,7 +114,7 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Func<ChatResponse, Task> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
         {
-            chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            chatRequest.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             var response = await StreamCompletionAsync(chatRequest, resultHandler, streamUsage, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);

@@ -12,5 +12,13 @@ namespace OpenAI
         [JsonInclude]
         [JsonPropertyName("file_id")]
         public string FileId { get; private set; }
+
+        /// <summary>
+        /// The MIME type of the file.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("mime_type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string MimeType { get; private set; }
     }
 }
