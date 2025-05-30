@@ -192,8 +192,9 @@ namespace OpenAI.Tests
                 new(Role.System, "You are a helpful assistant designed to output JSON."),
                 new(Role.User, "Who won the world series in 2020?"),
             };
-
-            var chatRequest = new ChatRequest(messages, Model.GPT4o);
+#pragma warning disable CS0618 // Type or member is obsolete
+            var chatRequest = new ChatRequest(messages, Model.GPT4o, responseFormat: TextResponseFormat.Json);
+#pragma warning restore CS0618 // Type or member is obsolete
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
