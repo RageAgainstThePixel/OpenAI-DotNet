@@ -69,6 +69,10 @@ namespace OpenAI.Chat
                     }
                 }
             }
+            else
+            {
+                ToolChoice = "auto";
+            }
 
             Tools = toolList?.ToList();
         }

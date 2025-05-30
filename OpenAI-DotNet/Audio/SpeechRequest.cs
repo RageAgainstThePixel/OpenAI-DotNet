@@ -79,6 +79,7 @@ namespace OpenAI.Audio
         /// The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.
         /// </summary>
         [JsonPropertyName("speed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [FunctionProperty("The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.", false, 1.0f)]
         public float? Speed { get; }
     }

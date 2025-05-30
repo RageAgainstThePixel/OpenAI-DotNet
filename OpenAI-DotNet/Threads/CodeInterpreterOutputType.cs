@@ -9,6 +9,8 @@ namespace OpenAI.Threads
         [EnumMember(Value = "logs")]
         Logs,
         [EnumMember(Value = "image")]
-        Image
+        Image,
+        [EnumMember(Value = "files")]
+        Files
     }
 }

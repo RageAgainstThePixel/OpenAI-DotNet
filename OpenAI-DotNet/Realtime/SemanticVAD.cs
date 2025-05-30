@@ -4,6 +4,8 @@ namespace OpenAI.Realtime
 {
     public sealed class SemanticVAD : IVoiceActivityDetectionSettings
     {
+        public SemanticVAD() { }
+
         public SemanticVAD(bool createResponse = true, bool interruptResponse = true, VAD_Eagerness eagerness = VAD_Eagerness.Auto)
         {
             CreateResponse = createResponse;

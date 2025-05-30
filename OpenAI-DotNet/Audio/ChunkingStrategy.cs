@@ -6,6 +6,15 @@ namespace OpenAI.Audio
 {
     public sealed class ChunkingStrategy
     {
+        [JsonConstructor]
+        internal ChunkingStrategy(string type, int? prefixPaddingMs, int? silenceDurationMs, float? threshold)
+        {
+            Type = type;
+            PrefixPaddingMs = prefixPaddingMs;
+            SilenceDurationMs = silenceDurationMs;
+            Threshold = threshold;
+        }
+
         /// <summary>
         /// Controls how the audio is cut into chunks.
         /// When set to "auto", the server first normalizes loudness and then uses voice activity detection (VAD) to choose boundaries.
@@ -29,26 +38,30 @@ namespace OpenAI.Audio
             Threshold = threshold;
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
         public string Type { get; private set; }
 
         /// <summary>
         /// Amount of audio to include before the VAD detected speech (in milliseconds).
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("prefix_padding_ms")]
-        public int? PrefixPaddingMs { get; }
+        public int? PrefixPaddingMs { get; private set; }
 
         /// <summary>
         /// Duration of silence to detect speech stop (in milliseconds). With shorter values the model will respond more quickly, but may jump in on short pauses from the user.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("silence_duration_ms")]
-        public int? SilenceDurationMs { get; }
+        public int? SilenceDurationMs { get; private set; }
 
         /// <summary>
         /// Sensitivity threshold (0.0 to 1.0) for voice activity detection. A higher threshold will require louder audio to activate the model, and thus might perform better in noisy environments.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("threshold")]
-        public float? Threshold { get; }
+        public float? Threshold { get; private set; }
 
         public static ChunkingStrategy Auto => new()
         {
