@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -71,11 +72,24 @@ namespace OpenAI.Proxy
 
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
                     var method = new HttpMethod(httpContext.Request.Method);
+                    var originalQuery = QueryHelpers.ParseQuery(httpContext.Request.QueryString.Value ?? "");
+                    var modifiedQuery = new Dictionary<string, string>(originalQuery.Count);
+
+                    foreach (var pair in originalQuery)
+                    {
+                        modifiedQuery[pair.Key] = pair.Value.FirstOrDefault();
+                    }
+
+                    if (openAIClient.OpenAIClientSettings.IsAzureOpenAI)
+                    {
+                        modifiedQuery["api-version"] = openAIClient.OpenAIClientSettings.ApiVersion;
+                    }
 
                     var uri = new Uri(string.Format(
                         openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
-                        $"{endpoint}{httpContext.Request.QueryString}"
+                        QueryHelpers.AddQueryString(endpoint, modifiedQuery)
                     ));
+
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
