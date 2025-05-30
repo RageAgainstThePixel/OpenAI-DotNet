@@ -41,7 +41,7 @@ namespace OpenAI.Assistants
             }
             else
             {
-                request.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+                request.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             }
 
             return await CreateAssistantAsync(request, cancellationToken);

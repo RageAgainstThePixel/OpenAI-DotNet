@@ -26,7 +26,7 @@ namespace OpenAI.Threads
             string toolChoice,
             bool? parallelToolCalls,
             JsonSchema jsonSchema,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
+            TextResponseFormat responseFormat = TextResponseFormat.Auto,
             CreateThreadRequest createThreadRequest = null)
             : this(assistantId, model, instructions, tools, toolResources, metadata, temperature, topP, 0, maxPromptTokens, maxCompletionTokens, truncationStrategy, toolChoice, parallelToolCalls, jsonSchema, responseFormat, createThreadRequest)
         {
@@ -112,7 +112,7 @@ namespace OpenAI.Threads
         /// </param>
         /// <param name="responseFormat">
         /// An object specifying the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
+        /// Setting to <see cref="TextResponseFormat.Json"/> or <see cref="TextResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.<br/>
         /// Important: When using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message.
         /// Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit,
@@ -138,7 +138,7 @@ namespace OpenAI.Threads
             string toolChoice = null,
             bool? parallelToolCalls = null,
             JsonSchema jsonSchema = null,
-            ChatResponseFormat responseFormat = ChatResponseFormat.Auto,
+            TextResponseFormat responseFormat = TextResponseFormat.Auto,
             CreateThreadRequest createThreadRequest = null)
         {
             AssistantId = assistantId;
@@ -198,7 +198,11 @@ namespace OpenAI.Threads
             {
                 ResponseFormatObject = responseFormat switch
                 {
-                    ChatResponseFormat.Text or ChatResponseFormat.Json => responseFormat,
+                    TextResponseFormat.Text or
+#pragma warning disable CS0618 // Type or member is obsolete
+                        TextResponseFormat.Json
+#pragma warning restore CS0618 // Type or member is obsolete
+                        => responseFormat,
                     _ => null
                 };
             }
@@ -337,7 +341,7 @@ namespace OpenAI.Threads
 
         /// <summary>
         /// An object specifying the format that the model must output.
-        /// Setting to <see cref="ChatResponseFormat.Json"/> or <see cref="ChatResponseFormat.JsonSchema"/> enables JSON mode,
+        /// Setting to <see cref="TextResponseFormat.Json"/> or <see cref="TextResponseFormat.JsonSchema"/> enables JSON mode,
         /// which guarantees the message the model generates is valid JSON.
         /// </summary>
         /// <remarks>
@@ -348,12 +352,12 @@ namespace OpenAI.Threads
         /// which indicates the generation exceeded max_tokens or the conversation exceeded the max context length.
         /// </remarks>
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(ResponseFormatConverter))]
+        [JsonConverter(typeof(TextResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ResponseFormatObject ResponseFormatObject { get; internal set; }
+        public TextResponseFormatConfiguration ResponseFormatObject { get; internal set; }
 
         [JsonIgnore]
-        public ChatResponseFormat ResponseFormat => ResponseFormatObject ?? ChatResponseFormat.Auto;
+        public TextResponseFormat ResponseFormat => ResponseFormatObject ?? TextResponseFormat.Auto;
 
         /// <summary>
         /// The optional <see cref="CreateThreadRequest"/> options to use.

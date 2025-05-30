@@ -77,7 +77,7 @@ namespace OpenAI
         [JsonPropertyName("schema")]
         public JsonNode Schema { get; private set; }
 
-        public static implicit operator ResponseFormatObject(JsonSchema jsonSchema) => new(jsonSchema);
+        public static implicit operator TextResponseFormatConfiguration(JsonSchema jsonSchema) => new(jsonSchema);
 
         public static implicit operator JsonSchema(Type type) => new(type.Name, type.GenerateJsonSchema());
 
