@@ -45,7 +45,7 @@ namespace OpenAI.Extensions
             }
             else
             {
-                activeTool = "none";
+                activeTool = string.IsNullOrWhiteSpace(toolChoice) ? "none" : toolChoice;
             }
         }
     }
