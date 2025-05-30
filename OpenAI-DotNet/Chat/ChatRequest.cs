@@ -36,45 +36,9 @@ namespace OpenAI.Chat
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty,
                 responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, reasoningEffort, user)
         {
-            var toolList = tools?.ToList();
-
-            if (toolList is { Count: > 0 })
-            {
-                if (string.IsNullOrWhiteSpace(toolChoice))
-                {
-                    ToolChoice = "auto";
-                }
-                else
-                {
-                    if (!toolChoice.Equals("none") &&
-                        !toolChoice.Equals("required") &&
-                        !toolChoice.Equals("auto"))
-                    {
-                        var tool = toolList.FirstOrDefault(t => t.Function.Name.Contains(toolChoice)) ??
-                            throw new ArgumentException($"The specified tool choice '{toolChoice}' was not found in the list of tools");
-                        ToolChoice = new { type = "function", function = new { name = tool.Function.Name } };
-                    }
-                    else
-                    {
-                        ToolChoice = toolChoice;
-                    }
-                }
-
-                foreach (var tool in toolList)
-                {
-                    if (tool?.Function?.Arguments != null)
-                    {
-                        // just in case clear any lingering func args.
-                        tool.Function.Arguments = null;
-                    }
-                }
-            }
-            else
-            {
-                ToolChoice = "auto";
-            }
-
-            Tools = toolList?.ToList();
+            tools.ProcessTools(toolChoice, out var toolList, out var activeTool);
+            Tools = toolList;
+            ToolChoice = activeTool;
         }
 
         /// <summary>
