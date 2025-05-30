@@ -20,13 +20,18 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        wasGoodbyeCalled = true;
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -66,6 +71,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 ToolCall toolCall = functionCallResponse;
+                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
                                 toolCall.InvokeFunction();
                             }
 
@@ -74,7 +80,11 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                Assert.IsTrue(wasGoodbyeCalled);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
@@ -102,14 +112,19 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
-                        wasGoodbyeCalled = true;
                         return "Goodbye!";
                     })
                 };
@@ -152,6 +167,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 ToolCall toolCall = functionCallResponse;
+                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
                                 // ReSharper disable once MethodHasAsyncOverloadWithCancellation
                                 toolCall.InvokeFunction();
                             }
@@ -160,7 +176,10 @@ namespace OpenAI.Tests
                     }
                 }
 
-                Assert.IsTrue(wasGoodbyeCalled);
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
@@ -188,13 +207,18 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        wasGoodbyeCalled = true;
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -237,6 +261,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 ToolCall toolCall = functionCallResponse;
+                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
                                 toolCall.InvokeFunction();
                             }
 
@@ -245,7 +270,11 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                Assert.IsTrue(wasGoodbyeCalled);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
@@ -273,11 +302,18 @@ namespace OpenAI.Tests
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource();
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -321,6 +357,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 ToolCall toolCall = functionCallResponse;
+                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
                                 toolCall.InvokeFunction();
                             }
 
@@ -329,6 +366,11 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
