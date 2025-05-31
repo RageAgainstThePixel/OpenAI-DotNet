@@ -146,7 +146,7 @@ namespace OpenAI.Extensions
         internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, CancellationToken cancellationToken, [CallerMemberName] string methodName = null)
             => await response.ReadAsStringAsync(debugResponse, null, null, null, cancellationToken, methodName).ConfigureAwait(false);
 
-        internal static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, HttpContent requestContent, MemoryStream responseStream, List<ServerSentEvent> events, CancellationToken cancellationToken, [CallerMemberName] string methodName = null)
+        private static async Task<string> ReadAsStringAsync(this HttpResponseMessage response, bool debugResponse, HttpContent requestContent, MemoryStream responseStream, List<ServerSentEvent> events, CancellationToken cancellationToken, [CallerMemberName] string methodName = null)
         {
             var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var debugMessage = new StringBuilder();
@@ -287,6 +287,15 @@ namespace OpenAI.Extensions
             }
 
             return responseAsString;
+        }
+
+        internal static async Task<T> DeserializeAsync<T>(this HttpResponseMessage response, bool debug, OpenAIClient client, CancellationToken cancellationToken)
+            where T : BaseResponse
+        {
+            var responseAsString = await response.ReadAsStringAsync(debug, cancellationToken);
+            var result = JsonSerializer.Deserialize<T>(responseAsString, OpenAIClient.JsonSerializationOptions);
+            result.SetResponseData(response.Headers, client);
+            return result;
         }
 
         internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client)
