@@ -9,6 +9,9 @@ namespace OpenAI
 {
     internal class AudioOutputConverter : JsonConverter<AudioOutput>
     {
+        public override void Write(Utf8JsonWriter writer, AudioOutput value, JsonSerializerOptions options)
+            => JsonSerializer.Serialize(writer, new { id = value.Id }, options);
+
         public override AudioOutput Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string id = null;
@@ -55,11 +58,6 @@ namespace OpenAI
             }
 
             return new AudioOutput(id, expiresAt, data, transcript);
-        }
-
-        public override void Write(Utf8JsonWriter writer, AudioOutput value, JsonSerializerOptions options)
-        {
-            JsonSerializer.Serialize(writer, new { id = value.Id });
         }
     }
 }

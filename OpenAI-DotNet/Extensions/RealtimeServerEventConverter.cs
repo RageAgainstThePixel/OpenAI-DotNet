@@ -10,7 +10,7 @@ namespace OpenAI
     internal class RealtimeServerEventConverter : JsonConverter<IServerEvent>
     {
         public override void Write(Utf8JsonWriter writer, IServerEvent value, JsonSerializerOptions options)
-            => throw new NotImplementedException();
+            => JsonSerializer.Serialize(writer, value, value.GetType(), options);
 
         public override IServerEvent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

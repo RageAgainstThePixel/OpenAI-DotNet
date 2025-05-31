@@ -158,7 +158,7 @@ namespace OpenAI.Responses
         /// The status of the response generation.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("status")]
         public ResponseStatus Status { get; private set; }
 
@@ -223,7 +223,7 @@ namespace OpenAI.Responses
         /// - Disabled (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("truncation")]
         public Truncation Truncation { get; private set; }
 

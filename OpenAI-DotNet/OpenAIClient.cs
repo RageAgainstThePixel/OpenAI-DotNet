@@ -124,7 +124,9 @@ namespace OpenAI
             {
                 new JsonStringEnumConverterFactory(),
                 new RealtimeClientEventConverter(),
-                new RealtimeServerEventConverter()
+                new RealtimeServerEventConverter(),
+                new ResponseContentConverter(),
+                new ResponseItemConverter()
             },
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
