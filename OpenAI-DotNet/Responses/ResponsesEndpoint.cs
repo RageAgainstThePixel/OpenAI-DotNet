@@ -1,11 +1,10 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Realtime;
+using OpenAI.Extensions;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAI.Extensions;
 
 namespace OpenAI.Responses
 {
