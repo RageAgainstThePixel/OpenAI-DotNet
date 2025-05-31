@@ -38,31 +38,4 @@ namespace OpenAI.Responses
         [JsonPropertyName("status")]
         public ResponseStatus Status { get; private set; }
     }
-
-    public sealed class WebSearchToolCall : IResponseItem
-    {
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("id")]
-        public string Id { get; private set; }
-
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        [JsonPropertyName("type")]
-        public ResponseItemType Type { get; private set; } = ResponseItemType.WebSearchCall;
-
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("object")]
-        public string Object { get; private set; }
-
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("status")]
-        public ResponseStatus Status { get; private set; }
-    }
 }
