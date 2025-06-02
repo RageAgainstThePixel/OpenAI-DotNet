@@ -44,5 +44,18 @@ namespace OpenAI.Tests
             Assert.IsNotEmpty(response.Id);
             Assert.AreEqual(ResponseStatus.Completed, response.Status);
         }
+
+        [Test]
+        public async Task Test_01_02_SimpleTestInput_Streaming()
+        {
+            Assert.NotNull(OpenAIClient.ResponsesEndpoint);
+            var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync("Tell me a three sentence bedtime story about a unicorn.", async (@event, sseEvent) =>
+            {
+                await Task.CompletedTask;
+            });
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+        }
     }
 }

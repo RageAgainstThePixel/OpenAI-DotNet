@@ -1,12 +1,11 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Extensions;
 using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class AudioContent : IResponseContent, IAppendable<AudioContent>
+    public sealed class AudioContent : BaseResponse, IResponseContent
     {
         public AudioContent() { }
 
@@ -23,14 +22,9 @@ namespace OpenAI.Responses
         }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        [JsonPropertyName("index")]
-        public int? Index { get; private set; }
-
-        [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("type")]
-        public ResponseContentType Type { get; private set; } = ResponseContentType.InputAudio;
+        public ResponseContentType Type { get; internal set; } = ResponseContentType.InputAudio;
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -44,19 +38,7 @@ namespace OpenAI.Responses
 
         public override string ToString() => Data;
 
-        public void AppendFrom(AudioContent other)
-        {
-            if (other == null) { return; }
-
-            if (other.Format > 0)
-            {
-                Format = other.Format;
-            }
-
-            if (!string.IsNullOrWhiteSpace(other.Data))
-            {
-                Data += other.Data;
-            }
-        }
+        [JsonIgnore]
+        public string Object => Type.ToString();
     }
 }

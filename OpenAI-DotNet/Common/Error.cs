@@ -54,7 +54,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("line")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Line { get; private set; }
 
         [JsonIgnore]

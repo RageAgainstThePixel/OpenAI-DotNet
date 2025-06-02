@@ -2,23 +2,21 @@
 
 namespace OpenAI.Responses
 {
-    public interface IResponseItem : IListItem
+    public interface IResponseItem : IListItem, IServerSentEvent
     {
         /// <summary>
         /// The unique ID of this response item.
         /// </summary>
-        public string Id { get; }
+        string Id { get; }
 
         /// <summary>
         /// The type of response item.
         /// </summary>
-        public ResponseItemType Type { get; }
-
-        public string Object { get; }
+        ResponseItemType Type { get; }
 
         /// <summary>
         /// The status of the response item.
         /// </summary>
-        public ResponseStatus Status { get; }
+        ResponseStatus Status { get; }
     }
 }

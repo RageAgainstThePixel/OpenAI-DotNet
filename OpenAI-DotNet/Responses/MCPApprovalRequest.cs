@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class MCPApprovalRequest : IResponseItem
+    public sealed class MCPApprovalRequest : BaseResponse, IResponseItem
     {
         public MCPApprovalRequest() { }
 

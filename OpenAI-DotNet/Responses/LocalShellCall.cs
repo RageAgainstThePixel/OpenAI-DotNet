@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class LocalShellCall : IResponseItem
+    public sealed class LocalShellCall : BaseResponse, IResponseItem
     {
         public LocalShellCall() { }
 

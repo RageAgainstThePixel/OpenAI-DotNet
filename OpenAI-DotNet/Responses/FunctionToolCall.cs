@@ -7,7 +7,7 @@ namespace OpenAI.Responses
     /// <summary>
     /// A tool call to run a function.
     /// </summary>
-    public sealed class FunctionToolCall : IResponseItem
+    public sealed class FunctionToolCall : BaseResponse, IResponseItem
     {
         public FunctionToolCall() { }
 

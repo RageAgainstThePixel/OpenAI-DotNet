@@ -239,9 +239,9 @@ namespace OpenAI.Responses
         /// If set to true, the model response data will be streamed to the client as it is generated using server-sent events.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("stream")]
-        public bool? Stream { get; }
+        public bool Stream { get; internal set; }
 
         /// <summary>
         /// What sampling temperature to use, between 0 and 2.

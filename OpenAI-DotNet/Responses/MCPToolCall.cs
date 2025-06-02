@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class MCPToolCall : IResponseItem
+    public sealed class MCPToolCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

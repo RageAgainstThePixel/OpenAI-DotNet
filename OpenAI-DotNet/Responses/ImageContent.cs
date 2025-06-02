@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class ImageContent : IResponseContent
+    public sealed class ImageContent : BaseResponse, IResponseContent
     {
         public ImageContent() { }
 
@@ -27,21 +27,24 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("type")]
-        public ResponseContentType Type { get; }
+        public ResponseContentType Type { get; private set; }
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("detail")]
-        public ImageDetail Detail { get; }
+        public ImageDetail Detail { get; private set; }
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_id")]
-        public string FileId { get; }
+        public string FileId { get; private set; }
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("image_url")]
-        public string ImageUrl { get; }
+        public string ImageUrl { get; private set; }
+
+        [JsonIgnore]
+        public string Object => Type.ToString();
     }
 }

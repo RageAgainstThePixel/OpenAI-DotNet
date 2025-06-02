@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Reasoning : IResponseItem
+    public sealed class Reasoning : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

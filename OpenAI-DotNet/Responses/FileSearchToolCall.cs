@@ -8,7 +8,7 @@ namespace OpenAI.Responses
     /// <summary>
     /// The results of a file search tool call.
     /// </summary>
-    public sealed class FileSearchToolCall : IResponseItem
+    public sealed class FileSearchToolCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

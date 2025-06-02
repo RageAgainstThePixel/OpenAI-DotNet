@@ -8,6 +8,6 @@ namespace OpenAI.Responses
     {
         [JsonInclude]
         [JsonPropertyName("reason")]
-        public IncompleteReason Reason { get; }
+        public IncompleteReason Reason { get; private set; }
     }
 }

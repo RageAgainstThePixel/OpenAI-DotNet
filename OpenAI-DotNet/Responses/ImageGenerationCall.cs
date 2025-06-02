@@ -7,7 +7,7 @@ namespace OpenAI.Responses
     /// <summary>
     /// An image generation request made by the model.
     /// </summary>
-    public sealed class ImageGenerationCall : IResponseItem
+    public sealed class ImageGenerationCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

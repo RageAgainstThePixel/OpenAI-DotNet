@@ -1,15 +1,18 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
-using OpenAI.Threads;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class Response : BaseResponse
+    public sealed class Response : BaseResponse, IServerSentEvent
     {
+        public static implicit operator string(Response response)
+            => response?.Id;
+
         /// <summary>
         /// Unique identifier for this Response.
         /// </summary>
@@ -56,10 +59,16 @@ namespace OpenAI.Responses
         [JsonPropertyName("incomplete_details")]
         public IncompleteDetails IncompleteDetails { get; private set; }
 
+        private List<IResponseItem> output = [];
+
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("output")]
-        public IReadOnlyList<IResponseItem> Output { get; private set; }
+        public IReadOnlyList<IResponseItem> Output
+        {
+            get => output;
+            private set => output = value?.ToList() ?? [];
+        }
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -234,5 +243,23 @@ namespace OpenAI.Responses
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("user")]
         public string User { get; private set; }
+
+        internal void InsertOutputItem(IResponseItem item, int index)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            if (index > output.Count)
+            {
+                for (var i = output.Count; i < index; i++)
+                {
+                    output.Add(null);
+                }
+            }
+
+            output.Insert(index, item);
+        }
     }
 }

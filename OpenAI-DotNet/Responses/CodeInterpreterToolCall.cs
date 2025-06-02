@@ -9,7 +9,7 @@ namespace OpenAI.Responses
     /// <summary>
     /// A tool call to run code.
     /// </summary>
-    public sealed class CodeInterpreterToolCall : IResponseItem
+    public sealed class CodeInterpreterToolCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

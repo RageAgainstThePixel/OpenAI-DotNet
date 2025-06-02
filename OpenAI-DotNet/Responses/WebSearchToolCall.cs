@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class WebSearchToolCall : IResponseItem
+    public sealed class WebSearchToolCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
         [JsonInclude]

@@ -2,7 +2,7 @@
 
 namespace OpenAI.Responses
 {
-    public interface IResponseContent
+    public interface IResponseContent : IServerSentEvent
     {
         public ResponseContentType Type { get; }
     }

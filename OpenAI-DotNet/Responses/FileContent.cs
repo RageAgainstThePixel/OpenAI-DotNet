@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class FileContent : IResponseContent
+    public sealed class FileContent : BaseResponse, IResponseContent
     {
         public FileContent() { }
 
@@ -47,5 +47,8 @@ namespace OpenAI.Responses
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_name")]
         public string FileName { get; private set; }
+
+        [JsonIgnore]
+        public string Object => Type.ToString();
     }
 }

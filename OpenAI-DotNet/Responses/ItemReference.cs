@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class ItemReference : IResponseItem
+    public sealed class ItemReference : BaseResponse, IResponseItem
     {
         public ItemReference() { }
 
