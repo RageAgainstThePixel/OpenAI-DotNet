@@ -21,6 +21,7 @@ namespace OpenAI.Responses
                 "input_text" => root.Deserialize<TextContent>(options),
                 "output_text" => root.Deserialize<TextContent>(options),
                 "input_audio" => root.Deserialize<AudioContent>(options),
+                "output_audio" => root.Deserialize<AudioContent>(options),
                 "input_image" => root.Deserialize<ImageContent>(options),
                 "input_file" => root.Deserialize<FileContent>(options),
                 "refusal" => root.Deserialize<RefusalContent>(options),

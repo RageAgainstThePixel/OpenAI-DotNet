@@ -132,12 +132,6 @@ namespace OpenAI.Responses
                             response!.InsertOutputItem(item, outputIndex);
                             serverSentEvent = item;
                             break;
-                        case "response.reasoning_summary_part.added":
-                        case "response.reasoning_summary_part.done":
-                            break;
-                        case "response.reasoning_summary_text.delta":
-                        case "response.reasoning_summary_text.done":
-                            break;
                         case "response.audio.delta":
                         case "response.audio.done":
                         case "response.audio.transcript.delta":
@@ -163,6 +157,26 @@ namespace OpenAI.Responses
                             switch (contentItem)
                             {
                                 case AudioContent audioContent:
+                                    AudioContent partialContent;
+                                    switch (@event)
+                                    {
+                                        case "response.audio.delta":
+                                            partialContent = new AudioContent(audioContent.Type, base64Data: delta);
+                                            audioContent.AppendFrom(partialContent);
+                                            serverSentEvent = partialContent;
+                                            break;
+                                        case "response.audio.transcript.delta":
+                                            partialContent = new AudioContent(audioContent.Type, transcript: delta);
+                                            audioContent.AppendFrom(partialContent);
+                                            serverSentEvent = partialContent;
+                                            break;
+                                        case "response.audio.done":
+                                        case "response.audio.transcript.done":
+                                            serverSentEvent = audioContent;
+                                            break;
+                                        default:
+                                            throw new InvalidOperationException($"Unexpected event type: {@event} for AudioContent.");
+                                    }
                                     break;
                                 case TextContent textContent:
                                     var text = @object["text"]?.GetValue<string>();
@@ -184,6 +198,8 @@ namespace OpenAI.Responses
                                         var annotation = sseResponse.Deserialize<Annotation>(@object["annotation"], client);
                                         textContent.InsertAnnotation(annotation, annotationIndex.Value);
                                     }
+
+                                    serverSentEvent = textContent;
                                     break;
                                 case RefusalContent refusalContent:
                                     var refusal = @object["refusal"]?.GetValue<string>();
@@ -197,10 +213,16 @@ namespace OpenAI.Responses
                                     {
                                         refusalContent.Delta = delta;
                                     }
+
+                                    serverSentEvent = refusalContent;
                                     break;
                             }
-
-                            serverSentEvent = contentItem;
+                            break;
+                        case "response.reasoning_summary_part.added":
+                        case "response.reasoning_summary_part.done":
+                            break;
+                        case "response.reasoning_summary_text.delta":
+                        case "response.reasoning_summary_text.done":
                             break;
                         case "response.web_search_call.completed":
                         case "response.web_search_call.in_progress":
