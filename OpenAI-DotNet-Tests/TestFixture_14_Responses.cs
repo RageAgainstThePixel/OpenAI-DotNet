@@ -51,6 +51,7 @@ namespace OpenAI.Tests
             Assert.NotNull(OpenAIClient.ResponsesEndpoint);
             var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync("Tell me a three sentence bedtime story about a unicorn.", async (@event, sseEvent) =>
             {
+                Console.WriteLine($"{@event}: {sseEvent.ToJsonString()}");
                 await Task.CompletedTask;
             });
             Assert.NotNull(response);

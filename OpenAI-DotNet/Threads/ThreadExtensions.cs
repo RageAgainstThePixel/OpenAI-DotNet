@@ -251,10 +251,6 @@ namespace OpenAI.Threads
         /// <returns><see cref="RunResponse"/>.</returns>
         public static async Task<RunResponse> WaitForStatusChangeAsync(this RunResponse run, int? pollingInterval = null, int? timeout = null, CancellationToken cancellationToken = default)
         {
-            if (run.Status is not (RunStatus.Queued or RunStatus.InProgress or RunStatus.Cancelling))
-            {
-                return run;
-            }
             using CancellationTokenSource cts = timeout is < 0
                 ? new CancellationTokenSource()
                 : new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30));

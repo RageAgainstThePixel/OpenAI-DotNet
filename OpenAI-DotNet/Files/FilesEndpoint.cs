@@ -46,9 +46,9 @@ namespace OpenAI.Files
                 query = new Dictionary<string, string> { { nameof(purpose), purpose } };
             }
 
-            using var response = await client.Client.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
-            var resultAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<FilesList>(resultAsString, client)?.Files;
+            using var response = await HttpClient.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            var result = await response.DeserializeAsync<FilesList>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
+            return result?.Files;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace OpenAI.Files
         /// <item><description>The Batch API only supports .jsonl files up to 100 MB in size.</description></item>
         /// </list>
         /// </remarks>
-        public async Task<FileResponse> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
-            => await UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken).ConfigureAwait(false);
+        public Task<FileResponse> UploadFileAsync(string filePath, string purpose, CancellationToken cancellationToken = default)
+            => UploadFileAsync(new FileUploadRequest(filePath, purpose), cancellationToken);
 
         /// <summary>
         /// Upload a file that contains document(s) to be used across various endpoints/features.
@@ -101,9 +101,8 @@ namespace OpenAI.Files
                 request.Dispose();
             }
 
-            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<FileResponse>(responseAsString, client);
+            using var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            return await response.DeserializeAsync<FileResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -118,7 +117,7 @@ namespace OpenAI.Files
 
             async Task<bool> InternalDeleteFileAsync(int attempt)
             {
-                using var response = await client.Client.DeleteAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
+                using var response = await HttpClient.DeleteAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
                 // We specifically don't use the extension method here bc we need to check if it's still processing the file.
                 var responseAsString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
@@ -149,9 +148,8 @@ namespace OpenAI.Files
         /// <returns><see cref="FileResponse"/>.</returns>
         public async Task<FileResponse> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
-            using var response = await client.Client.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<FileResponse>(responseAsString, client);
+            using var response = await HttpClient.GetAsync(GetUrl($"/{fileId}"), cancellationToken).ConfigureAwait(false);
+            return await response.DeserializeAsync<FileResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -214,7 +212,7 @@ namespace OpenAI.Files
         /// <param name="fileData"><see cref="FileResponse"/> to download.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The file as a stream in an asynchronous operation.</returns>
-        public async Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
-            => await client.Client.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken).ConfigureAwait(false);
+        public Task<Stream> RetrieveFileStreamAsync(FileResponse fileData, CancellationToken cancellationToken = default)
+            => HttpClient.GetStreamAsync(GetUrl($"/{fileData.Id}/content"), cancellationToken);
     }
 }

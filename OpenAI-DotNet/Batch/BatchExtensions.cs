@@ -14,8 +14,8 @@ namespace OpenAI.Batch
         /// <param name="batchResponse"><see cref="BatchResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="BatchResponse"/>.</returns>
-        public static async Task<BatchResponse> UpdateAsync(this BatchResponse batchResponse, CancellationToken cancellationToken = default)
-            => await batchResponse.Client.BatchEndpoint.RetrieveBatchAsync(batchResponse.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<BatchResponse> UpdateAsync(this BatchResponse batchResponse, CancellationToken cancellationToken = default)
+            => batchResponse.Client.BatchEndpoint.RetrieveBatchAsync(batchResponse.Id, cancellationToken);
 
         /// <summary>
         /// Waits for <see cref="BatchResponse.Status"/> to change.

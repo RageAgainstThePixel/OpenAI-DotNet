@@ -14,8 +14,8 @@ namespace OpenAI.VectorStores
         /// <param name="vectorStoreFileBatchResponse"><see cref="VectorStoreFileBatchResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="VectorStoreFileBatchResponse"/>.</returns>
-        public static async Task<VectorStoreFileBatchResponse> UpdateAsync(this VectorStoreFileBatchResponse vectorStoreFileBatchResponse, CancellationToken cancellationToken = default)
-            => await vectorStoreFileBatchResponse.Client.VectorStoresEndpoint.GetVectorStoreFileBatchAsync(vectorStoreFileBatchResponse.VectorStoreId, vectorStoreFileBatchResponse.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<VectorStoreFileBatchResponse> UpdateAsync(this VectorStoreFileBatchResponse vectorStoreFileBatchResponse, CancellationToken cancellationToken = default)
+            => vectorStoreFileBatchResponse.Client.VectorStoresEndpoint.GetVectorStoreFileBatchAsync(vectorStoreFileBatchResponse.VectorStoreId, vectorStoreFileBatchResponse.Id, cancellationToken);
 
         /// <summary>
         /// Waits for <see cref="VectorStoreFileBatchResponse.Status"/> to change.

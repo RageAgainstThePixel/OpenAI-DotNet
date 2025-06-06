@@ -29,10 +29,7 @@ namespace OpenAI.Responses
         [JsonPropertyName("text")]
         public string Text { get; internal set; }
 
-        [JsonIgnore]
-        public string Delta { get; internal set; }
-
-        private List<Annotation> annotations = [];
+        private List<Annotation> annotations;
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -40,8 +37,13 @@ namespace OpenAI.Responses
         public IReadOnlyList<Annotation> Annotations
         {
             get => annotations;
-            private set => annotations = value?.ToList() ?? [];
+            private set => annotations = value?.ToList();
         }
+
+        [JsonInclude]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonPropertyName("delta")]
+        public string Delta { get; internal set; }
 
         [JsonIgnore]
         public string Object => Type.ToString();
@@ -52,6 +54,8 @@ namespace OpenAI.Responses
             {
                 throw new ArgumentNullException(nameof(item));
             }
+
+            annotations ??= new();
 
             if (index > annotations.Count)
             {

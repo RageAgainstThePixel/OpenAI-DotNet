@@ -52,7 +52,6 @@ namespace OpenAI.Responses
         private async Task<Response> StreamResponseAsync(string endpoint, StringContent payload, Func<string, IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken)
         {
             Response response = null;
-            var currentSequenceNumber = -1;
 
             // ReSharper disable AccessToModifiedClosure
             using var streamResponse = await this.StreamEventsAsync(endpoint, payload, async (sseResponse, ssEvent) =>
@@ -61,18 +60,10 @@ namespace OpenAI.Responses
                 var @event = ssEvent.Value.GetValue<string>();
                 Console.WriteLine(ssEvent.ToJsonString());
                 var @object = ssEvent.Data ?? ssEvent.Value;
-                var sequenceNumber = @object["sequence_number"]?.GetValue<int>() ?? int.MinValue;
 
+                // ReSharper disable once AccessToModifiedClosure
                 try
                 {
-                    if (sequenceNumber >= currentSequenceNumber)
-                    {
-                        // TODO figure out how to handle out of order events.
-                        throw new InvalidOperationException($"Events come out of order! got {sequenceNumber} expected: {currentSequenceNumber}");
-                    }
-
-                    currentSequenceNumber++;
-
                     switch (@event)
                     {
                         case "response.created":
@@ -82,7 +73,6 @@ namespace OpenAI.Responses
                         case "response.incomplete":
                             var partialResponse = sseResponse.Deserialize<Response>(@object["response"], client);
 
-                            // ReSharper disable once AccessToModifiedClosure
                             if (response == null)
                             {
                                 response = partialResponse;

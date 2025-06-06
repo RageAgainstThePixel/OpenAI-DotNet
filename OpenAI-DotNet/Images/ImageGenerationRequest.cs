@@ -118,7 +118,7 @@ namespace OpenAI.Images
         [JsonPropertyName("size")]
         [FunctionProperty("The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024 for dall-e-2. Must be one of 1024x1024, 1792x1024, or 1024x1792 for dall-e-3 models.", true,
             defaultValue: "1024x1024",
-            possibleValues: new object[] { "256x256", "512x512", "1024x1024", "1792x1024", "1024x1792" })]
+            possibleValues: ["256x256", "512x512", "1024x1024", "1792x1024", "1024x1792"])]
         public string Size { get; }
 
         /// <summary>

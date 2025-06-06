@@ -13,10 +13,6 @@ namespace OpenAI.Responses
 
         public static async Task<Response> WaitForStatusChangeAsync(this Response response, int? pollingInterval = null, int? timeout = null, CancellationToken cancellationToken = default)
         {
-            if (response.Status is not (ResponseStatus.None or ResponseStatus.Queued or ResponseStatus.InProgress or ResponseStatus.Searching))
-            {
-                return response;
-            }
             using CancellationTokenSource cts = timeout is < 0
                 ? new CancellationTokenSource()
                 : new CancellationTokenSource(TimeSpan.FromSeconds(timeout ?? 30));

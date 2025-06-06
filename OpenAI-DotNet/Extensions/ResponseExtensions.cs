@@ -289,26 +289,41 @@ namespace OpenAI.Extensions
             return responseAsString;
         }
 
-        internal static async Task<T> DeserializeAsync<T>(this HttpResponseMessage response, bool debug, OpenAIClient client, CancellationToken cancellationToken) where T : BaseResponse
+        internal static async Task<T> DeserializeAsync<T>(this HttpResponseMessage response, bool debug, OpenAIClient client, CancellationToken cancellationToken)
         {
             var responseAsString = await response.ReadAsStringAsync(debug, cancellationToken);
             var result = JsonSerializer.Deserialize<T>(responseAsString, OpenAIClient.JsonSerializationOptions);
-            result.SetResponseData(response.Headers, client);
+
+            if (result is BaseResponse baseResponse)
+            {
+                baseResponse.SetResponseData(response.Headers, client);
+            }
+
             return result;
         }
 
-        internal static async Task<T> DeserializeAsync<T>(this HttpResponseMessage response, bool debug, StringContent payload, OpenAIClient client, CancellationToken cancellationToken) where T : BaseResponse
+        internal static async Task<T> DeserializeAsync<T>(this HttpResponseMessage response, bool debug, HttpContent payload, OpenAIClient client, CancellationToken cancellationToken)
         {
             var responseAsString = await response.ReadAsStringAsync(debug, payload, cancellationToken);
             var result = JsonSerializer.Deserialize<T>(responseAsString, OpenAIClient.JsonSerializationOptions);
-            result.SetResponseData(response.Headers, client);
+
+            if (result is BaseResponse baseResponse)
+            {
+                baseResponse.SetResponseData(response.Headers, client);
+            }
+
             return result;
         }
 
-        internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client) where T : BaseResponse
+        internal static T Deserialize<T>(this HttpResponseMessage response, string json, OpenAIClient client)
         {
             var result = JsonSerializer.Deserialize<T>(json, OpenAIClient.JsonSerializationOptions);
-            result.SetResponseData(response.Headers, client);
+
+            if (result is BaseResponse baseResponse)
+            {
+                baseResponse.SetResponseData(response.Headers, client);
+            }
+
             return result;
         }
 
