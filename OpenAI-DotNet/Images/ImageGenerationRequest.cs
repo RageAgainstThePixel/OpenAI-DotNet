@@ -35,7 +35,7 @@ namespace OpenAI.Images
         /// are returned. Must be one of `url` or `b64_json`. URLs are only
         /// valid for 60 minutes after the image has been generated.
         /// `gpt-image-1` does not support urls and only supports base64-encoded images.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </param>
         /// <param name="outputFormat">
         /// The format in which the generated images are returned. This parameter is only supported for `gpt-image-1`. Must be one of `png`, `jpeg`, or `webp`.
@@ -75,7 +75,7 @@ namespace OpenAI.Images
             Model model = null,
             int numberOfResults = 1,
             string quality = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
+            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
             string outputFormat = null,
             int? outputCompression = null,
             string size = null,
@@ -88,7 +88,7 @@ namespace OpenAI.Images
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT_Image_1 : model;
             Number = numberOfResults;
             Quality = quality;
-            ResponseFormat = Model == Models.Model.GPT_Image_1 ? ImageResponseFormat.B64_Json : responseFormat;
+            ResponseFormat = Model == Models.Model.GPT_Image_1 ? 0 : responseFormat;
             OutputFormat = outputFormat;
             OutputCompression = outputCompression;
             Size = size;
@@ -142,7 +142,7 @@ namespace OpenAI.Images
         /// are returned. Must be one of `url` or `b64_json`. URLs are only
         /// valid for 60 minutes after the image has been generated.
         /// `gpt-image-1` does not support urls and only supports base64-encoded images.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </summary>
         [JsonPropertyName("response_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
