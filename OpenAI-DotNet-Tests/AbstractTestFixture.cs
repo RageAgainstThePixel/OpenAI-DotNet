@@ -2,7 +2,6 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
@@ -28,8 +27,6 @@ namespace OpenAI.Tests
 
         protected readonly HttpClient HttpClient;
 
-        protected readonly WebSocketClient WebSocket;
-
         protected readonly OpenAIClient OpenAIClient;
 
         protected AbstractTestFixture()
@@ -39,7 +36,6 @@ namespace OpenAI.Tests
             {
                 BaseAddress = GetBaseAddressFromLaunchSettings()
             });
-            WebSocket = webApplicationFactory.Server.CreateWebSocketClient();
             var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication(TestUserToken);
 
