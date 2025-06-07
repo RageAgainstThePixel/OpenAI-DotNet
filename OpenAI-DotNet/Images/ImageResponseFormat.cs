@@ -9,6 +9,6 @@ namespace OpenAI.Images
         [EnumMember(Value = "url")]
         Url = 1,
         [EnumMember(Value = "b64_json")]
-        B64_Json,
+        B64_Json
     }
 }
