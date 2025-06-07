@@ -29,11 +29,11 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [Obsolete("Use new .ctor overload")]
-        protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json, string user = null)
+        protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ImageResponseFormat responseFormat = ImageResponseFormat.Url, string user = null)
         {
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT_Image_1 : model;
             Number = numberOfResults;
