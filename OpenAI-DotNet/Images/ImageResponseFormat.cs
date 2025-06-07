@@ -6,9 +6,9 @@ namespace OpenAI.Images
 {
     public enum ImageResponseFormat
     {
+        [EnumMember(Value = "b64_json")]
+        B64_Json = 0,
         [EnumMember(Value = "url")]
         Url,
-        [EnumMember(Value = "b64_json")]
-        B64_Json
     }
 }

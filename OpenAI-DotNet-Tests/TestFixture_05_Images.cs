@@ -15,7 +15,7 @@ namespace OpenAI.Tests
         public async Task Test_01_01_GenerateImages()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
-            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.DallE_3);
+            var request = new ImageGenerationRequest("A house riding a velociraptor", Model.GPT_Image_1);
             var imageResults = await OpenAIClient.ImagesEndPoint.GenerateImageAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -47,6 +47,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_02_01_CreateImageEdit()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
@@ -54,7 +55,7 @@ namespace OpenAI.Tests
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
 
-            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small);
+            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", model: Model.DallE_2, size: ImageSize.Small);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -68,6 +69,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_02_02_CreateImageEdit_B64_Json()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
@@ -75,7 +77,7 @@ namespace OpenAI.Tests
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
 
-            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
+            var request = new ImageEditRequest(imageAssetPath, maskAssetPath, "A sunlit indoor lounge area with a pool containing a flamingo", model: Model.DallE_2, size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageEditAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -89,12 +91,13 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_03_01_CreateImageVariation()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
-            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small);
+            var request = new ImageVariationRequest(imageAssetPath, model: Model.DallE_2, size: ImageSize.Small);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
             Assert.IsNotNull(imageResults);
@@ -108,12 +111,13 @@ namespace OpenAI.Tests
         }
 
         [Test]
+        [Obsolete]
         public async Task Test_03_02_CreateImageVariation_B64_Json()
         {
             Assert.IsNotNull(OpenAIClient.ImagesEndPoint);
 
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
-            var request = new ImageVariationRequest(imageAssetPath, size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
+            var request = new ImageVariationRequest(imageAssetPath, model: Model.DallE_2, size: ImageSize.Small, responseFormat: ImageResponseFormat.B64_Json);
             var imageResults = await OpenAIClient.ImagesEndPoint.CreateImageVariationAsync(request);
 
             Assert.IsNotNull(imageResults);

@@ -32,7 +32,7 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <param name="size">
         /// The size of the generated images.
@@ -54,31 +54,34 @@ namespace OpenAI.Images
             Model model = null,
             int numberOfResults = 1,
             string quality = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
             string size = null,
             string style = null,
             string user = null)
         {
             Prompt = prompt;
-            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.DallE_2 : model;
+            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT_Image_1 : model;
             Number = numberOfResults;
             Quality = quality;
-            ResponseFormat = responseFormat;
-            Size = size ?? "1024x1024";
+            ResponseFormat = Model == Models.Model.GPT_Image_1 ? ImageResponseFormat.B64_Json : responseFormat;
+            Size = size;
             Style = style;
             User = user;
         }
 
+        /// <summary>
+        /// The model to use for generation.
+        /// </summary>
         [JsonPropertyName("model")]
-        [FunctionProperty("The model to use for image generation.", true, "dall-e-2", "dall-e-3")]
+        [FunctionProperty("The model to use for image generation.", true, "dall-e-2", "dall-e-3", "gpt-image-1")]
         public string Model { get; }
 
         /// <summary>
         /// A text description of the desired image(s).
-        /// The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3.
+        /// The maximum length is 32000 characters for gpt-image-1, 1000 characters for dall-e-2 and 4000 characters for dall-e-3.
         /// </summary>
         [JsonPropertyName("prompt")]
-        [FunctionProperty("A text description of the desired image(s). The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3.", true)]
+        [FunctionProperty("A text description of the desired image(s). The maximum length is 32000 characters for gpt-image-1, 1000 characters for dall-e-2 and 4000 characters for dall-e-3.", true)]
         public string Prompt { get; }
 
         /// <summary>
@@ -103,9 +106,10 @@ namespace OpenAI.Images
         /// <summary>
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </summary>
         [JsonPropertyName("response_format")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ImageResponseFormat>))]
         [FunctionProperty("The format in which the generated images are returned. Must be one of url or b64_json.", true)]
         public ImageResponseFormat ResponseFormat { get; }
@@ -130,7 +134,7 @@ namespace OpenAI.Images
         /// </summary>
         [JsonPropertyName("style")]
         [FunctionProperty("The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This param is only supported for dall-e-3.",
-            possibleValues: new object[] { "vivid", "natural" })]
+            possibleValues: ["vivid", "natural"])]
         public string Style { get; }
 
         /// <summary>

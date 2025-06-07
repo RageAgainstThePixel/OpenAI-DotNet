@@ -30,18 +30,19 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <param name="model">
         /// The model to use for image generation.
         /// </param>
+        [Obsolete("Use new .ctr overload")]
         public ImageEditRequest(
             string imagePath,
             string prompt,
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
             Model model = null)
             : this(imagePath, null, prompt, numberOfResults, size, user, responseFormat, model)
         {
@@ -73,11 +74,12 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <param name="model">
         /// The model to use for image generation.
         /// </param>
+        [Obsolete("Use new .ctr overload")]
         public ImageEditRequest(
             string imagePath,
             string maskPath,
@@ -85,7 +87,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
             Model model = null)
             : this(
                 File.OpenRead(imagePath),
@@ -124,11 +126,12 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <param name="model">
         /// The model to use for image generation.
         /// </param>
+        [Obsolete("Use new .ctr overload")]
         public ImageEditRequest(
             Stream image,
             string imageName,
@@ -136,7 +139,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
             Model model = null)
             : this(image, imageName, null, null, prompt, numberOfResults, size, user, responseFormat, model)
         {
@@ -170,11 +173,12 @@ namespace OpenAI.Images
         /// <param name="responseFormat">
         /// The format in which the generated images are returned.
         /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <param name="model">
         /// The model to use for image generation.
         /// </param>
+        [Obsolete("Use new .ctr overload")]
         public ImageEditRequest(
             Stream image,
             string imageName,
@@ -184,7 +188,7 @@ namespace OpenAI.Images
             int numberOfResults = 1,
             ImageSize size = ImageSize.Large,
             string user = null,
-            ImageResponseFormat responseFormat = ImageResponseFormat.Url,
+            ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json,
             Model model = null)
             : base(model, numberOfResults, size, responseFormat, user)
         {
