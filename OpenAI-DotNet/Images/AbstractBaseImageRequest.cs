@@ -2,7 +2,6 @@
 
 using OpenAI.Models;
 using System;
-using System.Text.Json.Serialization;
 
 namespace OpenAI.Images
 {
@@ -11,28 +10,17 @@ namespace OpenAI.Images
     /// </summary>
     public abstract class AbstractBaseImageRequest
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="model">
-        /// The model to use for image generation.
-        /// </param>
-        /// <param name="numberOfResults">
-        /// The number of images to generate. Must be between 1 and 10.
-        /// </param>
-        /// <param name="size">
-        /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
-        /// </param>
-        /// <param name="user">
-        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
-        /// </param>
-        /// <param name="responseFormat">
-        /// The format in which the generated images are returned.
-        /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
-        /// </param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ImageResponseFormat responseFormat = ImageResponseFormat.Url, string user = null)
+        protected AbstractBaseImageRequest(Model model = null, int? numberOfResults = null, string size = null, ImageResponseFormat responseFormat = 0, string user = null)
+        {
+            Model = model?.Id;
+            Number = numberOfResults;
+            Size = size;
+            User = user;
+            ResponseFormat = responseFormat;
+        }
+
+        [Obsolete("Use new .ctor overload")]
+        protected AbstractBaseImageRequest(Model model, int numberOfResults, ImageSize size, ImageResponseFormat responseFormat, string user)
         {
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.DallE_2 : model;
             Number = numberOfResults;
@@ -49,40 +37,32 @@ namespace OpenAI.Images
 
         /// <summary>
         /// The model to use for image generation.
+        /// Only `dall-e-2` and `gpt-image-1` are supported.
+        /// Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.
         /// </summary>
-        [JsonPropertyName("model")]
-        [FunctionProperty("The model to use for image generation.", true, "dall-e-2")]
-        public string Model { get; }
+        public string Model { get; private set; }
 
         /// <summary>
         /// The number of images to generate. Must be between 1 and 10.
         /// </summary>
-        [JsonPropertyName("n")]
-        [FunctionProperty("The number of images to generate. Must be between 1 and 10.", false, 1)]
-        public int Number { get; }
+        public int? Number { get; private set; }
 
         /// <summary>
-        /// The format in which the generated images are returned.
-        /// Must be one of url or b64_json.
-        /// <para/> Defaults to <see cref="ImageResponseFormat.Url"/>
+        /// The format in which generated images with `dall-e-2` and `dall-e-3`
+        /// are returned. Must be one of `url` or `b64_json`. URLs are only
+        /// valid for 60 minutes after the image has been generated.
+        /// `gpt-image-1` does not support urls and only supports base64-encoded images.
         /// </summary>
-        [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<ImageResponseFormat>))]
-        [FunctionProperty("The format in which the generated images are returned. Must be one of url or b64_json.")]
-        public ImageResponseFormat ResponseFormat { get; }
+        public ImageResponseFormat ResponseFormat { get; private set; }
 
         /// <summary>
-        /// The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
+        /// The size of the generated images. Must be one of `1024x1024`, `1536x1024` (landscape), `1024x1536` (portrait), or `auto` (default value) for `gpt-image-1`, and one of `256x256`, `512x512`, or `1024x1024` for `dall-e-2`.
         /// </summary>
-        [JsonPropertyName("size")]
-        [FunctionProperty("The size of the generated images.", false, "256x256", "512x512", "1024x1024")]
-        public string Size { get; }
+        public string Size { get; private set; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
-        [JsonPropertyName("user")]
-        [FunctionProperty("A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.")]
-        public string User { get; }
+        public string User { get; private set; }
     }
 }

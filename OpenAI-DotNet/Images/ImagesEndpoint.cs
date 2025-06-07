@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -49,9 +50,32 @@ namespace OpenAI.Images
 
             try
             {
-                using var imageData = new MemoryStream();
-                await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-                payload.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
+                if (!string.IsNullOrWhiteSpace(request.Model))
+                {
+                    payload.Add(new StringContent(request.Model), "model");
+                }
+
+                payload.Add(new StringContent(request.Prompt), "prompt");
+
+                if (request.Images.Count == 1)
+                {
+                    using var imageData = new MemoryStream();
+                    var image = request.Images.FirstOrDefault();
+                    await image.Value.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+                    payload.Add(new ByteArrayContent(imageData.ToArray()), "image", image.Key);
+                }
+                else
+                {
+                    async Task ProcessImageAsync(MultipartFormDataContent content, int index, string imageName, Stream imageStream)
+                    {
+                        using var imageData = new MemoryStream();
+                        await imageStream.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+                        content.Add(new ByteArrayContent(imageData.ToArray()), $"image_{index}", imageName);
+                    }
+
+                    await Task.WhenAll(request.Images.Select((image, i)
+                        => ProcessImageAsync(payload, i, image.Key, image.Value)).ToList());
+                }
 
                 if (request.Mask != null)
                 {
@@ -60,10 +84,25 @@ namespace OpenAI.Images
                     payload.Add(new ByteArrayContent(maskData.ToArray()), "mask", request.MaskName);
                 }
 
-                payload.Add(new StringContent(request.Prompt), "prompt");
-                payload.Add(new StringContent(request.Number.ToString()), "n");
-                payload.Add(new StringContent(request.Size), "size");
-                payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+                if (request.Number.HasValue)
+                {
+                    payload.Add(new StringContent(request.Number.Value.ToString()), "n");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Size))
+                {
+                    payload.Add(new StringContent(request.Size), "size");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Quality))
+                {
+                    payload.Add(new StringContent(request.Quality), "quality");
+                }
+
+                if (request.ResponseFormat > 0)
+                {
+                    payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+                }
 
                 if (!string.IsNullOrWhiteSpace(request.User))
                 {
@@ -94,9 +133,26 @@ namespace OpenAI.Images
                 using var imageData = new MemoryStream();
                 await request.Image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
                 payload.Add(new ByteArrayContent(imageData.ToArray()), "image", request.ImageName);
-                payload.Add(new StringContent(request.Number.ToString()), "n");
-                payload.Add(new StringContent(request.Size), "size");
-                payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+
+                if (!string.IsNullOrWhiteSpace(request.Model))
+                {
+                    payload.Add(new StringContent(request.Model), "model");
+                }
+
+                if (request.Number.HasValue)
+                {
+                    payload.Add(new StringContent(request.Number.Value.ToString()), "n");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Size))
+                {
+                    payload.Add(new StringContent(request.Size), "size");
+                }
+
+                if (request.ResponseFormat > 0)
+                {
+                    payload.Add(new StringContent(request.ResponseFormat.ToString().ToLower()), "response_format");
+                }
 
                 if (!string.IsNullOrWhiteSpace(request.User))
                 {
