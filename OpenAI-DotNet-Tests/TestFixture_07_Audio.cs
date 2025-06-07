@@ -11,6 +11,18 @@ namespace OpenAI.Tests
 {
     internal class TestFixture_07_Audio : AbstractTestFixture
     {
+        private string testDirectory;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            testDirectory = Path.GetFullPath($"../../../Assets/Tests/{nameof(TestFixture_07_Audio)}");
+            if (!Directory.Exists(testDirectory))
+            {
+                Directory.CreateDirectory(testDirectory);
+            }
+        }
+
         [Test]
         public async Task Test_01_01_Transcription_Text()
         {
@@ -160,7 +172,9 @@ namespace OpenAI.Tests
 
             var response = await OpenAIClient.AudioEndpoint.CreateSpeechAsync(request, ChunkCallback);
             Assert.IsFalse(response.IsEmpty);
-            await File.WriteAllBytesAsync("../../../Assets/HelloWorld.mp3", response.ToArray());
+            var path = Path.Combine(testDirectory, $"{nameof(Test_03_01_Speech)}-{DateTime.UtcNow:yyyyMMddHHmmss}.mp3");
+            await File.WriteAllBytesAsync(path, response.ToArray());
+            Console.WriteLine(path);
         }
 
         [Test]
@@ -181,7 +195,9 @@ namespace OpenAI.Tests
 
             var response = await OpenAIClient.AudioEndpoint.CreateSpeechAsync(request, ChunkCallback);
             Assert.IsFalse(response.IsEmpty);
-            await File.WriteAllBytesAsync("../../../Assets/HelloWorld_Instructions.mp3", response.ToArray());
+            var path = Path.Combine(testDirectory, $"{nameof(Test_03_02_SpeechWithInstructions)}-{DateTime.UtcNow:yyyyMMddHHmmss}.mp3");
+            await File.WriteAllBytesAsync(path, response.ToArray());
+            Console.WriteLine(path);
         }
     }
 }
