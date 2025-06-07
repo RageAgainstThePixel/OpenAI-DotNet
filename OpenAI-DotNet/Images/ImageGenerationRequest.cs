@@ -115,18 +115,24 @@ namespace OpenAI.Images
         }
 
         /// <summary>
-        /// A text description of the desired image(s). The maximum length is 32000 characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters for `dall-e-3`.
+        /// A text description of the desired image(s).
+        /// The maximum length is 32000 characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters for `dall-e-3`.
         /// </summary>
         [JsonPropertyName("prompt")]
-        [FunctionProperty("A text description of the desired image(s). The maximum length is 32000 characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters for `dall-e-3`.", true)]
+        [FunctionProperty("A text description of the desired image(s). " +
+                          "The maximum length is 32000 characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters for `dall-e-3`.", true)]
         public string Prompt { get; }
 
         /// <summary>
-        /// The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`. Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.
+        /// The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`.
+        /// Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.
         /// </summary>
         [JsonPropertyName("model")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [FunctionProperty("The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`. Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.", true, "dall-e-2", "dall-e-3", "gpt-image-1")]
+        [FunctionProperty("The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`. " +
+                          "Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.",
+            true,
+            possibleValues: ["dall-e-2", "dall-e-3", "gpt-image-1"])]
         public string Model { get; }
 
         /// <summary>
@@ -225,13 +231,15 @@ namespace OpenAI.Images
         public string Moderation { get; }
 
         /// <summary>
-        /// Allows to set transparency for the background of the generated image(s). 
-        /// This parameter is only supported for `gpt-image-1`.
+        /// Allows to set transparency for the background of the generated image(s).
         /// Must be one of `transparent`, `opaque` or `auto` (default value).
         /// When `auto` is used, the model will automatically determine the best background for the image.
         /// If `transparent`, the output format needs to support transparency,
         /// so it should be set to either `png` (default value) or `webp`.
         /// </summary>
+        /// <remarks>
+        /// This parameter is only supported for `gpt-image-1`
+        /// </remarks>
         [JsonPropertyName("background")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [FunctionProperty("Allows to set transparency for the background of the generated image(s). " +
@@ -243,11 +251,13 @@ namespace OpenAI.Images
         public string Background { get; }
 
         /// <summary>
-        /// The style of the generated images.
-        /// This parameter is only supported for `dall-e-3`. Must be one of `vivid` or `natural`.
+        /// The style of the generated images. Must be one of `vivid` or `natural`.
         /// Vivid causes the model to lean towards generating hyper-real and dramatic images.
         /// Natural causes the model to produce more natural, less hyper-real looking images.
         /// </summary>
+        /// <remarks>
+        /// This parameter is only supported for `dall-e-3`.
+        /// </remarks>
         [JsonPropertyName("style")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [FunctionProperty("The style of the generated images. This parameter is only supported for `dall-e-3`. " +

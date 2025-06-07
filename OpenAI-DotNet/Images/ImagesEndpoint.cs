@@ -57,25 +57,16 @@ namespace OpenAI.Images
 
                 payload.Add(new StringContent(request.Prompt), "prompt");
 
-                if (request.Images.Count == 1)
+                async Task ProcessImageAsync(MultipartFormDataContent content, int index, KeyValuePair<string, Stream> value)
                 {
                     using var imageData = new MemoryStream();
-                    var image = request.Images.FirstOrDefault();
-                    await image.Value.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-                    payload.Add(new ByteArrayContent(imageData.ToArray()), "image", image.Key);
+                    var (name, image) = value;
+                    await image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
+                    content.Add(new ByteArrayContent(imageData.ToArray()), $"image_{index}", name);
                 }
-                else
-                {
-                    async Task ProcessImageAsync(MultipartFormDataContent content, int index, string imageName, Stream imageStream)
-                    {
-                        using var imageData = new MemoryStream();
-                        await imageStream.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-                        content.Add(new ByteArrayContent(imageData.ToArray()), $"image_{index}", imageName);
-                    }
 
-                    await Task.WhenAll(request.Images.Select((image, i)
-                        => ProcessImageAsync(payload, i, image.Key, image.Value)).ToList());
-                }
+                await Task.WhenAll(request.Images.Select((image, i)
+                    => ProcessImageAsync(payload, i, image)).ToList());
 
                 if (request.Mask != null)
                 {

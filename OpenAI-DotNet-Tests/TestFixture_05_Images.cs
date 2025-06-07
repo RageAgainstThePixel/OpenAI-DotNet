@@ -54,7 +54,6 @@ namespace OpenAI.Tests
 
             var imageAssetPath = Path.GetFullPath("../../../Assets/image_edit_original.png");
             var maskAssetPath = Path.GetFullPath("../../../Assets/image_edit_mask.png");
-
             var request = new ImageEditRequest(
                 prompt: "A sunlit indoor lounge area with a pool containing a flamingo",
                 imagePath: imageAssetPath,
@@ -65,11 +64,11 @@ namespace OpenAI.Tests
             Assert.IsNotNull(imageResults);
             Assert.NotZero(imageResults.Count);
 
-            foreach (var image in imageResults)
+            foreach (var result in imageResults)
             {
-                Assert.IsNotNull(image);
-                Assert.IsFalse(string.IsNullOrWhiteSpace(image.B64_Json));
-                var imageBytes = Convert.FromBase64String(image.B64_Json);
+                Assert.IsNotNull(result);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(result.B64_Json));
+                var imageBytes = Convert.FromBase64String(result.B64_Json);
                 Assert.IsNotNull(imageBytes);
                 var path = Path.Combine(testDirectory, $"{nameof(Test_02_01_CreateImageEdit)}-{DateTime.UtcNow:yyyyMMddHHmmss}.png");
                 await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
@@ -90,10 +89,10 @@ namespace OpenAI.Tests
             Assert.IsNotNull(imageResults);
             Assert.NotZero(imageResults.Count);
 
-            foreach (var image in imageResults)
+            foreach (var result in imageResults)
             {
-                Assert.IsNotNull(image);
-                Console.WriteLine(image);
+                Assert.IsNotNull(result);
+                Console.WriteLine(result);
             }
         }
 
@@ -109,11 +108,11 @@ namespace OpenAI.Tests
             Assert.IsNotNull(imageResults);
             Assert.NotZero(imageResults.Count);
 
-            foreach (var image in imageResults)
+            foreach (var result in imageResults)
             {
-                Assert.IsNotNull(image);
-                Assert.IsFalse(string.IsNullOrWhiteSpace(image.B64_Json));
-                var imageBytes = Convert.FromBase64String(image.B64_Json);
+                Assert.IsNotNull(result);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(result.B64_Json));
+                var imageBytes = Convert.FromBase64String(result.B64_Json);
                 Assert.IsNotNull(imageBytes);
                 var path = Path.Combine(testDirectory, $"{nameof(Test_03_02_CreateImageVariation_B64_Json)}-{DateTime.UtcNow:yyyyMMddHHmmss}.png");
                 await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
