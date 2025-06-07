@@ -24,7 +24,9 @@ namespace OpenAI.Tests
             foreach (var image in imageResults)
             {
                 Assert.IsNotNull(image);
-                Console.WriteLine(image);
+                var imageBytes = Convert.FromBase64String(image.B64_Json);
+                await using var fileStream = new FileStream($"../../../Assets/{Guid.NewGuid()}.png", FileMode.Create, FileAccess.Write);
+                await fileStream.WriteAsync(imageBytes, 0, imageBytes.Length);
             }
         }
 
