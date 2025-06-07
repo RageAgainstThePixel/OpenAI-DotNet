@@ -31,7 +31,7 @@ namespace OpenAI.Images
         /// <param name="model">
         /// The model to use for image generation.
         /// </param>
-        [Obsolete("Use new .ctr overload")]
+        [Obsolete("Use new .ctor overload")]
         public ImageVariationRequest(
             string imagePath,
             int numberOfResults = 1,
