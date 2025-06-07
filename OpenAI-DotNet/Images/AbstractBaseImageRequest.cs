@@ -32,7 +32,7 @@ namespace OpenAI.Images
         /// <para/> Defaults to <see cref="ImageResponseFormat.B64_Json"/>
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        [Obsolete("Use new .ctr overload")]
+        [Obsolete("Use new .ctor overload")]
         protected AbstractBaseImageRequest(Model model = null, int numberOfResults = 1, ImageSize size = ImageSize.Large, ImageResponseFormat responseFormat = ImageResponseFormat.B64_Json, string user = null)
         {
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT_Image_1 : model;
