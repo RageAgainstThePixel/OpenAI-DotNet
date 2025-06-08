@@ -66,7 +66,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("usage")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Usage Usage { get; private set; }
+        public TokenUsage Usage { get; private set; }
 
         /// <summary>
         /// Which conversation the response is added to, determined by the `conversation`

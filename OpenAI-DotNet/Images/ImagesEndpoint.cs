@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -57,16 +58,17 @@ namespace OpenAI.Images
 
                 payload.Add(new StringContent(request.Prompt), "prompt");
 
-                async Task ProcessImageAsync(MultipartFormDataContent content, int index, KeyValuePair<string, Stream> value)
+                var imageLabel = request.Images.Count > 1 ? "image[]" : "image";
+
+                async Task ProcessImageAsync(MultipartFormDataContent content, KeyValuePair<string, Stream> value)
                 {
                     using var imageData = new MemoryStream();
                     var (name, image) = value;
                     await image.CopyToAsync(imageData, cancellationToken).ConfigureAwait(false);
-                    content.Add(new ByteArrayContent(imageData.ToArray()), $"image_{index}", name);
+                    content.Add(new ByteArrayContent(imageData.ToArray()), imageLabel, name);
                 }
 
-                await Task.WhenAll(request.Images.Select((image, i)
-                    => ProcessImageAsync(payload, i, image)).ToList());
+                await Task.WhenAll(request.Images.Select(image => ProcessImageAsync(payload, image)).ToList());
 
                 if (request.Mask != null)
                 {
@@ -164,9 +166,20 @@ namespace OpenAI.Images
             var resultAsString = await response.ReadAsStringAsync(EnableDebug, requestContent, cancellationToken).ConfigureAwait(false);
             var imagesResponse = response.Deserialize<ImagesResponse>(resultAsString, client);
 
-            if (imagesResponse?.Results is not { Count: not 0 })
+            if (imagesResponse == null ||
+                imagesResponse.Results.Count == 0)
             {
                 throw new HttpRequestException($"{nameof(DeserializeResponseAsync)} returned no results!  HTTP status code: {response.StatusCode}. Response body: {resultAsString}");
+            }
+
+            foreach (var result in imagesResponse.Results)
+            {
+                result.CreatedAt = DateTimeOffset.FromUnixTimeSeconds(imagesResponse.CreatedAtUnixSeconds).UtcDateTime;
+                result.Background = imagesResponse.Background;
+                result.OutputFormat = imagesResponse.OutputFormat;
+                result.Quality = imagesResponse.Quality;
+                result.Size = imagesResponse.Size;
+                result.Usage = imagesResponse.Usage;
             }
 
             return imagesResponse.Results;

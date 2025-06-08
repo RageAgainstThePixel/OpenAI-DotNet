@@ -2,9 +2,9 @@
 
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Realtime
+namespace OpenAI
 {
-    public sealed class Usage
+    public sealed class TokenUsage
     {
         /// <summary>
         /// The total number of tokens in the Response including input and output text and audio tokens.
