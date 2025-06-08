@@ -1,33 +1,16 @@
-using OpenAI.Responses;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class Reasoning : BaseResponse, IResponseItem
+    public sealed class Reasoning
     {
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("id")]
-        public string Id { get; private set; }
+        public Reasoning() { }
 
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        [JsonPropertyName("type")]
-        public ResponseItemType Type { get; private set; } = ResponseItemType.WebSearchCall;
-
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("object")]
-        public string Object { get; private set; }
-
-        /// <inheritdoc />
-        [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonPropertyName("status")]
-        public ResponseStatus Status { get; private set; }
+        public Reasoning(ReasoningEffort effort, ReasoningSummary summary = ReasoningSummary.Auto)
+        {
+            Effort = effort;
+            Summary = summary;
+        }
 
         /// <summary>
         /// Constrains effort on reasoning for reasoning models.

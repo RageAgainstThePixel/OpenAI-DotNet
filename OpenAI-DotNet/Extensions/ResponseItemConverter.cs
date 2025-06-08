@@ -28,7 +28,7 @@ namespace OpenAI.Responses
                 "local_shell_call_output" => root.Deserialize<LocalShellCall>(options),
                 "file_search_call" => root.Deserialize<FileSearchToolCall>(options),
                 "web_search_call" => root.Deserialize<WebSearchToolCall>(options),
-                "reasoning" => root.Deserialize<Reasoning>(options),
+                "reasoning" => root.Deserialize<ReasoningItem>(options),
                 "mcp_call" => root.Deserialize<MCPToolCall>(options),
                 "mcp_approval_request" => root.Deserialize<MCPApprovalRequest>(options),
                 "mcp_approval_response" => root.Deserialize<MCPApprovalResponse>(options),
