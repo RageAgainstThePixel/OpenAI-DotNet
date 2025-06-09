@@ -36,7 +36,7 @@ namespace OpenAI.Chat
             : this(messages, model, frequencyPenalty, logitBias, maxTokens, number, presencePenalty,
                 responseFormat, seed, stops, temperature, topP, topLogProbs, parallelToolCalls, jsonSchema, audioConfig, reasoningEffort, user)
         {
-            tools.ProcessTools(toolChoice, out var toolList, out var activeTool);
+            tools.ProcessTools<Tool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList;
             ToolChoice = activeTool;
         }

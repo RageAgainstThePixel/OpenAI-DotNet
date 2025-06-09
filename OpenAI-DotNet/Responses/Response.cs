@@ -4,6 +4,7 @@ using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -211,7 +212,7 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<Tool> Tools { get; private set; }
+        public IReadOnlyList<ITool> Tools { get; private set; }
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling,
@@ -261,5 +262,15 @@ namespace OpenAI.Responses
 
             output.Insert(index, item);
         }
+
+        public void PrintUsage()
+        {
+            if (Usage == null) { return; }
+            var message = $"{Id} | {Model} | {Usage}";
+            Console.WriteLine(message);
+        }
+
+        public override string ToString()
+            => JsonSerializer.Serialize(this, ResponseExtensions.DebugJsonOptions);
     }
 }

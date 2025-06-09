@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
+using OpenAI.Extensions;
 using OpenAI.Models;
 using OpenAI.Realtime;
 using System;
@@ -70,9 +71,8 @@ namespace OpenAI.Tests
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
+                                functionCallResponse.InvokeFunction();
                             }
 
                             break;
@@ -166,10 +166,9 @@ namespace OpenAI.Tests
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
                                 // ReSharper disable once MethodHasAsyncOverloadWithCancellation
-                                toolCall.InvokeFunction();
+                                functionCallResponse.InvokeFunction();
                             }
 
                             break;
@@ -257,12 +256,11 @@ namespace OpenAI.Tests
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                functionCall.InvokeFunction();
                             }
 
                             break;
@@ -353,12 +351,11 @@ namespace OpenAI.Tests
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                functionCall.InvokeFunction();
                             }
 
                             break;

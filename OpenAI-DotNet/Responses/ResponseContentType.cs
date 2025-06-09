@@ -7,7 +7,7 @@ namespace OpenAI.Responses
     public enum ResponseContentType
     {
         [EnumMember(Value = "input_text")]
-        InputText,
+        InputText = 1,
         [EnumMember(Value = "output_text")]
         OutputText,
         [EnumMember(Value = "input_audio")]

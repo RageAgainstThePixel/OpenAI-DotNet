@@ -70,7 +70,9 @@ namespace OpenAI.Extensions
                 new RealtimeClientEventConverter(),
                 new RealtimeServerEventConverter(),
                 new ResponseContentConverter(),
-                new ResponseItemConverter()
+                new ResponseItemConverter(),
+                new FilterConverter(),
+                new ToolConverter(),
             },
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };

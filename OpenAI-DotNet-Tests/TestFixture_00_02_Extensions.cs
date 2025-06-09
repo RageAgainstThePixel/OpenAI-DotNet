@@ -1,8 +1,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
-using OpenAI.Audio;
+using OpenAI.Extensions;
 using OpenAI.Images;
+using OpenAI.Responses;
 using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
@@ -17,20 +18,37 @@ namespace OpenAI.Tests
     internal class TestFixture_00_02_Extensions : AbstractTestFixture
     {
         [Test]
-        public void Test_01_01_GetTools()
+        public void Test_01_01_01_GetTools()
         {
             var tools = Tool.GetAllAvailableTools(forceUpdate: true, clearCache: true).ToList();
             Assert.IsNotNull(tools);
             Assert.IsNotEmpty(tools);
             tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
-            tools.Add(Tool.GetOrCreateTool(OpenAIClient.AudioEndpoint, nameof(AudioEndpoint.CreateTranscriptionTextAsync)));
-
-            foreach (var tool in tools)
+            tools.ProcessTools<Tool>(null, out var toolList, out _);
+            Assert.NotNull(toolList);
+            Console.WriteLine(JsonSerializer.Serialize(toolList, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
             {
-                Console.WriteLine(tool.Function?.Name ?? tool.Type);
-            }
+                WriteIndented = true
+            }));
+        }
+        [Test]
+        public void Test_01_01_02_GetTools()
+        {
+            var tools = Tool.GetAllAvailableTools(forceUpdate: true, clearCache: true).ToList();
+            Assert.IsNotNull(tools);
+            Assert.IsNotEmpty(tools);
+            tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
+            tools.Add(new CodeInterpreterTool());
+            tools.Add(new ComputerUsePreviewTool());
+            tools.Add(new FileSearchTool());
+            tools.Add(new ImageGenerationTool());
+            tools.Add(new LocalShellTool());
+            tools.Add(new MCPTool());
+            tools.Add(new WebSearchPreviewTool());
+            tools.ProcessTools<ITool>(null, out var toolList, out _);
+            Assert.NotNull(toolList);
 
-            Console.WriteLine(JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
+            Console.WriteLine(JsonSerializer.Serialize(toolList, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
             {
                 WriteIndented = true
             }));

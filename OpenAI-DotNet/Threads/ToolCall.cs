@@ -2,12 +2,22 @@
 
 using OpenAI.Extensions;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Threads
 {
-    public sealed class ToolCall : IAppendable<ToolCall>
+    public sealed class ToolCall : IToolCall, IAppendable<ToolCall>
     {
+        public ToolCall() { }
+
+        public ToolCall(string callId, string name, string arguments = null)
+        {
+            Id = callId;
+            Type = "function";
+            FunctionCall = new FunctionCall(name, arguments);
+        }
+
         [JsonInclude]
         [JsonPropertyName("index")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -58,12 +68,18 @@ namespace OpenAI.Threads
         [JsonIgnore]
         public bool IsFunction => Type == "function";
 
+        [JsonIgnore]
+        public string CallId => Id;
+
+        [JsonIgnore]
+        public string Name => FunctionCall?.Name;
+
+        [JsonIgnore]
+        public JsonNode Arguments => FunctionCall?.Arguments;
+
         public void AppendFrom(ToolCall other)
         {
-            if (other == null)
-            {
-                return;
-            }
+            if (other == null) { return; }
 
             if (!string.IsNullOrWhiteSpace(other.Id))
             {
@@ -104,8 +120,5 @@ namespace OpenAI.Threads
                 FileSearch = other.FileSearch;
             }
         }
-
-        public static implicit operator OpenAI.ToolCall(ToolCall toolCall)
-            => new(toolCall.Id, toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments);
     }
 }

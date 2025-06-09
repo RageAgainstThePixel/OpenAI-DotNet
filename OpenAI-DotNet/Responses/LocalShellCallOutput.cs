@@ -10,7 +10,6 @@ namespace OpenAI.Responses
 
         public LocalShellCallOutput(string output)
         {
-            Type = ResponseItemType.LocalShellCallOutput;
             Output = output;
         }
 

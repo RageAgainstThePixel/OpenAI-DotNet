@@ -1,5 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -21,6 +23,7 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("input_tokens_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public InputTokensDetails InputTokensDetails { get; private set; }
 
         /// <summary>
@@ -35,6 +38,7 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("output_tokens_details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public OutputTokensDetails OutputTokensDetails { get; private set; }
 
         /// <summary>
@@ -43,5 +47,8 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonPropertyName("total_tokens")]
         public int TotalTokens { get; private set; }
+
+        public override string ToString()
+            => JsonSerializer.Serialize(this, ResponseExtensions.DebugJsonOptions);
     }
 }

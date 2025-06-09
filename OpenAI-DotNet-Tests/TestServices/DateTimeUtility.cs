@@ -9,6 +9,6 @@ namespace OpenAI.Tests.Weather
     {
         [Function("Get the current date and time.")]
         public static async Task<string> GetDateTime()
-            => await Task.FromResult(DateTimeOffset.Now.ToString());
+            => await Task.FromResult(DateTimeOffset.UtcNow.ToString());
     }
 }

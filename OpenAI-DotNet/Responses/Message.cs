@@ -7,16 +7,23 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class MessageItem : BaseResponse, IResponseItem
+    public sealed class Message : BaseResponse, IResponseItem
     {
-        public MessageItem() { }
+        public static implicit operator Message(string input) => new(Role.User, input);
 
-        public MessageItem(Role role, IResponseContent content)
+        public Message() { }
+
+        public Message(Role role, string text)
+            : this(role, new TextContent(text))
+        {
+        }
+
+        public Message(Role role, IResponseContent content)
             : this(role, [content])
         {
         }
 
-        public MessageItem(Role role, IEnumerable<IResponseContent> content)
+        public Message(Role role, IEnumerable<IResponseContent> content)
         {
             Type = ResponseItemType.Message;
             Role = role;
@@ -80,5 +87,8 @@ namespace OpenAI.Responses
 
             content.Insert(index, item);
         }
+
+        public override string ToString()
+            => Content?.LastOrDefault()?.ToString() ?? string.Empty;
     }
 }

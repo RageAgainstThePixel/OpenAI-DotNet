@@ -52,6 +52,6 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<MCPTool> Tools { get; private set; }
+        public IReadOnlyList<MCPServerTool> Tools { get; private set; }
     }
 }

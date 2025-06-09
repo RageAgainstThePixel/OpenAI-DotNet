@@ -1,6 +1,8 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -34,11 +36,37 @@ namespace OpenAI.Responses
         [JsonPropertyName("status")]
         public ResponseStatus Status { get; private set; }
 
+        private List<ReasoningSummary> summary = [];
+
         /// <summary>
         /// Reasoning text contents.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("summary")]
-        public IReadOnlyList<ReasoningSummary> Summary { get; private set; }
+        public IReadOnlyList<ReasoningSummary> Summary
+        {
+            get => summary;
+            private set => summary = value?.ToList() ?? [];
+        }
+
+        internal void InsertSummary(ReasoningSummary item, int index)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            summary ??= new();
+
+            if (index > summary.Count)
+            {
+                for (var i = summary.Count; i < index; i++)
+                {
+                    summary.Add(null);
+                }
+            }
+
+            summary.Insert(index, item);
+        }
     }
 }

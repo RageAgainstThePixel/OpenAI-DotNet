@@ -192,7 +192,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public Task<RunResponse> CreateRunAsync(string threadId, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => CreateRunAsync(threadId, request, streamEventHandler == null ? null : (_, serverSentEvent) => streamEventHandler.Invoke(serverSentEvent), cancellationToken);
+            => CreateRunAsync(threadId, request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken);
 
         /// <summary>
         /// Create a run.
@@ -220,7 +220,7 @@ namespace OpenAI.Threads
             }
 
             request.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
-            return await CreateRunAsync(threadId, request, streamEventHandler == null ? null : (_, serverSentEvent) => streamEventHandler.Invoke(serverSentEvent), cancellationToken).ConfigureAwait(false);
+            return await CreateRunAsync(threadId, request, streamEventHandler == null ? null : (_, e) => streamEventHandler.Invoke(e), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public Task<RunResponse> CreateThreadAndRunAsync(CreateThreadAndRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => CreateThreadAndRunAsync(request, streamEventHandler == null ? null : (_, serverSentEvent) => streamEventHandler.Invoke(serverSentEvent), cancellationToken);
+            => CreateThreadAndRunAsync(request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken);
 
         /// <summary>
         /// Create a thread and run it in one request.
@@ -295,7 +295,7 @@ namespace OpenAI.Threads
             }
 
             request.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
-            return await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : (_, serverSentEvent) => streamEventHandler.Invoke(serverSentEvent), cancellationToken).ConfigureAwait(false);
+            return await CreateThreadAndRunAsync(request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ namespace OpenAI.Threads
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
         public Task<RunResponse> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => SubmitToolOutputsAsync(threadId, runId, request, streamEventHandler == null ? null : (_, serverSentEvent) => streamEventHandler.Invoke(serverSentEvent), cancellationToken);
+            => SubmitToolOutputsAsync(threadId, runId, request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken);
 
         /// <summary>
         /// When a run has the status: "requires_action" and required_action.type is submit_tool_outputs,
