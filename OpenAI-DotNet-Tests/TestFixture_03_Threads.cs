@@ -555,7 +555,7 @@ namespace OpenAI.Tests
                     }
                 }
 
-                var run = await assistant.CreateThreadAndRunAsync("What date is it?", StreamEventHandler);
+                var run = await assistant.CreateThreadAndRunAsync("What is today's date?", StreamEventHandler);
                 Assert.IsNotNull(run);
                 Assert.IsTrue(hasInvokedCallback);
                 Assert.NotNull(thread);

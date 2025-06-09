@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
+using OpenAI.Extensions;
 using OpenAI.Models;
 using OpenAI.Realtime;
 using System;
@@ -16,6 +17,7 @@ namespace OpenAI.Tests
         public async Task Test_01_01_RealtimeSession()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -60,7 +62,7 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
@@ -70,9 +72,8 @@ namespace OpenAI.Tests
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -108,6 +109,7 @@ namespace OpenAI.Tests
         public async Task Test_01_02_RealtimeSession_IAsyncEnumerable()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -166,10 +168,8 @@ namespace OpenAI.Tests
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                // ReSharper disable once MethodHasAsyncOverloadWithCancellation
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -203,6 +203,7 @@ namespace OpenAI.Tests
         public async Task Test_02_RealtimeSession_Semantic_VAD()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -250,19 +251,18 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -298,6 +298,7 @@ namespace OpenAI.Tests
         public async Task Test_03_RealtimeSession_VAD_Disabled()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -346,19 +347,18 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                Console.WriteLine($"tool_call: {toolCall.Function.Name}");
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;

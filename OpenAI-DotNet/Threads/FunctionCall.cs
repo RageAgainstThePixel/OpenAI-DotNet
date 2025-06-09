@@ -6,6 +6,15 @@ namespace OpenAI.Threads
 {
     public sealed class FunctionCall
     {
+        public FunctionCall() { }
+
+        public FunctionCall(string name, string arguments = null, string output = null)
+        {
+            Name = name;
+            Arguments = arguments;
+            Output = output;
+        }
+
         /// <summary>
         /// The name of the function.
         /// </summary>

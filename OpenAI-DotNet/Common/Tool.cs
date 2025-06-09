@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenAI
 {
-    public sealed class Tool : IAppendable<Tool>
+    public sealed class Tool : IAppendable<Tool>, ITool
     {
         public Tool() { }
 
@@ -22,6 +22,22 @@ namespace OpenAI
         {
             Function = function;
             Type = nameof(function);
+        }
+
+        public Tool(ITool iTool)
+        {
+            if (iTool.Type == "function" &&
+                iTool is Function function)
+            {
+                Type = "function";
+                Function = function;
+                TryRegisterTool(this);
+            }
+            else
+            {
+                Type = "tool";
+                Reference = iTool;
+            }
         }
 
         [Obsolete("use new OpenAI.Tools.ToolCall class")]
@@ -59,9 +75,6 @@ namespace OpenAI
         [JsonPropertyName("type")]
         public string Type { get; private set; }
 
-        [JsonIgnore]
-        public bool IsFunction => Type == "function";
-
         [JsonInclude]
         [JsonPropertyName("function")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -71,6 +84,15 @@ namespace OpenAI
         [JsonPropertyName("file_search")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public FileSearchOptions FileSearchOptions { get; private set; }
+
+        [JsonIgnore]
+        public bool IsFunction => Type == "function";
+
+        [JsonIgnore]
+        public ITool Reference { get; }
+
+        [JsonIgnore]
+        public bool IsReference => Type == "tool";
 
         public void AppendFrom(Tool other)
         {
@@ -111,20 +133,20 @@ namespace OpenAI
 
         #region Tool Calling
 
-        private void ValidateToolCall(ToolCall toolCall)
+        private void ValidateToolCall(IToolCall toolCall)
         {
             if (!IsFunction)
             {
                 throw new InvalidOperationException("This tool is not a function.");
             }
 
-            if (Function.Name != toolCall.Function.Name)
+            if (Function.Name != toolCall.Name)
             {
                 throw new InvalidOperationException("Tool does not match tool call!");
             }
         }
 
-        [Obsolete("Use overload with ToolCall parameter")]
+        [Obsolete("Use overload with IToolCall parameter")]
         public string InvokeFunction()
             => IsFunction
                 ? Function.Invoke()
@@ -136,10 +158,10 @@ namespace OpenAI
         /// <param name="toolCall">The <see cref="ToolCall"/> with the function arguments to invoke.</param>
         /// <returns>The result of the function as json.</returns>
         /// <exception cref="InvalidOperationException">Raised if function call is invalid or tool is not a function.</exception>
-        public string InvokeFunction(ToolCall toolCall)
+        public string InvokeFunction(IToolCall toolCall)
         {
             ValidateToolCall(toolCall);
-            Function.Arguments = toolCall.Function.Arguments;
+            Function.Arguments = toolCall.Arguments;
             return Function.Invoke();
         }
 
@@ -148,7 +170,7 @@ namespace OpenAI
         /// </summary>
         /// <typeparam name="T">The type to deserialize the result to.</typeparam>
         /// <returns>The result of the function.</returns>
-        [Obsolete("Use overload with ToolCall parameter")]
+        [Obsolete("Use overload with IToolCall parameter")]
         public T InvokeFunction<T>()
             => IsFunction
                 ? Function.Invoke<T>()
@@ -161,10 +183,10 @@ namespace OpenAI
         /// <param name="toolCall">The <see cref="ToolCall"/> with the function arguments to invoke.</param>
         /// <returns>The result of the function.</returns>
         /// <exception cref="InvalidOperationException">Raised if function call is invalid or tool is not a function.</exception>
-        public T InvokeFunction<T>(ToolCall toolCall)
+        public T InvokeFunction<T>(IToolCall toolCall)
         {
             ValidateToolCall(toolCall);
-            Function.Arguments = toolCall.Function.Arguments;
+            Function.Arguments = toolCall.Arguments;
             return Function.Invoke<T>();
         }
 
@@ -173,7 +195,7 @@ namespace OpenAI
         /// </summary>
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function as json.</returns>
-        [Obsolete("Use overload with ToolCall parameter")]
+        [Obsolete("Use overload with IToolCall parameter")]
         public Task<string> InvokeFunctionAsync(CancellationToken cancellationToken = default)
             => IsFunction
                 ? Function.InvokeAsync(cancellationToken)
@@ -186,10 +208,10 @@ namespace OpenAI
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function as json.</returns>
         /// <exception cref="InvalidOperationException">Raised if function call is invalid or tool is not a function.</exception>
-        public Task<string> InvokeFunctionAsync(ToolCall toolCall, CancellationToken cancellationToken = default)
+        public Task<string> InvokeFunctionAsync(IToolCall toolCall, CancellationToken cancellationToken = default)
         {
             ValidateToolCall(toolCall);
-            Function.Arguments = toolCall.Function.Arguments;
+            Function.Arguments = toolCall.Arguments;
             return Function.InvokeAsync(cancellationToken);
         }
 
@@ -199,7 +221,7 @@ namespace OpenAI
         /// <typeparam name="T">The type to deserialize the result to.</typeparam>
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function.</returns>
-        [Obsolete("Use overload with ToolCall parameter")]
+        [Obsolete("Use overload with IToolCall parameter")]
         public Task<T> InvokeFunctionAsync<T>(CancellationToken cancellationToken = default)
             => IsFunction
                 ? Function.InvokeAsync<T>(cancellationToken)
@@ -213,10 +235,10 @@ namespace OpenAI
         /// <param name="cancellationToken">Optional, A token to cancel the request.</param>
         /// <returns>The result of the function.</returns>
         /// <exception cref="InvalidOperationException">Raised if function call is invalid or tool is not a function.</exception>
-        public Task<T> InvokeFunctionAsync<T>(ToolCall toolCall, CancellationToken cancellationToken = default)
+        public Task<T> InvokeFunctionAsync<T>(IToolCall toolCall, CancellationToken cancellationToken = default)
         {
             ValidateToolCall(toolCall);
-            Function.Arguments = toolCall.Function.Arguments;
+            Function.Arguments = toolCall.Arguments;
             return Function.InvokeAsync<T>(cancellationToken);
         }
 
@@ -224,11 +246,7 @@ namespace OpenAI
 
         #region Tool Cache
 
-        private static readonly List<Tool> toolCache =
-        [
-            FileSearch,
-            CodeInterpreter
-        ];
+        private static readonly List<Tool> toolCache = [];
 
         /// <summary>
         /// Gets a list of all available tools.
@@ -283,8 +301,6 @@ namespace OpenAI
         {
             toolCache.Clear();
             Function.ClearFunctionCache();
-            toolCache.Add(CodeInterpreter);
-            toolCache.Add(FileSearch);
         }
 
         /// <summary>
@@ -411,11 +427,11 @@ namespace OpenAI
             return false;
         }
 
-        internal static bool TryGetTool(ToolCall toolCall, out Tool tool)
+        internal static bool TryGetTool(IToolCall toolCall, out Tool tool)
         {
             tool = toolCache
-                .Where(knownTool => knownTool.Type == toolCall.Type)
-                .FirstOrDefault(knownTool => knownTool.Function.Name == toolCall.Function.Name);
+                .Where(knownTool => knownTool.IsFunction)
+                .FirstOrDefault(knownTool => knownTool.Function.Name == toolCall.Name);
             return tool != null;
         }
 
@@ -577,5 +593,10 @@ namespace OpenAI
         }
 
         #endregion Func<,> Overloads
+    }
+
+    public interface ITool
+    {
+        public string Type { get; }
     }
 }

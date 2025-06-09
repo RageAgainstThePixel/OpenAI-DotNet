@@ -9,7 +9,7 @@ namespace OpenAI.Responses
 {
     public sealed class TextContent : BaseResponse, IResponseContent
     {
-        public static implicit operator TextContent(string input) => new(input);
+        public static implicit operator TextContent(string value) => new(value);
 
         public TextContent() { }
 
@@ -20,20 +20,20 @@ namespace OpenAI.Responses
         }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public ResponseContentType Type { get; private set; }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("text")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Text { get; internal set; }
 
         private List<Annotation> annotations;
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("annotations")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Annotation> Annotations
         {
             get => annotations;
@@ -41,8 +41,8 @@ namespace OpenAI.Responses
         }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("delta")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Delta { get; internal set; }
 
         [JsonIgnore]
@@ -67,5 +67,8 @@ namespace OpenAI.Responses
 
             annotations.Insert(index, item);
         }
+
+        public override string ToString()
+            => Text;
     }
 }

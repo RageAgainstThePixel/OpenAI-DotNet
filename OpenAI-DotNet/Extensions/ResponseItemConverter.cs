@@ -18,11 +18,11 @@ namespace OpenAI.Responses
 
             return type switch
             {
-                "message" => root.Deserialize<MessageItem>(options),
+                "message" => root.Deserialize<Message>(options),
                 "computer_call" => root.Deserialize<ComputerToolCall>(options),
                 "computer_call_output" => root.Deserialize<ComputerToolCall>(options),
                 "function_call" => root.Deserialize<FunctionToolCall>(options),
-                "function_call_output" => root.Deserialize<FunctionToolCall>(options),
+                "function_call_output" => root.Deserialize<FunctionToolCallOutput>(options),
                 "image_generation_call" => root.Deserialize<ImageGenerationCall>(options),
                 "local_shell_call" => root.Deserialize<LocalShellCall>(options),
                 "local_shell_call_output" => root.Deserialize<LocalShellCall>(options),

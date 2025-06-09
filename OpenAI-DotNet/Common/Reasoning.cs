@@ -4,6 +4,8 @@ namespace OpenAI
 {
     public sealed class Reasoning
     {
+        public static implicit operator Reasoning(ReasoningEffort effort) => new(effort);
+
         public Reasoning() { }
 
         public Reasoning(ReasoningEffort effort, ReasoningSummary summary = ReasoningSummary.Auto)
@@ -18,6 +20,7 @@ namespace OpenAI
         /// Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
         /// </summary>
         [JsonInclude]
+        [JsonPropertyName("effort")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ReasoningEffort Effort { get; private set; }
 
@@ -27,6 +30,7 @@ namespace OpenAI
         /// One of `auto`, `concise`, or `detailed`.
         /// </summary>
         [JsonInclude]
+        [JsonPropertyName("summary")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ReasoningSummary Summary { get; private set; }
     }

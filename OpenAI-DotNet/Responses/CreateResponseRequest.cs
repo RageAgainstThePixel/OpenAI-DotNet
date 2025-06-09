@@ -12,7 +12,7 @@ namespace OpenAI.Responses
     public sealed class CreateResponseRequest
     {
         public static implicit operator CreateResponseRequest(string textInput) =>
-            new(new List<IResponseItem> { new MessageItem(Role.User, new TextContent(textInput)) });
+            new(new List<IResponseItem> { new Message(Role.User, new TextContent(textInput)) });
 
         public CreateResponseRequest(
             string textInput,
@@ -36,7 +36,7 @@ namespace OpenAI.Responses
             Truncation truncation = Truncation.Auto,
             string user = null)
             : this(
-                input: new List<IResponseItem> { new MessageItem(Role.User, new TextContent(textInput)) },
+                input: new List<IResponseItem> { new Message(Role.User, new TextContent(textInput)) },
                 model: model,
                 background: background,
                 include: include,
@@ -109,7 +109,7 @@ namespace OpenAI.Responses
                 };
             }
 
-            tools.ProcessTools(toolChoice, out var toolList, out var activeTool);
+            tools.ProcessTools<ITool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList;
             ToolChoice = activeTool;
             TopP = topP;
@@ -282,9 +282,9 @@ namespace OpenAI.Responses
         /// Use this to provide a list of functions the model may generate JSON inputs for.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("tools")]
-        public IReadOnlyList<Tool> Tools { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyList<ITool> Tools { get; }
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling,

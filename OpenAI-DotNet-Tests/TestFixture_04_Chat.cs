@@ -28,7 +28,7 @@ namespace OpenAI.Tests
                 new(Role.User, "Where was it played?")
             };
 
-            var chatRequest = new ChatRequest(messages, Model.GPT4o);
+            var chatRequest = new ChatRequest(messages, Model.GPT4_1_Nano);
             var response = await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest);
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
@@ -36,7 +36,7 @@ namespace OpenAI.Tests
             Assert.AreEqual(1, response.Choices.Count);
             Assert.IsNotNull(response.FirstChoice);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(choice.Message.Role == Role.Assistant);
             Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
             Console.WriteLine(response.ToString());
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
             Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
             Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
-            response.GetUsage();
+            response.PrintUsage();
 
             messages.Add(response.FirstChoice.Message);
             messages.Add(new(Role.User, "What are some other good family dog breeds?"));
@@ -132,7 +132,7 @@ namespace OpenAI.Tests
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
             Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
             Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace OpenAI.Tests
             Assert.IsNotEmpty(response.FirstChoice.Message.AudioOutput.Transcript);
             Assert.IsNotNull(response.FirstChoice.Message.AudioOutput.Data);
             Assert.IsFalse(response.FirstChoice.Message.AudioOutput.Data.IsEmpty);
-            response.GetUsage();
+            response.PrintUsage();
             messages.Add(response.FirstChoice.Message);
             messages.Add(new(Role.User, "What are some other good family dog breeds?"));
             chatRequest = new ChatRequest(messages, Model.GPT4oAudio, audioConfig: Voice.Alloy);
@@ -205,7 +205,7 @@ namespace OpenAI.Tests
                 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
             }
 
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -659,7 +659,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -695,7 +695,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response);
             Assert.IsNotNull(response.Choices);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishDetails}");
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -722,7 +722,7 @@ namespace OpenAI.Tests
                 Console.WriteLine($"[{choice.Index}] {choice.Message.Role}: {choice} | Finish Reason: {choice.FinishReason}");
             }
 
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -769,7 +769,7 @@ namespace OpenAI.Tests
             Assert.IsTrue(choice.Message.Role == Role.Assistant);
             Assert.IsTrue(choice.Message.Content!.Equals(cumulativeDelta));
             Console.WriteLine(response.ToString());
-            response.GetUsage();
+            response.PrintUsage();
         }
 
         [Test]
@@ -803,7 +803,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(mathResponse.FinalAnswer);
             Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
 
-            chatResponse.GetUsage();
+            chatResponse.PrintUsage();
         }
 
         [Test]
@@ -860,7 +860,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(mathResponse.FinalAnswer);
             Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
 
-            chatResponse.GetUsage();
+            chatResponse.PrintUsage();
         }
 
         [Test]
@@ -883,7 +883,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(response.Choices);
             Assert.IsNotEmpty(response.Choices);
             Console.WriteLine($"{response.FirstChoice.Message.Role}: {response.FirstChoice} | Finish Reason: {response.FirstChoice.FinishReason}");
-            response.GetUsage();
+            response.PrintUsage();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Extensions;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -14,6 +16,9 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("reasoning_tokens")]
-        public int ReasoningTokens { get; }
+        public int ReasoningTokens { get; private set; }
+
+        public override string ToString()
+            => JsonSerializer.Serialize(this, ResponseExtensions.DebugJsonOptions);
     }
 }

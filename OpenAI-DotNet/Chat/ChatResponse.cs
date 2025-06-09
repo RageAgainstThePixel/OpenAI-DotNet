@@ -124,18 +124,15 @@ namespace OpenAI.Chat
             }
         }
 
-        public string GetUsage(bool log = true)
+        [Obsolete("use PrintUsage")]
+        public void GetUsage()
+            => PrintUsage();
+
+        public void PrintUsage()
         {
-            if (Usage == null) { return string.Empty; }
-
+            if (Usage == null) { return; }
             var message = $"{Id} | {Model} | {Usage}";
-
-            if (log)
-            {
-                Console.WriteLine(message);
-            }
-
-            return message;
+            Console.WriteLine(message);
         }
     }
 }

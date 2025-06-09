@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
 {
-    public sealed class ResponseFunctionCallArgumentsResponse : BaseRealtimeEvent, IServerEvent, IRealtimeEventStream
+    public sealed class ResponseFunctionCallArgumentsResponse : BaseRealtimeEvent, IToolCall, IServerEvent, IRealtimeEventStream
     {
         /// <inheritdoc />
         [JsonInclude]
@@ -71,8 +71,5 @@ namespace OpenAI.Realtime
 
         [JsonIgnore]
         public bool IsDone => Type.EndsWith("done");
-
-        public static implicit operator ToolCall(ResponseFunctionCallArgumentsResponse response)
-            => new(response.CallId, response.Name, response.Arguments);
     }
 }
