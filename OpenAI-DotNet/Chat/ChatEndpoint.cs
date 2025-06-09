@@ -72,7 +72,7 @@ namespace OpenAI.Chat
         public Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
             => StreamCompletionAsync(chatRequest, response =>
             {
-                resultHandler.Invoke(response);
+                resultHandler(response);
                 return Task.CompletedTask;
             }, streamUsage, cancellationToken);
 
@@ -93,7 +93,7 @@ namespace OpenAI.Chat
         public Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
             => StreamCompletionAsync<T>(chatRequest, response =>
             {
-                resultHandler.Invoke(response);
+                resultHandler(response);
                 return Task.CompletedTask;
             }, streamUsage, cancellationToken);
 
@@ -153,12 +153,12 @@ namespace OpenAI.Chat
                     chatResponse.AppendFrom(partialResponse);
                 }
 
-                return resultHandler.Invoke(partialResponse);
+                return resultHandler(partialResponse);
             }, cancellationToken);
 
             if (chatResponse == null) { return null; }
             chatResponse.SetResponseData(response.Headers, client);
-            await resultHandler.Invoke(chatResponse).ConfigureAwait(false);
+            await resultHandler(chatResponse).ConfigureAwait(false);
             return chatResponse;
         }
 

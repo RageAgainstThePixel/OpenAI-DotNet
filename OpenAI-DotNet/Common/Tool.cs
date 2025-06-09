@@ -125,12 +125,10 @@ namespace OpenAI
                 }
             }
 
-#pragma warning disable CS0618 // Type or member is obsolete
             if (other.FileSearchOptions != null)
             {
                 FileSearchOptions = other.FileSearchOptions;
             }
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         #region Tool Calling
@@ -148,7 +146,7 @@ namespace OpenAI
             }
         }
 
-        [Obsolete("Use overload with ToolCall parameter")]
+        [Obsolete("Use overload with IToolCall parameter")]
         public string InvokeFunction()
             => IsFunction
                 ? Function.Invoke()

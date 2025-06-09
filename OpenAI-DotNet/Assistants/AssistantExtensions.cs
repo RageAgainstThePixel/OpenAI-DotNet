@@ -141,7 +141,7 @@ namespace OpenAI.Assistants
         /// <returns>Tool output result as <see cref="string"/>.</returns>
         public static Task<T> InvokeToolCallAsync<T>(this AssistantResponse assistant, IToolCall toolCall, CancellationToken cancellationToken = default)
         {
-            var tool = assistant.Tools.FirstOrDefault(tool => tool.Type == "function" && tool.Function.Name == toolCall.Name) ??
+            var tool = assistant.Tools.FirstOrDefault(tool => tool.IsFunction && tool.Function.Name == toolCall.Name) ??
                        throw new InvalidOperationException($"Failed to find a valid tool for [{toolCall.CallId}] {toolCall.Name}");
             return tool.InvokeFunctionAsync<T>(toolCall, cancellationToken);
         }
