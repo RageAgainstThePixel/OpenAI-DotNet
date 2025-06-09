@@ -1,6 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
+using OpenAI.Audio;
 using OpenAI.Extensions;
 using OpenAI.Images;
 using OpenAI.Responses;
@@ -24,6 +25,7 @@ namespace OpenAI.Tests
             Assert.IsNotNull(tools);
             Assert.IsNotEmpty(tools);
             tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
+            tools.Add(Tool.GetOrCreateTool(OpenAIClient.AudioEndpoint, nameof(AudioEndpoint.CreateSpeechAsync)));
             tools.ProcessTools<Tool>(null, out var toolList, out _);
             Assert.NotNull(toolList);
             Console.WriteLine(JsonSerializer.Serialize(toolList, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
@@ -31,6 +33,7 @@ namespace OpenAI.Tests
                 WriteIndented = true
             }));
         }
+
         [Test]
         public void Test_01_01_02_GetTools()
         {
@@ -38,12 +41,12 @@ namespace OpenAI.Tests
             Assert.IsNotNull(tools);
             Assert.IsNotEmpty(tools);
             tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
-            tools.Add(new CodeInterpreterTool());
-            tools.Add(new ComputerUsePreviewTool());
-            tools.Add(new FileSearchTool());
+            tools.Add(new CodeInterpreterTool("container_id"));
+            tools.Add(new ComputerUsePreviewTool(1024, 768, "browser"));
+            tools.Add(new FileSearchTool("vector_store_id"));
             tools.Add(new ImageGenerationTool());
             tools.Add(new LocalShellTool());
-            tools.Add(new MCPTool());
+            tools.Add(new MCPTool("mcp_server", "https://mcp_server"));
             tools.Add(new WebSearchPreviewTool());
             tools.ProcessTools<ITool>(null, out var toolList, out _);
             Assert.NotNull(toolList);

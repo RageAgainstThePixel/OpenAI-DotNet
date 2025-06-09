@@ -17,14 +17,14 @@ namespace OpenAI
         [JsonConstructor]
         public CompoundFilter(IEnumerable<ComparisonFilter> filters, CompoundFilterOperator type)
         {
-            Filters = filters?.ToList() ?? throw new ArgumentNullException(nameof(filters));
             Type = type;
+            Filters = filters?.ToList() ?? throw new ArgumentNullException(nameof(filters));
         }
-
-        [JsonPropertyName("filters")]
-        public IReadOnlyList<ComparisonFilter> Filters { get; }
 
         [JsonPropertyName("type")]
         public CompoundFilterOperator Type { get; }
+
+        [JsonPropertyName("filters")]
+        public IReadOnlyList<ComparisonFilter> Filters { get; }
     }
 }

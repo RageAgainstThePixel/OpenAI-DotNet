@@ -13,7 +13,25 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(MCPTool mcpTool) => new(mcpTool as ITool);
 
-        public MCPTool() { }
+        public MCPTool(
+            string serverLabel,
+            string serverUrl,
+            IReadOnlyList<string> allowedTools,
+            IReadOnlyDictionary<string, object> headers,
+            string requireApproval)
+            : this(serverLabel, serverUrl, allowedTools, headers, (object)requireApproval)
+        {
+        }
+
+        public MCPTool(
+            string serverLabel,
+            string serverUrl,
+            IReadOnlyList<string> allowedTools,
+            IReadOnlyDictionary<string, object> headers,
+            MCPApprovalFilter requireApproval)
+            : this(serverLabel, serverUrl, allowedTools, headers, (object)requireApproval)
+        {
+        }
 
         public MCPTool(
             string serverLabel,
@@ -32,30 +50,37 @@ namespace OpenAI.Responses
         [JsonPropertyName("type")]
         public string Type => "mcp";
 
-        [JsonInclude]
+        /// <summary>
+        /// A label for this MCP server, used to identify it in tool calls.
+        /// </summary>
         [JsonPropertyName("server_label")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string ServerLabel { get; private set; }
+        public string ServerLabel { get; }
 
-        [JsonInclude]
+        /// <summary>
+        /// The URL for the MCP server.
+        /// </summary>
         [JsonPropertyName("server_url")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string ServerUrl { get; private set; }
+        public string ServerUrl { get; }
 
-        [JsonInclude]
+        /// <summary>
+        /// List of allowed tool names.
+        /// </summary>
         [JsonPropertyName("allowed_tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<string> AllowedTools { get; private set; }
+        public IReadOnlyList<string> AllowedTools { get; }
 
-        [JsonInclude]
+        /// <summary>
+        /// Optional HTTP headers to send to the MCP server. Use for authentication or other purposes.
+        /// </summary>
         [JsonPropertyName("headers")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyDictionary<string, object> Headers { get; private set; }
+        public IReadOnlyDictionary<string, object> Headers { get; }
 
         /// <summary>
         /// Specify which of the MCP server's tools require approval.
+        /// Can be one of <see cref="MCPApprovalFilter"/>, "always", or "never".
+        /// When set to "never", all tools will not require approval.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("require_approval")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(StringOrObjectConverter<MCPApprovalFilter>))]

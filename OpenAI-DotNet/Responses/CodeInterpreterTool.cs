@@ -13,8 +13,6 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(CodeInterpreterTool codeInterpreterTool) => new(codeInterpreterTool as ITool);
 
-        public CodeInterpreterTool() { }
-
         public CodeInterpreterTool(string containerId)
         {
             Container = containerId;
@@ -25,14 +23,12 @@ namespace OpenAI.Responses
             Container = new CodeInterpreterContainer(fileIds);
         }
 
-        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type { get; private set; } = "code_interpreter";
+        public string Type => "code_interpreter";
 
         /// <summary>
         /// The code interpreter container. Can be a container ID or an object that specifies uploaded file IDs to make available to your code.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("container")]
         [JsonConverter(typeof(StringOrObjectConverter<CodeInterpreterContainer>))]
         public object Container { get; private set; }

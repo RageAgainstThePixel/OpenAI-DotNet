@@ -17,6 +17,7 @@ namespace OpenAI.Tests
         public async Task Test_01_01_RealtimeSession()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -61,7 +62,7 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
@@ -72,7 +73,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 Console.WriteLine($"tool_call: {functionCallResponse.Name}");
-                                functionCallResponse.InvokeFunction();
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -108,6 +109,7 @@ namespace OpenAI.Tests
         public async Task Test_01_02_RealtimeSession_IAsyncEnumerable()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -167,8 +169,7 @@ namespace OpenAI.Tests
                             if (functionCallResponse.IsDone)
                             {
                                 Console.WriteLine($"tool_call: {functionCallResponse.Name}");
-                                // ReSharper disable once MethodHasAsyncOverloadWithCancellation
-                                functionCallResponse.InvokeFunction();
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -202,6 +203,7 @@ namespace OpenAI.Tests
         public async Task Test_02_RealtimeSession_Semantic_VAD()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -249,7 +251,7 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
@@ -260,7 +262,7 @@ namespace OpenAI.Tests
                             if (functionCall.IsDone)
                             {
                                 Console.WriteLine($"tool_call: {functionCall.Name}");
-                                functionCall.InvokeFunction();
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -296,6 +298,7 @@ namespace OpenAI.Tests
         public async Task Test_03_RealtimeSession_VAD_Disabled()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
@@ -344,7 +347,7 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
@@ -355,7 +358,7 @@ namespace OpenAI.Tests
                             if (functionCall.IsDone)
                             {
                                 Console.WriteLine($"tool_call: {functionCall.Name}");
-                                functionCall.InvokeFunction();
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;

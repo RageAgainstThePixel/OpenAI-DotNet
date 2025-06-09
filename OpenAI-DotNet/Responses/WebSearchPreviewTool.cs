@@ -4,11 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
+    /// <summary>
+    /// This tool searches the web for relevant results to use in a response. 
+    /// </summary>
     public sealed class WebSearchPreviewTool : ITool
     {
         public static implicit operator Tool(WebSearchPreviewTool webSearchPreviewTool) => new(webSearchPreviewTool as ITool);
-
-        public WebSearchPreviewTool() { }
 
         public WebSearchPreviewTool(SearchContextSize searchContextSize = 0, UserLocation userLocation = null)
         {

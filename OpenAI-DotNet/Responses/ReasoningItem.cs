@@ -36,7 +36,7 @@ namespace OpenAI.Responses
         [JsonPropertyName("status")]
         public ResponseStatus Status { get; private set; }
 
-        private List<ReasoningSummary> summary = [];
+        private List<ReasoningSummary> summary = new();
 
         /// <summary>
         /// Reasoning text contents.
@@ -46,7 +46,7 @@ namespace OpenAI.Responses
         public IReadOnlyList<ReasoningSummary> Summary
         {
             get => summary;
-            private set => summary = value?.ToList() ?? [];
+            private set => summary = value?.ToList() ?? new();
         }
 
         internal void InsertSummary(ReasoningSummary item, int index)

@@ -2,7 +2,6 @@
 
 using NUnit.Framework;
 using OpenAI.Chat;
-using OpenAI.Extensions;
 using OpenAI.Models;
 using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;

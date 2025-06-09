@@ -293,7 +293,7 @@ namespace OpenAI.Tests
             Assert.NotNull(lastItem);
             Assert.AreEqual(ResponseItemType.Message, lastItem.Type);
             Assert.IsInstanceOf<Message>(lastItem);
-            Assert.AreEqual(lastItem, messageItem);
+            Assert.AreEqual(lastItem.Id, messageItem.Id);
             Assert.NotNull(messageItem);
             Assert.IsNotEmpty(messageItem!.Content);
             Assert.IsInstanceOf<Responses.TextContent>(messageItem.Content[0]);

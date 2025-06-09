@@ -7,11 +7,12 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
+    /// <summary>
+    /// A tool that searches for relevant content from uploaded files.
+    /// </summary>
     public sealed class FileSearchTool : ITool
     {
         public static implicit operator Tool(FileSearchTool fileSearchTool) => new(fileSearchTool as ITool);
-
-        public FileSearchTool() { }
 
         public FileSearchTool(string vectorStoreId, int? maxNumberOfResults = null, RankingOptions rankingOptions = null, IEnumerable<IFilter> filters = null)
             : this([vectorStoreId], maxNumberOfResults, rankingOptions, filters)
@@ -29,23 +30,19 @@ namespace OpenAI.Responses
         [JsonPropertyName("type")]
         public string Type => "file_search";
 
-        [JsonInclude]
         [JsonPropertyName("vector_store_ids")]
-        public IReadOnlyList<string> VectorStoreIds { get; private set; }
+        public IReadOnlyList<string> VectorStoreIds { get; }
 
-        [JsonInclude]
         [JsonPropertyName("max_num_results")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxNumberOfResults { get; private set; }
+        public int? MaxNumberOfResults { get; }
 
-        [JsonInclude]
         [JsonPropertyName("ranking_options")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public RankingOptions RankingOptions { get; private set; }
+        public RankingOptions RankingOptions { get; }
 
-        [JsonInclude]
         [JsonPropertyName("filters")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<IFilter> Filters { get; private set; }
+        public IReadOnlyList<IFilter> Filters { get; }
     }
 }

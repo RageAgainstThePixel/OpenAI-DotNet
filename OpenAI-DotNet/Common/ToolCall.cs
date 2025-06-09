@@ -3,6 +3,8 @@
 using OpenAI.Extensions;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenAI
 {
@@ -76,5 +78,17 @@ namespace OpenAI
                 }
             }
         }
+
+        public string InvokeFunction()
+            => ToolExtensions.InvokeFunction(this);
+
+        public T InvokeFunction<T>()
+            => ToolExtensions.InvokeFunction<T>(this);
+
+        public Task<string> InvokeFunctionAsync(CancellationToken cancellationToken = default)
+            => ToolExtensions.InvokeFunctionAsync(this, cancellationToken);
+
+        public Task<T> InvokeFunctionAsync<T>(CancellationToken cancellationToken = default)
+            => ToolExtensions.InvokeFunctionAsync<T>(this, cancellationToken);
     }
 }

@@ -51,7 +51,6 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("call_id")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string CallId { get; private set; }
 
         /// <summary>
@@ -59,7 +58,6 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; private set; }
 
         private string argumentsString;
@@ -93,6 +91,7 @@ namespace OpenAI.Responses
             internal set => arguments = value;
         }
 
+        [JsonIgnore]
         internal string Delta
         {
             set => argumentsString += value;
