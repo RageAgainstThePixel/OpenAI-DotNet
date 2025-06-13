@@ -36,7 +36,7 @@ namespace OpenAI.Tests
             {
                 BaseAddress = GetBaseAddressFromLaunchSettings()
             });
-            var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
+            var settings = new OpenAISettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication(TestUserToken);
 
             OpenAIClient = new OpenAIClient(auth, settings, HttpClient)

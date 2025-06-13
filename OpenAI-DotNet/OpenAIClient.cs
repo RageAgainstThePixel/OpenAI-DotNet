@@ -42,7 +42,7 @@ namespace OpenAI
         /// </param>
         /// <param name="clientSettings">
         /// The API client settings for specifying OpenAI deployments to Azure, a proxy domain,
-        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIClientSettings.Default"/>,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAISettings.Default"/>,
         /// potentially loading from environment vars or from a config file.
         /// </param>
         /// <param name="client">A <see cref="HttpClient"/>.</param>
@@ -53,10 +53,10 @@ namespace OpenAI
         /// This internal HttpClient is disposed of when OpenAIClient is disposed of.
         /// If you provide an external HttpClient instance to OpenAIClient, you are responsible for managing its disposal.
         /// </remarks>
-        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null, HttpClient client = null)
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAISettings clientSettings = null, HttpClient client = null)
         {
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
-            OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
+            Settings = clientSettings ?? OpenAISettings.Default;
 
             if (string.IsNullOrWhiteSpace(OpenAIAuthentication?.ApiKey))
             {
@@ -141,7 +141,7 @@ namespace OpenAI
         /// <summary>
         /// The client settings for configuring Azure OpenAI or custom domain.
         /// </summary>
-        internal OpenAIClientSettings OpenAIClientSettings { get; }
+        internal OpenAISettings Settings { get; }
 
         /// <summary>
         /// Enables or disables debugging for all endpoints.
@@ -259,7 +259,7 @@ namespace OpenAI
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
             client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v2");
 
-            if (OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.OpenAIDomain) &&
+            if (Settings.BaseRequestUrlFormat.Contains(OpenAISettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
                  (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
                   !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
@@ -267,7 +267,7 @@ namespace OpenAI
                 throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
             }
 
-            if (OpenAIClientSettings.UseOAuthAuthentication)
+            if (Settings.UseOAuthAuthentication)
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             }

@@ -44,9 +44,9 @@ namespace OpenAI
         {
             string route;
 
-            if (client.OpenAIClientSettings.IsAzureOpenAI && IsAzureDeployment == true)
+            if (client.Settings.IsAzureOpenAI && IsAzureDeployment == true)
             {
-                route = $"deployments/{client.OpenAIClientSettings.DeploymentId}/{Root}{endpoint}";
+                route = $"deployments/{client.Settings.DeploymentId}/{Root}{endpoint}";
             }
             else
             {
@@ -54,11 +54,11 @@ namespace OpenAI
             }
 
             var baseUrlFormat = IsWebSocketEndpoint == true
-                ? client.OpenAIClientSettings.BaseWebSocketUrlFormat
-                : client.OpenAIClientSettings.BaseRequestUrlFormat;
+                ? client.Settings.BaseWebSocketUrlFormat
+                : client.Settings.BaseRequestUrlFormat;
             var result = string.Format(baseUrlFormat, route);
 
-            foreach (var defaultQueryParameter in client.OpenAIClientSettings.DefaultQueryParameters)
+            foreach (var defaultQueryParameter in client.Settings.DefaultQueryParameters)
             {
                 queryParameters ??= new Dictionary<string, string>();
                 queryParameters.Add(defaultQueryParameter.Key, defaultQueryParameter.Value);

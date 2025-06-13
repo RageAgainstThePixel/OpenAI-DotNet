@@ -263,17 +263,17 @@ https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-id}
 - `deployment-id` The deployment name you chose when you deployed the model.
 - `api-version` The API version to use for this operation. This follows the YYYY-MM-DD format.
 
-To setup the client to use your deployment, you'll need to pass in `OpenAIClientSettings` into the client constructor.
+To setup the client to use your deployment, you'll need to pass in `OpenAISettings` into the client constructor.
 
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
-var settings = new OpenAIClientSettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
+var settings = new OpenAISettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
 using var api = new OpenAIClient(auth, settings);
 ```
 
 #### [Azure Active Directory Authentication](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#authentication)
 
-[Authenticate with MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) as usual and get access token, then use the access token when creating your `OpenAIAuthentication`. Then be sure to set useAzureActiveDirectory to true when creating your `OpenAIClientSettings`.
+[Authenticate with MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) as usual and get access token, then use the access token when creating your `OpenAIAuthentication`. Then be sure to set useAzureActiveDirectory to true when creating your `OpenAISettings`.
 
 [Tutorial: Desktop app that calls web APIs: Acquire a token](https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-desktop-acquire-token?tabs=dotnet)
 
@@ -281,7 +281,7 @@ using var api = new OpenAIClient(auth, settings);
 // get your access token using any of the MSAL methods
 var accessToken = result.AccessToken;
 var auth = new OpenAIAuthentication(accessToken);
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
+var settings = new OpenAISettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
 using var api = new OpenAIClient(auth, settings);
 ```
 
@@ -300,7 +300,7 @@ Follow these steps:
 1. Setup a new project using either the [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) or [com.openai.unity](https://github.com/RageAgainstThePixel/com.openai.unity) packages.
 2. Authenticate users with your OAuth provider.
 3. After successful authentication, create a new `OpenAIAuthentication` object and pass in the custom token with the prefix `sess-`.
-4. Create a new `OpenAIClientSettings` object and specify the domain where your intermediate API is located.
+4. Create a new `OpenAISettings` object and specify the domain where your intermediate API is located.
 5. Pass your new `auth` and `settings` objects to the `OpenAIClient` constructor when you create the client instance.
 
 Here's an example of how to set up the front end:
@@ -308,7 +308,7 @@ Here's an example of how to set up the front end:
 ```csharp
 var authToken = await LoginAsync();
 var auth = new OpenAIAuthentication($"sess-{authToken}");
-var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
+var settings = new OpenAISettings(domain: "api.your-custom-domain.com");
 using var api = new OpenAIClient(auth, settings);
 ```
 
@@ -325,7 +325,7 @@ In this example, we demonstrate how to set up and use `OpenAIProxy` in a new ASP
     - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
 4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxy.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
-5. Create `OpenAIAuthentication` and `OpenAIClientSettings` as you would normally with your API keys, org id, or Azure settings.
+5. Create `OpenAIAuthentication` and `OpenAISettings` as you would normally with your API keys, org id, or Azure settings.
 
 ```csharp
 public partial class Program
@@ -348,7 +348,7 @@ public partial class Program
     public static void Main(string[] args)
     {
         var auth = OpenAIAuthentication.LoadFromEnv();
-        var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
+        var settings = new OpenAISettings(/* your custom settings if using Azure OpenAI */);
         using var openAIClient = new OpenAIClient(auth, settings);
         OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }

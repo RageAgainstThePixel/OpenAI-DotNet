@@ -70,7 +70,7 @@ namespace OpenAI.Tests
         [Test]
         public async Task Test_03_Client_Unauthenticated()
         {
-            var settings = new OpenAIClientSettings(domain: HttpClient.BaseAddress?.Authority);
+            var settings = new OpenAISettings(domain: HttpClient.BaseAddress?.Authority);
             var auth = new OpenAIAuthentication("sess-invalid-token");
             var openAIClient = new OpenAIClient(auth, settings, HttpClient);
 
@@ -96,7 +96,7 @@ namespace OpenAI.Tests
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-                var realtimeUri = new Uri(string.Format(OpenAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat, "echo"));
+                var realtimeUri = new Uri(string.Format(OpenAIClient.Settings.BaseWebSocketUrlFormat, "echo"));
                 Console.WriteLine(realtimeUri);
                 using var websocket = await OpenAIClient.CreateWebsocketAsync.Invoke(realtimeUri, cts.Token);
 

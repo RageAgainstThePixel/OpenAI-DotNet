@@ -56,7 +56,7 @@ namespace OpenAI.Proxy
         /// </summary>
         /// <typeparam name="T"><see cref="IAuthenticationFilter"/> type to use to validate your custom issued tokens.</typeparam>
         /// <param name="args">Startup args.</param>
-        /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAIClientSettings"/>.</param>
+        /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAISettings"/>.</param>
         public static IHost CreateDefaultHost<T>(string[] args, OpenAIClient openAIClient) where T : class, IAuthenticationFilter
             => Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -81,7 +81,7 @@ namespace OpenAI.Proxy
         /// </summary>
         /// <typeparam name="T"><see cref="IAuthenticationFilter"/> type to use to validate your custom issued tokens.</typeparam>
         /// <param name="args">Startup args.</param>
-        /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAIClientSettings"/>.</param>
+        /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAISettings"/>.</param>
         public static WebApplication CreateWebApplication<T>(string[] args, OpenAIClient openAIClient) where T : class, IAuthenticationFilter
         {
             var builder = WebApplication.CreateBuilder(args);

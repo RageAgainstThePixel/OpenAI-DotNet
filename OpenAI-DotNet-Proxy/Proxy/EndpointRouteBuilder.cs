@@ -57,7 +57,7 @@ namespace OpenAI.Proxy
         /// <param name="routePrefix">Optional, custom route prefix. i.e. '/openai'.</param>
         public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter, string routePrefix = "")
         {
-            endpoints.Map($"{routePrefix}{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
+            endpoints.Map($"{routePrefix}{openAIClient.Settings.BaseRequest}{{**endpoint}}", HandleRequest);
             return;
 
             async Task HandleRequest(HttpContext httpContext, string endpoint)
@@ -80,13 +80,13 @@ namespace OpenAI.Proxy
                         modifiedQuery[pair.Key] = pair.Value.FirstOrDefault();
                     }
 
-                    if (openAIClient.OpenAIClientSettings.IsAzureOpenAI)
+                    if (openAIClient.Settings.IsAzureOpenAI)
                     {
-                        modifiedQuery["api-version"] = openAIClient.OpenAIClientSettings.ApiVersion;
+                        modifiedQuery["api-version"] = openAIClient.Settings.ApiVersion;
                     }
 
                     var uri = new Uri(string.Format(
-                        openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
+                        openAIClient.Settings.BaseRequestUrlFormat,
                         QueryHelpers.AddQueryString(endpoint, modifiedQuery)
                     ));
 
@@ -191,7 +191,7 @@ namespace OpenAI.Proxy
                 }
 
                 var uri = new Uri(string.Format(
-                    openAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat,
+                    openAIClient.Settings.BaseWebSocketUrlFormat,
                     $"{endpoint}{httpContext.Request.QueryString}"
                 ));
                 await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);
