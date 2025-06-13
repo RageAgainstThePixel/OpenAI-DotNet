@@ -33,8 +33,17 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.7.0
 - Added support for Responses API
+- Added support for gpt-image-1
+- Updated all static model definitions
 - Updated speech requests with instructions input
 - Updated audio transcription requests with ChunkingStrategy and includes
+- Updated default Azure OpenAI API Version to [GA 2024-10-21](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#data-plane-inference)
+- Renamed ChatResponseFormat -&gt; TextResponseFormat
+- Renamed ResponseFormatObject  -&gt; TextResponseFormatConfiguration
+- Renamed Realtime.Usage -&gt; OpenAI.TokenUsage
+- Moved Realtime.TokenDetails -&gt; OpenAI.TokenDetails
+- Removed ImageSize enum
+- Renamed OpenAIClientSettings -&gt; OpenAISettings to match with unity package
 Version 8.6.4
 - Added SemanticVAD options to realtime
 - Added new audio models to static model list
