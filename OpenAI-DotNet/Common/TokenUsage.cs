@@ -20,14 +20,14 @@ namespace OpenAI
         public int? InputTokens { get; private set; }
 
         [JsonInclude]
-        [JsonPropertyName("output_tokens")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? OutputTokens { get; private set; }
-
-        [JsonInclude]
         [JsonPropertyName("input_token_details")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TokenUsageDetails InputTokenDetails { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("output_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? OutputTokens { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("output_token_details")]

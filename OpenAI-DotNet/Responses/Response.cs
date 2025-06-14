@@ -79,7 +79,7 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("usage")]
-        public ResponseUsage Usage { get; private set; }
+        public TokenUsage Usage { get; private set; }
 
         /// <summary>
         /// Whether to allow the model to run tool calls in parallel.

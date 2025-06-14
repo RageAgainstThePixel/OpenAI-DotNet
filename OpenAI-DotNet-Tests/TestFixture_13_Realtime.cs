@@ -66,6 +66,9 @@ namespace OpenAI.Tests
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
@@ -91,6 +94,8 @@ namespace OpenAI.Tests
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -162,6 +167,9 @@ namespace OpenAI.Tests
                             await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                             await session.SendAsync(new CreateResponseRequest(), cts.Token);
                             break;
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
@@ -185,6 +193,8 @@ namespace OpenAI.Tests
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -255,6 +265,9 @@ namespace OpenAI.Tests
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
@@ -280,6 +293,8 @@ namespace OpenAI.Tests
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -351,6 +366,9 @@ namespace OpenAI.Tests
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
@@ -376,6 +394,8 @@ namespace OpenAI.Tests
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;

@@ -37,5 +37,13 @@ namespace OpenAI
         [JsonPropertyName("image_tokens")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? ImageTokens { get; private set; }
+
+        /// <summary>
+        /// The number of image tokens used in the Response.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("reasoning_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? ReasoningTokens { get; private set; }
     }
 }
