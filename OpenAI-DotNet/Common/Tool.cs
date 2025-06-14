@@ -26,11 +26,11 @@ namespace OpenAI
 
         public Tool(ITool iTool)
         {
-            if (iTool.Type == "function" &&
-                iTool is Function function)
+            if (iTool is Function function)
             {
-                Type = "function";
+                Type = nameof(function);
                 Function = function;
+                Function.Type = Type;
                 TryRegisterTool(this);
             }
             else

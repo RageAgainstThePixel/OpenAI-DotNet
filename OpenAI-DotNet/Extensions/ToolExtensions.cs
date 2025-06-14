@@ -59,14 +59,26 @@ namespace OpenAI.Extensions
             if (typeof(T) == typeof(Tool))
             {
                 // cannot add ITools to List<Tool>
-                result.AddRange((IEnumerable<T>)tools.Where(tool => !tool.IsReference));
+                result.AddRange((IEnumerable<T>)tools.Where(tool =>
+                {
+                    if (tool.IsFunction)
+                    {
+                        tool.Function.Type = null;
+                    }
+
+                    return !tool.IsReference;
+                }));
             }
             else
             {
                 // add all ITools
                 result.AddRange((IEnumerable<T>)tools.Where(tool => tool.IsReference).Select(tool => tool.Reference));
                 // finally add all custom functions
-                result.AddRange((IEnumerable<T>)tools.Where(tool => tool.IsFunction).Select(tool => tool.Function));
+                result.AddRange((IEnumerable<T>)tools.Where(tool => tool.IsFunction).Select(tool =>
+                {
+                    tool.Function.Type = "function";
+                    return tool.Function;
+                }));
             }
 
             return result;
