@@ -58,7 +58,7 @@ namespace OpenAI.Tests
             var textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
 
@@ -85,7 +85,7 @@ namespace OpenAI.Tests
             var textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
 
@@ -159,7 +159,7 @@ namespace OpenAI.Tests
             textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
 
@@ -228,7 +228,7 @@ namespace OpenAI.Tests
             var textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
 
@@ -255,7 +255,7 @@ namespace OpenAI.Tests
             var textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
 
@@ -300,7 +300,7 @@ namespace OpenAI.Tests
             var textContent = messageItem.Content[0] as Responses.TextContent;
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
-            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
     }
