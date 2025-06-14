@@ -50,6 +50,8 @@ namespace OpenAI.Tests
                     Assert.IsNotNull(vectorStore);
                     Assert.AreEqual("test-vector-store", vectorStore.Name);
 
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+
                     // list vector stores
                     var vectorStores = await OpenAIClient.VectorStoresEndpoint.ListVectorStoresAsync();
                     Assert.IsNotNull(vectorStores);
