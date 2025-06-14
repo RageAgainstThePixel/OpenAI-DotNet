@@ -40,7 +40,7 @@ namespace OpenAI
             var @event = new JsonObject
             {
                 {
-                    Event.ToString().ToLower(), Value
+                    Event.ToString().ToLower(), Value.DeepClone()
                 }
             };
 
