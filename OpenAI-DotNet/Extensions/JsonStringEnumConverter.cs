@@ -86,6 +86,13 @@ namespace OpenAI.Extensions
         }
 
         public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
-            => writer.WriteStringValue(enumToString[value]);
+        {
+            if (enumToString.TryGetValue(value, out var stringValue))
+            {
+                writer.WriteStringValue(stringValue);
+                return;
+            }
+            writer.WriteStringValue(value.ToString());
+        }
     }
 }

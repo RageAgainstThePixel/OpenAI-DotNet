@@ -46,7 +46,7 @@ namespace OpenAI
 
             if (Data != null)
             {
-                @event.Add(ServerSentEventKind.Data.ToString().ToLower(), Data);
+                @event.Add(ServerSentEventKind.Data.ToString().ToLower(), Data.DeepClone());
             }
 
             return @event.ToEscapedJsonString();
