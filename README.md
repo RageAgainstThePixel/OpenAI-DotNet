@@ -57,6 +57,14 @@ dotnet add package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
+- [Responses](#responses)
+  - [Create Response](#create-response)
+    - [Simple Text Response](#simple-response-with-text)
+    - [Streaming Response with Function Calling](#streaming-response-with-function-calling)
+  - [Get Response](#get-response)
+  - [List Input Items](#list-input-items)
+  - [Cancel Response](#cancel-response)
+  - [Delete Response](#delete-response)
 - [Realtime](#realtime)
   - [Create Realtime Session](#create-realtime-session)
   - [Client Events](#client-events)
@@ -404,6 +412,126 @@ Delete a fine-tuned model. You must have the Owner role in your organization.
 ```csharp
 using var api = new OpenAIClient();
 var isDeleted = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
+Assert.IsTrue(isDeleted);
+```
+
+---
+
+### [Responses](https://platform.openai.com/docs/api-reference/responses)
+
+OpenAI's most advanced interface for generating model responses. Supports text and image inputs, and text outputs. Create stateful interactions with the model, using the output of previous responses as input. Extend the model's capabilities with built-in tools for file search, web search, computer use, and more. Allow the model access to external systems and data using function calling.
+
+- Related Guides:
+  - [QuickStart](https://platform.openai.com/docs/quickstart?api-mode=responses)
+  - [Text Inputs and Outputs](https://platform.openai.com/docs/guides/text?api-mode=responses)
+  - [Image Inputs](https://platform.openai.com/docs/guides/images?api-mode=responses)
+  - [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs?api-mode=responses)
+  - [Conversation State](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses)
+  - [Extend the model with tools](https://platform.openai.com/docs/guides/tools?api-mode=responses)
+
+The Response API is accessed via `OpenAIClient.ResponsesEndpoint`
+
+#### [Create Response](https://platform.openai.com/docs/api-reference/responses/create)
+
+Creates a model response. Provide text or image inputs to generate text or JSON outputs. Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+
+##### Simple Response With Text
+
+```csharp
+var api = new OpenAIClient();
+var response = await api.ResponsesEndpoint.CreateModelResponseAsync("Tell me a three sentence bedtime story about a unicorn.");
+var responseItem = response.Output.LastOrDefault();
+Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+response.PrintUsage();
+```
+
+##### Streaming Response with Function Calling
+
+```csharp
+var api = new OpenAIClient();
+var conversation = new List<IResponseItem>
+{
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, "What time is it?"),
+};
+var tools = new List<Tool>
+{
+    Tool.GetOrCreateTool(typeof(DateTimeUtility), nameof(DateTimeUtility.GetDateTime))
+};
+var request = new CreateResponseRequest(conversation, Model.GPT4_1_Nano, tools: tools);
+
+async Task StreamCallback(string @event, IServerSentEvent sseEvent)
+{
+    switch (sseEvent)
+    {
+        case Message messageItem:
+            conversation.Add(messageItem);
+
+            break;
+        case FunctionToolCall functionToolCall:
+            conversation.Add(functionToolCall);
+            var output = await functionToolCall.InvokeFunctionAsync();
+            conversation.Add(output);
+
+            break;
+    }
+}
+
+var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request, StreamCallback);
+var responseItem = response.Output.LastOrDefault();
+var usedTool = responseItem as FunctionToolCall;
+response.PrintUsage();
+Console.WriteLine($"{usedTool.Name}: {usedTool.Arguments}");
+// the tool output was added to the conversation in the StreamCallback, so submit it back to the model
+response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(new(conversation, Model.GPT4_1_Nano, tools: tools), StreamCallback);
+responseItem = response.Output.LastOrDefault();
+Console.WriteLine($"{messageItem.Role}: {messageItem}");
+response.PrintUsage();
+```
+
+#### [Get Response](https://platform.openai.com/docs/api-reference/responses/get)
+
+Retrieves a model response with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var response = await api.ResponsesEndpoint.GetModelResponseAsync("response-id");
+Console.WriteLine(response.ToString());
+```
+
+#### [List Input Items](https://platform.openai.com/docs/api-reference/responses/input-items)
+
+Returns a list of input items for a given response.
+
+```csharp
+var api = new OpenAIClient();
+var responseInputItems = await api.ResponsesEndpoint.ListInputItemsAsync("response-id");
+foreach (var item in responseInputItems)
+{
+    Console.WriteLine(item.ToJsonString());
+}
+```
+
+#### [Cancel Response](https://platform.openai.com/docs/api-reference/responses/cancel)
+
+Cancels a model response with the given ID.
+
+> [!NOTE]
+> Only responses created with the background parameter set to true can be cancelled.
+
+```csharp
+var api = new OpenAIClient();
+var isCancelled = await api.ResponsesEndpoint.CancelModelResponseAsync("response-id");
+Assert.IsTrue(isCancelled);
+```
+
+#### [Delete Response](https://platform.openai.com/docs/api-reference/responses/delete)
+
+Deletes a model response with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var isDeleted = await api.ResponsesEndpoint.DeleteModelResponseAsync("response-id");
 Assert.IsTrue(isDeleted);
 ```
 
