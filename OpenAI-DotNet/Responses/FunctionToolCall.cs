@@ -103,10 +103,10 @@ namespace OpenAI.Responses
             return new FunctionToolCallOutput(this, result);
         }
 
-        public FunctionToolCallOutput InvokeFunction<T>(JsonSerializerOptions options = null)
+        public FunctionToolCallOutput<T> InvokeFunction<T>(JsonSerializerOptions options = null)
         {
             var result = ToolExtensions.InvokeFunction<T>(this);
-            return new FunctionToolCallOutput(this, JsonSerializer.Serialize(result, options ?? OpenAIClient.JsonSerializationOptions));
+            return new(this, result, JsonSerializer.Serialize(result, options ?? OpenAIClient.JsonSerializationOptions));
         }
 
         public async Task<FunctionToolCallOutput> InvokeFunctionAsync(CancellationToken cancellationToken = default)
@@ -115,10 +115,10 @@ namespace OpenAI.Responses
             return new FunctionToolCallOutput(this, result);
         }
 
-        public async Task<FunctionToolCallOutput> InvokeFunctionAsync<T>(JsonSerializerOptions options = null, CancellationToken cancellationToken = default)
+        public async Task<FunctionToolCallOutput<T>> InvokeFunctionAsync<T>(JsonSerializerOptions options = null, CancellationToken cancellationToken = default)
         {
             var result = await this.InvokeFunctionAsync<T>(cancellationToken).ConfigureAwait(false);
-            return new FunctionToolCallOutput(this, JsonSerializer.Serialize(result, options ?? OpenAIClient.JsonSerializationOptions));
+            return new(this, result, JsonSerializer.Serialize(result, options ?? OpenAIClient.JsonSerializationOptions));
         }
     }
 }

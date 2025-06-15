@@ -10,7 +10,7 @@ namespace OpenAI
     {
         public Error() { }
 
-        internal Error(Exception e)
+        public Error(Exception e)
         {
             Type = e.GetType().Name;
             Message = e.Message;

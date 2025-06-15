@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class FunctionToolCallOutput : BaseResponse, IResponseItem
+    public class FunctionToolCallOutput : BaseResponse, IResponseItem
     {
         public FunctionToolCallOutput() { }
 
@@ -62,5 +62,17 @@ namespace OpenAI.Responses
 
         public override string ToString()
             => Output;
+    }
+
+    public class FunctionToolCallOutput<T> : FunctionToolCallOutput
+    {
+        public FunctionToolCallOutput(FunctionToolCall toolCall, T outputResults, string output)
+            : base(toolCall, output)
+        {
+            OutputResult = outputResults;
+        }
+
+        [JsonIgnore]
+        public T OutputResult { get; internal set; }
     }
 }
