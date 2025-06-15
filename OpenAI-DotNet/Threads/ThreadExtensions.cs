@@ -17,8 +17,8 @@ namespace OpenAI.Threads
         /// <param name="thread"><see cref="ThreadResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadResponse"/>.</returns>
-        public static async Task<ThreadResponse> UpdateAsync(this ThreadResponse thread, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.RetrieveThreadAsync(thread, cancellationToken).ConfigureAwait(false);
+        public static Task<ThreadResponse> UpdateAsync(this ThreadResponse thread, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.RetrieveThreadAsync(thread, cancellationToken);
 
         /// <summary>
         /// Modify the thread.
@@ -30,8 +30,8 @@ namespace OpenAI.Threads
         /// <param name="metadata">The metadata to set on the thread.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadResponse"/>.</returns>
-        public static async Task<ThreadResponse> ModifyAsync(this ThreadResponse thread, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.ModifyThreadAsync(thread, metadata, cancellationToken).ConfigureAwait(false);
+        public static Task<ThreadResponse> ModifyAsync(this ThreadResponse thread, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.ModifyThreadAsync(thread, metadata, cancellationToken);
 
         /// <summary>
         /// Deletes the thread.
@@ -70,8 +70,8 @@ namespace OpenAI.Threads
         /// <param name="request"><see cref="Message"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> CreateMessageAsync(this ThreadResponse thread, Message request, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.CreateMessageAsync(thread.Id, request, cancellationToken).ConfigureAwait(false);
+        public static Task<MessageResponse> CreateMessageAsync(this ThreadResponse thread, Message request, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.CreateMessageAsync(thread.Id, request, cancellationToken);
 
         /// <summary>
         /// List the messages associated to this thread.
@@ -80,8 +80,8 @@ namespace OpenAI.Threads
         /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{MessageResponse}"/>.</returns>
-        public static async Task<ListResponse<MessageResponse>> ListMessagesAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.ListMessagesAsync(thread.Id, query, null, cancellationToken).ConfigureAwait(false);
+        public static Task<ListResponse<MessageResponse>> ListMessagesAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.ListMessagesAsync(thread.Id, query, null, cancellationToken);
 
         /// <summary>
         /// Retrieve a message.
@@ -89,8 +89,8 @@ namespace OpenAI.Threads
         /// <param name="message"><see cref="MessageResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> UpdateAsync(this MessageResponse message, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.RetrieveMessageAsync(message.ThreadId, message.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<MessageResponse> UpdateAsync(this MessageResponse message, CancellationToken cancellationToken = default)
+            => message.Client.ThreadsEndpoint.RetrieveMessageAsync(message.ThreadId, message.Id, cancellationToken);
 
         /// <summary>
         /// Retrieve a message.
@@ -99,8 +99,8 @@ namespace OpenAI.Threads
         /// <param name="messageId">The id of the message to get.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> RetrieveMessageAsync(this ThreadResponse thread, string messageId, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.RetrieveMessageAsync(thread.Id, messageId, cancellationToken).ConfigureAwait(false);
+        public static Task<MessageResponse> RetrieveMessageAsync(this ThreadResponse thread, string messageId, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.RetrieveMessageAsync(thread.Id, messageId, cancellationToken);
 
         /// <summary>
         /// Modify a message.
@@ -115,8 +115,8 @@ namespace OpenAI.Threads
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> ModifyAsync(this MessageResponse message, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await message.Client.ThreadsEndpoint.ModifyMessageAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+        public static Task<MessageResponse> ModifyAsync(this MessageResponse message, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => message.Client.ThreadsEndpoint.ModifyMessageAsync(message, metadata, cancellationToken);
 
         /// <summary>
         /// Modifies a message.
@@ -132,19 +132,19 @@ namespace OpenAI.Threads
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="MessageResponse"/>.</returns>
-        public static async Task<MessageResponse> ModifyMessageAsync(this ThreadResponse thread, string messageId, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.ModifyMessageAsync(thread, messageId, metadata, cancellationToken).ConfigureAwait(false);
+        public static Task<MessageResponse> ModifyMessageAsync(this ThreadResponse thread, string messageId, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.ModifyMessageAsync(thread, messageId, metadata, cancellationToken);
 
         #endregion Messages
 
         #region Runs
 
         [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
-            => await thread.CreateRunAsync(request, async streamEvent =>
+        public static Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => thread.CreateRunAsync(request, streamEvent =>
             {
                 streamEventHandler?.Invoke(streamEvent);
-                await Task.CompletedTask;
+                return Task.CompletedTask;
             }, cancellationToken);
 
         /// <summary>
@@ -155,15 +155,15 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> CreateRunAsync(this ThreadResponse thread, CreateRunRequest request = null, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken);
 
         [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
-            => await thread.CreateRunAsync(assistant, async streamEvent =>
+        public static Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => thread.CreateRunAsync(assistant, streamEvent =>
             {
                 streamEventHandler?.Invoke(streamEvent);
-                await Task.CompletedTask;
+                return Task.CompletedTask;
             }, cancellationToken);
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public static Task<RunResponse> CreateRunAsync(this ThreadResponse thread, AssistantResponse assistant, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             var request = new CreateRunRequest(
                 assistant,
@@ -185,7 +185,7 @@ namespace OpenAI.Threads
                 topP: assistant.ReasoningEffort > 0 ? null : assistant.TopP,
                 reasoningEffort: assistant.ReasoningEffort,
                 responseFormat: assistant.ResponseFormat);
-            return await thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
+            return thread.Client.ThreadsEndpoint.CreateRunAsync(thread, request, streamEventHandler, cancellationToken);
         }
 
         /// <summary>
@@ -194,8 +194,8 @@ namespace OpenAI.Threads
         /// <param name="run"><see cref="RunResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ThreadResponse"/>.</returns>
-        public static async Task<ThreadResponse> GetThreadAsync(this RunResponse run, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.RetrieveThreadAsync(run.ThreadId, cancellationToken).ConfigureAwait(false);
+        public static Task<ThreadResponse> GetThreadAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.RetrieveThreadAsync(run.ThreadId, cancellationToken);
 
         /// <summary>
         /// Lists all the runs associated to a thread.
@@ -204,8 +204,8 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{RunResponse}"/>.</returns>
-        public static async Task<ListResponse<RunResponse>> ListRunsAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.ListRunsAsync(thread.Id, query, cancellationToken).ConfigureAwait(false);
+        public static Task<ListResponse<RunResponse>> ListRunsAsync(this ThreadResponse thread, ListQuery query = null, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.ListRunsAsync(thread.Id, query, cancellationToken);
 
         /// <summary>
         /// Get the latest status of the <see cref="RunResponse"/>.
@@ -213,8 +213,8 @@ namespace OpenAI.Threads
         /// <param name="run"><see cref="RunResponse"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> UpdateAsync(this RunResponse run, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.RetrieveRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> UpdateAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.RetrieveRunAsync(run.ThreadId, run.Id, cancellationToken);
 
         /// <summary>
         /// Retrieves a run.
@@ -223,8 +223,8 @@ namespace OpenAI.Threads
         /// <param name="runId">The id of the run to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> RetrieveRunAsync(this ThreadResponse thread, string runId, CancellationToken cancellationToken = default)
-            => await thread.Client.ThreadsEndpoint.RetrieveRunAsync(thread.Id, runId, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> RetrieveRunAsync(this ThreadResponse thread, string runId, CancellationToken cancellationToken = default)
+            => thread.Client.ThreadsEndpoint.RetrieveRunAsync(thread.Id, runId, cancellationToken);
 
         /// <summary>
         /// Modifies a run.
@@ -238,8 +238,8 @@ namespace OpenAI.Threads
         /// Keys can be a maximum of 64 characters long and values can be a maximum of 512 characters long.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> ModifyAsync(this RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.ModifyRunAsync(run.ThreadId, run.Id, metadata, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> ModifyAsync(this RunResponse run, IReadOnlyDictionary<string, string> metadata, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.ModifyRunAsync(run.ThreadId, run.Id, metadata, cancellationToken);
 
         /// <summary>
         /// Waits for <see cref="RunResponse.Status"/> to change.
@@ -266,11 +266,11 @@ namespace OpenAI.Threads
         }
 
         [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
-            => await run.SubmitToolOutputsAsync(request, async streamEvent =>
+        public static Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => run.SubmitToolOutputsAsync(request, streamEvent =>
             {
                 streamEventHandler?.Invoke(streamEvent);
-                await Task.CompletedTask;
+                return Task.CompletedTask;
             }, cancellationToken);
 
         /// <summary>
@@ -283,15 +283,15 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run.ThreadId, run.Id, request, streamEventHandler, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, SubmitToolOutputsRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.SubmitToolOutputsAsync(run.ThreadId, run.Id, request, streamEventHandler, cancellationToken);
 
         [Obsolete("use new overload with Func<IServerSentEvent, Task> instead.")]
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
-            => await run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), async streamEvent =>
+        public static Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Action<IServerSentEvent> streamEventHandler, CancellationToken cancellationToken = default)
+            => run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), streamEvent =>
             {
                 streamEventHandler?.Invoke(streamEvent);
-                await Task.CompletedTask;
+                return Task.CompletedTask;
             }, cancellationToken);
 
         /// <summary>
@@ -304,8 +304,8 @@ namespace OpenAI.Threads
         /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
-            => await run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), streamEventHandler, cancellationToken).ConfigureAwait(false);
+        public static Task<RunResponse> SubmitToolOutputsAsync(this RunResponse run, IEnumerable<ToolOutput> outputs, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+            => run.SubmitToolOutputsAsync(new SubmitToolOutputsRequest(outputs), streamEventHandler, cancellationToken);
 
         /// <summary>
         /// Returns a list of run steps belonging to a run.
@@ -314,8 +314,8 @@ namespace OpenAI.Threads
         /// <param name="query">Optional, <see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{RunStep}"/>.</returns>
-        public static async Task<ListResponse<RunStepResponse>> ListRunStepsAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken).ConfigureAwait(false);
+        public static Task<ListResponse<RunStepResponse>> ListRunStepsAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.ListRunStepsAsync(run.ThreadId, run.Id, query, cancellationToken);
 
         /// <summary>
         /// Retrieves a run step.
@@ -324,8 +324,8 @@ namespace OpenAI.Threads
         /// <param name="runStepId">Id of the run step.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunStepResponse"/>.</returns>
-        public static async Task<RunStepResponse> RetrieveRunStepAsync(this RunResponse run, string runStepId, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.RetrieveRunStepAsync(run.ThreadId, run.Id, runStepId, cancellationToken).ConfigureAwait(false);
+        public static Task<RunStepResponse> RetrieveRunStepAsync(this RunResponse run, string runStepId, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.RetrieveRunStepAsync(run.ThreadId, run.Id, runStepId, cancellationToken);
 
         /// <summary>
         /// Retrieves a run step.
@@ -333,8 +333,8 @@ namespace OpenAI.Threads
         /// <param name="runStep"><see cref="RunStepResponse"/> to retrieve.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunStepResponse"/>.</returns>
-        public static async Task<RunStepResponse> UpdateAsync(this RunStepResponse runStep, CancellationToken cancellationToken = default)
-            => await runStep.Client.ThreadsEndpoint.RetrieveRunStepAsync(runStep.ThreadId, runStep.RunId, runStep.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<RunStepResponse> UpdateAsync(this RunStepResponse runStep, CancellationToken cancellationToken = default)
+            => runStep.Client.ThreadsEndpoint.RetrieveRunStepAsync(runStep.ThreadId, runStep.RunId, runStep.Id, cancellationToken);
 
         /// <summary>
         /// Cancels a run that is <see cref="RunStatus.InProgress"/>.
@@ -342,8 +342,8 @@ namespace OpenAI.Threads
         /// <param name="run"><see cref="RunResponse"/> to cancel.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="RunResponse"/>.</returns>
-        public static async Task<bool> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.CancelRunAsync(run.ThreadId, run.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<bool> CancelAsync(this RunResponse run, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.CancelRunAsync(run.ThreadId, run.Id, cancellationToken);
 
         /// <summary>
         /// Returns a list of messages for a given thread that the run belongs to.
@@ -352,8 +352,8 @@ namespace OpenAI.Threads
         /// <param name="query"><see cref="ListQuery"/>.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ListResponse{ThreadMessage}"/>.</returns>
-        public static async Task<ListResponse<MessageResponse>> ListMessagesAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
-            => await run.Client.ThreadsEndpoint.ListMessagesAsync(run.ThreadId, query, run.Id, cancellationToken).ConfigureAwait(false);
+        public static Task<ListResponse<MessageResponse>> ListMessagesAsync(this RunResponse run, ListQuery query = null, CancellationToken cancellationToken = default)
+            => run.Client.ThreadsEndpoint.ListMessagesAsync(run.ThreadId, query, run.Id, cancellationToken);
 
         #endregion Runs
     }

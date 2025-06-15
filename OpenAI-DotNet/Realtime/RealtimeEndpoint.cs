@@ -27,7 +27,7 @@ namespace OpenAI.Realtime
             string model = string.IsNullOrWhiteSpace(configuration?.Model) ? Models.Model.GPT4oRealtime : configuration!.Model;
             var queryParameters = new Dictionary<string, string>();
 
-            if (client.OpenAIClientSettings.IsAzureOpenAI)
+            if (client.Settings.IsAzureOpenAI)
             {
                 queryParameters["deployment"] = model;
             }

@@ -183,7 +183,15 @@ namespace OpenAI.Realtime
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e);
+                        switch (e)
+                        {
+                            case TaskCanceledException:
+                            case OperationCanceledException:
+                                break;
+                            default:
+                                Console.WriteLine(e);
+                                break;
+                        }
                     }
                 } while (!cancellationToken.IsCancellationRequested && websocketClient.State == State.Open);
             }
@@ -221,12 +229,30 @@ namespace OpenAI.Realtime
                 {
                     T @event = default;
 
-                    lock (eventLock)
+                    try
                     {
-                        if (events.TryDequeue(out var dequeuedEvent) &&
-                            dequeuedEvent is T typedEvent)
+
+                        lock (eventLock)
                         {
-                            @event = typedEvent;
+                            if (events.TryDequeue(out var dequeuedEvent) &&
+                                dequeuedEvent is T typedEvent)
+                            {
+                                @event = typedEvent;
+                            }
+                        }
+
+                        await Task.Yield();
+                    }
+                    catch (Exception e)
+                    {
+                        switch (e)
+                        {
+                            case TaskCanceledException:
+                            case OperationCanceledException:
+                                break;
+                            default:
+                                Console.WriteLine(e);
+                                break;
                         }
                     }
 
@@ -234,8 +260,6 @@ namespace OpenAI.Realtime
                     {
                         yield return @event;
                     }
-
-                    await Task.Yield();
                 } while (!cancellationToken.IsCancellationRequested && websocketClient.State == State.Open);
             }
             finally
@@ -326,7 +350,7 @@ namespace OpenAI.Realtime
             if (@event is InputAudioBufferAppendRequest)
             {
                 // no response for this client event
-                return default;
+                return null;
             }
 
             var response = await tcs.Task.WithCancellation(eventCts.Token).ConfigureAwait(false);

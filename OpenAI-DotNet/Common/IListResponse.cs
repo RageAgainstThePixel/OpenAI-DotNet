@@ -5,8 +5,10 @@ using System.Collections.Generic;
 namespace OpenAI
 {
     public interface IListResponse<out TObject>
-        where TObject : BaseResponse
+        where TObject : IListItem
     {
         IReadOnlyList<TObject> Items { get; }
     }
+
+    public interface IListItem { }
 }

@@ -8,19 +8,31 @@ namespace OpenAI.Audio
 {
     public sealed class SpeechRequest
     {
+        [Obsolete("use new .ctr overload with instructions parameter")]
+        public SpeechRequest(string input, Model model, Voice voice, SpeechResponseFormat responseFormat, float? speed = null)
+        {
+            Input = !string.IsNullOrWhiteSpace(input) ? input : throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.TTS_1 : model;
+            Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;
+            ResponseFormat = responseFormat;
+            Speed = speed;
+        }
+
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="input">The text to generate audio for. The maximum length is 4096 characters.</param>
         /// <param name="model">One of the available TTS models. Defaults to tts-1.</param>
         /// <param name="voice">The voice to use when generating the audio.</param>
+        /// <param name="instructions">Control the voice of your generated audio with additional instructions. Does not work with tts-1 or tts-1-hd.</param>
         /// <param name="responseFormat">The format to audio in. Supported formats are mp3, opus, aac, flac, wav and pcm.</param>
         /// <param name="speed">The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.</param>
-        public SpeechRequest(string input, Model model = null, Voice voice = null, SpeechResponseFormat responseFormat = SpeechResponseFormat.MP3, float? speed = null)
+        public SpeechRequest(string input, Model model = null, Voice voice = null, string instructions = null, SpeechResponseFormat responseFormat = SpeechResponseFormat.MP3, float? speed = null)
         {
             Input = !string.IsNullOrWhiteSpace(input) ? input : throw new ArgumentException("Input cannot be null or empty.", nameof(input));
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.TTS_1 : model;
             Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;
+            Instructions = instructions;
             ResponseFormat = responseFormat;
             Speed = speed;
         }
@@ -47,6 +59,14 @@ namespace OpenAI.Audio
         public string Voice { get; }
 
         /// <summary>
+        /// Control the voice of your generated audio with additional instructions. Does not work with tts-1 or tts-1-hd.
+        /// </summary>
+        [JsonPropertyName("instructions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [FunctionProperty("Control the voice of your generated audio with additional instructions. Does not work with tts-1 or tts-1-hd.")]
+        public string Instructions { get; }
+
+        /// <summary>
         /// The format to audio in. Supported formats are mp3, opus, aac, flac, wav and pcm.
         /// </summary>
         [JsonPropertyName("response_format")]
@@ -59,6 +79,7 @@ namespace OpenAI.Audio
         /// The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.
         /// </summary>
         [JsonPropertyName("speed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [FunctionProperty("The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.", false, 1.0f)]
         public float? Speed { get; }
     }

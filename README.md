@@ -57,6 +57,14 @@ dotnet add package OpenAI-DotNet
   - [List Models](#list-models)
   - [Retrieve Models](#retrieve-model)
   - [Delete Fine Tuned Model](#delete-fine-tuned-model)
+- [Responses](#responses)
+  - [Create Response](#create-response)
+    - [Simple Text Response](#simple-response-with-text)
+    - [Streaming Response with Function Calling](#streaming-response-with-function-calling)
+  - [Get Response](#get-response)
+  - [List Input Items](#list-input-items)
+  - [Cancel Response](#cancel-response)
+  - [Delete Response](#delete-response)
 - [Realtime](#realtime)
   - [Create Realtime Session](#create-realtime-session)
   - [Client Events](#client-events)
@@ -263,17 +271,17 @@ https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-id}
 - `deployment-id` The deployment name you chose when you deployed the model.
 - `api-version` The API version to use for this operation. This follows the YYYY-MM-DD format.
 
-To setup the client to use your deployment, you'll need to pass in `OpenAIClientSettings` into the client constructor.
+To setup the client to use your deployment, you'll need to pass in `OpenAISettings` into the client constructor.
 
 ```csharp
 var auth = new OpenAIAuthentication("sk-apiKey");
-var settings = new OpenAIClientSettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
+var settings = new OpenAISettings(resourceName: "your-resource-name", deploymentId: "deployment-id", apiVersion: "api-version");
 using var api = new OpenAIClient(auth, settings);
 ```
 
 #### [Azure Active Directory Authentication](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#authentication)
 
-[Authenticate with MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) as usual and get access token, then use the access token when creating your `OpenAIAuthentication`. Then be sure to set useAzureActiveDirectory to true when creating your `OpenAIClientSettings`.
+[Authenticate with MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) as usual and get access token, then use the access token when creating your `OpenAIAuthentication`. Then be sure to set useAzureActiveDirectory to true when creating your `OpenAISettings`.
 
 [Tutorial: Desktop app that calls web APIs: Acquire a token](https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-desktop-acquire-token?tabs=dotnet)
 
@@ -281,7 +289,7 @@ using var api = new OpenAIClient(auth, settings);
 // get your access token using any of the MSAL methods
 var accessToken = result.AccessToken;
 var auth = new OpenAIAuthentication(accessToken);
-var settings = new OpenAIClientSettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
+var settings = new OpenAISettings(resourceName: "your-resource", deploymentId: "deployment-id", apiVersion: "api-version", useActiveDirectoryAuthentication: true);
 using var api = new OpenAIClient(auth, settings);
 ```
 
@@ -300,7 +308,7 @@ Follow these steps:
 1. Setup a new project using either the [OpenAI-DotNet](https://github.com/RageAgainstThePixel/OpenAI-DotNet) or [com.openai.unity](https://github.com/RageAgainstThePixel/com.openai.unity) packages.
 2. Authenticate users with your OAuth provider.
 3. After successful authentication, create a new `OpenAIAuthentication` object and pass in the custom token with the prefix `sess-`.
-4. Create a new `OpenAIClientSettings` object and specify the domain where your intermediate API is located.
+4. Create a new `OpenAISettings` object and specify the domain where your intermediate API is located.
 5. Pass your new `auth` and `settings` objects to the `OpenAIClient` constructor when you create the client instance.
 
 Here's an example of how to set up the front end:
@@ -308,7 +316,7 @@ Here's an example of how to set up the front end:
 ```csharp
 var authToken = await LoginAsync();
 var auth = new OpenAIAuthentication($"sess-{authToken}");
-var settings = new OpenAIClientSettings(domain: "api.your-custom-domain.com");
+var settings = new OpenAISettings(domain: "api.your-custom-domain.com");
 using var api = new OpenAIClient(auth, settings);
 ```
 
@@ -325,7 +333,7 @@ In this example, we demonstrate how to set up and use `OpenAIProxy` in a new ASP
     - Manually editing .csproj: `<PackageReference Include="OpenAI-DotNet-Proxy" />`
 3. Create a new class that inherits from `AbstractAuthenticationFilter` and override the `ValidateAuthentication` method. This will implement the `IAuthenticationFilter` that you will use to check user session token against your internal server.
 4. In `Program.cs`, create a new proxy web application by calling `OpenAIProxy.CreateWebApplication` method, passing your custom `AuthenticationFilter` as a type argument.
-5. Create `OpenAIAuthentication` and `OpenAIClientSettings` as you would normally with your API keys, org id, or Azure settings.
+5. Create `OpenAIAuthentication` and `OpenAISettings` as you would normally with your API keys, org id, or Azure settings.
 
 ```csharp
 public partial class Program
@@ -348,7 +356,7 @@ public partial class Program
     public static void Main(string[] args)
     {
         var auth = OpenAIAuthentication.LoadFromEnv();
-        var settings = new OpenAIClientSettings(/* your custom settings if using Azure OpenAI */);
+        var settings = new OpenAISettings(/* your custom settings if using Azure OpenAI */);
         using var openAIClient = new OpenAIClient(auth, settings);
         OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();
     }
@@ -404,6 +412,126 @@ Delete a fine-tuned model. You must have the Owner role in your organization.
 ```csharp
 using var api = new OpenAIClient();
 var isDeleted = await api.ModelsEndpoint.DeleteFineTuneModelAsync("your-fine-tuned-model");
+Assert.IsTrue(isDeleted);
+```
+
+---
+
+### [Responses](https://platform.openai.com/docs/api-reference/responses)
+
+OpenAI's most advanced interface for generating model responses. Supports text and image inputs, and text outputs. Create stateful interactions with the model, using the output of previous responses as input. Extend the model's capabilities with built-in tools for file search, web search, computer use, and more. Allow the model access to external systems and data using function calling.
+
+- Related Guides:
+  - [QuickStart](https://platform.openai.com/docs/quickstart?api-mode=responses)
+  - [Text Inputs and Outputs](https://platform.openai.com/docs/guides/text?api-mode=responses)
+  - [Image Inputs](https://platform.openai.com/docs/guides/images?api-mode=responses)
+  - [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs?api-mode=responses)
+  - [Conversation State](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses)
+  - [Extend the model with tools](https://platform.openai.com/docs/guides/tools?api-mode=responses)
+
+The Response API is accessed via `OpenAIClient.ResponsesEndpoint`
+
+#### [Create Response](https://platform.openai.com/docs/api-reference/responses/create)
+
+Creates a model response. Provide text or image inputs to generate text or JSON outputs. Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+
+##### Simple Response With Text
+
+```csharp
+var api = new OpenAIClient();
+var response = await api.ResponsesEndpoint.CreateModelResponseAsync("Tell me a three sentence bedtime story about a unicorn.");
+var responseItem = response.Output.LastOrDefault();
+Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+response.PrintUsage();
+```
+
+##### Streaming Response with Function Calling
+
+```csharp
+var api = new OpenAIClient();
+var conversation = new List<IResponseItem>
+{
+    new Message(Role.System, "You are a helpful assistant."),
+    new Message(Role.User, "What time is it?"),
+};
+var tools = new List<Tool>
+{
+    Tool.GetOrCreateTool(typeof(DateTimeUtility), nameof(DateTimeUtility.GetDateTime))
+};
+var request = new CreateResponseRequest(conversation, Model.GPT4_1_Nano, tools: tools);
+
+async Task StreamCallback(string @event, IServerSentEvent sseEvent)
+{
+    switch (sseEvent)
+    {
+        case Message messageItem:
+            conversation.Add(messageItem);
+
+            break;
+        case FunctionToolCall functionToolCall:
+            conversation.Add(functionToolCall);
+            var output = await functionToolCall.InvokeFunctionAsync();
+            conversation.Add(output);
+
+            break;
+    }
+}
+
+var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request, StreamCallback);
+var responseItem = response.Output.LastOrDefault();
+var usedTool = responseItem as FunctionToolCall;
+response.PrintUsage();
+Console.WriteLine($"{usedTool.Name}: {usedTool.Arguments}");
+// the tool output was added to the conversation in the StreamCallback, so submit it back to the model
+response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(new(conversation, Model.GPT4_1_Nano, tools: tools), StreamCallback);
+responseItem = response.Output.LastOrDefault();
+Console.WriteLine($"{messageItem.Role}: {messageItem}");
+response.PrintUsage();
+```
+
+#### [Get Response](https://platform.openai.com/docs/api-reference/responses/get)
+
+Retrieves a model response with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var response = await api.ResponsesEndpoint.GetModelResponseAsync("response-id");
+Console.WriteLine(response.ToString());
+```
+
+#### [List Input Items](https://platform.openai.com/docs/api-reference/responses/input-items)
+
+Returns a list of input items for a given response.
+
+```csharp
+var api = new OpenAIClient();
+var responseInputItems = await api.ResponsesEndpoint.ListInputItemsAsync("response-id");
+foreach (var item in responseInputItems)
+{
+    Console.WriteLine(item.ToJsonString());
+}
+```
+
+#### [Cancel Response](https://platform.openai.com/docs/api-reference/responses/cancel)
+
+Cancels a model response with the given ID.
+
+> [!NOTE]
+> Only responses created with the background parameter set to true can be cancelled.
+
+```csharp
+var api = new OpenAIClient();
+var isCancelled = await api.ResponsesEndpoint.CancelModelResponseAsync("response-id");
+Assert.IsTrue(isCancelled);
+```
+
+#### [Delete Response](https://platform.openai.com/docs/api-reference/responses/delete)
+
+Deletes a model response with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var isDeleted = await api.ResponsesEndpoint.DeleteModelResponseAsync("response-id");
 Assert.IsTrue(isDeleted);
 ```
 

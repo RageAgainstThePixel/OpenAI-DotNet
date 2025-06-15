@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -66,7 +67,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("usage")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Usage Usage { get; private set; }
+        public TokenUsage Usage { get; private set; }
 
         /// <summary>
         /// Which conversation the response is added to, determined by the `conversation`
@@ -121,5 +122,12 @@ namespace OpenAI.Realtime
         [JsonPropertyName("max_output_tokens")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public object MaxOutputTokens { get; private set; }
+
+        public void PrintUsage()
+        {
+            if (Usage == null) { return; }
+            var message = $"{Id}: {Usage}";
+            Console.WriteLine(message);
+        }
     }
 }

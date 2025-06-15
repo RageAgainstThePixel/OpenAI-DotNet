@@ -14,9 +14,7 @@ namespace OpenAI.Extensions
 {
     internal static class BaseEndpointExtensions
     {
-        private const string ssePattern = @"(?:(?<type>[^:\n]*):)(?<value>[^\n]*)";
-
-        private static Regex sseRegex = new(ssePattern);
+        private static Regex sseRegex = new(@"(?:(?<type>[^:\n]*):)(?<value>[^\n]*)");
 
         /// <summary>
         /// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
@@ -34,19 +32,11 @@ namespace OpenAI.Extensions
 
             try
             {
-                while (await reader.ReadLineAsync().ConfigureAwait(false) is { } streamData)
+                while (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } streamData)
                 {
-                    if (isEndOfStream)
-                    {
-                        break;
-                    }
-
+                    if (isEndOfStream) { break; }
                     cancellationToken.ThrowIfCancellationRequested();
-
-                    if (string.IsNullOrWhiteSpace(streamData))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrWhiteSpace(streamData)) { continue; }
 
                     var matches = sseRegex.Matches(streamData);
 

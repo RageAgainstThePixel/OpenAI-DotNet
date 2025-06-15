@@ -37,9 +37,8 @@ namespace OpenAI.Chat
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<ChatResponse>(responseAsString, client);
+            using var response = await HttpClient.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
+            return await response.DeserializeAsync<ChatResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<(T, ChatResponse)> GetCompletionAsync<T>(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
-            chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            chatRequest.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             var response = await GetCompletionAsync(chatRequest, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);
@@ -70,12 +69,12 @@ namespace OpenAI.Chat
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
-            => await StreamCompletionAsync(chatRequest, async response =>
+        public Task<ChatResponse> StreamCompletionAsync(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
+            => StreamCompletionAsync(chatRequest, response =>
             {
-                resultHandler.Invoke(response);
-                await Task.CompletedTask;
-            }, streamUsage, cancellationToken).ConfigureAwait(false);
+                resultHandler(response);
+                return Task.CompletedTask;
+            }, streamUsage, cancellationToken);
 
         /// <summary>
         /// Created a completion for the chat message and stream the results to the <paramref name="resultHandler"/> as they come in.
@@ -91,11 +90,11 @@ namespace OpenAI.Chat
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="ChatResponse"/>.</returns>
-        public async Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
-            => await StreamCompletionAsync<T>(chatRequest, async response =>
+        public Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Action<ChatResponse> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
+            => StreamCompletionAsync<T>(chatRequest, response =>
             {
-                resultHandler.Invoke(response);
-                await Task.CompletedTask;
+                resultHandler(response);
+                return Task.CompletedTask;
             }, streamUsage, cancellationToken);
 
         /// <summary>
@@ -114,7 +113,7 @@ namespace OpenAI.Chat
         /// <returns><see cref="ChatResponse"/>.</returns>
         public async Task<(T, ChatResponse)> StreamCompletionAsync<T>(ChatRequest chatRequest, Func<ChatResponse, Task> resultHandler, bool streamUsage = false, CancellationToken cancellationToken = default)
         {
-            chatRequest.ResponseFormatObject = new ResponseFormatObject(typeof(T));
+            chatRequest.ResponseFormatObject = new TextResponseFormatConfiguration(typeof(T));
             var response = await StreamCompletionAsync(chatRequest, resultHandler, streamUsage, cancellationToken).ConfigureAwait(false);
             var output = JsonSerializer.Deserialize<T>(response.FirstChoice, OpenAIClient.JsonSerializationOptions);
             return (output, response);
@@ -141,7 +140,7 @@ namespace OpenAI.Chat
             chatRequest.StreamOptions = streamUsage ? new StreamOptions() : null;
             ChatResponse chatResponse = null;
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, async (sseResponse, ssEvent) =>
+            using var response = await this.StreamEventsAsync(GetUrl("/completions"), payload, (sseResponse, ssEvent) =>
             {
                 var partialResponse = sseResponse.Deserialize<ChatResponse>(ssEvent, client);
 
@@ -154,12 +153,12 @@ namespace OpenAI.Chat
                     chatResponse.AppendFrom(partialResponse);
                 }
 
-                await resultHandler.Invoke(partialResponse).ConfigureAwait(false);
+                return resultHandler(partialResponse);
             }, cancellationToken);
 
             if (chatResponse == null) { return null; }
             chatResponse.SetResponseData(response.Headers, client);
-            await resultHandler.Invoke(chatResponse).ConfigureAwait(false);
+            await resultHandler(chatResponse).ConfigureAwait(false);
             return chatResponse;
         }
 
@@ -184,7 +183,7 @@ namespace OpenAI.Chat
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = payload;
-            using var response = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);

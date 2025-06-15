@@ -10,7 +10,7 @@ namespace OpenAI
     {
         public Error() { }
 
-        internal Error(Exception e)
+        public Error(Exception e)
         {
             Type = e.GetType().Name;
             Message = e.Message;
@@ -54,7 +54,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("line")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Line { get; private set; }
 
         [JsonIgnore]

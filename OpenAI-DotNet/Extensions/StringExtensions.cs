@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using OpenAI.Responses;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenAI.Extensions
 {
@@ -60,7 +62,19 @@ namespace OpenAI.Extensions
 
         private static readonly JsonSerializerOptions escapedJsonOptions = new()
         {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new JsonStringEnumConverterFactory(),
+                new RealtimeClientEventConverter(),
+                new RealtimeServerEventConverter(),
+                new ResponseContentConverter(),
+                new ResponseItemConverter(),
+                new FilterConverter(),
+                new ToolConverter(),
+            },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
     }
 }

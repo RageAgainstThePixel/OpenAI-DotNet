@@ -9,14 +9,11 @@ namespace OpenAI.Extensions
         public static void AppendFrom<T>(this List<T> self, IReadOnlyList<T> other)
             where T : IAppendable<T>, new()
         {
-            if (other == null)
-            {
-                return;
-            }
+            if (other == null) { return; }
 
             foreach (var otherItem in other)
             {
-                if (otherItem == null || !otherItem.Index.HasValue) { continue; }
+                if (otherItem is not { Index: not null }) { continue; }
 
                 if (otherItem.Index + 1 > self.Count)
                 {

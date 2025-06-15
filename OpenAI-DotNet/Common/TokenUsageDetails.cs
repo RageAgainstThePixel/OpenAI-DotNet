@@ -2,7 +2,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Realtime
+namespace OpenAI
 {
     public sealed class TokenUsageDetails
     {
@@ -11,6 +11,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("cached_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? CachedTokens { get; private set; }
 
         /// <summary>
@@ -18,6 +19,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? TextTokens { get; private set; }
 
         /// <summary>
@@ -25,10 +27,23 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("audio_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? AudioTokens { get; private set; }
 
+        /// <summary>
+        /// The number of image tokens used in the Response.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("image_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? ImageTokens { get; private set; }
+
+        /// <summary>
+        /// The number of image tokens used in the Response.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("reasoning_tokens")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? ReasoningTokens { get; private set; }
     }
 }

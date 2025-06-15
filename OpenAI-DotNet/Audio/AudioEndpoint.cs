@@ -35,7 +35,7 @@ namespace OpenAI.Audio
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await HttpClient.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
@@ -109,6 +109,22 @@ namespace OpenAI.Audio
                 payload.Add(new ByteArrayContent(audioData.ToArray()), "file", request.AudioName);
                 payload.Add(new StringContent(request.Model), "model");
 
+                if (request.ChunkingStrategy != null)
+                {
+                    var stringContent = request.ChunkingStrategy.Type == "auto"
+                        ? "auto"
+                        : JsonSerializer.Serialize(request.ChunkingStrategy, OpenAIClient.JsonSerializationOptions);
+                    payload.Add(new StringContent(stringContent), "chunking_strategy");
+                }
+
+                if (request.Include is { Length: > 0 })
+                {
+                    foreach (var include in request.Include)
+                    {
+                        payload.Add(new StringContent(include), "include[]");
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.Language))
                 {
                     payload.Add(new StringContent(request.Language), "language");
@@ -139,7 +155,7 @@ namespace OpenAI.Audio
                 request.Dispose();
             }
 
-            using var response = await client.Client.PostAsync(GetUrl("/transcriptions"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await HttpClient.PostAsync(GetUrl("/transcriptions"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }
@@ -204,7 +220,7 @@ namespace OpenAI.Audio
                 request.Dispose();
             }
 
-            using var response = await client.Client.PostAsync(GetUrl("/translations"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await HttpClient.PostAsync(GetUrl("/translations"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }

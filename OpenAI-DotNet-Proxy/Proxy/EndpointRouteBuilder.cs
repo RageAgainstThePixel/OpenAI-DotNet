@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace OpenAI.Proxy
         /// <param name="routePrefix">Optional, custom route prefix. i.e. '/openai'.</param>
         public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter, string routePrefix = "")
         {
-            endpoints.Map($"{routePrefix}{openAIClient.OpenAIClientSettings.BaseRequest}{{**endpoint}}", HandleRequest);
+            endpoints.Map($"{routePrefix}{openAIClient.Settings.BaseRequest}{{**endpoint}}", HandleRequest);
             return;
 
             async Task HandleRequest(HttpContext httpContext, string endpoint)
@@ -71,11 +72,24 @@ namespace OpenAI.Proxy
 
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
                     var method = new HttpMethod(httpContext.Request.Method);
+                    var originalQuery = QueryHelpers.ParseQuery(httpContext.Request.QueryString.Value ?? "");
+                    var modifiedQuery = new Dictionary<string, string>(originalQuery.Count);
+
+                    foreach (var pair in originalQuery)
+                    {
+                        modifiedQuery[pair.Key] = pair.Value.FirstOrDefault();
+                    }
+
+                    if (openAIClient.Settings.IsAzureOpenAI)
+                    {
+                        modifiedQuery["api-version"] = openAIClient.Settings.ApiVersion;
+                    }
 
                     var uri = new Uri(string.Format(
-                        openAIClient.OpenAIClientSettings.BaseRequestUrlFormat,
-                        $"{endpoint}{httpContext.Request.QueryString}"
+                        openAIClient.Settings.BaseRequestUrlFormat,
+                        QueryHelpers.AddQueryString(endpoint, modifiedQuery)
                     ));
+
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
@@ -177,7 +191,7 @@ namespace OpenAI.Proxy
                 }
 
                 var uri = new Uri(string.Format(
-                    openAIClient.OpenAIClientSettings.BaseWebSocketUrlFormat,
+                    openAIClient.Settings.BaseWebSocketUrlFormat,
                     $"{endpoint}{httpContext.Request.QueryString}"
                 ));
                 await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);

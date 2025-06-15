@@ -43,8 +43,8 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="EmbeddingsResponse"/>.</returns>
-        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(string input, string model = null, string user = null, int? dimensions = null, CancellationToken cancellationToken = default)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user, dimensions), cancellationToken).ConfigureAwait(false);
+        public Task<EmbeddingsResponse> CreateEmbeddingAsync(string input, string model = null, string user = null, int? dimensions = null, CancellationToken cancellationToken = default)
+            => CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user, dimensions), cancellationToken);
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
@@ -67,8 +67,8 @@ namespace OpenAI.Embeddings
         /// </param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="EmbeddingsResponse"/>.</returns>
-        public async Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, string model = null, string user = null, int? dimensions = null, CancellationToken cancellationToken = default)
-            => await CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user, dimensions), cancellationToken).ConfigureAwait(false);
+        public Task<EmbeddingsResponse> CreateEmbeddingAsync(IEnumerable<string> input, string model = null, string user = null, int? dimensions = null, CancellationToken cancellationToken = default)
+            => CreateEmbeddingAsync(new EmbeddingsRequest(input, model, user, dimensions), cancellationToken);
 
         /// <summary>
         /// Creates an embedding vector representing the input text.
@@ -79,9 +79,8 @@ namespace OpenAI.Embeddings
         public async Task<EmbeddingsResponse> CreateEmbeddingAsync(EmbeddingsRequest request, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await client.Client.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
-            return response.Deserialize<EmbeddingsResponse>(responseAsString, client);
+            using var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            return await response.DeserializeAsync<EmbeddingsResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
     }
 }

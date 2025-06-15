@@ -2,7 +2,9 @@
 
 using NUnit.Framework;
 using OpenAI.Audio;
+using OpenAI.Extensions;
 using OpenAI.Images;
+using OpenAI.Responses;
 using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
@@ -17,20 +19,39 @@ namespace OpenAI.Tests
     internal class TestFixture_00_02_Extensions : AbstractTestFixture
     {
         [Test]
-        public void Test_01_01_GetTools()
+        public void Test_01_01_01_GetTools()
         {
             var tools = Tool.GetAllAvailableTools(forceUpdate: true, clearCache: true).ToList();
             Assert.IsNotNull(tools);
             Assert.IsNotEmpty(tools);
             tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
-            tools.Add(Tool.GetOrCreateTool(OpenAIClient.AudioEndpoint, nameof(AudioEndpoint.CreateTranscriptionTextAsync)));
-
-            foreach (var tool in tools)
+            tools.Add(Tool.GetOrCreateTool(OpenAIClient.AudioEndpoint, nameof(AudioEndpoint.CreateSpeechAsync)));
+            tools.ProcessTools<Tool>(null, out var toolList, out _);
+            Assert.NotNull(toolList);
+            Console.WriteLine(JsonSerializer.Serialize(toolList, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
             {
-                Console.WriteLine(tool.Function?.Name ?? tool.Type);
-            }
+                WriteIndented = true
+            }));
+        }
 
-            Console.WriteLine(JsonSerializer.Serialize(tools, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
+        [Test]
+        public void Test_01_01_02_GetTools()
+        {
+            var tools = Tool.GetAllAvailableTools(forceUpdate: true, clearCache: true).ToList();
+            Assert.IsNotNull(tools);
+            Assert.IsNotEmpty(tools);
+            tools.Add(Tool.GetOrCreateTool(OpenAIClient.ImagesEndPoint, nameof(ImagesEndpoint.GenerateImageAsync)));
+            tools.Add(new CodeInterpreterTool("container_id"));
+            tools.Add(new ComputerUsePreviewTool(1024, 768, "browser"));
+            tools.Add(new FileSearchTool("vector_store_id"));
+            tools.Add(new ImageGenerationTool());
+            tools.Add(new LocalShellTool());
+            tools.Add(new MCPTool("mcp_server", "https://mcp_server"));
+            tools.Add(new WebSearchPreviewTool());
+            tools.ProcessTools<ITool>(null, out var toolList, out _);
+            Assert.NotNull(toolList);
+
+            Console.WriteLine(JsonSerializer.Serialize(toolList, new JsonSerializerOptions(OpenAIClient.JsonSerializationOptions)
             {
                 WriteIndented = true
             }));

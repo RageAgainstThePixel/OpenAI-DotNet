@@ -7,8 +7,6 @@ namespace OpenAI
 {
     public sealed class EventResponse : BaseResponse
     {
-        public EventResponse() { }
-
         [JsonInclude]
         [JsonPropertyName("object")]
         public string Object { get; private set; }

@@ -166,11 +166,15 @@ namespace OpenAI.Tests
         public void Test_11_AzureConfigurationSettings()
         {
             var auth = new OpenAIAuthentication("testKeyAaBbCcDd");
-            var settings = new OpenAIClientSettings(resourceName: "test-resource", deploymentId: "deployment-id-test");
+            const string domain = "custom.azure.openai.com";
+            const string resource = "test-resource";
+            const string deploymentId = "deployment-id-test";
+            var settings = new OpenAISettings(resourceName: resource, deploymentId: deploymentId, azureDomain: domain);
             var api = new OpenAIClient(auth, settings);
-            Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
-            Console.WriteLine(api.OpenAIClientSettings.BaseRequestUrlFormat);
-            Assert.AreEqual("https://test-resource.openai.azure.com/openai/{0}", api.OpenAIClientSettings.BaseRequestUrlFormat);
+            Console.WriteLine(api.Settings.BaseRequest);
+            Console.WriteLine(api.Settings.BaseRequestUrlFormat);
+            Assert.AreEqual(deploymentId, api.Settings.DeploymentId);
+            Assert.AreEqual($"https://{resource}.{domain}/openai/{{0}}", api.Settings.BaseRequestUrlFormat);
         }
 
         [Test]
@@ -178,13 +182,13 @@ namespace OpenAI.Tests
         {
             var auth = new OpenAIAuthentication("sess-customIssuedToken");
             const string domain = "api.your-custom-domain.com";
-            var settings = new OpenAIClientSettings(domain: domain);
+            var settings = new OpenAISettings(domain: domain);
             var api = new OpenAIClient(auth, settings);
-            Console.WriteLine(api.OpenAIClientSettings.BaseRequest);
-            Console.WriteLine(api.OpenAIClientSettings.BaseRequestUrlFormat);
-            Console.WriteLine(api.OpenAIClientSettings.BaseWebSocketUrlFormat);
-            Assert.AreEqual($"https://{domain}/v1/{{0}}", api.OpenAIClientSettings.BaseRequestUrlFormat);
-            Assert.AreEqual($"wss://{domain}/v1/{{0}}", api.OpenAIClientSettings.BaseWebSocketUrlFormat);
+            Console.WriteLine(api.Settings.BaseRequest);
+            Console.WriteLine(api.Settings.BaseRequestUrlFormat);
+            Console.WriteLine(api.Settings.BaseWebSocketUrlFormat);
+            Assert.AreEqual($"https://{domain}/v1/{{0}}", api.Settings.BaseRequestUrlFormat);
+            Assert.AreEqual($"wss://{domain}/v1/{{0}}", api.Settings.BaseWebSocketUrlFormat);
         }
 
         [TearDown]

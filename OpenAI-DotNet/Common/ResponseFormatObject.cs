@@ -1,9 +1,11 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
+    [Obsolete("use TextResponseFormatConfiguration instead")]
     public sealed class ResponseFormatObject
     {
         public ResponseFormatObject() { }
@@ -12,7 +14,7 @@ namespace OpenAI
         {
             if (type == ChatResponseFormat.JsonSchema)
             {
-                throw new System.ArgumentException("Use the constructor overload that accepts a JsonSchema object for ChatResponseFormat.JsonSchema.", nameof(type));
+                throw new ArgumentException("Use the constructor overload that accepts a JsonSchema object for ChatResponseFormat.JsonSchema.", nameof(type));
             }
             Type = type;
         }

@@ -12,6 +12,7 @@ using OpenAI.Images;
 using OpenAI.Models;
 using OpenAI.Moderations;
 using OpenAI.Realtime;
+using OpenAI.Responses;
 using OpenAI.Threads;
 using OpenAI.VectorStores;
 using System;
@@ -41,7 +42,7 @@ namespace OpenAI
         /// </param>
         /// <param name="clientSettings">
         /// The API client settings for specifying OpenAI deployments to Azure, a proxy domain,
-        /// or <see langword="null"/> to attempt to use the <see cref="OpenAIClientSettings.Default"/>,
+        /// or <see langword="null"/> to attempt to use the <see cref="OpenAISettings.Default"/>,
         /// potentially loading from environment vars or from a config file.
         /// </param>
         /// <param name="client">A <see cref="HttpClient"/>.</param>
@@ -52,10 +53,10 @@ namespace OpenAI
         /// This internal HttpClient is disposed of when OpenAIClient is disposed of.
         /// If you provide an external HttpClient instance to OpenAIClient, you are responsible for managing its disposal.
         /// </remarks>
-        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAIClientSettings clientSettings = null, HttpClient client = null)
+        public OpenAIClient(OpenAIAuthentication openAIAuthentication = null, OpenAISettings clientSettings = null, HttpClient client = null)
         {
             OpenAIAuthentication = openAIAuthentication ?? OpenAIAuthentication.Default;
-            OpenAIClientSettings = clientSettings ?? OpenAIClientSettings.Default;
+            Settings = clientSettings ?? OpenAISettings.Default;
 
             if (string.IsNullOrWhiteSpace(OpenAIAuthentication?.ApiKey))
             {
@@ -76,6 +77,7 @@ namespace OpenAI
             BatchEndpoint = new BatchEndpoint(this);
             VectorStoresEndpoint = new VectorStoresEndpoint(this);
             RealtimeEndpoint = new RealtimeEndpoint(this);
+            ResponsesEndpoint = new ResponsesEndpoint(this);
         }
 
         ~OpenAIClient() => Dispose(false);
@@ -122,7 +124,11 @@ namespace OpenAI
             {
                 new JsonStringEnumConverterFactory(),
                 new RealtimeClientEventConverter(),
-                new RealtimeServerEventConverter()
+                new RealtimeServerEventConverter(),
+                new ResponseContentConverter(),
+                new ResponseItemConverter(),
+                new FilterConverter(),
+                new ToolConverter(),
             },
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
@@ -135,7 +141,7 @@ namespace OpenAI
         /// <summary>
         /// The client settings for configuring Azure OpenAI or custom domain.
         /// </summary>
-        internal OpenAIClientSettings OpenAIClientSettings { get; }
+        internal OpenAISettings Settings { get; }
 
         /// <summary>
         /// Enables or disables debugging for all endpoints.
@@ -219,7 +225,20 @@ namespace OpenAI
         /// </summary>
         public VectorStoresEndpoint VectorStoresEndpoint { get; }
 
+        /// <summary>
+        /// Communicate with a GPT-4o class model in real time using WebSockets.
+        /// Supports text and audio inputs and outputs, along with audio transcriptions.
+        /// <see href="https://platform.openai.com/docs/api-reference/realtime"/>
+        /// </summary>
         public RealtimeEndpoint RealtimeEndpoint { get; }
+
+        /// <summary>
+        /// Creates a model response.
+        /// Provide text or image inputs to generate text or JSON outputs.
+        /// Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+        /// <see href="https://platform.openai.com/docs/api-reference/responses"/>
+        /// </summary>
+        public ResponsesEndpoint ResponsesEndpoint { get; }
 
         #endregion Endpoints
 
@@ -240,7 +259,7 @@ namespace OpenAI
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
             client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v2");
 
-            if (OpenAIClientSettings.BaseRequestUrlFormat.Contains(OpenAIClientSettings.OpenAIDomain) &&
+            if (Settings.BaseRequestUrlFormat.Contains(OpenAISettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||
                  (!OpenAIAuthentication.ApiKey.Contains(AuthInfo.SecretKeyPrefix) &&
                   !OpenAIAuthentication.ApiKey.Contains(AuthInfo.SessionKeyPrefix))))
@@ -248,7 +267,7 @@ namespace OpenAI
                 throw new InvalidCredentialException($"{OpenAIAuthentication.ApiKey} must start with '{AuthInfo.SecretKeyPrefix}'");
             }
 
-            if (OpenAIClientSettings.UseOAuthAuthentication)
+            if (Settings.UseOAuthAuthentication)
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OpenAIAuthentication.ApiKey);
             }

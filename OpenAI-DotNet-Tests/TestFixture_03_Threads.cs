@@ -176,7 +176,10 @@ namespace OpenAI.Tests
                     name: "Math Tutor",
                     instructions: "You are a personal math tutor. Answer questions briefly, in a sentence or less. Your responses should be formatted in JSON.",
                     model: Model.GPT4o,
-                    responseFormat: ChatResponseFormat.Json));
+#pragma warning disable CS0618 // Type or member is obsolete
+                    responseFormat: TextResponseFormat.Json
+#pragma warning restore CS0618 // Type or member is obsolete
+                ));
             ThreadResponse thread = null;
 
             try
@@ -334,7 +337,9 @@ namespace OpenAI.Tests
                 Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync))
             };
             Assert.IsTrue(tools.All(tool => tool.Function?.Arguments == null), "Expected all tool function arguments to be null");
-            var assistantRequest = new CreateAssistantRequest(tools: tools, instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
+            var assistantRequest = new CreateAssistantRequest(
+                tools: tools,
+                instructions: "You are a helpful weather assistant. Use the appropriate unit based on geographical location.");
             var assistant = await OpenAIClient.AssistantsEndpoint.CreateAssistantAsync(assistantRequest);
             Assert.NotNull(assistant);
             ThreadResponse thread = null;
@@ -360,9 +365,13 @@ namespace OpenAI.Tests
                                         Console.WriteLine($"Tool Output: {toolOutput}");
                                     }
 
-                                    await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
+                                    var toolRun = await runResponse.SubmitToolOutputsAsync(toolOutputs, StreamEventHandler);
+                                    Assert.NotNull(toolRun);
+                                    Assert.IsTrue(toolRun.Status == RunStatus.Completed, $"Failed to complete submit tool outputs! {toolRun.Status}");
                                 }
                                 break;
+                            case Error errorResponse:
+                                throw errorResponse.Exception ?? new Exception(errorResponse.Message);
                             default:
                                 Console.WriteLine(streamEvent.ToJsonString());
                                 break;
@@ -381,6 +390,8 @@ namespace OpenAI.Tests
                 Assert.IsNotNull(run);
                 Assert.IsTrue(run.Status == RunStatus.Completed);
                 var messages = await thread.ListMessagesAsync();
+                Assert.NotNull(messages);
+                Assert.IsNotEmpty(messages.Items);
 
                 foreach (var response in messages.Items.Reverse())
                 {
@@ -552,7 +563,7 @@ namespace OpenAI.Tests
                     }
                 }
 
-                var run = await assistant.CreateThreadAndRunAsync("What date is it?", StreamEventHandler);
+                var run = await assistant.CreateThreadAndRunAsync("What is today's date?", StreamEventHandler);
                 Assert.IsNotNull(run);
                 Assert.IsTrue(hasInvokedCallback);
                 Assert.NotNull(thread);

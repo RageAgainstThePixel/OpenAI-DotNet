@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
+using OpenAI.Extensions;
 using OpenAI.Models;
 using OpenAI.Realtime;
 using System;
@@ -16,17 +17,23 @@ namespace OpenAI.Tests
         public async Task Test_01_01_RealtimeSession()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        wasGoodbyeCalled = true;
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -55,18 +62,21 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -74,12 +84,18 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                Assert.IsTrue(wasGoodbyeCalled);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -98,18 +114,24 @@ namespace OpenAI.Tests
         public async Task Test_01_02_RealtimeSession_IAsyncEnumerable()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
-                        wasGoodbyeCalled = true;
                         return "Goodbye!";
                     })
                 };
@@ -145,27 +167,34 @@ namespace OpenAI.Tests
                             await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                             await session.SendAsync(new CreateResponseRequest(), cts.Token);
                             break;
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
                         case ResponseFunctionCallArgumentsResponse functionCallResponse:
                             if (functionCallResponse.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                // ReSharper disable once MethodHasAsyncOverloadWithCancellation
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCallResponse.Name}");
+                                await functionCallResponse.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
                     }
                 }
 
-                Assert.IsTrue(wasGoodbyeCalled);
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -184,17 +213,23 @@ namespace OpenAI.Tests
         public async Task Test_02_RealtimeSession_Semantic_VAD()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
-                        wasGoodbyeCalled = true;
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -226,18 +261,21 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -245,12 +283,18 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
-                Assert.IsTrue(wasGoodbyeCalled);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
@@ -269,15 +313,23 @@ namespace OpenAI.Tests
         public async Task Test_03_RealtimeSession_VAD_Disabled()
         {
             RealtimeSession session = null;
+            Tool.ClearRegisteredTools();
 
             try
             {
                 Assert.IsNotNull(OpenAIClient.RealtimeEndpoint);
-                var cts = new CancellationTokenSource();
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var wasGoodbyeCalled = false;
+                var mutex = new object();
                 var tools = new List<Tool>
                 {
                     Tool.FromFunc("goodbye", () =>
                     {
+                        lock (mutex)
+                        {
+                            wasGoodbyeCalled = true;
+                        }
+                        Console.WriteLine("Hanging up...");
                         cts.Cancel();
                         return "Goodbye!";
                     })
@@ -310,18 +362,21 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 
-                void SessionEvents(IServerEvent @event)
+                async void SessionEvents(IServerEvent @event)
                 {
                     switch (@event)
                     {
+                        case RealtimeResponse realtimeResponse:
+                            realtimeResponse.Response.PrintUsage();
+                            break;
                         case ResponseAudioTranscriptResponse transcriptResponse:
                             Console.WriteLine(transcriptResponse.ToString());
                             break;
-                        case ResponseFunctionCallArgumentsResponse functionCallResponse:
-                            if (functionCallResponse.IsDone)
+                        case ResponseFunctionCallArgumentsResponse functionCall:
+                            if (functionCall.IsDone)
                             {
-                                ToolCall toolCall = functionCallResponse;
-                                toolCall.InvokeFunction();
+                                Console.WriteLine($"tool_call: {functionCall.Name}");
+                                await functionCall.InvokeFunctionAsync(cts.Token);
                             }
 
                             break;
@@ -329,11 +384,18 @@ namespace OpenAI.Tests
                 }
 
                 await responseTask.ConfigureAwait(true);
+
+                lock (mutex)
+                {
+                    Assert.IsTrue(wasGoodbyeCalled);
+                }
             }
             catch (Exception e)
             {
                 switch (e)
                 {
+                    case TaskCanceledException:
+                    case OperationCanceledException:
                     case ObjectDisposedException:
                         // ignore
                         break;
