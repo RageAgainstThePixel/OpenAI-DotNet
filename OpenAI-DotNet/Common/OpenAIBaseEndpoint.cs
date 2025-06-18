@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -46,6 +47,11 @@ namespace OpenAI
 
             if (client.Settings.IsAzureOpenAI && IsAzureDeployment == true)
             {
+                if (string.IsNullOrWhiteSpace(client.Settings.DeploymentId))
+                {
+                    throw new InvalidOperationException("Deployment ID must be provided for Azure OpenAI endpoints.");
+                }
+
                 route = $"deployments/{client.Settings.DeploymentId}/{Root}{endpoint}";
             }
             else

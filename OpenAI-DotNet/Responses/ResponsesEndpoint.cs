@@ -23,8 +23,6 @@ namespace OpenAI.Responses
 
         protected override string Root => "responses";
 
-        protected override bool? IsAzureDeployment => true;
-
         /// <summary>
         /// Creates a model response.
         /// Provide text or image inputs to generate text or JSON outputs.

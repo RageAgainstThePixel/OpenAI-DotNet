@@ -32,6 +32,7 @@ dotnet_style_predefined_type_for_member_access = true
 dotnet_style_predefined_type_for_locals_parameters_members = true
 
 # Code Style
+dotnet_sort_system_directives_first = false
 csharp_style_var_when_type_is_apparent = true
 csharp_place_field_attribute_on_same_line=false
 csharp_place_accessorholder_attribute_on_same_line=false
