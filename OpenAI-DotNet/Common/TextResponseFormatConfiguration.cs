@@ -1,14 +1,11 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
-using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
     public sealed class TextResponseFormatConfiguration
     {
-        public TextResponseFormatConfiguration() { }
-
         [Obsolete("Use new overload with TextResponseFormat instead")]
         public TextResponseFormatConfiguration(ChatResponseFormat type)
         {
@@ -41,16 +38,9 @@ namespace OpenAI
             Type = type;
         }
 
-        [JsonInclude]
-        [JsonPropertyName("type")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<TextResponseFormat>))]
-        public TextResponseFormat Type { get; private set; }
+        public TextResponseFormat Type { get; }
 
-        [JsonInclude]
-        [JsonPropertyName("json_schema")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public JsonSchema JsonSchema { get; private set; }
+        public JsonSchema JsonSchema { get; }
 
         public static implicit operator TextResponseFormatConfiguration(TextResponseFormat type) => new(type);
 

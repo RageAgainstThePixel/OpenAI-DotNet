@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -32,8 +33,21 @@ namespace OpenAI.Responses
         /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="Response"/>.</returns>
-        public async Task<Response> CreateModelResponseAsync(CreateResponseRequest request, Func<IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        public async Task<Response> CreateModelResponseAsync(CreateResponseRequest request, Func<IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken = default)
             => await CreateModelResponseAsync(request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Creates a model response.
+        /// Provide text or image inputs to generate text or JSON outputs.
+        /// Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+        /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/></typeparam>
+        /// <param name="request"><see cref="CreateResponseRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="Response"/>.</returns>
+        public async Task<(T, Response)> CreateModelResponseAsync<T>(CreateResponseRequest request, Func<IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken = default)
+            => await CreateModelResponseAsync<T>(request, streamEventHandler == null ? null : (_, e) => streamEventHandler(e), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates a model response.
@@ -44,7 +58,7 @@ namespace OpenAI.Responses
         /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
         /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns><see cref="Response"/>.</returns>
-        public async Task<Response> CreateModelResponseAsync(CreateResponseRequest request, Func<string, IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken = default)
+        public async Task<Response> CreateModelResponseAsync(CreateResponseRequest request, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
         {
             var endpoint = GetUrl();
             request.Stream = streamEventHandler != null;
@@ -57,6 +71,50 @@ namespace OpenAI.Responses
 
             using var response = await HttpClient.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Response>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Creates a model response.
+        /// Provide text or image inputs to generate text or JSON outputs.
+        /// Have the model call your own custom code or use built-in tools like web search or file search to use your own data as input for the model's response.
+        /// </summary>
+        /// <typeparam name="T"><see cref="JsonSchema"/></typeparam>
+        /// <param name="request"><see cref="CreateResponseRequest"/>.</param>
+        /// <param name="streamEventHandler">Optional, <see cref="Func{String, IServerSentEvent, Task}"/> stream callback handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
+        /// <returns><see cref="Response"/>.</returns>
+        public async Task<(T, Response)> CreateModelResponseAsync<T>(CreateResponseRequest request, Func<string, IServerSentEvent, Task> streamEventHandler = null, CancellationToken cancellationToken = default)
+        {
+            var endpoint = GetUrl();
+            request.Stream = streamEventHandler != null;
+            request.TextResponseFormatObject = new TextResponseFormatObject(new TextResponseFormatConfiguration(typeof(T)));
+            using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
+
+            T output = default;
+            Response response;
+
+            if (request.Stream)
+            {
+                response = await StreamResponseAsync(endpoint, payload, streamEventHandler, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                using var httpResponseMessage = await HttpClient.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
+                response = await httpResponseMessage.DeserializeAsync<Response>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
+            }
+
+            var lastItem = response.Output?.LastOrDefault();
+
+            if (lastItem is Message messageItem)
+            {
+                if (EnableDebug)
+                {
+                    Console.WriteLine($"{messageItem.Role}: {messageItem}");
+                }
+                output = JsonSerializer.Deserialize<T>(messageItem.ToString(), OpenAIClient.JsonSerializationOptions);
+            }
+
+            return (output, response);
         }
 
         private async Task<Response> StreamResponseAsync(string endpoint, StringContent payload, Func<string, IServerSentEvent, Task> streamEventHandler, CancellationToken cancellationToken)
