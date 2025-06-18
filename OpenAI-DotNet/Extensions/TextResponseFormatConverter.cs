@@ -13,9 +13,15 @@ namespace OpenAI.Extensions
             TextResponseFormatConfiguration result;
             try
             {
-                if (reader.TokenType is JsonTokenType.Null or JsonTokenType.String)
+                if (reader.TokenType == JsonTokenType.Null)
                 {
                     return TextResponseFormat.Auto;
+                }
+
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    var type = JsonSerializer.Deserialize<TextResponseFormat>(ref reader, options);
+                    return new TextResponseFormatConfiguration(type);
                 }
 
                 var jsonObject = JsonDocument.ParseValue(ref reader).RootElement;
@@ -90,9 +96,15 @@ namespace OpenAI.Extensions
             TextResponseFormatConfiguration result;
             try
             {
-                if (reader.TokenType is JsonTokenType.Null or JsonTokenType.String)
+                if (reader.TokenType == JsonTokenType.Null)
                 {
                     return TextResponseFormat.Auto;
+                }
+
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    var type = JsonSerializer.Deserialize<TextResponseFormat>(ref reader, options);
+                    return new TextResponseFormatConfiguration(type);
                 }
 
                 var jsonObject = JsonDocument.ParseValue(ref reader).RootElement;
