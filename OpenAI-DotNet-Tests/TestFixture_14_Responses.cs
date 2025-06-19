@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using OpenAI.Models;
 using OpenAI.Responses;
+using OpenAI.Tests.StructuredOutput;
 using OpenAI.Tests.Weather;
 using System;
 using System.Collections.Generic;
@@ -301,6 +302,87 @@ namespace OpenAI.Tests
             Assert.NotNull(textContent);
             Assert.IsNotEmpty(textContent!.Text);
             Console.WriteLine($"{messageItem.Role}: {messageItem}");
+            response.PrintUsage();
+        }
+
+        [Test]
+        public async Task Test_04_01_JsonSchema()
+        {
+            Assert.IsNotNull(OpenAIClient.ResponsesEndpoint);
+
+            var messages = new List<IResponseItem>
+            {
+                new Message(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
+                new Message(Role.User, "how can I solve 8x + 7 = -23")
+            };
+
+            var request = new CreateResponseRequest(messages, model: Model.GPT4_1_Nano);
+            var (mathResponse, response) = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync<MathResponse>(request);
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            Assert.NotNull(mathResponse);
+            Assert.IsNotEmpty(mathResponse.Steps);
+
+            for (var i = 0; i < mathResponse.Steps.Count; i++)
+            {
+                var step = mathResponse.Steps[i];
+                Assert.IsNotNull(step.Explanation);
+                Console.WriteLine($"Step {i}: {step.Explanation}");
+                Assert.IsNotNull(step.Output);
+                Console.WriteLine($"Result: {step.Output}");
+            }
+
+            Assert.IsNotNull(mathResponse.FinalAnswer);
+            Console.WriteLine($"Final Answer: {mathResponse.FinalAnswer}");
+            response.PrintUsage();
+        }
+
+        [Test]
+        public async Task Test_04_01_JsonSchema_Streaming()
+        {
+            Assert.IsNotNull(OpenAIClient.ResponsesEndpoint);
+
+            var messages = new List<IResponseItem>
+            {
+                new Message(Role.System, "You are a helpful math tutor. Guide the user through the solution step by step."),
+                new Message(Role.User, "how can I solve 8x + 7 = -23")
+            };
+
+            Task StreamCallback(string @event, IServerSentEvent sseEvent)
+            {
+                switch (sseEvent)
+                {
+                    case Message messageItem:
+                        Assert.NotNull(messageItem);
+                        var matchSchema = messageItem.FromSchema<MathResponse>();
+                        Assert.NotNull(matchSchema);
+                        Assert.IsNotEmpty(matchSchema.Steps);
+
+                        for (var i = 0; i < matchSchema.Steps.Count; i++)
+                        {
+                            var step = matchSchema.Steps[i];
+                            Assert.IsNotNull(step.Explanation);
+                            Console.WriteLine($"Step {i}: {step.Explanation}");
+                            Assert.IsNotNull(step.Output);
+                            Console.WriteLine($"Result: {step.Output}");
+                        }
+
+                        Assert.IsNotNull(matchSchema.FinalAnswer);
+                        Console.WriteLine($"Final Answer: {matchSchema.FinalAnswer}");
+                        break;
+                }
+
+                return Task.CompletedTask;
+            }
+
+            var request = new CreateResponseRequest(messages, model: Model.GPT4_1_Nano);
+            var (mathResponse, response) = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync<MathResponse>(request, StreamCallback);
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            Assert.NotNull(mathResponse);
+            Assert.IsNotEmpty(mathResponse.Steps);
             response.PrintUsage();
         }
     }

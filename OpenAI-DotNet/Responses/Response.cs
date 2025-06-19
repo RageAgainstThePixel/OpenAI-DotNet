@@ -188,10 +188,9 @@ namespace OpenAI.Responses
         /// Configuration options for a text response from the model. Can be plain text or structured JSON data.
         /// </summary>
         [JsonInclude]
-        [JsonConverter(typeof(TextResponseFormatConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("text")]
-        public TextResponseFormatConfiguration TextResponseFormatConfiguration { get; internal set; }
+        public TextResponseFormatObject TextResponseFormatConfiguration { get; internal set; }
 
         [JsonIgnore]
         public TextResponseFormat TextResponseFormat => TextResponseFormatConfiguration ?? TextResponseFormat.Auto;

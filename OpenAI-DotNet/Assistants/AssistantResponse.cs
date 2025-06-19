@@ -144,7 +144,7 @@ namespace OpenAI.Assistants
         /// </remarks>
         [JsonInclude]
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(TextResponseFormatConverter))]
+        [JsonConverter(typeof(TextResponseFormatConfigurationConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TextResponseFormatConfiguration ResponseFormatObject { get; private set; }
 

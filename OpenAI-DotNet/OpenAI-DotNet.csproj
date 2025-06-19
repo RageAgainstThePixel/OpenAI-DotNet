@@ -29,8 +29,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.7.0</Version>
+    <Version>8.7.1</Version>
     <PackageReleaseNotes>
+Version 8.7.1
+- Fix Azure OpenAI endpoints that don't contain the deployment-id
+- Add JsonSchema support to Responses
 Version 8.7.0
 - Added support for Responses API
 - Added support for gpt-image-1

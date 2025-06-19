@@ -345,7 +345,7 @@ namespace OpenAI.Chat
         public double? PresencePenalty { get; }
 
         [JsonPropertyName("response_format")]
-        [JsonConverter(typeof(TextResponseFormatConverter))]
+        [JsonConverter(typeof(TextResponseFormatConfigurationConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TextResponseFormatConfiguration ResponseFormatObject { get; internal set; }
 

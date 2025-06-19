@@ -466,26 +466,19 @@ async Task StreamCallback(string @event, IServerSentEvent sseEvent)
     {
         case Message messageItem:
             conversation.Add(messageItem);
-
             break;
         case FunctionToolCall functionToolCall:
             conversation.Add(functionToolCall);
             var output = await functionToolCall.InvokeFunctionAsync();
             conversation.Add(output);
-
+            await api.ResponsesEndpoint.CreateModelResponseAsync(new(conversation, Model.GPT4_1_Nano, tools: tools, toolChoice: "none"), StreamCallback);
             break;
     }
 }
 
-var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request, StreamCallback);
+var response = await api.ResponsesEndpoint.CreateModelResponseAsync(request, StreamCallback);
 var responseItem = response.Output.LastOrDefault();
-var usedTool = responseItem as FunctionToolCall;
-response.PrintUsage();
-Console.WriteLine($"{usedTool.Name}: {usedTool.Arguments}");
-// the tool output was added to the conversation in the StreamCallback, so submit it back to the model
-response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(new(conversation, Model.GPT4_1_Nano, tools: tools), StreamCallback);
-responseItem = response.Output.LastOrDefault();
-Console.WriteLine($"{messageItem.Role}: {messageItem}");
+Console.WriteLine($"{responseItem.Role}: {responseItem}");
 response.PrintUsage();
 ```
 

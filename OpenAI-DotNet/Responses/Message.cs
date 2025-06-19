@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -90,5 +91,11 @@ namespace OpenAI.Responses
 
         public override string ToString()
             => Content?.LastOrDefault()?.ToString() ?? string.Empty;
+
+        public T FromSchema<T>(JsonSerializerOptions options = null)
+        {
+            options ??= OpenAIClient.JsonSerializationOptions;
+            return JsonSerializer.Deserialize<T>(ToString(), options);
+        }
     }
 }
