@@ -33,6 +33,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.7.1
 - Fix Azure OpenAI endpoints that don't contain the deployment-id
+- Add JsonSchema support to Responses
 Version 8.7.0
 - Added support for Responses API
 - Added support for gpt-image-1
