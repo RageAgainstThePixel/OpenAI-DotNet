@@ -17,7 +17,7 @@ namespace OpenAI
 
         [JsonInclude]
         [JsonPropertyName("format")]
-        [JsonConverter(typeof(ResponseTextResponseFormatConverter))]
+        [JsonConverter(typeof(ResponseTextResponseObjectConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TextResponseFormatConfiguration Format { get; private set; }
 
