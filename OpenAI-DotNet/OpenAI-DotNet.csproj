@@ -37,7 +37,7 @@ Version 8.7.2
   - Added IAnnotation
   - Added UrlCitation
   - Added ContainerFileCitation
-  - Responses.TextContent.Annotations array type changed from Annotaiton to IAnnotation
+  - Responses.TextContent.Annotations array type changed from Annotation to IAnnotation
   - Added Responses.TextContent.LogProbs
 Version 8.7.1
 - Fix Azure OpenAI endpoints that don't contain the deployment-id
