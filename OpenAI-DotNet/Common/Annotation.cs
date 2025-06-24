@@ -8,11 +8,6 @@ namespace OpenAI
     public sealed class Annotation : IAppendable<Annotation>
     {
         [JsonInclude]
-        [JsonPropertyName("index")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int? Index { get; private set; }
-
-        [JsonInclude]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(Extensions.JsonStringEnumConverter<AnnotationType>))]
         public AnnotationType Type { get; private set; }
@@ -22,33 +17,39 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("text")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Text { get; private set; }
 
         /// <summary>
-        /// A citation within the message that points to a specific quote from a
-        /// specific File associated with the assistant or the message.
-        /// Generated when the assistant uses the 'retrieval' tool to search files.
+        /// A citation to a file.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_citation")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public FileCitation FileCitation { get; private set; }
 
         /// <summary>
-        /// A URL for the file that's generated when the assistant used the 'code_interpreter' tool to generate a file.
+        /// A path to a file.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_path")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public FilePath FilePath { get; private set; }
 
         [JsonInclude]
+        [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Index { get; private set; }
+
+        [JsonInclude]
         [JsonPropertyName("start_index")]
-        public int StartIndex { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? StartIndex { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("end_index")]
-        public int EndIndex { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? EndIndex { get; private set; }
 
         public void AppendFrom(Annotation other)
         {

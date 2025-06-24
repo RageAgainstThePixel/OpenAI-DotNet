@@ -14,6 +14,8 @@ namespace OpenAI.Responses
         public static implicit operator CreateResponseRequest(string textInput) =>
             new(new List<IResponseItem> { new Message(Role.User, new TextContent(textInput)) });
 
+        public CreateResponseRequest() { }
+
         public CreateResponseRequest(
             string textInput,
             Model model = null,
@@ -24,6 +26,7 @@ namespace OpenAI.Responses
             IReadOnlyDictionary<string, string> metadata = null,
             bool? parallelToolCalls = null,
             string previousResponseId = null,
+            Prompt prompt = null,
             Reasoning reasoning = null,
             string serviceTier = null,
             bool? store = null,
@@ -45,6 +48,7 @@ namespace OpenAI.Responses
                 metadata: metadata,
                 parallelToolCalls: parallelToolCalls,
                 previousResponseId: previousResponseId,
+                prompt: prompt,
                 reasoning: reasoning,
                 serviceTier: serviceTier,
                 store: store,
@@ -69,6 +73,7 @@ namespace OpenAI.Responses
             IReadOnlyDictionary<string, string> metadata = null,
             bool? parallelToolCalls = null,
             string previousResponseId = null,
+            Prompt prompt = null,
             Reasoning reasoning = null,
             string serviceTier = null,
             bool? store = null,
@@ -90,6 +95,7 @@ namespace OpenAI.Responses
             Metadata = metadata;
             ParallelToolCalls = parallelToolCalls;
             PreviousResponseId = previousResponseId;
+            Prompt = prompt;
             Reasoning = reasoning;
             ServiceTier = serviceTier;
             Store = store;
@@ -122,7 +128,7 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("input")]
-        public IReadOnlyList<IResponseItem> Input { get; }
+        public IReadOnlyList<IResponseItem> Input { get; private set; }
 
         /// <summary>
         /// Model ID used to generate the response, like gpt-4o or o3.
@@ -131,15 +137,15 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("model")]
-        public string Model { get; }
+        public string Model { get; private set; }
 
         /// <summary>
         /// Whether to run the model response in the background. 
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("background")]
-        public bool? Background { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? Background { get; private set; }
 
         /// <summary>
         /// Specify additional output data to include in the model response.<br/>
@@ -149,9 +155,9 @@ namespace OpenAI.Responses
         /// - computer_call_output.output.image_url: Include image urls from the computer call output.<br/>
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("include")]
-        public IReadOnlyList<string> Include { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyList<string> Include { get; private set; }
 
         /// <summary>
         /// Inserts a system (or developer) message as the first item in the model's context.
@@ -160,9 +166,9 @@ namespace OpenAI.Responses
         /// This makes it simple to swap out system (or developer) messages in new responses.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("instructions")]
-        public string Instructions { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Instructions { get; private set; }
 
         /// <summary>
         /// An upper bound for the number of tokens that can be generated for a
@@ -170,9 +176,9 @@ namespace OpenAI.Responses
         /// tokens.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("max_output_tokens")]
-        public int? MaxOutputTokens { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? MaxOutputTokens { get; private set; }
 
         /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
@@ -182,26 +188,31 @@ namespace OpenAI.Responses
         /// Values are strings with a maximum length of 512 characters.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("metadata")]
-        public IReadOnlyDictionary<string, string> Metadata { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyDictionary<string, string> Metadata { get; private set; }
 
         /// <summary>
         /// Whether to allow the model to run tool calls in parallel.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("parallel_tool_calls")]
-        public bool? ParallelToolCalls { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? ParallelToolCalls { get; private set; }
 
         /// <summary>
         /// The unique ID of the previous response to the model.
         /// Use this to create multi-turn conversations.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("previous_response_id")]
-        public string PreviousResponseId { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string PreviousResponseId { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("prompt")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Prompt Prompt { get; private set; }
 
         /// <summary>
         /// Configuration options for reasoning models.
@@ -210,9 +221,9 @@ namespace OpenAI.Responses
         /// o-series models only!
         /// </remarks>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("reasoning")]
-        public Reasoning Reasoning { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Reasoning Reasoning { get; private set; }
 
         /// <summary>
         /// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service:<br/>
@@ -223,24 +234,24 @@ namespace OpenAI.Responses
         /// When this parameter is set, the response body will include the service_tier utilized.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("service_tier")]
-        public string ServiceTier { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string ServiceTier { get; private set; }
 
         /// <summary>
         /// Whether to store the generated model response for later retrieval via API.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("store")]
-        public bool? Store { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? Store { get; private set; }
 
         /// <summary>
         /// If set to true, the model response data will be streamed to the client as it is generated using server-sent events.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("stream")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Stream { get; internal set; }
 
         /// <summary>
@@ -251,19 +262,18 @@ namespace OpenAI.Responses
         /// Defaults to 1
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("temperature")]
-        public double? Temperature { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? Temperature { get; private set; }
 
         /// <summary>
         /// Configuration options for a text response from the model. Can be plain text or structured JSON data.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("text")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TextResponseFormatObject TextResponseFormatObject { get; internal set; }
 
-        [JsonInclude]
         [JsonIgnore]
         public TextResponseFormat TextResponseFormat => TextResponseFormatObject ?? TextResponseFormat.Auto;
 
@@ -272,9 +282,9 @@ namespace OpenAI.Responses
         /// See the tools parameter to see how to specify which tools the model can call.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("tool_choice")]
-        public object ToolChoice { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public object ToolChoice { get; private set; }
 
         /// <summary>
         /// A list of tools the model may call. Currently, only functions are supported as a tool.
@@ -283,7 +293,7 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonPropertyName("tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<ITool> Tools { get; }
+        public IReadOnlyList<ITool> Tools { get; private set; }
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling,
@@ -293,9 +303,9 @@ namespace OpenAI.Responses
         /// Defaults to 1
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("top_p")]
-        public double? TopP { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? TopP { get; private set; }
 
         /// <summary>
         /// The truncation strategy to use for the model response.<br/>
@@ -304,16 +314,16 @@ namespace OpenAI.Responses
         /// - Disabled (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("truncation")]
-        public Truncation Truncation { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Truncation Truncation { get; private set; }
 
         /// <summary>
         /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("user")]
-        public string User { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string User { get; private set; }
     }
 }

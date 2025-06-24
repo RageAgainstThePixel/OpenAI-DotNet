@@ -29,8 +29,16 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.7.1</Version>
+    <Version>8.7.2</Version>
     <PackageReleaseNotes>
+Version 8.7.2
+- Add support for predefined prompts in Responses endpoint
+- Fixed WebSearchToolPreview streaming annotation deserialization
+  - Added IAnnotation
+  - Added UrlCitation
+  - Added ContainerFileCitation
+  - Responses.TextContent.Annotations array type changed from Annotaiton to IAnnotation
+  - Added Responses.TextContent.LogProbs
 Version 8.7.1
 - Fix Azure OpenAI endpoints that don't contain the deployment-id
 - Add JsonSchema support to Responses

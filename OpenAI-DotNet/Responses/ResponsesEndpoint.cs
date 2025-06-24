@@ -271,7 +271,7 @@ namespace OpenAI.Responses
 
                                     if (annotationIndex.HasValue)
                                     {
-                                        var annotation = sseResponse.Deserialize<Annotation>(@object["annotation"], client);
+                                        var annotation = sseResponse.Deserialize<IAnnotation>(@object["annotation"], client);
                                         textContent.InsertAnnotation(annotation, annotationIndex.Value);
                                     }
 
