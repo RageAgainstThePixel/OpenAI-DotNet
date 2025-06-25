@@ -4,10 +4,16 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI
 {
-    public sealed class FilePath
+    public sealed class FilePath : IAnnotation
     {
+        [JsonInclude]
+        [JsonPropertyName("type")]
+        [JsonConverter(typeof(Extensions.JsonStringEnumConverter<AnnotationType>))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public AnnotationType Type { get; private set; } = AnnotationType.FilePath;
+
         /// <summary>
-        /// The ID of the file that was generated.
+        /// The ID of the file.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("file_id")]
@@ -20,5 +26,13 @@ namespace OpenAI
         [JsonPropertyName("mime_type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string MimeType { get; private set; }
+
+        /// <summary>
+        /// The index of the file in the list of files.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Index { get; private set; }
     }
 }

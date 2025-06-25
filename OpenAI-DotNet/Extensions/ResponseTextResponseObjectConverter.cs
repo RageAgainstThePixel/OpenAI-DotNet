@@ -71,7 +71,7 @@ namespace OpenAI.Extensions
                     }, options);
                     break;
                 case TextResponseFormat.Text:
-                    JsonSerializer.Serialize(writer, new { type = value }, options);
+                    JsonSerializer.Serialize(writer, new { type = value.Type }, options);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value.Type), $"Unsupported response format: {value.Type}");

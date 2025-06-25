@@ -14,6 +14,8 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(FileSearchTool fileSearchTool) => new(fileSearchTool as ITool);
 
+        public FileSearchTool() { }
+
         public FileSearchTool(string vectorStoreId, int? maxNumberOfResults = null, RankingOptions rankingOptions = null, IEnumerable<IFilter> filters = null)
             : this([vectorStoreId], maxNumberOfResults, rankingOptions, filters)
         {
@@ -27,22 +29,27 @@ namespace OpenAI.Responses
             Filters = filters?.ToList();
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type => "file_search";
+        public string Type { get; private set; } = "file_search";
 
+        [JsonInclude]
         [JsonPropertyName("vector_store_ids")]
-        public IReadOnlyList<string> VectorStoreIds { get; }
+        public IReadOnlyList<string> VectorStoreIds { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("max_num_results")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxNumberOfResults { get; }
+        public int? MaxNumberOfResults { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("ranking_options")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public RankingOptions RankingOptions { get; }
+        public RankingOptions RankingOptions { get; private set; }
 
+        [JsonInclude]
         [JsonPropertyName("filters")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<IFilter> Filters { get; }
+        public IReadOnlyList<IFilter> Filters { get; private set; }
     }
 }

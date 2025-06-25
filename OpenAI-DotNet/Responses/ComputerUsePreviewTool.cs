@@ -11,6 +11,8 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(ComputerUsePreviewTool computerUsePreviewTool) => new(computerUsePreviewTool as ITool);
 
+        public ComputerUsePreviewTool() { }
+
         public ComputerUsePreviewTool(int displayHeight, int displayWidth, string environment)
         {
             DisplayHeight = displayHeight;
@@ -18,25 +20,29 @@ namespace OpenAI.Responses
             Environment = environment;
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type => "computer_use_preview";
+        public string Type { get; private set; } = "computer_use_preview";
 
         /// <summary>
         /// The height of the computer display.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("display_height")]
-        public int DisplayHeight { get; }
+        public int DisplayHeight { get; private set; }
 
         /// <summary>
         /// The width of the computer display.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("display_width")]
-        public int DisplayWidth { get; }
+        public int DisplayWidth { get; private set; }
 
         /// <summary>
         /// The type of computer environment to control.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("environment")]
-        public string Environment { get; }
+        public string Environment { get; private set; }
     }
 }

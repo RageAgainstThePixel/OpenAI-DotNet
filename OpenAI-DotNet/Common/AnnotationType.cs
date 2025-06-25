@@ -7,8 +7,12 @@ namespace OpenAI
     public enum AnnotationType
     {
         [EnumMember(Value = "file_citation")]
-        FileCitation,
+        FileCitation = 1,
         [EnumMember(Value = "file_path")]
-        FilePath
+        FilePath,
+        [EnumMember(Value = "url_citation")]
+        UrlCitation,
+        [EnumMember(Value = "container_file_citation")]
+        ContainerFileCitation
     }
 }

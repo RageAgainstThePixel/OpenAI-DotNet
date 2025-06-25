@@ -12,6 +12,24 @@ namespace OpenAI.Responses
             => JsonSerializer.Serialize(writer, value, value.GetType(), options);
 
         public override IFilter Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotImplementedException();
+        {
+            var root = JsonDocument.ParseValue(ref reader).RootElement;
+            var type = root.GetProperty("type").GetString()!;
+            switch (type)
+            {
+                case "eq":
+                case "ne":
+                case "gt":
+                case "gte":
+                case "lt":
+                case "lte":
+                    return root.Deserialize<ComparisonFilter>(options);
+                case "or":
+                case "and":
+                    return root.Deserialize<CompoundFilter>(options);
+                default:
+                    throw new NotImplementedException($"Unknown filter type: {type}");
+            }
+        }
     }
 }

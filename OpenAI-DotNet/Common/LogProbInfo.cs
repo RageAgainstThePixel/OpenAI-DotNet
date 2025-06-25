@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Chat
+namespace OpenAI
 {
     /// <summary>
     /// Contains log probability information.
@@ -40,6 +40,7 @@ namespace OpenAI.Chat
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("top_logprobs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<LogProbInfo> TopLogProbs { get; private set; }
     }
 }

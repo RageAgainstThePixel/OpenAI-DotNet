@@ -127,6 +127,7 @@ namespace OpenAI
                 new RealtimeServerEventConverter(),
                 new ResponseContentConverter(),
                 new ResponseItemConverter(),
+                new AnnotationConverter(),
                 new FilterConverter(),
                 new ToolConverter(),
             },

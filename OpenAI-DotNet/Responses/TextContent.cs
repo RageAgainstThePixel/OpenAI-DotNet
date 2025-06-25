@@ -29,12 +29,15 @@ namespace OpenAI.Responses
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Text { get; internal set; }
 
-        private List<Annotation> annotations;
+        private List<IAnnotation> annotations;
 
+        /// <summary>
+        /// The annotations of the text output.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("annotations")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<Annotation> Annotations
+        public IReadOnlyList<IAnnotation> Annotations
         {
             get => annotations;
             private set => annotations = value?.ToList();
@@ -45,17 +48,25 @@ namespace OpenAI.Responses
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Delta { get; internal set; }
 
+        /// <summary>
+        /// A list of message content tokens with log probability information.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("logprobs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IReadOnlyList<LogProbInfo> LogProbs { get; private set; }
+
         [JsonIgnore]
         public string Object => Type.ToString();
 
-        internal void InsertAnnotation(Annotation item, int index)
+        internal void InsertAnnotation(IAnnotation item, int index)
         {
             if (item == null)
             {
                 throw new ArgumentNullException(nameof(item));
             }
 
-            annotations ??= new();
+            annotations ??= [];
 
             if (index > annotations.Count)
             {
