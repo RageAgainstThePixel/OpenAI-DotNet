@@ -11,7 +11,10 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(LocalShellTool localShellTool) => new(localShellTool as ITool);
 
+        public LocalShellTool() { }
+
+        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type => "local_shell";
+        public string Type { get; private set; } = "local_shell";
     }
 }

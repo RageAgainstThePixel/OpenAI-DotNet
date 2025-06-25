@@ -11,14 +11,17 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(WebSearchPreviewTool webSearchPreviewTool) => new(webSearchPreviewTool as ITool);
 
+        public WebSearchPreviewTool() { }
+
         public WebSearchPreviewTool(SearchContextSize searchContextSize = 0, UserLocation userLocation = null)
         {
             SearchContextSize = searchContextSize;
             UserLocation = userLocation;
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type => "web_search_preview";
+        public string Type { get; private set; } = "web_search_preview";
 
         /// <summary>
         /// High level guidance for the amount of context window space to use for the search. One of low, medium, or high. medium is the default.

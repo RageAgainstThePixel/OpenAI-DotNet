@@ -13,6 +13,8 @@ namespace OpenAI.Responses
     {
         public static implicit operator Tool(MCPTool mcpTool) => new(mcpTool as ITool);
 
+        public MCPTool() { }
+
         public MCPTool(
             string serverLabel,
             string serverUrl,
@@ -47,43 +49,49 @@ namespace OpenAI.Responses
             RequireApproval = requireApproval;
         }
 
+        [JsonInclude]
         [JsonPropertyName("type")]
-        public string Type => "mcp";
+        public string Type { get; private set; } = "mcp";
 
         /// <summary>
         /// A label for this MCP server, used to identify it in tool calls.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("server_label")]
-        public string ServerLabel { get; }
+        public string ServerLabel { get; private set; }
 
         /// <summary>
         /// The URL for the MCP server.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("server_url")]
-        public string ServerUrl { get; }
+        public string ServerUrl { get; private set; }
 
         /// <summary>
         /// List of allowed tool names.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("allowed_tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyList<string> AllowedTools { get; }
+        public IReadOnlyList<string> AllowedTools { get; private set; }
 
         /// <summary>
         /// Optional HTTP headers to send to the MCP server. Use for authentication or other purposes.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("headers")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyDictionary<string, object> Headers { get; }
+        public IReadOnlyDictionary<string, object> Headers { get; private set; }
 
         /// <summary>
         /// Specify which of the MCP server's tools require approval.
         /// Can be one of <see cref="MCPApprovalFilter"/>, "always", or "never".
         /// When set to "never", all tools will not require approval.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("require_approval")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(StringOrObjectConverter<MCPApprovalFilter>))]
-        public object RequireApproval { get; }
+        public object RequireApproval { get; private set; }
     }
 }

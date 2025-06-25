@@ -18,7 +18,15 @@ namespace OpenAI.Responses
 
             return type switch
             {
+                "code_interpreter" => root.Deserialize<CodeInterpreterTool>(options),
+                "computer_user_preview" => root.Deserialize<ComputerUsePreviewTool>(options),
+                "file_search" => root.Deserialize<FileSearchTool>(options),
                 "function" => root.Deserialize<Function>(options),
+                "image_generation" => root.Deserialize<ImageGenerationTool>(options),
+                "local_shell" => root.Deserialize<LocalShellTool>(options),
+                "mcp" => root.Deserialize<MCPTool>(options),
+                "tool" => root.Deserialize<Tool>(options),
+                "web_search_preview" => root.Deserialize<WebSearchPreviewTool>(options),
                 _ => throw new NotImplementedException($"Unknown tool item type: {type}")
             };
         }
