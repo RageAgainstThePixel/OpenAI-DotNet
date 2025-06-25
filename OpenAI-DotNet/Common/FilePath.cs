@@ -20,18 +20,19 @@ namespace OpenAI
         public string FileId { get; private set; }
 
         /// <summary>
-        /// The index of the file in the list of files.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("index")]
-        public int? Index { get; private set; }
-
-        /// <summary>
         /// The MIME type of the file.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("mime_type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string MimeType { get; private set; }
+
+        /// <summary>
+        /// The index of the file in the list of files.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Index { get; private set; }
     }
 }

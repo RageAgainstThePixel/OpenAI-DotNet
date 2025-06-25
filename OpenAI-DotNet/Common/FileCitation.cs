@@ -24,6 +24,7 @@ namespace OpenAI
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("filename")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FileName { get; private set; }
 
         /// <summary>
