@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.7.2</Version>
+    <Version>8.7.3</Version>
     <PackageReleaseNotes>
+Version 8.7.3
+- Fixed Response.Instructions deserialization when using CreateResponseRequest.Prompt
 Version 8.7.2
 - Add support for predefined prompts in Responses endpoint
 - Fixed WebSearchToolPreview streaming annotation deserialization

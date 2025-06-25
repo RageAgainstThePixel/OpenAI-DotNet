@@ -339,7 +339,7 @@ namespace OpenAI.Tests
         }
 
         [Test]
-        public async Task Test_04_01_JsonSchema_Streaming()
+        public async Task Test_04_02_JsonSchema_Streaming()
         {
             Assert.IsNotNull(OpenAIClient.ResponsesEndpoint);
 
@@ -383,6 +383,85 @@ namespace OpenAI.Tests
             Assert.AreEqual(ResponseStatus.Completed, response.Status);
             Assert.NotNull(mathResponse);
             Assert.IsNotEmpty(mathResponse.Steps);
+            response.PrintUsage();
+        }
+
+        [Test]
+        public async Task Test_05_01_Prompts()
+        {
+            Assert.NotNull(OpenAIClient.ResponsesEndpoint);
+
+            var conversation = new List<IResponseItem>
+            {
+                new Message(Role.User, "What's the weather like today?"),
+            };
+            var tools = new List<Tool>
+            {
+                Tool.GetOrCreateTool(typeof(WeatherService), nameof(WeatherService.GetCurrentWeatherAsync)),
+            };
+            var request = new CreateResponseRequest(
+                input: conversation,
+                model: Model.GPT4_1_Nano,
+                prompt: new Prompt("pmpt_685c102c61608193b3654325fa76fc880b22337c811a3a71"),
+                tools: tools,
+                toolChoice: "none");
+            var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request);
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            var responseItem = response.Output.LastOrDefault();
+            Assert.NotNull(responseItem);
+            Assert.AreEqual(ResponseItemType.Message, responseItem.Type);
+            Assert.IsInstanceOf<Message>(responseItem);
+            var messageItem = responseItem as Message;
+            Assert.NotNull(messageItem);
+            Assert.IsNotEmpty(messageItem!.Content);
+            Assert.IsInstanceOf<Responses.TextContent>(messageItem.Content[0]);
+            var textContent = messageItem.Content[0] as Responses.TextContent;
+            Assert.NotNull(textContent);
+            Assert.IsNotEmpty(textContent!.Text);
+            Console.WriteLine($"{messageItem.Role}:{textContent.Text}");
+            response.PrintUsage();
+            conversation.Add(messageItem);
+            conversation.Add(new Message(Role.User, "I'm currently in San Francisco"));
+            request = new(conversation, Model.GPT4_1_Nano, tools: tools, toolChoice: "auto");
+            response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request);
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            responseItem = response.Output.LastOrDefault();
+            Assert.NotNull(responseItem);
+            Assert.AreEqual(ResponseItemType.FunctionCall, responseItem.Type);
+            Assert.IsInstanceOf<FunctionToolCall>(responseItem);
+            var usedTool = responseItem as FunctionToolCall;
+            conversation.Add(usedTool);
+            Assert.NotNull(usedTool);
+            Assert.IsNotEmpty(usedTool.Name);
+            Assert.IsTrue(usedTool.Name.Contains(nameof(WeatherService.GetCurrentWeatherAsync)));
+            Assert.NotNull(usedTool.Arguments);
+            Console.WriteLine($"{usedTool.Name}: {usedTool.Arguments}");
+            response.PrintUsage();
+            var functionResult = await usedTool.InvokeFunctionAsync();
+            Assert.IsNotNull(functionResult);
+            Console.WriteLine($"{usedTool.Name} Result: {functionResult}");
+            conversation.Add(functionResult);
+            request = new(conversation, Model.GPT4_1_Nano, tools: tools, toolChoice: "none");
+            response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request);
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            responseItem = response.Output.LastOrDefault();
+            Assert.NotNull(responseItem);
+            Assert.AreEqual(ResponseItemType.Message, responseItem.Type);
+            Assert.IsInstanceOf<Message>(responseItem);
+            messageItem = responseItem as Message;
+            Assert.NotNull(messageItem);
+            Assert.IsNotEmpty(messageItem!.Content);
+            Assert.IsInstanceOf<Responses.TextContent>(messageItem.Content[0]);
+            textContent = messageItem.Content[0] as Responses.TextContent;
+            Assert.NotNull(textContent);
+            Assert.IsNotEmpty(textContent!.Text);
+            Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
         }
     }
