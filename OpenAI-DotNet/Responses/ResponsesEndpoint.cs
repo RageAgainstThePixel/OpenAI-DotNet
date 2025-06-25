@@ -164,12 +164,6 @@ namespace OpenAI.Responses
 
                             serverSentEvent = response;
                             break;
-                        case "response.code_interpreter_call.code.delta":
-                        case "response.code_interpreter_call.code.done":
-                        case "response.code_interpreter_call.completed":
-                        case "response.code_interpreter_call.in_progress":
-                        case "response.code_interpreter_call.interpreting":
-                            break;
                         case "response.content_part.added":
                         case "response.content_part.done":
                             var part = sseResponse.Deserialize<IResponseContent>(@object["part"], client);
@@ -186,10 +180,6 @@ namespace OpenAI.Responses
                             {
                                 serverSentEvent = part;
                             }
-                            break;
-                        case "response.file_search_call.completed":
-                        case "response.file_search_call.in_progress":
-                        case "response.file_search_call.searching":
                             break;
                         case "response.output_item.added":
                         case "response.output_item.done":
@@ -321,13 +311,20 @@ namespace OpenAI.Responses
                             summaryItem.Delta = !string.IsNullOrWhiteSpace(delta) ? delta : null;
                             serverSentEvent = summaryItem;
                             break;
-                        case "response.web_search_call.completed":
-                        case "response.web_search_call.in_progress":
-                        case "response.web_search_call.searching":
-                            break;
                         case "error":
                             serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
                             break;
+                        case "response.code_interpreter_call.code.delta":
+                        case "response.code_interpreter_call.code.done":
+                        case "response.code_interpreter_call.completed":
+                        case "response.code_interpreter_call.in_progress":
+                        case "response.code_interpreter_call.interpreting":
+                        case "response.file_search_call.completed":
+                        case "response.file_search_call.in_progress":
+                        case "response.file_search_call.searching":
+                        case "response.web_search_call.completed":
+                        case "response.web_search_call.in_progress":
+                        case "response.web_search_call.searching":
                         default:
                             // if not properly handled raise it up to caller to deal with it themselves.
                             serverSentEvent = ssEvent;
