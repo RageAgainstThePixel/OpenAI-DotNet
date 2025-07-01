@@ -52,12 +52,12 @@ namespace OpenAI.Proxy
         /// Maps the <see cref="OpenAIClient"/> endpoints.
         /// </summary>
         /// <param name="endpoints"><see cref="IEndpointRouteBuilder"/>.</param>
-        /// <param name="openAIClient"><see cref="OpenAIClient"/>.</param>
+        /// <param name="client"><see cref="OpenAIClient"/>.</param>
         /// <param name="authenticationFilter"><see cref="IAuthenticationFilter"/>.</param>
         /// <param name="routePrefix">Optional, custom route prefix. i.e. '/openai'.</param>
-        public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient openAIClient, IAuthenticationFilter authenticationFilter, string routePrefix = "")
+        public static void MapOpenAIEndpoints(this IEndpointRouteBuilder endpoints, OpenAIClient client, IAuthenticationFilter authenticationFilter, string routePrefix = "")
         {
-            endpoints.Map($"{routePrefix}{openAIClient.Settings.BaseRequest}{{**endpoint}}", HandleRequest);
+            endpoints.Map($"{routePrefix}{client.Settings.BaseRequest}{{**endpoint}}", HandleRequest);
             return;
 
             async Task HandleRequest(HttpContext httpContext, string endpoint)
@@ -80,13 +80,13 @@ namespace OpenAI.Proxy
                         modifiedQuery[pair.Key] = pair.Value.FirstOrDefault();
                     }
 
-                    if (openAIClient.Settings.IsAzureOpenAI)
+                    if (client.Settings.IsAzureOpenAI)
                     {
-                        modifiedQuery["api-version"] = openAIClient.Settings.ApiVersion;
+                        modifiedQuery["api-version"] = client.Settings.ApiVersion;
                     }
 
                     var uri = new Uri(string.Format(
-                        openAIClient.Settings.BaseRequestUrlFormat,
+                        client.Settings.BaseRequestUrlFormat,
                         QueryHelpers.AddQueryString(endpoint, modifiedQuery)
                     ));
 
@@ -98,8 +98,10 @@ namespace OpenAI.Proxy
                         request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
                     }
 
-                    var proxyResponse = await openAIClient.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted).ConfigureAwait(false);
+                    var proxyResponse = await client.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted).ConfigureAwait(false);
                     httpContext.Response.StatusCode = (int)proxyResponse.StatusCode;
+                    httpContext.Response.ContentLength = proxyResponse.Content.Headers.ContentLength;
+                    httpContext.Response.ContentType = proxyResponse.Content.Headers.ContentType?.ToString();
 
                     foreach (var (key, value) in proxyResponse.Headers)
                     {
@@ -112,11 +114,10 @@ namespace OpenAI.Proxy
                         if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
-
-                    httpContext.Response.ContentType = proxyResponse.Content.Headers.ContentType?.ToString() ?? string.Empty;
                     const string streamingContent = "text/event-stream";
 
-                    if (httpContext.Response.ContentType.Equals(streamingContent))
+                    if (httpContext.Response.ContentType != null &&
+                        httpContext.Response.ContentType.Equals(streamingContent, StringComparison.OrdinalIgnoreCase))
                     {
                         var stream = await proxyResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                         await WriteServerStreamEventsAsync(httpContext, stream).ConfigureAwait(false);
@@ -185,13 +186,13 @@ namespace OpenAI.Proxy
 
                 using var hostWebsocket = new ClientWebSocket();
 
-                foreach (var header in openAIClient.WebsocketHeaders)
+                foreach (var header in client.WebsocketHeaders)
                 {
                     hostWebsocket.Options.SetRequestHeader(header.Key, header.Value);
                 }
 
                 var uri = new Uri(string.Format(
-                    openAIClient.Settings.BaseWebSocketUrlFormat,
+                    client.Settings.BaseWebSocketUrlFormat,
                     $"{endpoint}{httpContext.Request.QueryString}"
                 ));
                 await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);

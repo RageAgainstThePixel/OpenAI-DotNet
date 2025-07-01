@@ -29,8 +29,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.7.3</Version>
+    <Version>8.7.4</Version>
     <PackageReleaseNotes>
+Version 8.7.4
+- Updated proxy support for the OpenAI-DotNet-Proxy package
+- Renamed OpenAIAuthentication.LoadFromEnv -&gt; OpenAIAuthentication.LoadFromEnvironment
 Version 8.7.3
 - Fixed Response.Instructions deserialization when using CreateResponseRequest.Prompt
 Version 8.7.2
@@ -481,7 +484,8 @@ Version 4.4.0
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub"
+      Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

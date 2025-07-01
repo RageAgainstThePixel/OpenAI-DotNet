@@ -231,7 +231,7 @@ Use your system's environment variables specify an api key and organization to u
 - Use `OPENAI_PROJECT_ID` to specify a project.
 
 ```csharp
-using var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnv());
+using var api = new OpenAIClient(OpenAIAuthentication.LoadFromEnvironment());
 ```
 
 ### Handling OpenAIClient and HttpClient Lifecycle
@@ -355,7 +355,7 @@ public partial class Program
 
     public static void Main(string[] args)
     {
-        var auth = OpenAIAuthentication.LoadFromEnv();
+        var auth = OpenAIAuthentication.LoadFromEnvironment();
         var settings = new OpenAISettings(/* your custom settings if using Azure OpenAI */);
         using var openAIClient = new OpenAIClient(auth, settings);
         OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient).Run();

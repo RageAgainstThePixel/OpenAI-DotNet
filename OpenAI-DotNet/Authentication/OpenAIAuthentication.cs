@@ -71,7 +71,7 @@ namespace OpenAI
         /// <summary>
         /// The default authentication to use when no other auth is specified.
         /// This can be set manually, or automatically loaded via environment variables or a config file.
-        /// <seealso cref="LoadFromEnv"/><seealso cref="LoadFromDirectory"/>
+        /// <seealso cref="LoadFromEnvironment"/><seealso cref="LoadFromDirectory"/>
         /// </summary>
         public static OpenAIAuthentication Default
         {
@@ -84,12 +84,16 @@ namespace OpenAI
 
                 var auth = LoadFromDirectory() ??
                            LoadFromDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) ??
-                           LoadFromEnv();
+                           LoadFromEnvironment();
                 cachedDefault = auth ?? throw new UnauthorizedAccessException("Failed to load a valid API Key!");
                 return auth;
             }
             internal set => cachedDefault = value;
         }
+
+        [Obsolete("use LoadFromEnvironment")]
+        public static OpenAIAuthentication LoadFromEnv(string organizationId = null)
+            => LoadFromEnvironment(organizationId);
 
         /// <summary>
         /// Attempts to load api keys from environment variables, as "OPENAI_KEY" (or "OPENAI_SECRET_KEY", for backwards compatibility)
@@ -102,7 +106,7 @@ namespace OpenAI
         /// Returns the loaded <see cref="OpenAIAuthentication"/> any api keys were found,
         /// or <see langword="null"/> if there were no matching environment vars.
         /// </returns>
-        public static OpenAIAuthentication LoadFromEnv(string organizationId = null)
+        public static OpenAIAuthentication LoadFromEnvironment(string organizationId = null)
         {
             var apiKey = Environment.GetEnvironmentVariable(OPENAI_KEY);
 
