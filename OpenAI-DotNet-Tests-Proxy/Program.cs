@@ -33,7 +33,7 @@ namespace OpenAI.Tests.Proxy
 
         public static void Main(string[] args)
         {
-            var auth = OpenAIAuthentication.LoadFromEnv();
+            var auth = OpenAIAuthentication.LoadFromEnvironment();
             var settings = new OpenAISettings(/* your custom settings if using Azure OpenAI */);
             using var openAIClient = new OpenAIClient(auth, settings);
             using var app = OpenAIProxy.CreateWebApplication<AuthenticationFilter>(args, openAIClient);

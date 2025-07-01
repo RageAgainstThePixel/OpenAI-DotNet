@@ -22,12 +22,12 @@ namespace OpenAI.Tests
         [Test]
         public void Test_01_GetAuthFromEnv()
         {
-            var auth = OpenAIAuthentication.LoadFromEnv();
+            var auth = OpenAIAuthentication.LoadFromEnvironment();
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
             Assert.IsNotEmpty(auth.ApiKey);
 
-            auth = OpenAIAuthentication.LoadFromEnv("org-testOrg");
+            auth = OpenAIAuthentication.LoadFromEnvironment("org-testOrg");
             Assert.IsNotNull(auth);
             Assert.IsNotNull(auth.ApiKey);
             Assert.IsNotEmpty(auth.ApiKey);

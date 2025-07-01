@@ -22,8 +22,11 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.7.0</Version>
+    <Version>8.7.4</Version>
     <PackageReleaseNotes>
+Version 8.7.4
+- Updated proxy support for the OpenAI-DotNet package
+- Ensure we're returning the full response message body and content length to the clients
 Version 8.7.0
 - Fix Azure OpenAI api-version query parameter not being forwarded correctly
 Version 8.4.0
