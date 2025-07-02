@@ -10,7 +10,6 @@ namespace OpenAI
     /// </summary>
     public sealed class OpenAISettings
     {
-        internal const string WS = "ws://";
         internal const string WSS = "wss://";
         internal const string Http = "http://";
         internal const string Https = "https://";

@@ -15,8 +15,6 @@ namespace OpenAI.Realtime
 
         protected override string Root => "realtime";
 
-        protected override bool? IsWebSocketEndpoint => true;
-
         /// <summary>
         /// Creates a new realtime session with the provided <see cref="SessionConfiguration"/> options.
         /// </summary>
@@ -47,7 +45,7 @@ namespace OpenAI.Realtime
                 throw new InvalidOperationException("Failed to create a session. Ensure the configuration is valid and the API key is set.");
             }
 
-            var websocket = new WebSocket(GetUrl(queryParameters: queryParameters), new Dictionary<string, string>
+            var websocket = new WebSocket(GetWebsocketUri(queryParameters: queryParameters), new Dictionary<string, string>
             {
                 { "User-Agent", "OpenAI-DotNet" },
                 { "OpenAI-Beta", "realtime=v1" },
