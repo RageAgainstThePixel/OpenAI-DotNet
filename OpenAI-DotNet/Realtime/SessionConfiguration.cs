@@ -24,10 +24,12 @@ namespace OpenAI.Realtime
             IEnumerable<Tool> tools = null,
             string toolChoice = null,
             float? temperature = null,
-            int? maxResponseOutputTokens = null)
+            int? maxResponseOutputTokens = null,
+            int? expiresAfter = null)
         {
+            ClientSecret = new ClientSecret(expiresAfter);
             Model = string.IsNullOrWhiteSpace(model.Id)
-                ? "gpt-4o-realtime-preview"
+                ? Models.Model.GPT4oRealtime
                 : model;
             Modalities = modalities;
             Voice = voice ?? OpenAI.Voice.Alloy;
@@ -92,6 +94,11 @@ namespace OpenAI.Realtime
             Temperature = temperature;
             MaxResponseOutputTokens = maxResponseOutputTokens;
         }
+
+        [JsonInclude]
+        [JsonPropertyName("client_secret")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ClientSecret ClientSecret { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("modalities")]

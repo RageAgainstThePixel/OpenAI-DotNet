@@ -42,7 +42,6 @@ namespace OpenAI.Proxy
             SetupServices(app.ApplicationServices);
 
             app.UseHttpsRedirection();
-            app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
@@ -82,7 +81,8 @@ namespace OpenAI.Proxy
         /// <typeparam name="T"><see cref="IAuthenticationFilter"/> type to use to validate your custom issued tokens.</typeparam>
         /// <param name="args">Startup args.</param>
         /// <param name="openAIClient"><see cref="OpenAIClient"/> with configured <see cref="OpenAIAuthentication"/> and <see cref="OpenAISettings"/>.</param>
-        public static WebApplication CreateWebApplication<T>(string[] args, OpenAIClient openAIClient) where T : class, IAuthenticationFilter
+        /// <param name="routePrefix"></param>
+        public static WebApplication CreateWebApplication<T>(string[] args, OpenAIClient openAIClient, string routePrefix = "") where T : class, IAuthenticationFilter
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Logging.ClearProviders();
