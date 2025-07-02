@@ -6,9 +6,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OpenAI.Tests
 {
@@ -42,24 +39,7 @@ namespace OpenAI.Tests
             OpenAIClient = new OpenAIClient(auth, settings, HttpClient)
             {
                 EnableDebug = true,
-                CreateWebsocketAsync = CreateWebsocketAsync
             };
-
-            return;
-
-            async Task<WebSocket> CreateWebsocketAsync(Uri uri, CancellationToken cancellationToken)
-            {
-                var websocketClient = webApplicationFactory.Server.CreateWebSocketClient();
-                websocketClient.ConfigureRequest = request =>
-                {
-                    foreach (var (key, value) in OpenAIClient.WebsocketHeaders)
-                    {
-                        request.Headers[key] = value;
-                    }
-                };
-                var websocket = await websocketClient.ConnectAsync(uri, cancellationToken);
-                return websocket;
-            }
         }
 
         private static Uri GetBaseAddressFromLaunchSettings()

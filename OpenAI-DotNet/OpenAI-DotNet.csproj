@@ -29,8 +29,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.7.4</Version>
+    <Version>8.8.0</Version>
     <PackageReleaseNotes>
+Version 8.8.0
+- Improved RealtimeSession websocket support for proxies
+  - Proxy no longer handles the websocket connection directly, but instead initiates the connection to the OpenAI api directly using the ephemeral api key
 Version 8.7.4
 - Updated proxy support for the OpenAI-DotNet-Proxy package
 - Renamed OpenAIAuthentication.LoadFromEnv -&gt; OpenAIAuthentication.LoadFromEnvironment

@@ -30,7 +30,6 @@ namespace OpenAI.Extensions
             Address = uri;
             RequestHeaders = requestHeaders ?? new Dictionary<string, string>();
             SubProtocols = subProtocols ?? new List<string>();
-            CreateWebsocketAsync = (_, _) => Task.FromResult<System.Net.WebSockets.WebSocket>(new ClientWebSocket());
             RunMessageQueue();
         }
 
@@ -122,9 +121,6 @@ namespace OpenAI.Extensions
         public async void Connect()
             => await ConnectAsync().ConfigureAwait(false);
 
-        // used for unit testing websocket server
-        internal Func<Uri, CancellationToken, Task<System.Net.WebSockets.WebSocket>> CreateWebsocketAsync;
-
         public async Task ConnectAsync(CancellationToken cancellationToken = default)
         {
             try
@@ -141,7 +137,7 @@ namespace OpenAI.Extensions
                 _lifetimeCts = new CancellationTokenSource();
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token, cancellationToken);
 
-                _socket = await CreateWebsocketAsync.Invoke(Address, cts.Token).ConfigureAwait(false);
+                _socket = new ClientWebSocket();
 
                 if (_socket is ClientWebSocket clientWebSocket)
                 {

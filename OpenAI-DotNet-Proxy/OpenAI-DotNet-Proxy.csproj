@@ -22,8 +22,10 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.7.4</Version>
+    <Version>8.8.0</Version>
     <PackageReleaseNotes>
+Version 8.8.0
+- Removed Websocket handling from the proxy
 Version 8.7.4
 - Updated proxy support for the OpenAI-DotNet package
 - Ensure we're returning the full response message body and content length to the clients

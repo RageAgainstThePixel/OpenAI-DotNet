@@ -13,7 +13,6 @@ using System.Net.Http;
 using System.Net.WebSockets;
 using System.Security.Authentication;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAI.Proxy
@@ -66,8 +65,7 @@ namespace OpenAI.Proxy
                 {
                     if (httpContext.WebSockets.IsWebSocketRequest)
                     {
-                        await ProcessWebSocketRequest(httpContext, endpoint).ConfigureAwait(false);
-                        return;
+                        throw new InvalidOperationException("Websockets not supported");
                     }
 
                     await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
@@ -87,9 +85,7 @@ namespace OpenAI.Proxy
 
                     var uri = new Uri(string.Format(
                         client.Settings.BaseRequestUrlFormat,
-                        QueryHelpers.AddQueryString(endpoint, modifiedQuery)
-                    ));
-
+                        QueryHelpers.AddQueryString(endpoint, modifiedQuery)));
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
@@ -129,16 +125,18 @@ namespace OpenAI.Proxy
                 }
                 catch (AuthenticationException authenticationException)
                 {
+                    Console.WriteLine($"{nameof(AuthenticationException)}: {authenticationException.Message}");
                     httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await httpContext.Response.WriteAsync(authenticationException.Message).ConfigureAwait(false);
                 }
-                catch (WebSocketException)
+                catch (WebSocketException webEx)
                 {
-                    // ignore
+                    Console.WriteLine($"{nameof(WebSocketException)} [{webEx.WebSocketErrorCode}] {webEx.Message}");
                     throw;
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine($"{nameof(Exception)}: {e.Message}");
                     if (httpContext.Response.HasStarted) { throw; }
                     httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     var response = JsonSerializer.Serialize(new { error = new { e.Message, e.StackTrace } });
@@ -151,88 +149,6 @@ namespace OpenAI.Proxy
                     await contentStream.CopyToAsync(responseStream, httpContext.RequestAborted).ConfigureAwait(false);
                     await responseStream.FlushAsync(httpContext.RequestAborted).ConfigureAwait(false);
                 }
-            }
-
-            async Task ProcessWebSocketRequest(HttpContext httpContext, string endpoint)
-            {
-                using var clientWebsocket = await httpContext.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
-
-                try
-                {
-                    await authenticationFilter.ValidateAuthenticationAsync(httpContext.Request.Headers).ConfigureAwait(false);
-                }
-                catch (AuthenticationException authenticationException)
-                {
-                    var message = JsonSerializer.Serialize(new
-                    {
-                        type = "error",
-                        error = new
-                        {
-                            type = "invalid_request_error",
-                            code = "invalid_session_token",
-                            message = authenticationException.Message
-                        }
-                    });
-                    await clientWebsocket.SendAsync(System.Text.Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, httpContext.RequestAborted).ConfigureAwait(false);
-                    await clientWebsocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, authenticationException.Message, httpContext.RequestAborted).ConfigureAwait(false);
-                    return;
-                }
-
-                if (endpoint.EndsWith("echo"))
-                {
-                    await EchoAsync(clientWebsocket, httpContext.RequestAborted);
-                    return;
-                }
-
-                using var hostWebsocket = new ClientWebSocket();
-
-                foreach (var header in client.WebsocketHeaders)
-                {
-                    hostWebsocket.Options.SetRequestHeader(header.Key, header.Value);
-                }
-
-                var uri = new Uri(string.Format(
-                    client.Settings.BaseWebSocketUrlFormat,
-                    $"{endpoint}{httpContext.Request.QueryString}"
-                ));
-                await hostWebsocket.ConnectAsync(uri, httpContext.RequestAborted).ConfigureAwait(false);
-                var receive = ProxyWebSocketMessages(clientWebsocket, hostWebsocket, httpContext.RequestAborted);
-                var send = ProxyWebSocketMessages(hostWebsocket, clientWebsocket, httpContext.RequestAborted);
-                await Task.WhenAll(receive, send).ConfigureAwait(false);
-                return;
-
-                async Task ProxyWebSocketMessages(WebSocket fromSocket, WebSocket toSocket, CancellationToken cancellationToken)
-                {
-                    var buffer = new byte[1024 * 4];
-                    var memoryBuffer = buffer.AsMemory();
-
-                    while (fromSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
-                    {
-                        var result = await fromSocket.ReceiveAsync(memoryBuffer, cancellationToken).ConfigureAwait(false);
-
-                        if (fromSocket.CloseStatus.HasValue || result.MessageType == WebSocketMessageType.Close)
-                        {
-                            await toSocket.CloseOutputAsync(fromSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, fromSocket.CloseStatusDescription ?? "Closing", cancellationToken).ConfigureAwait(false);
-                            break;
-                        }
-
-                        await toSocket.SendAsync(memoryBuffer[..result.Count], result.MessageType, result.EndOfMessage, cancellationToken).ConfigureAwait(false);
-                    }
-                }
-            }
-
-            static async Task EchoAsync(WebSocket webSocket, CancellationToken cancellationToken)
-            {
-                var buffer = new byte[1024 * 4];
-                var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
-
-                while (!receiveResult.CloseStatus.HasValue)
-                {
-                    await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Count), receiveResult.MessageType, receiveResult.EndOfMessage, cancellationToken);
-                    receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
-                }
-
-                await webSocket.CloseAsync(receiveResult.CloseStatus.Value, receiveResult.CloseStatusDescription, cancellationToken);
             }
         }
     }

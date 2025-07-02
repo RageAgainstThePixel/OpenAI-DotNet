@@ -3,6 +3,7 @@
 using OpenAI.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,8 +14,6 @@ namespace OpenAI.Realtime
         internal RealtimeEndpoint(OpenAIClient client) : base(client) { }
 
         protected override string Root => "realtime";
-
-        protected override bool? IsWebSocketEndpoint => true;
 
         /// <summary>
         /// Creates a new realtime session with the provided <see cref="SessionConfiguration"/> options.
@@ -36,7 +35,23 @@ namespace OpenAI.Realtime
                 queryParameters["model"] = model;
             }
 
-            var session = new RealtimeSession(client.CreateWebSocket(GetUrl(queryParameters: queryParameters)), EnableDebug);
+            var payload = JsonSerializer.Serialize(configuration).ToJsonStringContent();
+            var createSessionResponse = await HttpClient.PostAsync(GetUrl("/sessions"), payload, cancellationToken).ConfigureAwait(false);
+            var createSession = await createSessionResponse.DeserializeAsync<SessionConfiguration>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
+
+            if (createSession == null ||
+                string.IsNullOrWhiteSpace(createSession.ClientSecret?.EphemeralApiKey))
+            {
+                throw new InvalidOperationException("Failed to create a session. Ensure the configuration is valid and the API key is set.");
+            }
+
+            var websocket = new WebSocket(GetWebsocketUri(queryParameters: queryParameters), new Dictionary<string, string>
+            {
+                { "User-Agent", "OpenAI-DotNet" },
+                { "OpenAI-Beta", "realtime=v1" },
+                { "Authorization", $"Bearer {createSession.ClientSecret.EphemeralApiKey}" }
+            });
+            var session = new RealtimeSession(websocket, EnableDebug);
             var sessionCreatedTcs = new TaskCompletionSource<SessionResponse>();
 
             try
@@ -46,7 +61,6 @@ namespace OpenAI.Realtime
                 await session.ConnectAsync(cancellationToken).ConfigureAwait(false);
                 var sessionResponse = await sessionCreatedTcs.Task.WithCancellation(cancellationToken).ConfigureAwait(false);
                 session.Configuration = sessionResponse.SessionConfiguration;
-                await session.SendAsync(new UpdateSessionRequest(configuration), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             finally
             {
