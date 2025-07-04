@@ -61,11 +61,9 @@ namespace OpenAI.Realtime
             int? expiresAfter = null)
         {
             ClientSecret = new ClientSecret(expiresAfter);
-            Model = string.IsNullOrWhiteSpace(model.Id)
-                ? Models.Model.GPT4oRealtime
-                : model;
+            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT4oRealtime : model;
             Modalities = modalities;
-            Voice = voice ?? OpenAI.Voice.Alloy;
+            Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;
             Instructions = string.IsNullOrWhiteSpace(instructions)
                 ? "Your knowledge cutoff is 2023-10. You are a helpful, witty, and friendly AI. Act like a human, " +
                   "but remember that you aren't a human and that you can't do human things in the real world. " +
