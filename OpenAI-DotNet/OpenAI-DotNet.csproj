@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.8.0</Version>
+    <Version>8.8.1</Version>
     <PackageReleaseNotes>
+Version 8.8.1
+- Updated realtime audio transcription settings properties
 Version 8.8.0
 - Improved RealtimeSession websocket support for proxies
   - Proxy no longer handles the websocket connection directly, but instead initiates the connection to the OpenAI api directly using the ephemeral api key

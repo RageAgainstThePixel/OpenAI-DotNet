@@ -9,13 +9,25 @@ namespace OpenAI.Realtime
     {
         public InputAudioTranscriptionSettings() { }
 
-        public InputAudioTranscriptionSettings(Model model)
+        public InputAudioTranscriptionSettings(Model model, string prompt = null, string language = null)
         {
-            Model = string.IsNullOrWhiteSpace(model.Id) ? "whisper-1" : model;
+            Model = string.IsNullOrWhiteSpace(model.Id) ? Models.Model.Whisper1 : model;
+            Prompt = prompt;
+            Language = language;
         }
 
         [JsonInclude]
         [JsonPropertyName("model")]
         public string Model { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("prompt")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Prompt { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("language")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Language { get; private set; }
     }
 }
