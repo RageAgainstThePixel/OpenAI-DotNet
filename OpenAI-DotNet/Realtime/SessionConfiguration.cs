@@ -2,6 +2,7 @@
 
 using OpenAI.Extensions;
 using OpenAI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -12,6 +13,38 @@ namespace OpenAI.Realtime
     {
         public SessionConfiguration() { }
 
+        [Obsolete("use new ctor overload")]
+        public SessionConfiguration(
+            Model model,
+            Modality modalities,
+            Voice voice,
+            string instructions,
+            RealtimeAudioFormat inputAudioFormat,
+            RealtimeAudioFormat outputAudioFormat,
+            Model transcriptionModel,
+            IVoiceActivityDetectionSettings turnDetectionSettings,
+            IEnumerable<Tool> tools,
+            string toolChoice,
+            float? temperature,
+            int? maxResponseOutputTokens,
+            int? expiresAfter)
+            : this(
+                model: model,
+                modalities: modalities,
+                voice: voice,
+                instructions: instructions,
+                inputAudioFormat: inputAudioFormat,
+                outputAudioFormat: outputAudioFormat,
+                inputAudioTranscriptionSettings: new(transcriptionModel),
+                turnDetectionSettings: turnDetectionSettings,
+                tools: tools,
+                toolChoice: toolChoice,
+                temperature: temperature,
+                maxResponseOutputTokens: maxResponseOutputTokens,
+                expiresAfter: expiresAfter)
+        {
+        }
+
         public SessionConfiguration(
             Model model,
             Modality modalities = Modality.Text | Modality.Audio,
@@ -19,7 +52,7 @@ namespace OpenAI.Realtime
             string instructions = null,
             RealtimeAudioFormat inputAudioFormat = RealtimeAudioFormat.PCM16,
             RealtimeAudioFormat outputAudioFormat = RealtimeAudioFormat.PCM16,
-            Model transcriptionModel = null,
+            InputAudioTranscriptionSettings inputAudioTranscriptionSettings = null,
             IVoiceActivityDetectionSettings turnDetectionSettings = null,
             IEnumerable<Tool> tools = null,
             string toolChoice = null,
@@ -28,11 +61,9 @@ namespace OpenAI.Realtime
             int? expiresAfter = null)
         {
             ClientSecret = new ClientSecret(expiresAfter);
-            Model = string.IsNullOrWhiteSpace(model.Id)
-                ? Models.Model.GPT4oRealtime
-                : model;
+            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT4oRealtime : model;
             Modalities = modalities;
-            Voice = voice ?? OpenAI.Voice.Alloy;
+            Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;
             Instructions = string.IsNullOrWhiteSpace(instructions)
                 ? "Your knowledge cutoff is 2023-10. You are a helpful, witty, and friendly AI. Act like a human, " +
                   "but remember that you aren't a human and that you can't do human things in the real world. " +
@@ -43,9 +74,7 @@ namespace OpenAI.Realtime
                 : instructions;
             InputAudioFormat = inputAudioFormat;
             OutputAudioFormat = outputAudioFormat;
-            InputAudioTranscriptionSettings = new(string.IsNullOrWhiteSpace(transcriptionModel)
-                ? "whisper-1"
-                : transcriptionModel);
+            InputAudioTranscriptionSettings = inputAudioTranscriptionSettings;
             VoiceActivityDetectionSettings = turnDetectionSettings ?? new ServerVAD();
             tools.ProcessTools<Tool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList?.Where(t => t.IsFunction).Select(tool =>
