@@ -15,10 +15,18 @@ namespace OpenAI.Responses
             FileName = fileName;
         }
 
+        /// <summary>
+        /// If the fileId starts with "http" or "https", it is a file url, otherwise it is a file id.
+        /// </summary>
+        /// <param name="fileId">The id or url of the file.</param>
         public FileContent(string fileId)
         {
             Type = ResponseContentType.InputFile;
-            FileId = fileId;
+            if (fileId.StartsWith("http")) {
+                FileUrl = fileId;
+            } else {
+                FileId = fileId;
+            }
         }
 
         public FileContent(byte[] fileData, string fileName)
@@ -47,6 +55,11 @@ namespace OpenAI.Responses
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_name")]
         public string FileName { get; private set; }
+
+        [JsonInclude]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonPropertyName("file_url")]
+        public string FileUrl { get; private set; }
 
         [JsonIgnore]
         public string Object => Type.ToString();
