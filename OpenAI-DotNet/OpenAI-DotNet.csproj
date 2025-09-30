@@ -35,6 +35,8 @@ Version 8.8.2
 - Add file_url for responses api
 - Added NoiseReductionSettings for RealtimeConfiguration
 - Fix ConversationItemTruncateRequest.ContentIndex default serialization
+- Added support for gpt-5 and latest API changes
+- Added ConverstaionsEndpoint
 Version 8.8.1
 - Updated realtime audio transcription settings properties
 Version 8.8.0

@@ -20,5 +20,7 @@ namespace OpenAI.Responses
         InputFile,
         [EnumMember(Value = "refusal")]
         Refusal,
+        [EnumMember(Value = "reasoning_text")]
+        ReasoningText
     }
 }

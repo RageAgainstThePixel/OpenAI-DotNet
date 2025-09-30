@@ -22,9 +22,13 @@ namespace OpenAI.Responses
         public FileContent(string fileId)
         {
             Type = ResponseContentType.InputFile;
-            if (fileId.StartsWith("http")) {
+
+            if (fileId.StartsWith("http"))
+            {
                 FileUrl = fileId;
-            } else {
+            }
+            else
+            {
                 FileId = fileId;
             }
         }
@@ -37,28 +41,28 @@ namespace OpenAI.Responses
         }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public ResponseContentType Type { get; private set; }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_data")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FileData { get; private set; }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FileId { get; private set; }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FileName { get; private set; }
 
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("file_url")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FileUrl { get; private set; }
 
         [JsonIgnore]

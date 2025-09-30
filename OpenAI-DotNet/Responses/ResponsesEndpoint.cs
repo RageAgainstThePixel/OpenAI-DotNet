@@ -140,6 +140,7 @@ namespace OpenAI.Responses
                     switch (@event)
                     {
                         case "response.created":
+                        case "response.queued":
                         case "response.in_progress":
                         case "response.completed":
                         case "response.failed":
@@ -215,6 +216,8 @@ namespace OpenAI.Responses
                         case "response.output_text.done":
                         case "response.refusal.delta":
                         case "response.refusal.done":
+                        case "response.reasoning_summary_text.delta":
+                        case "response.reasoning_summary_text.done":
                             messageItem = (Message)response!.Output[outputIndex!.Value];
 
                             if (messageItem.Id != itemId)
@@ -282,6 +285,18 @@ namespace OpenAI.Responses
 
                                     serverSentEvent = refusalContent;
                                     break;
+                                case ReasoningContent reasoningContent:
+                                    if (!string.IsNullOrWhiteSpace(text))
+                                    {
+                                        reasoningContent.Text = text;
+                                    }
+
+                                    if (!string.IsNullOrWhiteSpace(delta))
+                                    {
+                                        reasoningContent.Delta = delta;
+                                    }
+
+                                    break;
                             }
                             break;
                         case "response.reasoning_summary_part.added":
@@ -297,34 +312,35 @@ namespace OpenAI.Responses
                             }
 
                             break;
-                        case "response.reasoning_summary_text.delta":
-                        case "response.reasoning_summary_text.done":
-                            summaryIndex = @object["summary_index"]!.GetValue<int>();
-                            reasoningItem = (ReasoningItem)response!.Output[outputIndex!.Value];
-                            summaryItem = reasoningItem.Summary[summaryIndex];
-
-                            if (!string.IsNullOrWhiteSpace(text))
-                            {
-                                summaryItem.Text = text;
-                            }
-
-                            summaryItem.Delta = !string.IsNullOrWhiteSpace(delta) ? delta : null;
-                            serverSentEvent = summaryItem;
-                            break;
                         case "error":
                             serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
                             break;
-                        case "response.code_interpreter_call.code.delta":
-                        case "response.code_interpreter_call.code.done":
-                        case "response.code_interpreter_call.completed":
-                        case "response.code_interpreter_call.in_progress":
+                        // TODO - implement handling for these events:
                         case "response.code_interpreter_call.interpreting":
-                        case "response.file_search_call.completed":
+                        case "response.code_interpreter_call.in_progress":
+                        case "response.code_interpreter_call.completed":
+                        case "response.code_interpreter_call_code.delta":
+                        case "response.code_interpreter_call_code.done":
+                        case "response.custom_tool_call_input.delta":
+                        case "response.custom_tool_call_input.done":
                         case "response.file_search_call.in_progress":
                         case "response.file_search_call.searching":
-                        case "response.web_search_call.completed":
+                        case "response.file_search_call.completed":
+                        case "response.image_generation_call.in_progress":
+                        case "response.image_generation_call.generating":
+                        case "response.image_generation_call.partial_image":
+                        case "response.image_generation_call.completed":
+                        case "response.mcp_call_arguments.delta":
+                        case "response.mcp_call_arguments.done":
+                        case "response.mcp_call.in_progress":
+                        case "response.mcp_call.completed":
+                        case "response.mcp_call.failed":
+                        case "response.mcp_list_tools.in_progress":
+                        case "response.mcp_list_tools.completed":
+                        case "response.mcp_list_tools.failed":
                         case "response.web_search_call.in_progress":
                         case "response.web_search_call.searching":
+                        case "response.web_search_call.completed":
                         default:
                             // if not properly handled raise it up to caller to deal with it themselves.
                             serverSentEvent = ssEvent;
