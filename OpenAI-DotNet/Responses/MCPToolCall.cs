@@ -1,9 +1,13 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
+    /// <summary>
+    /// An invocation of a tool on an MCP server.
+    /// </summary>
     public sealed class MCPToolCall : BaseResponse, IResponseItem
     {
         /// <inheritdoc />
@@ -41,7 +45,6 @@ namespace OpenAI.Responses
         /// The label of the MCP server running the tool.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("server_label")]
         public string ServerLabel { get; private set; }
 
@@ -49,9 +52,8 @@ namespace OpenAI.Responses
         /// A JSON string of the arguments to pass to the function.
         /// </summary>
         [JsonInclude]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("arguments")]
-        public string Arguments { get; private set; }
+        public JsonNode Arguments { get; private set; }
 
         /// <summary>
         /// The output from the tool call.

@@ -38,5 +38,9 @@ namespace OpenAI.Responses
         McpListTools,
         [EnumMember(Value = "item_reference")]
         ItemReference,
+        [EnumMember(Value = "custom_tool_call")]
+        CustomToolCall,
+        [EnumMember(Value = "custom_tool_call_output")]
+        CustomToolCallOutput
     }
 }

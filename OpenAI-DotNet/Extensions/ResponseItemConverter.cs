@@ -23,6 +23,8 @@ namespace OpenAI.Responses
                 "computer_call_output" => root.Deserialize<ComputerToolCall>(options),
                 "function_call" => root.Deserialize<FunctionToolCall>(options),
                 "function_call_output" => root.Deserialize<FunctionToolCallOutput>(options),
+                "custom_tool_call" => root.Deserialize<CustomToolCall>(options),
+                "custom_tool_call_output" => root.Deserialize<CustomToolCallOutput>(options),
                 "image_generation_call" => root.Deserialize<ImageGenerationCall>(options),
                 "local_shell_call" => root.Deserialize<LocalShellCall>(options),
                 "local_shell_call_output" => root.Deserialize<LocalShellCall>(options),
