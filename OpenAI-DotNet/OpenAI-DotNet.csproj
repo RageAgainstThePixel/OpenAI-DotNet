@@ -32,7 +32,8 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <Version>8.8.2</Version>
     <PackageReleaseNotes>
 Version 8.8.2
-- TODO
+- Add file_url for responses api
+- Added NoiseReductionSettings for RealtimeConfiguration
 Version 8.8.1
 - Updated realtime audio transcription settings properties
 Version 8.8.0
