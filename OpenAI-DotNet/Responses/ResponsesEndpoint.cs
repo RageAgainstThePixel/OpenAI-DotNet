@@ -129,7 +129,7 @@ namespace OpenAI.Responses
 
                 if (EnableDebug)
                 {
-                    Console.WriteLine($"\"{@event}\": {ssEvent.ToJsonString()}");
+                    Console.WriteLine(ssEvent.ToJsonString());
                 }
 
                 var @object = ssEvent.Data ?? ssEvent.Value;
