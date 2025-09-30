@@ -126,7 +126,12 @@ namespace OpenAI.Responses
             {
                 IServerSentEvent serverSentEvent = null;
                 var @event = ssEvent.Value.GetValue<string>();
-                Console.WriteLine($"\"{@event}\": {ssEvent.ToJsonString()}");
+
+                if (EnableDebug)
+                {
+                    Console.WriteLine($"\"{@event}\": {ssEvent.ToJsonString()}");
+                }
+
                 var @object = ssEvent.Data ?? ssEvent.Value;
                 var text = @object["text"]?.GetValue<string>();
                 var delta = @object["delta"]?.GetValue<string>();
