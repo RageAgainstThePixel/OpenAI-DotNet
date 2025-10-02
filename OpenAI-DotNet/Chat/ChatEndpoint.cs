@@ -154,7 +154,7 @@ namespace OpenAI.Chat
                 }
 
                 return resultHandler(partialResponse);
-            }, cancellationToken);
+            }, null, cancellationToken);
 
             if (chatResponse == null) { return null; }
             chatResponse.SetResponseData(response.Headers, client);

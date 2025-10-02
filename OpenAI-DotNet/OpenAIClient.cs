@@ -262,7 +262,6 @@ namespace OpenAI
             }
 
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v2");
 
             if (Settings.BaseRequestUrlFormat.Contains(OpenAISettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||

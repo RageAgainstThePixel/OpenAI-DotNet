@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,96 +13,103 @@ namespace OpenAI.Extensions
 {
     internal static class BaseEndpointExtensions
     {
-        private static Regex sseRegex = new(@"(?:(?<type>[^:\n]*):)(?<value>[^\n]*)");
+        private const char Space = ' ';
+        private const char Bom = '\uFEFF';
+        private const char NewLine = '\n';
+        private const char Return = '\r';
+        private const string DoneTag = "[DONE]";
+        private const string DoneEvent = "done";
 
         /// <summary>
         /// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
         /// </summary>
-        public static async Task<HttpResponseMessage> StreamEventsAsync(this OpenAIBaseEndpoint baseEndpoint, string endpoint, StringContent payload, Func<HttpResponseMessage, ServerSentEvent, Task> eventCallback, CancellationToken cancellationToken)
+        public static async Task<HttpResponseMessage> StreamEventsAsync(
+            this OpenAIBaseEndpoint baseEndpoint,
+            string endpoint,
+            StringContent payload,
+            Func<HttpResponseMessage, ServerSentEvent, Task> eventCallback,
+            IReadOnlyDictionary<string, string> headers,
+            CancellationToken cancellationToken)
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+            }
+
             request.Content = payload;
             var response = await baseEndpoint.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var events = new Stack<ServerSentEvent>();
             using var reader = new StreamReader(stream);
-            var isEndOfStream = false;
 
             try
             {
                 while (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } streamData)
                 {
-                    if (isEndOfStream) { break; }
                     cancellationToken.ThrowIfCancellationRequested();
-                    if (string.IsNullOrWhiteSpace(streamData)) { continue; }
 
-                    var matches = sseRegex.Matches(streamData);
-
-                    for (var i = 0; i < matches.Count; i++)
+                    if (!TryParseServerSentEventLine(streamData, out var type, out var value, out var data))
                     {
-                        ServerSentEventKind type;
-                        string value;
-                        string data;
+                        continue;
+                    }
 
-                        var match = matches[i];
+                    // if either value or data equals doneTag then stop processing events.
+                    if (string.Equals(value, DoneTag, StringComparison.Ordinal) ||
+                        string.Equals(value, DoneEvent, StringComparison.Ordinal) ||
+                        string.Equals(data, DoneTag, StringComparison.Ordinal))
+                    {
+                        break;
+                    }
 
-                        // If the field type is not provided, treat it as a comment
-                        type = ServerSentEvent.EventMap.GetValueOrDefault(match.Groups[nameof(type)].Value.Trim(), ServerSentEventKind.Comment);
-                        // The UTF-8 decode algorithm strips one leading UTF-8 Byte Order Mark (BOM), if any.
-                        value = match.Groups[nameof(value)].Value.TrimStart(' ');
-                        data = match.Groups[nameof(data)].Value;
+                    var @event = new ServerSentEvent(type);
 
-                        const string doneTag = "[DONE]";
-                        const string doneEvent = "done";
+                    try
+                    {
+                        @event.Value = JsonNode.Parse(value);
+                    }
+                    catch
+                    {
+                        @event.Value = value;
+                    }
 
-                        // if either value or data equals doneTag then stop processing events.
-                        if (value.Equals(doneTag) || data.Equals(doneTag) || value.Equals(doneEvent))
-                        {
-                            isEndOfStream = true;
-                            break;
-                        }
+                    var hasInlineData = type != ServerSentEventKind.Data && !string.IsNullOrWhiteSpace(data);
 
-                        var @event = new ServerSentEvent(type);
-
+                    if (hasInlineData)
+                    {
                         try
                         {
-                            @event.Value = JsonNode.Parse(value);
+                            @event.Data = JsonNode.Parse(data);
                         }
                         catch
                         {
-                            @event.Value = value;
+                            @event.Data = string.IsNullOrWhiteSpace(data) ? null : data;
                         }
+                    }
+                    else if (type == ServerSentEventKind.Data)
+                    {
+                        @event.Data = @event.Value;
+                    }
 
-                        if (!string.IsNullOrWhiteSpace(data))
-                        {
-                            try
-                            {
-                                @event.Data = JsonNode.Parse(data);
-                            }
-                            catch
-                            {
-                                @event.Data = string.IsNullOrWhiteSpace(data) ? null : data;
-                            }
-                        }
+                    if (type == ServerSentEventKind.Data && events.Count > 0 && events.Peek().Event == ServerSentEventKind.Event)
+                    {
+                        var previousEvent = events.Pop();
+                        previousEvent.Data = @event.Value;
+                        events.Push(previousEvent);
+                        await eventCallback.Invoke(response, previousEvent).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        events.Push(@event);
 
-                        if (type == ServerSentEventKind.Data &&
-                            events.Count > 0 &&
-                            events.Peek().Event == ServerSentEventKind.Event)
+                        if (type != ServerSentEventKind.Event)
                         {
-                            var previousEvent = events.Pop();
-                            previousEvent.Data = @event.Value;
-                            events.Push(previousEvent);
-                            await eventCallback.Invoke(response, previousEvent).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            events.Push(@event);
-
-                            if (type != ServerSentEventKind.Event)
-                            {
-                                await eventCallback.Invoke(response, @event).ConfigureAwait(false);
-                            }
+                            await eventCallback.Invoke(response, @event).ConfigureAwait(false);
                         }
                     }
                 }
@@ -114,6 +120,78 @@ namespace OpenAI.Extensions
             }
 
             return response;
+        }
+
+        private static bool TryParseServerSentEventLine(string streamData, out ServerSentEventKind type, out string value, out string data)
+        {
+            type = ServerSentEventKind.Comment;
+            value = string.Empty;
+            data = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(streamData))
+            {
+                return false;
+            }
+
+            var span = streamData.AsSpan();
+            var colonIndex = span.IndexOf(':');
+
+            if (colonIndex < 0)
+            {
+                return false;
+            }
+
+            var typeSpan = TrimWhitespace(span[..colonIndex]);
+            var valueSpan = span[(colonIndex + 1)..];
+
+            while (!valueSpan.IsEmpty && valueSpan[0] == Space)
+            {
+                valueSpan = valueSpan[1..];
+            }
+
+            if (!valueSpan.IsEmpty && valueSpan[0] == Bom)
+            {
+                valueSpan = valueSpan[1..];
+            }
+
+            while (!valueSpan.IsEmpty && (valueSpan[^1] == Return || valueSpan[^1] == NewLine))
+            {
+                valueSpan = valueSpan[..^1];
+            }
+
+            value = valueSpan.Length == 0 ? string.Empty : new string(valueSpan);
+
+            if (typeSpan.Length == 0)
+            {
+                return false;
+            }
+
+            type = ServerSentEvent.EventMap.GetValueOrDefault(new string(typeSpan), ServerSentEventKind.Comment);
+
+            if (type == ServerSentEventKind.Data)
+            {
+                data = value;
+            }
+
+            return true;
+        }
+
+        private static ReadOnlySpan<char> TrimWhitespace(ReadOnlySpan<char> span)
+        {
+            var start = 0;
+            var end = span.Length - 1;
+
+            while (start <= end && char.IsWhiteSpace(span[start]))
+            {
+                start++;
+            }
+
+            while (end >= start && char.IsWhiteSpace(span[end]))
+            {
+                end--;
+            }
+
+            return start > end ? span[..0] : span[start..(end + 1)];
         }
     }
 }

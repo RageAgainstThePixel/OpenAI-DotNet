@@ -362,7 +362,8 @@ namespace OpenAI.Responses
                     serverSentEvent ??= ssEvent;
                     await streamEventHandler.Invoke(@event, serverSentEvent).ConfigureAwait(false);
                 }
-            }, cancellationToken).ConfigureAwait(false);
+            }, null, cancellationToken).ConfigureAwait(false);
+
             // ReSharper restore AccessToModifiedClosure
 
             if (response == null) { return null; }
