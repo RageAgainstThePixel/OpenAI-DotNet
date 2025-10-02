@@ -122,6 +122,19 @@ namespace OpenAI.Models
         public static Model O3 { get; } = new("o3", "openai");
 
         /// <summary>
+        /// The o-series of models are trained with reinforcement learning to think before they answer and perform complex reasoning.
+        /// The o3-pro model uses more compute to think harder and provide consistently better answers.<br/>
+        /// o3-pro is available in the Responses API only to enable support for multi-turn model interactions before responding to API requests,
+        /// and other advanced API features in the future. Since o3-pro is designed to tackle tough problems, some requests may take several minutes to finish.
+        /// To avoid timeouts, try using background mode.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 200,000 tokens<br/>
+        /// - Max Output Tokens: 100,000 tokens
+        /// </remarks>
+        public static Model O3Pro { get; } = new("o3-pro", "openai");
+
+        /// <summary>
         /// o3-mini is our newest small reasoning model, providing high intelligence at the same cost and latency targets of o1-mini.
         /// o3-mini supports key developer features, like Structured Outputs, function calling, and Batch API.
         /// </summary>
@@ -146,6 +159,15 @@ namespace OpenAI.Models
         #region Realtime Models
 
         /// <summary>
+        /// This is our first general-availability realtime model, capable of responding to audio and text inputs in realtime over WebRTC, WebSocket, or SIP connections.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 32,000 tokens<br/>
+        /// - Max Output Tokens: 4,096 tokens
+        /// </remarks>
+        public static Model GPT_Realtime { get; } = new("gpt-realtime", "openai");
+
+        /// <summary>
         /// This is a preview release of the GPT-4o Realtime model, capable of responding to audio and text inputs in realtime over WebRTC or a WebSocket interface.
         /// </summary>
         /// <remarks>
@@ -166,6 +188,44 @@ namespace OpenAI.Models
         #endregion Realtime Models
 
         #region Chat Models
+
+        /// <summary>
+        /// GPT-5 is our flagship model for coding, reasoning, and agentic tasks across domains.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 context window<br/>
+        /// - Max Output Tokens: 128,000 max output tokens
+        /// </remarks>
+        public static Model GPT_5 { get; } = new("gpt-5", "openai");
+
+        /// <summary>
+        /// GPT-5 mini is a faster, more cost-efficient version of GPT-5. It's great for well-defined tasks and precise prompts.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 context window<br/>
+        /// - Max Output Tokens: 128,000 max output tokens
+        /// </remarks>
+        public static Model GPT_5_Mini { get; } = new("gpt-5-mini", "openai");
+
+        /// <summary>
+        /// GPT-5 Nano is our fastest, cheapest version of GPT-5. It's great for summarization and classification tasks.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 context window<br/>
+        /// - Max Output Tokens: 128,000 max output tokens
+        /// </remarks>
+        public static Model GPT_5_Nano { get; } = new("gpt-5-nano", "openai");
+
+        /// <summary>
+        /// GPT-5 Chat points to the GPT-5 snapshot currently used in ChatGPT.
+        /// We recommend GPT-5 for most API usage,
+        /// but feel free to use this GPT-5 Chat model to test our latest improvements for chat use cases.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 128,000 context window<br/>
+        /// - Max Output Tokens: 16,384 max output tokens
+        /// </remarks>
+        public static Model GPT_5_Chat { get; } = new("gpt-5-chat-latest", "openai");
 
         /// <summary>
         /// ChatGPT-4o points to the GPT-4o snapshot currently used in ChatGPT.
@@ -248,6 +308,14 @@ namespace OpenAI.Models
         /// </remarks>
         public static Model GPT4_1_Nano { get; } = new("gpt-4.1-nano", "openai");
 
+        /// <summary>
+        /// Deprecated - a research preview of GPT-4.5. We recommend using gpt-4.1 or o3 models instead for most use cases.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 128,000 context window<br/>
+        /// - Max Output Tokens: 16,384 max output tokens
+        /// </remarks>
+        [Obsolete("Deprecated")]
         public static Model GPT4_5 { get; } = new("gpt-4.5-preview", "openai");
 
         /// <summary>
@@ -352,6 +420,16 @@ namespace OpenAI.Models
         #region Audio Models
 
         /// <summary>
+        /// The gpt-audio model is our first generally available audio model.
+        /// It accepts audio inputs and outputs, and can be used in the Chat Completions REST API.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 128,000 tokens<br/>
+        /// - Max Output Tokens: 16,384 max output tokens
+        /// </remarks>
+        public static Model GPT_Audio { get; } = new("gpt-audio", "openai");
+
+        /// <summary>
         /// TTS is a model that converts text to natural sounding spoken text.
         /// The tts-1-hd model is optimized for high quality text-to-speech use cases.
         /// Use it with the Speech endpoint in the Audio API.
@@ -417,5 +495,50 @@ namespace OpenAI.Models
         public static Model DallE_2 { get; } = new("dall-e-2", "openai");
 
         #endregion Image Models
+
+        #region Specilized Models
+
+        /// <summary>
+        /// GPT-5-Codex is a version of GPT-5 optimized for agentic coding tasks in Codex or similar environments.
+        /// It's available in the Responses API only and the underlying model snapshot will be regularly updated.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 tokens<br/>
+        /// - Max Output Tokens: 128,000 tokens
+        /// </remarks>
+        public static Model GPT_5_Codex { get; } = new("gpt-5-codex", "openai");
+
+        /// <summary>
+        /// codex-mini-latest is a fine-tuned version of o4-mini specifically for use in Codex CLI.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 200,000 tokens<br/>
+        /// - Max Output Tokens: 100,000 tokens
+        /// </remarks>
+        public static Model Codex_Mini_Latest { get; } = new("codex-mini-latest", "openai");
+
+        #endregion Specilized Models
+
+        #region Open Weight Models
+
+        /// <summary>
+        /// gpt-oss-120bis our most powerful open-weight model, which fits into a single H100 GPU (117B parameters with 5.1B active parameters).
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 131,072 context window<br/>
+        /// - Max Output Tokens: 131,072 max output tokens
+        /// </remarks>
+        public static Model GPT_OSS_120B { get; } = new("gpt-oss-120b", "openai");
+
+        /// <summary>
+        /// gpt-oss-20b is our medium-sized open-weight model for low latency, local, or specialized use-cases (21B parameters with 3.6B active parameters).
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 131,072 context window<br/>
+        /// - Max Output Tokens: 131,072 max output tokens
+        /// </remarks>
+        public static Model GPT_OSS_20B { get; } = new("gpt-oss-20b", "openai");
+
+        #endregion Open Weight Models
     }
 }
