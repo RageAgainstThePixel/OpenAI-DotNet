@@ -22,8 +22,10 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.8.0</Version>
+    <Version>8.8.2</Version>
     <PackageReleaseNotes>
+Version 8.8.2
+- Updated forwarded request headers
 Version 8.8.0
 - Removed Websocket handling from the proxy
 Version 8.7.4
