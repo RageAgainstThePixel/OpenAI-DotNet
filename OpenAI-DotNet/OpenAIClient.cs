@@ -75,6 +75,7 @@ namespace OpenAI
             VectorStoresEndpoint = new VectorStoresEndpoint(this);
             RealtimeEndpoint = new RealtimeEndpoint(this);
             ResponsesEndpoint = new ResponsesEndpoint(this);
+            ConversationsEndpoint = new ConversationsEndpoint(this);
         }
 
         ~OpenAIClient() => Dispose(false);
@@ -238,6 +239,12 @@ namespace OpenAI
         /// </summary>
         public ResponsesEndpoint ResponsesEndpoint { get; }
 
+        /// <summary>
+        /// Create and manage conversations to store and retrieve conversation state across Response API calls.
+        /// <see href="https://platform.openai.com/docs/api-reference/conversations"/>
+        /// </summary>
+        public ConversationsEndpoint ConversationsEndpoint { get; }
+
         #endregion Endpoints
 
         private HttpClient SetupHttpClient(HttpClient client = null)
@@ -255,7 +262,6 @@ namespace OpenAI
             }
 
             client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            client.DefaultRequestHeaders.Add("OpenAI-Beta", "assistants=v2");
 
             if (Settings.BaseRequestUrlFormat.Contains(OpenAISettings.OpenAIDomain) &&
                 (string.IsNullOrWhiteSpace(OpenAIAuthentication.ApiKey) ||

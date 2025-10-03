@@ -51,7 +51,7 @@ namespace OpenAI.Moderations
         public async Task<ModerationsResponse> CreateModerationAsync(ModerationsRequest request, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ModerationsResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 

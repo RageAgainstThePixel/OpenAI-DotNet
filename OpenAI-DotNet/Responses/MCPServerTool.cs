@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
@@ -12,14 +13,16 @@ namespace OpenAI.Responses
 
         [JsonInclude]
         [JsonPropertyName("description")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Description { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("input_schema")]
-        public string InputSchema { get; private set; }
+        public JsonNode InputSchema { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("annotations")]
-        public object Annotations { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public JsonNode Annotations { get; private set; }
     }
 }

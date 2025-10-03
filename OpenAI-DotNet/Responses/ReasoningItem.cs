@@ -49,6 +49,41 @@ namespace OpenAI.Responses
             private set => summary = value?.ToList() ?? new();
         }
 
+        private List<ReasoningContent> content = new();
+
+        [JsonInclude]
+        [JsonPropertyName("content")]
+        public IReadOnlyList<ReasoningContent> Content
+        {
+            get => content;
+            private set => content = value?.ToList() ?? new();
+        }
+
+        [JsonInclude]
+        [JsonPropertyName("encrypted_content")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string EncryptedContent { get; private set; }
+
+        internal void InsertReasoningContent(ReasoningContent reasoningContent, int index)
+        {
+            if (reasoningContent == null)
+            {
+                throw new ArgumentNullException(nameof(reasoningContent));
+            }
+
+            content ??= new();
+
+            if (index > content.Count)
+            {
+                for (var i = content.Count; i < index; i++)
+                {
+                    content.Add(null);
+                }
+            }
+
+            content.Insert(index, reasoningContent);
+        }
+
         internal void InsertSummary(ReasoningSummary item, int index)
         {
             if (item == null)

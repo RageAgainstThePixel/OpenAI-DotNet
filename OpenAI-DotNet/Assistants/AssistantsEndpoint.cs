@@ -1,6 +1,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using OpenAI.Extensions;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,11 @@ namespace OpenAI.Assistants
 
         protected override string Root => "assistants";
 
+        internal override IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; } = new Dictionary<string, IEnumerable<string>>
+        {
+            { "OpenAI-Beta", ["assistants=v2"] }
+        };
+
         /// <summary>
         /// Get list of assistants.
         /// </summary>
@@ -21,7 +27,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="ListResponse{AssistantResponse}"/>.</returns>
         public async Task<ListResponse<AssistantResponse>> ListAssistantsAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<AssistantResponse>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -56,7 +62,7 @@ namespace OpenAI.Assistants
         {
             request ??= new CreateAssistantRequest();
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<AssistantResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -68,7 +74,7 @@ namespace OpenAI.Assistants
         /// <returns><see cref="AssistantResponse"/>.</returns>
         public async Task<AssistantResponse> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<AssistantResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -82,7 +88,7 @@ namespace OpenAI.Assistants
         public async Task<AssistantResponse> ModifyAssistantAsync(string assistantId, CreateAssistantRequest request, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl($"/{assistantId}"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{assistantId}"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<AssistantResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -94,7 +100,7 @@ namespace OpenAI.Assistants
         /// <returns>True, if the assistant was deleted.</returns>
         public async Task<bool> DeleteAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.DeleteAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await DeleteAsync(GetUrl($"/{assistantId}"), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result?.Deleted ?? false;
         }

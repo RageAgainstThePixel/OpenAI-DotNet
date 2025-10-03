@@ -188,7 +188,7 @@ namespace OpenAI.Tests
             Console.WriteLine(api.Settings.BaseRequestUrlFormat);
             Console.WriteLine(api.Settings.BaseWebSocketUrlFormat);
             Assert.AreEqual($"https://{domain}/v1/{{0}}", api.Settings.BaseRequestUrlFormat);
-            Assert.AreEqual($"wss://{domain}/v1/{{0}}", api.Settings.BaseWebSocketUrlFormat);
+            Assert.AreEqual($"wss://{OpenAISettings.OpenAIDomain}/v1/{{0}}", api.Settings.BaseWebSocketUrlFormat);
         }
 
         [TearDown]

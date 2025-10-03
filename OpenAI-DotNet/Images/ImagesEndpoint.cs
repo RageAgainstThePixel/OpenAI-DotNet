@@ -35,7 +35,7 @@ namespace OpenAI.Images
         public async Task<IReadOnlyList<ImageResult>> GenerateImageAsync(ImageGenerationRequest request, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/generations"), payload, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
@@ -107,7 +107,7 @@ namespace OpenAI.Images
                 request.Dispose();
             }
 
-            using var response = await HttpClient.PostAsync(GetUrl("/edits"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/edits"), payload, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 
@@ -157,7 +157,7 @@ namespace OpenAI.Images
                 request.Dispose();
             }
 
-            using var response = await HttpClient.PostAsync(GetUrl("/variations"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/variations"), payload, cancellationToken).ConfigureAwait(false);
             return await DeserializeResponseAsync(response, payload, cancellationToken).ConfigureAwait(false);
         }
 

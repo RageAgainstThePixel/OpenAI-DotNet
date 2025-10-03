@@ -45,6 +45,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("content_index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public int ContentIndex { get; private set; }
 
         /// <summary>

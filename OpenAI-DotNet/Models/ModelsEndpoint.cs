@@ -36,7 +36,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the list of all <see cref="Model"/>s</returns>
         public async Task<IReadOnlyList<Model>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl(), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<ModelsList>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result?.Models;
         }
@@ -49,7 +49,7 @@ namespace OpenAI.Models
         /// <returns>Asynchronously returns the <see cref="Model"/> with all available properties</returns>
         public async Task<Model> GetModelDetailsAsync(string id, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{id}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Model>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -73,7 +73,7 @@ namespace OpenAI.Models
 
             try
             {
-                using var response = await HttpClient.DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
+                using var response = await DeleteAsync(GetUrl($"/{model.Id}"), cancellationToken).ConfigureAwait(false);
                 var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
                 return result?.Deleted ?? false;
             }

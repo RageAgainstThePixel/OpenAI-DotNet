@@ -25,6 +25,7 @@ namespace OpenAI.Responses
                 "input_image" => root.Deserialize<ImageContent>(options),
                 "input_file" => root.Deserialize<FileContent>(options),
                 "refusal" => root.Deserialize<RefusalContent>(options),
+                "reasoning_text" => root.Deserialize<ReasoningContent>(options),
                 _ => throw new NotImplementedException($"Unknown response content type: {type}")
             };
         }

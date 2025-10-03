@@ -48,6 +48,15 @@ namespace OpenAI.Responses
         public bool? Background { get; private set; }
 
         /// <summary>
+        /// The conversation that this response belongs to.
+        /// Input items and output items from this response are automatically added to this conversation.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("conversation")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Conversation Conversation { get; private set; }
+
+        /// <summary>
         /// An error object returned when the model fails to generate a Response.
         /// </summary>
         [JsonInclude]
@@ -112,6 +121,16 @@ namespace OpenAI.Responses
         public int? MaxOutputTokens { get; private set; }
 
         /// <summary>
+        /// The maximum number of total calls to built-in tools that can be processed in a response.
+        /// This maximum number applies across all built-in tool calls, not per individual tool.
+        /// Any further attempts to call a tool by the model will be ignored.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("max_tool_calls")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? MaxToolCalls { get; private set; }
+
+        /// <summary>
         /// Set of 16 key-value pairs that can be attached to an object.
         /// This can be useful for storing additional information about the object in a structured format,
         /// and querying for objects via API or the dashboard.
@@ -151,6 +170,16 @@ namespace OpenAI.Responses
         [JsonPropertyName("reasoning")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Reasoning Reasoning { get; private set; }
+
+        /// <summary>
+        /// A stable identifier used to help detect users of your application that may be violating OpenAI's usage policies.
+        /// The IDs should be a string that uniquely identifies each user.
+        /// We recommend hashing their username or email address, in order to avoid sending us any identifying information.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("safety_identifier")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string SafetyIdentifier { get; private set; }
 
         /// <summary>
         /// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service:<br/>
@@ -213,6 +242,15 @@ namespace OpenAI.Responses
         [JsonPropertyName("tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<ITool> Tools { get; private set; }
+
+        /// <summary>
+        /// An integer between 0 and 20 specifying the number of most likely tokens to return at each token position,
+        /// each with an associated log probability.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("top_logprobs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? TopLogProbs { get; private set; }
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling,

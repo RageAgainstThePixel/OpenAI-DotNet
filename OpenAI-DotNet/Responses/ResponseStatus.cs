@@ -20,6 +20,8 @@ namespace OpenAI.Responses
         [EnumMember(Value = "queued")]
         Queued,
         [EnumMember(Value = "incomplete")]
-        Incomplete
+        Incomplete,
+        [EnumMember(Value = "generating")]
+        Generating
     }
 }

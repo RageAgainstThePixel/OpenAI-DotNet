@@ -30,7 +30,7 @@ namespace OpenAI.VectorStores
         public async Task<VectorStoreResponse> CreateVectorStoreAsync(CreateVectorStoreRequest request, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -42,7 +42,7 @@ namespace OpenAI.VectorStores
         /// <returns><see cref="ListResponse{VectorStoreResponse}"/>.</returns>
         public async Task<ListResponse<VectorStoreResponse>> ListVectorStoresAsync(ListQuery query = null, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl(queryParameters: query), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<VectorStoreResponse>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -56,7 +56,7 @@ namespace OpenAI.VectorStores
         /// <returns><see cref="VectorStoreResponse"/>.</returns>
         public async Task<VectorStoreResponse> GetVectorStoreAsync(string vectorStoreId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl($"/{vectorStoreId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{vectorStoreId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -84,7 +84,7 @@ namespace OpenAI.VectorStores
             var expirationPolicy = expiresAfter.HasValue ? new ExpirationPolicy(expiresAfter.Value) : null;
             var request = new { name, expires_after = expirationPolicy, metadata };
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl($"/{vectorStoreId}"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{vectorStoreId}"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -98,7 +98,7 @@ namespace OpenAI.VectorStores
         /// <returns>True, if the vector store was successfully deleted.</returns>
         public async Task<bool> DeleteVectorStoreAsync(string vectorStoreId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.DeleteAsync(GetUrl($"/{vectorStoreId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await DeleteAsync(GetUrl($"/{vectorStoreId}"), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result?.Deleted ?? false;
         }
@@ -121,7 +121,7 @@ namespace OpenAI.VectorStores
         public async Task<VectorStoreFileResponse> CreateVectorStoreFileAsync(string vectorStoreId, string fileId, ChunkingStrategy chunkingStrategy = null, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(new { file_id = fileId, chunking_strategy = chunkingStrategy }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl($"/{vectorStoreId}/files"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{vectorStoreId}/files"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreFileResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -143,7 +143,7 @@ namespace OpenAI.VectorStores
                 queryParams.Add("filter", $"{filter.Value}");
             }
 
-            using var response = await HttpClient.GetAsync(GetUrl($"/{vectorStoreId}/files", queryParams), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{vectorStoreId}/files", queryParams), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<VectorStoreFileResponse>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -156,7 +156,7 @@ namespace OpenAI.VectorStores
         /// <returns><see cref="VectorStoreFileResponse"/>.</returns>
         public async Task<VectorStoreFileResponse> GetVectorStoreFileAsync(string vectorStoreId, string fileId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl($"/{vectorStoreId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{vectorStoreId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreFileResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -171,7 +171,7 @@ namespace OpenAI.VectorStores
         /// <returns>True, if the vector store file was successfully deleted.</returns>
         public async Task<bool> DeleteVectorStoreFileAsync(string vectorStoreId, string fileId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.DeleteAsync(GetUrl($"/{vectorStoreId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await DeleteAsync(GetUrl($"/{vectorStoreId}/files/{fileId}"), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result?.Deleted ?? false;
         }
@@ -198,7 +198,7 @@ namespace OpenAI.VectorStores
         {
             if (fileIds is not { Count: not 0 }) { throw new ArgumentNullException(nameof(fileIds)); }
             using var payload = JsonSerializer.Serialize(new { file_ids = fileIds, chunking_strategy = chunkingStrategy }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl($"/{vectorStoreId}/file_batches"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{vectorStoreId}/file_batches"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreFileBatchResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -238,7 +238,7 @@ namespace OpenAI.VectorStores
                 queryParams.Add("filter", $"{filter.Value}");
             }
 
-            using var response = await HttpClient.GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/files", queryParams), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/files", queryParams), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<VectorStoreFileBatchResponse>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -251,7 +251,7 @@ namespace OpenAI.VectorStores
         /// <returns><see cref="VectorStoreFileBatchResponse"/>.</returns>
         public async Task<VectorStoreFileBatchResponse> GetVectorStoreFileBatchAsync(string vectorStoreId, string fileBatchId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<VectorStoreFileBatchResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -265,7 +265,7 @@ namespace OpenAI.VectorStores
         /// <returns>True, if the vector store file batch was cancelled, otherwise false.</returns>
         public async Task<bool> CancelVectorStoreFileBatchAsync(string vectorStoreId, string fileBatchId, CancellationToken cancellationToken = default)
         {
-            using var response = await HttpClient.PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{vectorStoreId}/file_batches/{fileBatchId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<VectorStoreFileBatchResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
 
             if (result.Status < VectorStoreFileStatus.Cancelling)

@@ -69,7 +69,8 @@ namespace OpenAI.Tests
             Assert.NotNull(OpenAIClient.ResponsesEndpoint);
             var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync("Tell me a three sentence bedtime story about a unicorn.", async (@event, sseEvent) =>
             {
-                Console.WriteLine($"{@event}: {sseEvent.ToJsonString()}");
+                Assert.NotNull(@event);
+                Assert.NotNull(sseEvent);
                 await Task.CompletedTask;
             });
             Assert.NotNull(response);
@@ -463,6 +464,95 @@ namespace OpenAI.Tests
             Assert.IsNotEmpty(textContent!.Text);
             Console.WriteLine($"{messageItem.Role}: {messageItem}");
             response.PrintUsage();
+        }
+
+        [Test]
+        public async Task Test_06_01_ImageGenerationTool()
+        {
+            Assert.NotNull(OpenAIClient.ResponsesEndpoint);
+            var tools = new List<Tool>
+                {
+                    new ImageGenerationTool(
+                        model: Model.GPT_Image_1,
+                        size: "1024x1024",
+                        quality: "low",
+                        outputFormat: "png")
+                };
+            var request = new CreateResponseRequest(
+                input: new Message(Role.User, "Create an image of a futuristic city with flying cars."),
+                model: Model.GPT4_1_Nano,
+                tools: tools,
+                toolChoice: "auto");
+            var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request, serverSentEvent =>
+            {
+                if (serverSentEvent is ImageGenerationCall { Status: ResponseStatus.Generating } imageGenerationCall)
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(imageGenerationCall.Result));
+                }
+                return Task.CompletedTask;
+            });
+            Assert.NotNull(response);
+            Assert.IsNotEmpty(response.Id);
+            Assert.AreEqual(ResponseStatus.Completed, response.Status);
+
+            // make sure we have at least the image generation call in the response output array
+            var imageCall = response.Output.FirstOrDefault(i => i.Type == ResponseItemType.ImageGenerationCall) as ImageGenerationCall;
+            Assert.NotNull(imageCall);
+            Assert.AreEqual(ResponseStatus.Generating, imageCall.Status);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(imageCall.Result));
+
+            response.PrintUsage();
+        }
+
+        [Test]
+        public async Task Test_07_01_MCPTool()
+        {
+            try
+            {
+                Assert.NotNull(OpenAIClient.ResponsesEndpoint);
+                await Task.CompletedTask;
+
+                var conversation = new List<IResponseItem>
+                {
+                    new Message(Role.System, "You are a Dungeons and Dragons Master. Guide the players through the game turn by turn."),
+                    new Message(Role.User, "Roll 2d4+1")
+                };
+                var tools = new List<Tool>
+                {
+                    new MCPTool(
+                        serverLabel: "dmcp",
+                        serverDescription: "A Dungeons and Dragons MCP server to assist with dice rolling.",
+                        serverUrl: "https://dmcp-server.deno.dev/sse",
+                        requireApproval: MCPToolRequireApproval.Never)
+                };
+
+                Task StreamEventHandler(string @event, IServerSentEvent serverSentEvent)
+                {
+                    switch (serverSentEvent)
+                    {
+                        case MCPListTools mcpListTools:
+                            Assert.NotNull(mcpListTools);
+                            break;
+                        case MCPToolCall mcpToolCall:
+                            Assert.NotNull(mcpToolCall);
+                            break;
+                    }
+
+                    return Task.CompletedTask;
+                }
+
+                var request = new CreateResponseRequest(conversation, Model.GPT4_1_Nano, tools: tools, toolChoice: "auto");
+                var response = await OpenAIClient.ResponsesEndpoint.CreateModelResponseAsync(request, StreamEventHandler);
+
+                Assert.NotNull(response);
+                Assert.IsNotEmpty(response.Id);
+                Assert.AreEqual(ResponseStatus.Completed, response.Status);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

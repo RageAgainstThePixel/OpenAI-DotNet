@@ -22,6 +22,7 @@ namespace OpenAI.Proxy
         // Copied from https://github.com/microsoft/reverse-proxy/blob/51d797986b1fea03500a1ad173d13a1176fb5552/src/ReverseProxy/Forwarder/RequestUtilities.cs#L61-L83
         private static readonly HashSet<string> excludedHeaders = new()
         {
+            HeaderNames.Authorization,
             HeaderNames.Connection,
             HeaderNames.TransferEncoding,
             HeaderNames.KeepAlive,
@@ -89,6 +90,18 @@ namespace OpenAI.Proxy
                     using var request = new HttpRequestMessage(method, uri);
                     request.Content = new StreamContent(httpContext.Request.Body);
 
+                    foreach (var (key, value) in httpContext.Request.Headers)
+                    {
+                        if (excludedHeaders.Contains(key) ||
+                            string.Equals(key, HeaderNames.ContentType, StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(key, HeaderNames.ContentLength, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        request.Headers.TryAddWithoutValidation(key, value.ToArray());
+                    }
+
                     if (httpContext.Request.ContentType != null)
                     {
                         request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
@@ -110,6 +123,7 @@ namespace OpenAI.Proxy
                         if (excludedHeaders.Contains(key)) { continue; }
                         httpContext.Response.Headers[key] = value.ToArray();
                     }
+
                     const string streamingContent = "text/event-stream";
 
                     if (httpContext.Response.ContentType != null &&

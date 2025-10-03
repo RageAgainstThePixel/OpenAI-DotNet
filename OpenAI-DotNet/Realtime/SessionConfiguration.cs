@@ -58,7 +58,8 @@ namespace OpenAI.Realtime
             string toolChoice = null,
             float? temperature = null,
             int? maxResponseOutputTokens = null,
-            int? expiresAfter = null)
+            int? expiresAfter = null,
+            NoiseReductionSettings inputAudioNoiseSettings = null)
         {
             ClientSecret = new ClientSecret(expiresAfter);
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT4oRealtime : model;
@@ -74,7 +75,7 @@ namespace OpenAI.Realtime
                 : instructions;
             InputAudioFormat = inputAudioFormat;
             OutputAudioFormat = outputAudioFormat;
-            InputAudioTranscriptionSettings = inputAudioTranscriptionSettings;
+            InputAudioNoiseReduction = inputAudioNoiseSettings;
             VoiceActivityDetectionSettings = turnDetectionSettings ?? new ServerVAD();
             tools.ProcessTools<Tool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList?.Where(t => t.IsFunction).Select(tool =>
@@ -94,6 +95,8 @@ namespace OpenAI.Realtime
                     _ => maxResponseOutputTokens
                 };
             }
+
+            InputAudioTranscriptionSettings = inputAudioTranscriptionSettings;
         }
 
         internal SessionConfiguration(
@@ -187,5 +190,10 @@ namespace OpenAI.Realtime
         [JsonPropertyName("max_response_output_tokens")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public object MaxResponseOutputTokens { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("input_audio_noise_reduction")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public NoiseReductionSettings InputAudioNoiseReduction { get; private set; }
     }
 }

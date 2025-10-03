@@ -94,7 +94,17 @@ namespace OpenAI.Responses
         [JsonIgnore]
         internal string Delta
         {
-            set => argumentsString += value;
+            set
+            {
+                if (value == null)
+                {
+                    argumentsString = null;
+                }
+                else
+                {
+                    argumentsString += value;
+                }
+            }
         }
 
         public FunctionToolCallOutput InvokeFunction()

@@ -71,7 +71,7 @@ namespace OpenAI.Responses
             private set => content = value?.ToList() ?? [];
         }
 
-        internal void AddContentItem(IResponseContent item, int index)
+        internal void AddOrUpdateContentItem(IResponseContent item, int index)
         {
             if (item == null)
             {

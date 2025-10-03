@@ -36,7 +36,7 @@ namespace OpenAI.Realtime
             }
 
             var payload = JsonSerializer.Serialize(configuration).ToJsonStringContent();
-            var createSessionResponse = await HttpClient.PostAsync(GetUrl("/sessions"), payload, cancellationToken).ConfigureAwait(false);
+            var createSessionResponse = await PostAsync(GetUrl("/sessions"), payload, cancellationToken).ConfigureAwait(false);
             var createSession = await createSessionResponse.DeserializeAsync<SessionConfiguration>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
 
             if (createSession == null ||

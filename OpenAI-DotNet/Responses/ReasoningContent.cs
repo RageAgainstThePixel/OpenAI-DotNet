@@ -4,21 +4,21 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Responses
 {
-    public sealed class RefusalContent : BaseResponse, IResponseContent
+    public sealed class ReasoningContent : BaseResponse, IResponseContent
     {
         /// <summary>
-        /// The type of the refusal. Always `refusal`.
+        /// The type of the refusal. Always `reasoning_text`.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("type")]
         public ResponseContentType Type { get; private set; }
 
         /// <summary>
-        /// The refusal explanation from the model.
+        /// The reasoning text from the model.
         /// </summary>
         [JsonInclude]
-        [JsonPropertyName("refusal")]
-        public string Refusal { get; internal set; }
+        [JsonPropertyName("text")]
+        public string Text { get; internal set; }
 
         private string delta;
 
@@ -43,6 +43,6 @@ namespace OpenAI.Responses
         public string Object => Type.ToString();
 
         public override string ToString()
-            => Delta ?? Refusal ?? string.Empty;
+            => Delta ?? Text ?? string.Empty;
     }
 }

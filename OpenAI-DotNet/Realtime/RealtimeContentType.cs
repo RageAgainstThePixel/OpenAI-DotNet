@@ -15,6 +15,6 @@ namespace OpenAI.Realtime
         [EnumMember(Value = "input_audio")]
         InputAudio,
         [EnumMember(Value = "item_reference")]
-        ItemReference
+        ItemReference,
     }
 }

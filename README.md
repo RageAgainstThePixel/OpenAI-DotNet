@@ -65,6 +65,15 @@ dotnet add package OpenAI-DotNet
   - [List Input Items](#list-input-items)
   - [Cancel Response](#cancel-response)
   - [Delete Response](#delete-response)
+- [Conversations](#conversations) :new:
+  - [Create Conversation](#create-conversation) :new:
+  - [Retrieve Conversation](#retrieve-conversation) :new:
+  - [Update Conversation](#update-conversation) :new:
+  - [Delete Conversation](#delete-conversation) :new:
+  - [List Conversation Items](#list-conversation-items) :new:
+  - [Create Conversation Item](#create-conversation-item) :new:
+  - [Retrieve Conversation Item](#retrieve-conversation-item) :new:
+  - [Delete Conversation Item](#delete-conversation-item) :new:
 - [Realtime](#realtime)
   - [Create Realtime Session](#create-realtime-session)
   - [Client Events](#client-events)
@@ -525,6 +534,120 @@ Deletes a model response with the given ID.
 ```csharp
 var api = new OpenAIClient();
 var isDeleted = await api.ResponsesEndpoint.DeleteModelResponseAsync("response-id");
+Assert.IsTrue(isDeleted);
+```
+
+---
+
+### [Conversations](https://platform.openai.com/docs/api-reference/conversations)
+
+Create and manage conversations to store and retrieve conversation state across Response API calls.
+
+The Conversations API is accessed via `OpenAIClient.ConversationsEndpoint`
+
+#### [Create Conversation](https://platform.openai.com/docs/api-reference/conversations/create)
+
+Create a conversation.
+
+```csharp
+var api = new OpenAIClient();
+conversation = await api.ConversationsEndpoint.CreateConversationAsync(
+    new CreateConversationRequest(new Message(Role.Developer, systemPrompt)));
+Console.WriteLine(conversation.ToString());
+// use the conversation object when creating responses.
+var request = await api.ResponsesEndpoint.CreateResponseAsync(
+    new CreateResponseRequest(textInput: "Hello!", conversationId: conversation, model: Model.GPT5_Nano));
+var response = await openAI.ResponsesEndpoint.CreateModelResponseAsync(request);
+var responseItem = response.Output.LastOrDefault();
+Console.WriteLine($"{responseItem.Role}:{responseItem}");
+response.PrintUsage();
+```
+
+#### [Retrieve Conversation](https://platform.openai.com/docs/api-reference/conversations/retrieve)
+
+Get a conversation by id.
+
+```csharp
+var api = new OpenAIClient();
+var conversation = await api.ConversationsEndpoint.GetConversationAsync("conversation-id");
+Console.WriteLine(conversation.ToString());
+```
+
+#### [Update Conversation](https://platform.openai.com/docs/api-reference/conversations/update)
+
+Update a conversation with custom metadata.
+
+```csharp
+var api = new OpenAIClient();
+var metadata = new Dictionary<string, object>
+{
+    { "favorite_color", "blue" },
+    { "favorite_food", "pizza" }
+};
+var updatedConversation = await api.ConversationsEndpoint.UpdateConversationAsync("conversation-id", metadata);
+```
+
+#### [Delete Conversation](https://platform.openai.com/docs/api-reference/conversations/delete)
+
+Delete a conversation by id.
+
+```csharp
+var api = new OpenAIClient();
+var isDeleted = await api.ConversationsEndpoint.DeleteConversationAsync("conversation-id");
+Assert.IsTrue(isDeleted);
+```
+
+#### [List Conversation Items](https://platform.openai.com/docs/api-reference/conversations/list-items)
+
+List all items for a conversation with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var query = new ListQuery(limit: 10);
+var items = await api.ConversationsEndpoint.ListConversationItemsAsync("conversation-id", query);
+
+foreach (var item in items)
+{
+    Console.WriteLine(item.ToJsonString());
+}
+```
+
+#### [Create Conversation Item](https://platform.openai.com/docs/api-reference/conversations/create-item)
+
+Create a new conversation item for a conversation with the given ID.
+
+```csharp
+var api = new OpenAIClient();
+var items = new List<IResponseItem>
+{
+    new Message(Role.User, "Hello!"),
+    new Message(Role.Assistant, "Hi! How can I help you?")
+}
+var addedItems = await api.ConversationsEndpoint.CreateConversationItemsAsync("conversation-id", items);
+
+foreach (var item in addedItems)
+{
+    Console.WriteLine(item.ToJsonString());
+}
+```
+
+#### [Retrieve Conversation Item](https://platform.openai.com/docs/api-reference/conversations/retrieve-item)
+
+Get a conversation item by id.
+
+```csharp
+var api = new OpenAIClient();
+var item = await api.ConversationsEndpoint.GetConversationItemAsync("conversation-id", "item-id");
+Console.WriteLine(item.ToJsonString());
+```
+
+#### [Delete Conversation Item](https://platform.openai.com/docs/api-reference/conversations/delete-item)
+
+Delete a conversation item by id.
+
+```csharp
+var api = new OpenAIClient();
+var isDeleted = await api.ConversationsEndpoint.DeleteConversationItemAsync("conversation-id", "item-id");
 Assert.IsTrue(isDeleted);
 ```
 
