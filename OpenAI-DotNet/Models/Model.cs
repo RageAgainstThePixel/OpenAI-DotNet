@@ -196,7 +196,7 @@ namespace OpenAI.Models
         /// - Context Window: 400,000 context window<br/>
         /// - Max Output Tokens: 128,000 max output tokens
         /// </remarks>
-        public static Model GPT_5 { get; } = new("gpt-5", "openai");
+        public static Model GPT5 { get; } = new("gpt-5", "openai");
 
         /// <summary>
         /// GPT-5 mini is a faster, more cost-efficient version of GPT-5. It's great for well-defined tasks and precise prompts.
@@ -205,7 +205,7 @@ namespace OpenAI.Models
         /// - Context Window: 400,000 context window<br/>
         /// - Max Output Tokens: 128,000 max output tokens
         /// </remarks>
-        public static Model GPT_5_Mini { get; } = new("gpt-5-mini", "openai");
+        public static Model GPT5_Mini { get; } = new("gpt-5-mini", "openai");
 
         /// <summary>
         /// GPT-5 Nano is our fastest, cheapest version of GPT-5. It's great for summarization and classification tasks.
@@ -214,7 +214,7 @@ namespace OpenAI.Models
         /// - Context Window: 400,000 context window<br/>
         /// - Max Output Tokens: 128,000 max output tokens
         /// </remarks>
-        public static Model GPT_5_Nano { get; } = new("gpt-5-nano", "openai");
+        public static Model GPT5_Nano { get; } = new("gpt-5-nano", "openai");
 
         /// <summary>
         /// GPT-5 Chat points to the GPT-5 snapshot currently used in ChatGPT.
@@ -225,7 +225,7 @@ namespace OpenAI.Models
         /// - Context Window: 128,000 context window<br/>
         /// - Max Output Tokens: 16,384 max output tokens
         /// </remarks>
-        public static Model GPT_5_Chat { get; } = new("gpt-5-chat-latest", "openai");
+        public static Model GPT5_Chat { get; } = new("gpt-5-chat-latest", "openai");
 
         /// <summary>
         /// ChatGPT-4o points to the GPT-4o snapshot currently used in ChatGPT.
@@ -506,7 +506,7 @@ namespace OpenAI.Models
         /// - Context Window: 400,000 tokens<br/>
         /// - Max Output Tokens: 128,000 tokens
         /// </remarks>
-        public static Model GPT_5_Codex { get; } = new("gpt-5-codex", "openai");
+        public static Model GPT5_Codex { get; } = new("gpt-5-codex", "openai");
 
         /// <summary>
         /// codex-mini-latest is a fine-tuned version of o4-mini specifically for use in Codex CLI.
