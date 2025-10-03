@@ -496,7 +496,7 @@ namespace OpenAI.Models
 
         #endregion Image Models
 
-        #region Specilized Models
+        #region Specialized Models
 
         /// <summary>
         /// GPT-5-Codex is a version of GPT-5 optimized for agentic coding tasks in Codex or similar environments.
@@ -517,12 +517,12 @@ namespace OpenAI.Models
         /// </remarks>
         public static Model Codex_Mini_Latest { get; } = new("codex-mini-latest", "openai");
 
-        #endregion Specilized Models
+        #endregion Specialized Models
 
         #region Open Weight Models
 
         /// <summary>
-        /// gpt-oss-120bis our most powerful open-weight model, which fits into a single H100 GPU (117B parameters with 5.1B active parameters).
+        /// gpt-oss-120b is our most powerful open-weight model, which fits into a single H100 GPU (117B parameters with 5.1B active parameters).
         /// </summary>
         /// <remarks>
         /// - Context Window: 131,072 context window<br/>
