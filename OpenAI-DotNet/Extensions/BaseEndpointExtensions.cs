@@ -25,24 +25,14 @@ namespace OpenAI.Extensions
         /// </summary>
         public static async Task<HttpResponseMessage> StreamEventsAsync(
             this OpenAIBaseEndpoint baseEndpoint,
-            string endpoint,
+            string uri,
             StringContent payload,
             Func<HttpResponseMessage, ServerSentEvent, Task> eventCallback,
-            IReadOnlyDictionary<string, string> headers,
             CancellationToken cancellationToken)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
-
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-                }
-            }
-
+            using var request = new HttpRequestMessage(HttpMethod.Post, uri);
             request.Content = payload;
-            var response = await baseEndpoint.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var response = await baseEndpoint.ServerSentEventStreamAsync(request, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var events = new Stack<ServerSentEvent>();

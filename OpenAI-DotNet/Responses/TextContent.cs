@@ -43,10 +43,26 @@ namespace OpenAI.Responses
             private set => annotations = value?.ToList();
         }
 
+        private string delta;
+
         [JsonInclude]
         [JsonPropertyName("delta")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Delta { get; internal set; }
+        public string Delta
+        {
+            get => delta;
+            internal set
+            {
+                if (value == null)
+                {
+                    delta = null;
+                }
+                else
+                {
+                    delta += value;
+                }
+            }
+        }
 
         /// <summary>
         /// A list of message content tokens with log probability information.
@@ -80,6 +96,6 @@ namespace OpenAI.Responses
         }
 
         public override string ToString()
-            => Text;
+            => Delta ?? Text ?? string.Empty;
     }
 }

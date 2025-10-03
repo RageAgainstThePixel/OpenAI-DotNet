@@ -39,5 +39,33 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonPropertyName("result")]
         public string Result { get; private set; }
+
+        [JsonInclude]
+        [JsonPropertyName("partial_image_b64")]
+        public string PartialImageResult { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("output_format")]
+        public string OutputFormat { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("revised_prompt")]
+        public string RevisedPrompt { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("background")]
+        public string Background { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("size")]
+        public string Size { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("quality")]
+        public string Quality { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("partial_image_index")]
+        public int? PartialImageIndex { get; internal set; }
     }
 }

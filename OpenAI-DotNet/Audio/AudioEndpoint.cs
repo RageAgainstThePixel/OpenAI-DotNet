@@ -35,7 +35,7 @@ namespace OpenAI.Audio
         public async Task<ReadOnlyMemory<byte>> CreateSpeechAsync(SpeechRequest request, Func<ReadOnlyMemory<byte>, Task> chunkCallback = null, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/speech"), payload, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var memoryStream = new MemoryStream();
@@ -155,7 +155,7 @@ namespace OpenAI.Audio
                 request.Dispose();
             }
 
-            using var response = await HttpClient.PostAsync(GetUrl("/transcriptions"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/transcriptions"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }
@@ -220,7 +220,7 @@ namespace OpenAI.Audio
                 request.Dispose();
             }
 
-            using var response = await HttpClient.PostAsync(GetUrl("/translations"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/translations"), payload, cancellationToken).ConfigureAwait(false);
             var responseAsString = await response.ReadAsStringAsync(EnableDebug, payload, cancellationToken).ConfigureAwait(false);
             return (response, responseAsString);
         }

@@ -2,8 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenAI
 {
@@ -14,7 +17,19 @@ namespace OpenAI
         // ReSharper disable once InconsistentNaming
         protected readonly OpenAIClient client;
 
-        internal HttpClient HttpClient => client.Client;
+        private HttpClient HttpClient => client.Client;
+
+        private bool enableDebug;
+
+        /// <summary>
+        /// Enables or disables the logging of all http responses of header and body information for this endpoint.<br/>
+        /// WARNING! Enabling this in your production build, could potentially leak sensitive information!
+        /// </summary>
+        public bool EnableDebug
+        {
+            get => enableDebug || client.EnableDebug;
+            set => enableDebug = value;
+        }
 
         /// <summary>
         /// The root endpoint address.
@@ -30,6 +45,66 @@ namespace OpenAI
         /// If it is not an Azure supported Endpoint, is null.
         /// </remarks>
         protected virtual bool? IsAzureDeployment => null;
+
+        /// <summary>
+        /// Custom headers for this endpoint
+        /// </summary>
+        internal virtual IReadOnlyDictionary<string, IEnumerable<string>> Headers => null;
+
+        protected Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Get, uri);
+            return SendAsync(message, cancellationToken);
+        }
+
+        protected Task<HttpResponseMessage> PostAsync(string uri, HttpContent content, CancellationToken cancellationToken)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            message.Content = content;
+            return SendAsync(message, cancellationToken);
+        }
+
+        protected Task<HttpResponseMessage> PatchAsync(string uri, HttpContent content, CancellationToken cancellationToken)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Patch, uri);
+            message.Content = content;
+            return SendAsync(message, cancellationToken);
+        }
+
+        protected Task<HttpResponseMessage> DeleteAsync(string uri, CancellationToken cancellationToken)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
+            return SendAsync(message, cancellationToken);
+        }
+
+        protected Task<Stream> GetStreamAsync(string uri, CancellationToken cancellationToken)
+            => HttpClient.GetStreamAsync(uri, cancellationToken);
+
+        internal Task<HttpResponseMessage> SendAsync(HttpRequestMessage message, CancellationToken cancellationToken)
+        {
+            if (Headers is { Count: not 0 })
+            {
+                foreach (var header in Headers)
+                {
+                    message.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            return HttpClient.SendAsync(message, cancellationToken);
+        }
+
+        internal Task<HttpResponseMessage> ServerSentEventStreamAsync(HttpRequestMessage message, CancellationToken cancellationToken)
+        {
+            if (Headers is { Count: not 0 })
+            {
+                foreach (var header in Headers)
+                {
+                    message.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            return HttpClient.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        }
 
         /// <summary>
         /// Gets the full formatted url for the API endpoint.
@@ -74,18 +149,6 @@ namespace OpenAI
             }
 
             return result;
-        }
-
-        private bool enableDebug;
-
-        /// <summary>
-        /// Enables or disables the logging of all http responses of header and body information for this endpoint.<br/>
-        /// WARNING! Enabling this in your production build, could potentially leak sensitive information!
-        /// </summary>
-        public bool EnableDebug
-        {
-            get => enableDebug || client.EnableDebug;
-            set => enableDebug = value;
         }
     }
 }

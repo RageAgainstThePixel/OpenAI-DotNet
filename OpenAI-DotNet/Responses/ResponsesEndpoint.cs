@@ -69,7 +69,7 @@ namespace OpenAI.Responses
                 return await StreamResponseAsync(endpoint, payload, streamEventHandler, cancellationToken).ConfigureAwait(false);
             }
 
-            using var response = await HttpClient.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Response>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -99,7 +99,7 @@ namespace OpenAI.Responses
             }
             else
             {
-                using var httpResponseMessage = await HttpClient.PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
+                using var httpResponseMessage = await PostAsync(endpoint, payload, cancellationToken).ConfigureAwait(false);
                 response = await httpResponseMessage.DeserializeAsync<Response>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
             }
 
@@ -126,13 +126,13 @@ namespace OpenAI.Responses
             {
                 IServerSentEvent serverSentEvent = null;
                 var @event = ssEvent.Value.GetValue<string>();
+                var @object = ssEvent.Data ?? ssEvent.Value;
 
                 if (EnableDebug)
                 {
-                    Console.WriteLine(ssEvent.ToJsonString());
+                    Console.WriteLine(@object.ToJsonString());
                 }
 
-                var @object = ssEvent.Data ?? ssEvent.Value;
                 var text = @object["text"]?.GetValue<string>();
                 var delta = @object["delta"]?.GetValue<string>();
                 var itemId = @object["item_id"]?.GetValue<string>();
@@ -150,28 +150,24 @@ namespace OpenAI.Responses
                         case "response.completed":
                         case "response.failed":
                         case "response.incomplete":
+                        {
                             var partialResponse = sseResponse.Deserialize<Response>(@object["response"], client);
 
-                            if (response == null)
+                            if (response == null || response.Id == partialResponse.Id)
                             {
                                 response = partialResponse;
                             }
                             else
                             {
-                                if (response.Id == partialResponse.Id)
-                                {
-                                    response = partialResponse;
-                                }
-                                else
-                                {
-                                    throw new InvalidOperationException($"Response ID mismatch! Expected: {response.Id}, got: {partialResponse.Id}");
-                                }
+                                throw new InvalidOperationException($"Response ID mismatch! Expected: {response.Id}, got: {partialResponse.Id}");
                             }
 
                             serverSentEvent = response;
                             break;
+                        }
                         case "response.content_part.added":
                         case "response.content_part.done":
+                        {
                             var part = sseResponse.Deserialize<IResponseContent>(@object["part"], client);
                             var messageItem = (Message)response!.Output[outputIndex!.Value];
 
@@ -180,15 +176,18 @@ namespace OpenAI.Responses
                                 throw new InvalidOperationException($"MessageItem ID mismatch! Expected: {messageItem.Id}, got: {itemId}");
                             }
 
-                            messageItem.AddContentItem(part, contentIndex!.Value);
+                            messageItem.AddOrUpdateContentItem(part, contentIndex!.Value);
 
                             if (@event == "response.content_part.done")
                             {
                                 serverSentEvent = part;
                             }
+
                             break;
+                        }
                         case "response.output_item.added":
                         case "response.output_item.done":
+                        {
                             var item = sseResponse.Deserialize<IResponseItem>(@object["item"], client);
                             response!.InsertOutputItem(item, outputIndex!.Value);
 
@@ -196,22 +195,65 @@ namespace OpenAI.Responses
                             {
                                 serverSentEvent = item;
                             }
+
                             break;
+                        }
                         case "response.function_call_arguments.delta":
                         case "response.function_call_arguments.done":
+                        {
                             var functionToolCall = (FunctionToolCall)response!.Output[outputIndex!.Value];
 
                             if (functionToolCall.Id != itemId)
                             {
-                                throw new InvalidOperationException($"MessageItem ID mismatch! Expected: {functionToolCall.Id}, got: {itemId}");
+                                throw new InvalidOperationException($"FunctionToolCall ID mismatch! Expected: {functionToolCall.Id}, got: {itemId}");
                             }
 
-                            if (!string.IsNullOrWhiteSpace(delta))
-                            {
-                                functionToolCall.Delta = delta;
-                            }
-
+                            functionToolCall.Delta = delta;
+                            functionToolCall.Arguments = @object["arguments"];
+                            response!.InsertOutputItem(functionToolCall, outputIndex!.Value);
+                            serverSentEvent = functionToolCall;
                             break;
+                        }
+                        case "response.custom_tool_call_input.delta":
+                        case "response.custom_tool_call_input.done":
+                        {
+                            var customToolCall = (CustomToolCall)response!.Output[outputIndex!.Value];
+
+                            if (customToolCall.Id != itemId)
+                            {
+                                throw new InvalidOperationException($"CustomToolCall ID mismatch! Expected: {customToolCall.Id}, got: {itemId}");
+                            }
+
+                            customToolCall.Delta = delta;
+                            customToolCall.Input = @object["input"]?.GetValue<string>();
+                            response!.InsertOutputItem(customToolCall, outputIndex!.Value);
+                            serverSentEvent = customToolCall;
+                            break;
+                        }
+                        case "response.image_generation_call.in_progress":
+                        case "response.image_generation_call.generating":
+                        case "response.image_generation_call.partial_image":
+                        case "response.image_generation_call.completed":
+                        {
+                            var imageGenerationCall = (ImageGenerationCall)response!.Output[outputIndex!.Value];
+
+                            if (imageGenerationCall.Id != itemId)
+                            {
+                                throw new InvalidOperationException($"ImageGenerationCall ID mismatch! Expected: {imageGenerationCall.Id}, got: {itemId}");
+                            }
+
+                            imageGenerationCall.Size = @object["size"]?.GetValue<string>();
+                            imageGenerationCall.Quality = @object["quality"]?.GetValue<string>();
+                            imageGenerationCall.Background = @object["background"]?.GetValue<string>();
+                            imageGenerationCall.OutputFormat = @object["output_format"]?.GetValue<string>();
+                            imageGenerationCall.RevisedPrompt = @object["revised_prompt"]?.GetValue<string>();
+                            imageGenerationCall.PartialImageIndex = @object["partial_image_index"]?.GetValue<int>();
+                            imageGenerationCall.PartialImageResult = @object["partial_image_b64"]?.GetValue<string>();
+
+                            response!.InsertOutputItem(imageGenerationCall, outputIndex!.Value);
+                            serverSentEvent = imageGenerationCall;
+                            break;
+                        }
                         case "response.audio.delta":
                         case "response.audio.done":
                         case "response.audio.transcript.delta":
@@ -221,9 +263,10 @@ namespace OpenAI.Responses
                         case "response.output_text.done":
                         case "response.refusal.delta":
                         case "response.refusal.done":
-                        case "response.reasoning_summary_text.delta":
-                        case "response.reasoning_summary_text.done":
-                            messageItem = (Message)response!.Output[outputIndex!.Value];
+                        case "response.reasoning_text.delta":
+                        case "response.reasoning_text.done":
+                        {
+                            var messageItem = (Message)response!.Output[outputIndex!.Value];
 
                             if (messageItem.Id != itemId)
                             {
@@ -236,16 +279,19 @@ namespace OpenAI.Responses
                             {
                                 case AudioContent audioContent:
                                     AudioContent partialContent;
+
                                     switch (@event)
                                     {
                                         case "response.audio.delta":
                                             partialContent = new AudioContent(audioContent.Type, base64Data: delta);
                                             audioContent.AppendFrom(partialContent);
+                                            messageItem.AddOrUpdateContentItem(audioContent, contentIndex!.Value);
                                             serverSentEvent = partialContent;
                                             break;
                                         case "response.audio.transcript.delta":
                                             partialContent = new AudioContent(audioContent.Type, transcript: delta);
                                             audioContent.AppendFrom(partialContent);
+                                            messageItem.AddOrUpdateContentItem(audioContent, contentIndex!.Value);
                                             serverSentEvent = partialContent;
                                             break;
                                         case "response.audio.done":
@@ -255,16 +301,9 @@ namespace OpenAI.Responses
                                         default:
                                             throw new InvalidOperationException($"Unexpected event type: {@event} for AudioContent.");
                                     }
+
                                     break;
                                 case TextContent textContent:
-
-                                    if (!string.IsNullOrWhiteSpace(text))
-                                    {
-                                        textContent.Text = text;
-                                    }
-
-                                    textContent.Delta = !string.IsNullOrWhiteSpace(delta) ? delta : null;
-
                                     var annotationIndex = @object["annotation_index"]?.GetValue<int>();
 
                                     if (annotationIndex.HasValue)
@@ -272,71 +311,106 @@ namespace OpenAI.Responses
                                         var annotation = sseResponse.Deserialize<IAnnotation>(@object["annotation"], client);
                                         textContent.InsertAnnotation(annotation, annotationIndex.Value);
                                     }
+                                    else
+                                    {
+                                        textContent.Text = text;
+                                        textContent.Delta = delta;
+                                    }
 
+                                    messageItem.AddOrUpdateContentItem(textContent, contentIndex!.Value);
                                     serverSentEvent = textContent;
                                     break;
                                 case RefusalContent refusalContent:
-                                    var refusal = @object["refusal"]?.GetValue<string>();
-
-                                    if (!string.IsNullOrWhiteSpace(refusal))
-                                    {
-                                        refusalContent.Refusal = refusal;
-                                    }
-
-                                    if (!string.IsNullOrWhiteSpace(delta))
-                                    {
-                                        refusalContent.Delta = delta;
-                                    }
-
+                                    refusalContent.Delta = delta;
+                                    refusalContent.Refusal = @object["refusal"]?.GetValue<string>();
+                                    messageItem.AddOrUpdateContentItem(refusalContent, contentIndex!.Value);
                                     serverSentEvent = refusalContent;
                                     break;
                                 case ReasoningContent reasoningContent:
-                                    if (!string.IsNullOrWhiteSpace(text))
-                                    {
-                                        reasoningContent.Text = text;
-                                    }
-
-                                    if (!string.IsNullOrWhiteSpace(delta))
-                                    {
-                                        reasoningContent.Delta = delta;
-                                    }
-
+                                    reasoningContent.Text = text;
+                                    reasoningContent.Delta = delta;
+                                    messageItem.AddOrUpdateContentItem(reasoningContent, contentIndex!.Value);
+                                    serverSentEvent = reasoningContent;
                                     break;
                             }
+
                             break;
+                        }
                         case "response.reasoning_summary_part.added":
                         case "response.reasoning_summary_part.done":
+                        case "response.reasoning_summary_text.delta":
+                        case "response.reasoning_summary_text.done":
+                        {
                             var summaryIndex = @object["summary_index"]!.GetValue<int>();
                             var reasoningItem = (ReasoningItem)response!.Output[outputIndex!.Value];
-                            var summaryItem = sseResponse.Deserialize<ReasoningSummary>(@object["part"], client);
-                            reasoningItem.InsertSummary(summaryItem, summaryIndex);
 
-                            if (@event == "response.reasoning_summary_part.done")
+                            if (reasoningItem.Id != itemId)
                             {
-                                serverSentEvent = summaryItem;
+                                throw new InvalidOperationException($"ReasoningItem ID mismatch! Expected: {reasoningItem.Id}, got: {itemId}");
                             }
 
+                            ReasoningSummary summaryItem;
+
+                            if (@object["part"] != null)
+                            {
+                                summaryItem = sseResponse.Deserialize<ReasoningSummary>(@object["part"], client);
+                                reasoningItem.InsertSummary(summaryItem, summaryIndex);
+                            }
+                            else
+                            {
+                                summaryItem = reasoningItem.Summary[summaryIndex];
+                                summaryItem.Delta = delta;
+                                summaryItem.Text = text;
+                            }
+
+                            response!.InsertOutputItem(reasoningItem, outputIndex!.Value);
+                            serverSentEvent = summaryItem;
                             break;
-                        case "error":
-                            serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
+                        }
+                        case "response.mcp_call_arguments.delta":
+                        case "response.mcp_call_arguments.done":
+                        {
+                            var mcpToolCall = (MCPToolCall)response!.Output[outputIndex!.Value];
+
+                            if (mcpToolCall.Id != itemId)
+                            {
+                                throw new InvalidOperationException($"MCPToolCall ID mismatch! Expected: {mcpToolCall.Id}, got: {itemId}");
+                            }
+
+                            mcpToolCall.Delta = delta;
+                            mcpToolCall.Arguments = @object["arguments"];
+                            response!.InsertOutputItem(mcpToolCall, outputIndex!.Value);
+                            serverSentEvent = mcpToolCall;
                             break;
-                        // TODO - implement handling for these events:
-                        case "response.code_interpreter_call.interpreting":
-                        case "response.code_interpreter_call.in_progress":
-                        case "response.code_interpreter_call.completed":
+                        }
                         case "response.code_interpreter_call_code.delta":
                         case "response.code_interpreter_call_code.done":
-                        case "response.custom_tool_call_input.delta":
-                        case "response.custom_tool_call_input.done":
+                        {
+                            var codeInterpreterToolCall = (CodeInterpreterToolCall)response!.Output[outputIndex!.Value];
+
+                            if (codeInterpreterToolCall.Id != itemId)
+                            {
+                                throw new InvalidOperationException($"CodeInterpreterToolCall ID mismatch! Expected: {codeInterpreterToolCall.Id}, got: {itemId}");
+                            }
+
+                            codeInterpreterToolCall.Delta = delta;
+                            codeInterpreterToolCall.Code = @object["code"]?.GetValue<string>();
+                            response!.InsertOutputItem(codeInterpreterToolCall, outputIndex!.Value);
+                            serverSentEvent = codeInterpreterToolCall;
+                            break;
+                        }
+                        case "error":
+                        {
+                            serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
+                            break;
+                        }
+                        // Event status messages with no data payloads:
+                        case "response.code_interpreter_call.in_progress":
+                        case "response.code_interpreter_call.interpreting":
+                        case "response.code_interpreter_call.completed":
                         case "response.file_search_call.in_progress":
                         case "response.file_search_call.searching":
                         case "response.file_search_call.completed":
-                        case "response.image_generation_call.in_progress":
-                        case "response.image_generation_call.generating":
-                        case "response.image_generation_call.partial_image":
-                        case "response.image_generation_call.completed":
-                        case "response.mcp_call_arguments.delta":
-                        case "response.mcp_call_arguments.done":
                         case "response.mcp_call.in_progress":
                         case "response.mcp_call.completed":
                         case "response.mcp_call.failed":
@@ -347,9 +421,11 @@ namespace OpenAI.Responses
                         case "response.web_search_call.searching":
                         case "response.web_search_call.completed":
                         default:
+                        {
                             // if not properly handled raise it up to caller to deal with it themselves.
                             serverSentEvent = ssEvent;
                             break;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -362,10 +438,8 @@ namespace OpenAI.Responses
                     serverSentEvent ??= ssEvent;
                     await streamEventHandler.Invoke(@event, serverSentEvent).ConfigureAwait(false);
                 }
-            }, null, cancellationToken).ConfigureAwait(false);
-
+            }, cancellationToken).ConfigureAwait(false);
             // ReSharper restore AccessToModifiedClosure
-
             if (response == null) { return null; }
             response = await response.WaitForStatusChangeAsync(timeout: -1, cancellationToken: cancellationToken).ConfigureAwait(false);
             response.SetResponseData(streamResponse.Headers, client);
@@ -399,7 +473,7 @@ namespace OpenAI.Responses
                 queryParameters.Add("include", string.Join(",", include));
             }
 
-            using var response = await HttpClient.GetAsync(GetUrl($"/{responseId}", queryParameters), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{responseId}", queryParameters), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Response>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -415,7 +489,7 @@ namespace OpenAI.Responses
             {
                 throw new ArgumentException("Response ID cannot be null or empty.", nameof(responseId));
             }
-            using var response = await HttpClient.DeleteAsync(GetUrl($"/{responseId}"), cancellationToken).ConfigureAwait(false);
+            using var response = await DeleteAsync(GetUrl($"/{responseId}"), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result?.Deleted ?? false;
         }
@@ -435,7 +509,7 @@ namespace OpenAI.Responses
             {
                 throw new ArgumentException("Response ID cannot be null or empty.", nameof(responseId));
             }
-            using var response = await HttpClient.PostAsync(GetUrl($"/{responseId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl($"/{responseId}/cancel"), null!, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Response>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -452,7 +526,7 @@ namespace OpenAI.Responses
             {
                 throw new ArgumentException("Response ID cannot be null or empty.", nameof(responseId));
             }
-            using var response = await HttpClient.GetAsync(GetUrl($"/{responseId}/input_items", query), cancellationToken).ConfigureAwait(false);
+            using var response = await GetAsync(GetUrl($"/{responseId}/input_items", query), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<IResponseItem>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
     }

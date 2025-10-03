@@ -1,6 +1,5 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using OpenAI.Chat;
 using OpenAI.Extensions;
 using OpenAI.Models;
 using System;
@@ -46,6 +45,63 @@ namespace OpenAI.Responses
             int? topLogProbs = null)
             : this(
                 input: new List<IResponseItem> { new Message(Role.User, new TextContent(textInput)) },
+                model: model,
+                background: background,
+                include: include,
+                instructions: instructions,
+                maxOutputTokens: maxOutputTokens,
+                metadata: metadata,
+                parallelToolCalls: parallelToolCalls,
+                previousResponseId: previousResponseId,
+                prompt: prompt,
+                reasoning: reasoning,
+                serviceTier: serviceTier,
+                store: store,
+                temperature: temperature,
+                responseFormat: responseFormat,
+                jsonSchema: jsonSchema,
+                toolChoice: toolChoice,
+                tools: tools,
+                topP: topP,
+                truncation: truncation,
+                user: user,
+                conversationId: conversationId,
+                maxToolCalls: maxToolCalls,
+                promptCacheKey: promptCacheKey,
+                safetyIdentifier: safetyIdentifier,
+                topLogProbs: topLogProbs)
+        {
+        }
+
+        public CreateResponseRequest(
+            IResponseItem input,
+            Model model = null,
+            bool? background = null,
+            IEnumerable<string> include = null,
+            string instructions = null,
+            int? maxOutputTokens = null,
+            IReadOnlyDictionary<string, string> metadata = null,
+            bool? parallelToolCalls = null,
+            string previousResponseId = null,
+            Prompt prompt = null,
+            Reasoning reasoning = null,
+            string serviceTier = null,
+            bool? store = null,
+            double? temperature = null,
+            TextResponseFormat responseFormat = TextResponseFormat.Auto,
+            JsonSchema jsonSchema = null,
+            string toolChoice = null,
+            IEnumerable<Tool> tools = null,
+            double? topP = null,
+            Truncation truncation = Truncation.Auto,
+            string user = null,
+            string conversationId = null,
+            int? maxToolCalls = null,
+            string promptCacheKey = null,
+            string safetyIdentifier = null,
+            int? topLogProbs = null)
+            : this(
+                input: [input],
                 model: model,
                 background: background,
                 include: include,

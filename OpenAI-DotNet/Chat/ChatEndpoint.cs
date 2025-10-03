@@ -37,7 +37,7 @@ namespace OpenAI.Chat
         public async Task<ChatResponse> GetCompletionAsync(ChatRequest chatRequest, CancellationToken cancellationToken = default)
         {
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            using var response = await HttpClient.PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
+            using var response = await PostAsync(GetUrl("/completions"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ChatResponse>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -154,7 +154,7 @@ namespace OpenAI.Chat
                 }
 
                 return resultHandler(partialResponse);
-            }, null, cancellationToken);
+            }, cancellationToken);
 
             if (chatResponse == null) { return null; }
             chatResponse.SetResponseData(response.Headers, client);
@@ -183,7 +183,7 @@ namespace OpenAI.Chat
             using var payload = JsonSerializer.Serialize(chatRequest, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
             using var request = new HttpRequestMessage(HttpMethod.Post, GetUrl("/completions"));
             request.Content = payload;
-            using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            using var response = await ServerSentEventStreamAsync(request, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var reader = new StreamReader(stream);

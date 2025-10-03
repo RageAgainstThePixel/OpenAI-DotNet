@@ -48,12 +48,51 @@ namespace OpenAI.Responses
         [JsonPropertyName("server_label")]
         public string ServerLabel { get; private set; }
 
+        private string argumentsString;
+
+        private JsonNode arguments;
+
         /// <summary>
         /// A JSON string of the arguments to pass to the function.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("arguments")]
-        public JsonNode Arguments { get; private set; }
+        public JsonNode Arguments
+        {
+            get
+            {
+                if (arguments == null)
+                {
+                    if (!string.IsNullOrWhiteSpace(argumentsString))
+                    {
+                        arguments = JsonValue.Create(argumentsString);
+                    }
+                    else
+                    {
+                        arguments = null;
+                    }
+                }
+
+                return arguments;
+            }
+            internal set => arguments = value;
+        }
+
+        [JsonIgnore]
+        internal string Delta
+        {
+            set
+            {
+                if (value == null)
+                {
+                    argumentsString = null;
+                }
+                else
+                {
+                    argumentsString += value;
+                }
+            }
+        }
 
         /// <summary>
         /// The output from the tool call.

@@ -24,7 +24,7 @@ namespace OpenAI.Responses
         public async Task<Conversation> CreateConversationAsync(CreateConversationRequest request, CancellationToken cancellationToken = default)
         {
             var payload = JsonSerializer.Serialize(request, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            var response = await HttpClient.PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
+            var response = await PostAsync(GetUrl(), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Conversation>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -42,7 +42,7 @@ namespace OpenAI.Responses
                 throw new ArgumentNullException(nameof(conversationId));
             }
 
-            var response = await HttpClient.GetAsync(GetUrl($"/{conversationId}"), cancellationToken).ConfigureAwait(false);
+            var response = await GetAsync(GetUrl($"/{conversationId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Conversation>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -69,7 +69,7 @@ namespace OpenAI.Responses
             }
 
             var payload = JsonSerializer.Serialize(new { metadata }, OpenAIClient.JsonSerializationOptions).ToJsonStringContent();
-            var response = await HttpClient.PatchAsync(GetUrl($"/{conversationId}"), payload, cancellationToken).ConfigureAwait(false);
+            var response = await PatchAsync(GetUrl($"/{conversationId}"), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Conversation>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -90,7 +90,7 @@ namespace OpenAI.Responses
                 throw new ArgumentNullException(nameof(conversationId));
             }
 
-            var response = await HttpClient.DeleteAsync(GetUrl($"/{conversationId}"), cancellationToken).ConfigureAwait(false);
+            var response = await DeleteAsync(GetUrl($"/{conversationId}"), cancellationToken).ConfigureAwait(false);
             var result = await response.DeserializeAsync<DeletedResponse>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
             return result.Deleted;
         }
@@ -111,7 +111,7 @@ namespace OpenAI.Responses
                 throw new ArgumentNullException(nameof(conversationId));
             }
 
-            var response = await HttpClient.GetAsync(GetUrl($"/{conversationId}/items", query), cancellationToken).ConfigureAwait(false);
+            var response = await GetAsync(GetUrl($"/{conversationId}/items", query), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<IResponseItem>>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -147,7 +147,7 @@ namespace OpenAI.Responses
                 };
             }
 
-            var response = await HttpClient.PostAsync(GetUrl($"/{conversationId}/items", query), payload, cancellationToken).ConfigureAwait(false);
+            var response = await PostAsync(GetUrl($"/{conversationId}/items", query), payload, cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<ListResponse<IResponseItem>>(EnableDebug, payload, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -181,7 +181,7 @@ namespace OpenAI.Responses
                 };
             }
 
-            var response = await HttpClient.GetAsync(GetUrl($"/{conversationId}/items/{itemId}", query), cancellationToken).ConfigureAwait(false);
+            var response = await GetAsync(GetUrl($"/{conversationId}/items/{itemId}", query), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<IResponseItem>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
@@ -205,7 +205,7 @@ namespace OpenAI.Responses
                 throw new ArgumentNullException(nameof(itemId));
             }
 
-            var response = await HttpClient.DeleteAsync(GetUrl($"/{conversationId}/items/{itemId}"), cancellationToken).ConfigureAwait(false);
+            var response = await DeleteAsync(GetUrl($"/{conversationId}/items/{itemId}"), cancellationToken).ConfigureAwait(false);
             return await response.DeserializeAsync<Conversation>(EnableDebug, client, cancellationToken).ConfigureAwait(false);
         }
 
