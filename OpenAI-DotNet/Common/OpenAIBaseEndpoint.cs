@@ -51,30 +51,30 @@ namespace OpenAI
         /// </summary>
         internal virtual IReadOnlyDictionary<string, IEnumerable<string>> Headers => null;
 
-        protected Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
+        protected async Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
         {
             using var message = new HttpRequestMessage(HttpMethod.Get, uri);
-            return SendAsync(message, cancellationToken);
+            return await SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
-        protected Task<HttpResponseMessage> PostAsync(string uri, HttpContent content, CancellationToken cancellationToken)
+        protected async Task<HttpResponseMessage> PostAsync(string uri, HttpContent content, CancellationToken cancellationToken)
         {
             using var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = content;
-            return SendAsync(message, cancellationToken);
+            return await SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
-        protected Task<HttpResponseMessage> PatchAsync(string uri, HttpContent content, CancellationToken cancellationToken)
+        protected async Task<HttpResponseMessage> PatchAsync(string uri, HttpContent content, CancellationToken cancellationToken)
         {
             using var message = new HttpRequestMessage(HttpMethod.Patch, uri);
             message.Content = content;
-            return SendAsync(message, cancellationToken);
+            return await SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
-        protected Task<HttpResponseMessage> DeleteAsync(string uri, CancellationToken cancellationToken)
+        protected async Task<HttpResponseMessage> DeleteAsync(string uri, CancellationToken cancellationToken)
         {
             using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
-            return SendAsync(message, cancellationToken);
+            return await SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         protected Task<Stream> GetStreamAsync(string uri, CancellationToken cancellationToken)
