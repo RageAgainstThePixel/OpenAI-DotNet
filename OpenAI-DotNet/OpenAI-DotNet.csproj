@@ -33,6 +33,7 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.8.3
 - Fix regression ObjectDisposedException from OpenAIBaseEndpoint refactoring
+- Add Azure Blob Batch API compatible fields for CreateBatchRequest
 Version 8.8.2
 - Add file_url for responses api
 - Added NoiseReductionSettings for RealtimeConfiguration
