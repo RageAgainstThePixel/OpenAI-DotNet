@@ -52,30 +52,24 @@ namespace OpenAI
         internal virtual IReadOnlyDictionary<string, IEnumerable<string>> Headers => null;
 
         protected Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
-        {
-            using var message = new HttpRequestMessage(HttpMethod.Get, uri);
-            return SendAsync(message, cancellationToken);
-        }
+            => SendAsync(new(HttpMethod.Get, uri), cancellationToken);
 
         protected Task<HttpResponseMessage> PostAsync(string uri, HttpContent content, CancellationToken cancellationToken)
         {
-            using var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = content;
             return SendAsync(message, cancellationToken);
         }
 
         protected Task<HttpResponseMessage> PatchAsync(string uri, HttpContent content, CancellationToken cancellationToken)
         {
-            using var message = new HttpRequestMessage(HttpMethod.Patch, uri);
+            var message = new HttpRequestMessage(HttpMethod.Patch, uri);
             message.Content = content;
             return SendAsync(message, cancellationToken);
         }
 
         protected Task<HttpResponseMessage> DeleteAsync(string uri, CancellationToken cancellationToken)
-        {
-            using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
-            return SendAsync(message, cancellationToken);
-        }
+            => SendAsync(new(HttpMethod.Delete, uri), cancellationToken);
 
         protected Task<Stream> GetStreamAsync(string uri, CancellationToken cancellationToken)
             => HttpClient.GetStreamAsync(uri, cancellationToken);

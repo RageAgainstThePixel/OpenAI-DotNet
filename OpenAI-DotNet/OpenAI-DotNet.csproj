@@ -29,8 +29,10 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.8.2</Version>
+    <Version>8.8.3</Version>
     <PackageReleaseNotes>
+Version 8.8.3
+- Fix regression ObjectDisposedException from OpenAIBaseEndpoint refactoring
 Version 8.8.2
 - Add file_url for responses api
 - Added NoiseReductionSettings for RealtimeConfiguration
