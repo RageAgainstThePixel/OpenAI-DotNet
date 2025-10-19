@@ -44,5 +44,11 @@ namespace OpenAI.Batch
 
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, object> Metadata { get; }
+
+        [JsonPropertyName("input_blob")]
+        public string InputBlob { get; set; }
+
+        [JsonPropertyName("output_folder")]
+        public BatchOutputFolder OutputFolder { get; set; }
     }
 }

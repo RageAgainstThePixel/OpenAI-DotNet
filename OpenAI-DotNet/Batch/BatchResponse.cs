@@ -186,6 +186,27 @@ namespace OpenAI.Batch
         [JsonPropertyName("metadata")]
         public IReadOnlyDictionary<string, object> Metadata { get; private set; }
 
+        /// <summary>
+        /// The URL of the blob storage location where any errors encountered during processing will be written.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("error_blob")]
+        public string ErrorBlob { get; private set; }
+
+        /// <summary>
+        /// The URL of the blob storage location where the batch output will be written.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("output_blob")]
+        public string OutputBlob { get; private set; }
+
+        /// <summary>
+        /// The URL of the blob storage location where the batch input was read from.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("input_blob")]
+        public string InputBlob { get; private set; }
+
         public override string ToString() => Id;
 
         public static implicit operator string(BatchResponse response) => response?.ToString();
