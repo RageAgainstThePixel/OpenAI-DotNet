@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenAI.Realtime
@@ -24,6 +25,13 @@ namespace OpenAI.Realtime
         public string ItemId { get; private set; }
 
         /// <summary>
+        /// The log probabilities of the transcription.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("logprobs")]
+        public IReadOnlyList<LogProbInfo> LogProbs { get; }
+
+        /// <summary>
         /// The index of the content part containing the audio.
         /// </summary>
         [JsonInclude]
@@ -37,6 +45,10 @@ namespace OpenAI.Realtime
         [JsonPropertyName("transcript")]
         public string Transcript { get; private set; }
 
+        [JsonInclude]
+        [JsonPropertyName("usage")]
+        public object Usage { get; }
+
         /// <summary>
         /// Details of the transcription error.
         /// </summary>
@@ -49,5 +61,8 @@ namespace OpenAI.Realtime
 
         [JsonIgnore]
         public bool IsFailed => Type.Contains("failed");
+
+        public string PrintUsage()
+            => Usage?.ToString() ?? "";
     }
 }
