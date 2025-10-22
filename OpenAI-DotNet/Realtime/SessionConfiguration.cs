@@ -59,7 +59,9 @@ namespace OpenAI.Realtime
             float? temperature = null,
             int? maxResponseOutputTokens = null,
             int? expiresAfter = null,
-            NoiseReductionSettings inputAudioNoiseSettings = null)
+            NoiseReductionSettings inputAudioNoiseSettings = null,
+            float? speed = null,
+            Prompt prompt = null)
         {
             ClientSecret = new ClientSecret(expiresAfter);
             Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT4oRealtime : model;
@@ -127,73 +129,156 @@ namespace OpenAI.Realtime
             MaxResponseOutputTokens = maxResponseOutputTokens;
         }
 
+        /// <summary>
+        /// Ephemeral key returned by the API.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("client_secret")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ClientSecret ClientSecret { get; private set; }
 
+        /// <summary>
+        /// The set of modalities the model can respond with.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("modalities")]
         [JsonConverter(typeof(ModalityConverter))]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Modality Modalities { get; private set; }
 
+        /// <summary>
+        /// The Realtime model used for this session.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("model")]
         public string Model { get; private set; }
 
+        /// <summary>
+        /// The default system instructions (i.e. system message) prepended to model calls. This field allows
+        /// the client to guide the model on desired responses. The model can be instructed on response
+        /// content and format, (e.g. "be extremely succinct", "act friendly", "here are examples of good
+        /// responses") and on audio behavior (e.g. "talk quickly", "inject emotion into your voice", "laugh
+        /// frequently"). The instructions are not guaranteed to be followed by the model, but they provide
+        /// guidance to the model on the desired behavior.
+        /// </summary>
+        /// <remarks>
+        /// Note that the server sets default instructions which will be used if this field is not set and are
+        /// visible in the `session.created` event at the start of the session.
+        /// </remarks>
         [JsonInclude]
         [JsonPropertyName("instructions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Instructions { get; private set; }
 
+        /// <summary>
+        /// The voice the model uses to respond. Voice cannot be changed during the
+        /// session once the model has responded with audio at least once. Current
+        /// voice options are `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`,
+        /// `shimmer`, and `verse`.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("voice")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Voice { get; private set; }
 
+        /// <summary>
+        /// The format of input audio.Options are `pcm16`, `g711_ulaw`, or `g711_alaw`.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("input_audio_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeAudioFormat>))]
         public RealtimeAudioFormat InputAudioFormat { get; private set; }
 
+        /// <summary>
+        /// The format of output audio.Options are `pcm16`, `g711_ulaw`, or `g711_alaw`.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("output_audio_format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonConverter(typeof(Extensions.JsonStringEnumConverter<RealtimeAudioFormat>))]
         public RealtimeAudioFormat OutputAudioFormat { get; private set; }
 
+        /// <summary>
+        /// Configuration for input audio transcription, defaults to off and can be
+        /// set to `null` to turn off once on. Input audio transcription is not native
+        /// to the model, since the model consumes audio directly. Transcription runs
+        /// asynchronously and should be treated as rough guidance
+        /// rather than the representation understood by the model.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("input_audio_transcription")]
         public InputAudioTranscriptionSettings InputAudioTranscriptionSettings { get; private set; }
 
+        /// <summary>
+        /// The speed of the model's spoken response. 1.0 is the default speed. 0.25 is
+        /// the minimum speed. 1.5 is the maximum speed. This value can only be changed
+        /// in between model turns, not while a response is in progress.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("speed")]
+        public float? Speed { get; private set; }
+
+        /// <summary>
+        /// Configuration for turn detection. Can be set to `null` to turn off. Server
+        /// VAD means that the model will detect the start and end of speech based on
+        /// audio volume and respond at the end of user speech.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("turn_detection")]
         [JsonConverter(typeof(VoiceActivityDetectionSettingsConverter))]
         public IVoiceActivityDetectionSettings VoiceActivityDetectionSettings { get; private set; }
 
+        /// <summary>
+        /// Tools (functions) available to the model.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
         public IReadOnlyList<Function> Tools { get; private set; }
 
+        /// <summary>
+        ///  How the model chooses tools. Provide one of the string modes or force a specific function/MCP tool.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_choice")]
         public object ToolChoice { get; private set; }
 
+        /// <summary>
+        /// Sampling temperature for the model, limited to[0.6, 1.2]. Defaults to 0.8.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("temperature")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public float? Temperature { get; private set; }
 
+        /// <summary>
+        /// Maximum number of output tokens for a single assistant response,
+        /// inclusive of tool calls. Provide an integer between 1 and 4096 to
+        /// limit output tokens, or `inf` for the maximum available tokens for a
+        /// given model. Defaults to `inf`.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("max_response_output_tokens")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public object MaxResponseOutputTokens { get; private set; }
 
+        /// <summary>
+        /// Configuration for input audio noise reduction. This can be set to `null` to turn off.
+        /// Noise reduction filters audio added to the input audio buffer before it is sent to VAD and the model.
+        /// Filtering the audio can improve VAD and turn detection accuracy (reducing false positives) and
+        /// model performance by improving perception of the input audio.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("input_audio_noise_reduction")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public NoiseReductionSettings InputAudioNoiseReduction { get; private set; }
+
+        /// <summary>
+        /// Reference to a prompt template and its variables.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("prompt")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Prompt Prompt { get; private set; }
     }
 }

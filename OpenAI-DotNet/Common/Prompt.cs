@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAI.Responses
+namespace OpenAI
 {
     public sealed class Prompt
     {
