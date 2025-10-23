@@ -78,6 +78,7 @@ namespace OpenAI.Realtime
             InputAudioFormat = inputAudioFormat;
             OutputAudioFormat = outputAudioFormat;
             InputAudioNoiseReduction = inputAudioNoiseSettings;
+            Speed = speed;
             VoiceActivityDetectionSettings = turnDetectionSettings ?? new ServerVAD();
             tools.ProcessTools<Tool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList?.Where(t => t.IsFunction).Select(tool =>
@@ -99,6 +100,7 @@ namespace OpenAI.Realtime
             }
 
             InputAudioTranscriptionSettings = inputAudioTranscriptionSettings;
+            Prompt = prompt;
         }
 
         internal SessionConfiguration(
@@ -217,6 +219,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("speed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public float? Speed { get; private set; }
 
         /// <summary>
@@ -227,6 +230,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("turn_detection")]
         [JsonConverter(typeof(VoiceActivityDetectionSettingsConverter))]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IVoiceActivityDetectionSettings VoiceActivityDetectionSettings { get; private set; }
 
         /// <summary>
@@ -234,6 +238,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tools")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyList<Function> Tools { get; private set; }
 
         /// <summary>
@@ -241,6 +246,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("tool_choice")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object ToolChoice { get; private set; }
 
         /// <summary>
