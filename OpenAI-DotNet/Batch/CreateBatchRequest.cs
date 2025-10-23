@@ -25,12 +25,21 @@ namespace OpenAI.Batch
         /// <param name="metadata">
         /// Optional custom metadata for the batch.
         /// </param>
-        public CreateBatchRequest(string inputFileId, string endpoint, IReadOnlyDictionary<string, object> metadata = null)
+        /// <param name="inputBlob">Azure blob</param>
+        /// <param name="outputFolder"><see cref="BatchOutputFolder"/>.</param>
+        public CreateBatchRequest(
+            string inputFileId,
+            string endpoint,
+            IReadOnlyDictionary<string, object> metadata = null,
+            string inputBlob = null,
+            BatchOutputFolder outputFolder = null)
         {
             InputFileId = inputFileId;
             Endpoint = endpoint;
             CompletionWindow = DefaultCompletionWindow;
             Metadata = metadata;
+            InputBlob = inputBlob;
+            OutputFolder = outputFolder;
         }
 
         [JsonPropertyName("input_file_id")]
@@ -43,6 +52,15 @@ namespace OpenAI.Batch
         public string CompletionWindow { get; }
 
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, object> Metadata { get; }
+
+        [JsonPropertyName("input_blob")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string InputBlob { get; }
+
+        [JsonPropertyName("output_folder")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public BatchOutputFolder OutputFolder { get; }
     }
 }

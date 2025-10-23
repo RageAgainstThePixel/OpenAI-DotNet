@@ -29,8 +29,15 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <AssemblyOriginatorKeyFile>OpenAI-DotNet.pfx</AssemblyOriginatorKeyFile>
     <IncludeSymbols>true</IncludeSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.8.2</Version>
+    <Version>8.8.3</Version>
     <PackageReleaseNotes>
+Version 8.8.3
+- Fix regression ObjectDisposedException from OpenAIBaseEndpoint refactoring
+- Add Azure Blob Batch API compatible fields for CreateBatchRequest
+- Added DurationUsage
+- Updated ConversationItemInputAudioTranscriptionResponse to include logprobs and usage
+- Update Realtime.SessionConfiguration with Prompt and Speed parameters
+- Move Realtime.Prompt to common namespace
 Version 8.8.2
 - Add file_url for responses api
 - Added NoiseReductionSettings for RealtimeConfiguration

@@ -193,7 +193,12 @@ namespace OpenAI.Tests
                         Assert.IsNotEmpty(functionToolCall.Name);
                         Assert.IsTrue(functionToolCall.Name.Contains(nameof(DateTimeUtility.GetDateTime)));
                         Assert.NotNull(functionToolCall.Arguments);
-                        conversation.Add(functionToolCall);
+
+                        if (conversation.All(i => i.Id != functionToolCall.Id))
+                        {
+                            conversation.Add(functionToolCall);
+                        }
+
                         var output = await functionToolCall.InvokeFunctionAsync();
                         conversation.Add(output);
                         break;
