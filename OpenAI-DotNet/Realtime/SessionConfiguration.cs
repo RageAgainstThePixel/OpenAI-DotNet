@@ -27,23 +27,24 @@ namespace OpenAI.Realtime
             string toolChoice,
             float? temperature,
             int? maxResponseOutputTokens,
-            int? expiresAfter) : this(
-            model,
-            prompt: null,
-            instructions,
-            modalities,
-            voice,
-            speed: null,
-            inputAudioFormat,
-            outputAudioFormat,
-            inputAudioNoiseSettings: null,
-            inputAudioTranscriptionSettings: new(transcriptionModel),
-            turnDetectionSettings,
-            tools,
-            toolChoice,
-            temperature,
-            maxResponseOutputTokens,
-            expiresAfter)
+            int? expiresAfter)
+            : this(
+                model,
+                prompt: null,
+                instructions,
+                modalities,
+                voice,
+                speed: null,
+                inputAudioFormat,
+                outputAudioFormat,
+                inputAudioNoiseSettings: null,
+                inputAudioTranscriptionSettings: new(transcriptionModel),
+                turnDetectionSettings,
+                tools,
+                toolChoice,
+                temperature,
+                maxResponseOutputTokens,
+                expiresAfter)
         {
         }
 
@@ -64,23 +65,24 @@ namespace OpenAI.Realtime
             int? expiresAfter,
             NoiseReductionSettings inputAudioNoiseSettings,
             float? speed,
-            Prompt prompt) : this(
-            model,
-            prompt,
-            instructions,
-            modalities,
-            voice,
-            speed,
-            inputAudioFormat,
-            outputAudioFormat,
-            inputAudioNoiseSettings,
-            inputAudioTranscriptionSettings,
-            turnDetectionSettings,
-            tools,
-            toolChoice,
-            temperature,
-            maxResponseOutputTokens,
-            expiresAfter)
+            Prompt prompt)
+            : this(
+                model,
+                prompt,
+                instructions,
+                modalities,
+                voice,
+                speed,
+                inputAudioFormat,
+                outputAudioFormat,
+                inputAudioNoiseSettings,
+                inputAudioTranscriptionSettings,
+                turnDetectionSettings,
+                tools,
+                toolChoice,
+                temperature,
+                maxResponseOutputTokens,
+                expiresAfter)
         {
         }
 
