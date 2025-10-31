@@ -27,44 +27,85 @@ namespace OpenAI.Realtime
             string toolChoice,
             float? temperature,
             int? maxResponseOutputTokens,
-            int? expiresAfter)
-            : this(
-                model: model,
-                modalities: modalities,
-                voice: voice,
-                instructions: instructions,
-                inputAudioFormat: inputAudioFormat,
-                outputAudioFormat: outputAudioFormat,
-                inputAudioTranscriptionSettings: new(transcriptionModel),
-                turnDetectionSettings: turnDetectionSettings,
-                tools: tools,
-                toolChoice: toolChoice,
-                temperature: temperature,
-                maxResponseOutputTokens: maxResponseOutputTokens,
-                expiresAfter: expiresAfter)
+            int? expiresAfter) : this(
+            model,
+            prompt: null,
+            instructions,
+            modalities,
+            voice,
+            speed: null,
+            inputAudioFormat,
+            outputAudioFormat,
+            inputAudioNoiseSettings: null,
+            inputAudioTranscriptionSettings: new(transcriptionModel),
+            turnDetectionSettings,
+            tools,
+            toolChoice,
+            temperature,
+            maxResponseOutputTokens,
+            expiresAfter)
+        {
+        }
+
+        [Obsolete("Use new ctor overload")]
+        public SessionConfiguration(
+            Model model,
+            Modality modalities,
+            Voice voice,
+            string instructions,
+            RealtimeAudioFormat inputAudioFormat,
+            RealtimeAudioFormat outputAudioFormat,
+            InputAudioTranscriptionSettings inputAudioTranscriptionSettings,
+            IVoiceActivityDetectionSettings turnDetectionSettings,
+            IEnumerable<Tool> tools,
+            string toolChoice,
+            float? temperature,
+            int? maxResponseOutputTokens,
+            int? expiresAfter,
+            NoiseReductionSettings inputAudioNoiseSettings,
+            float? speed,
+            Prompt prompt) : this(
+            model,
+            prompt,
+            instructions,
+            modalities,
+            voice,
+            speed,
+            inputAudioFormat,
+            outputAudioFormat,
+            inputAudioNoiseSettings,
+            inputAudioTranscriptionSettings,
+            turnDetectionSettings,
+            tools,
+            toolChoice,
+            temperature,
+            maxResponseOutputTokens,
+            expiresAfter)
         {
         }
 
         public SessionConfiguration(
-            Model model,
+            Model model = null,
+            Prompt prompt = null,
+            string instructions = null,
             Modality modalities = Modality.Text | Modality.Audio,
             Voice voice = null,
-            string instructions = null,
+            float? speed = null,
             RealtimeAudioFormat inputAudioFormat = RealtimeAudioFormat.PCM16,
             RealtimeAudioFormat outputAudioFormat = RealtimeAudioFormat.PCM16,
+            NoiseReductionSettings inputAudioNoiseSettings = null,
             InputAudioTranscriptionSettings inputAudioTranscriptionSettings = null,
             IVoiceActivityDetectionSettings turnDetectionSettings = null,
             IEnumerable<Tool> tools = null,
             string toolChoice = null,
             float? temperature = null,
             int? maxResponseOutputTokens = null,
-            int? expiresAfter = null,
-            NoiseReductionSettings inputAudioNoiseSettings = null,
-            float? speed = null,
-            Prompt prompt = null)
+            int? expiresAfter = null)
         {
             ClientSecret = new ClientSecret(expiresAfter);
-            Model = string.IsNullOrWhiteSpace(model?.Id) ? Models.Model.GPT4oRealtime : model;
+            Model = string.IsNullOrWhiteSpace(model?.Id) && prompt == null
+                    ? Models.Model.GPT4oRealtime
+                    : model;
             Modalities = modalities;
             Voice = string.IsNullOrWhiteSpace(voice?.Id) ? OpenAI.Voice.Alloy : voice;
             Instructions = string.IsNullOrWhiteSpace(instructions)
@@ -82,10 +123,10 @@ namespace OpenAI.Realtime
             VoiceActivityDetectionSettings = turnDetectionSettings ?? new ServerVAD();
             tools.ProcessTools<Tool>(toolChoice, out var toolList, out var activeTool);
             Tools = toolList?.Where(t => t.IsFunction).Select(tool =>
-            {
-                tool.Function.Type = "function";
-                return tool.Function;
-            }).ToList();
+                {
+                    tool.Function.Type = "function";
+                    return tool.Function;
+                }).ToList();
             ToolChoice = activeTool;
             Temperature = temperature;
 
@@ -153,6 +194,7 @@ namespace OpenAI.Realtime
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("model")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Model { get; private set; }
 
         /// <summary>
