@@ -255,8 +255,7 @@ namespace OpenAI.Threads
                 IncompleteAtUnixTimeSeconds = other.IncompleteAtUnixTimeSeconds;
             }
 
-            if (Status == 0 &&
-                other.Status > 0)
+            if (other.Status > 0)
             {
                 Status = other.Status;
             }
