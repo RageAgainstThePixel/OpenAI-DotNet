@@ -256,7 +256,7 @@ namespace OpenAI.Extensions
 
                         if (@event.Data != null)
                         {
-                            @object[ServerSentEventKind.Data.ToString().ToLower()] = JsonNode.Parse(@event.Data.ToJsonString());
+                            @object[nameof(ServerSentEventKind.Data).ToLower()] = JsonNode.Parse(@event.Data.ToJsonString());
                         }
 
                         array.Add(@object);
