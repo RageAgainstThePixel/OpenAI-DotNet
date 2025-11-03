@@ -159,7 +159,9 @@ namespace OpenAI.Responses
             int? topLogProbs = null)
         {
             Input = input?.ToArray() ?? throw new ArgumentNullException(nameof(input));
-            Model = string.IsNullOrWhiteSpace(model) ? Models.Model.ChatGPT4o : model;
+            Model = string.IsNullOrWhiteSpace(model?.Id) && prompt == null
+                ? Models.Model.GPT4oRealtime
+                : model;
             Background = background;
             Include = include?.ToList();
             Instructions = instructions;
@@ -214,6 +216,7 @@ namespace OpenAI.Responses
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("model")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Model { get; private set; }
 
         /// <summary>
