@@ -22,8 +22,10 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>false</SignAssembly>
     <ImplicitUsings>false</ImplicitUsings>
-    <Version>8.8.2</Version>
+    <Version>8.8.6</Version>
     <PackageReleaseNotes>
+Version 8.8.6
+- Fix unimplemented routePrefix in OpenAIProxyStartup.CreateWebApplication
 Version 8.8.2
 - Updated forwarded request headers
 Version 8.8.0

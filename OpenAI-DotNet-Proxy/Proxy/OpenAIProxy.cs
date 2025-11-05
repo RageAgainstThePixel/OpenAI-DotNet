@@ -17,6 +17,7 @@ namespace OpenAI.Proxy
     /// </summary>
     public class OpenAIProxy
     {
+        private string routePrefix = "";
         private OpenAIClient openAIClient;
         private IAuthenticationFilter authenticationFilter;
 
@@ -46,7 +47,7 @@ namespace OpenAI.Proxy
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/health", HealthEndpoint);
-                endpoints.MapOpenAIEndpoints(openAIClient, authenticationFilter);
+                endpoints.MapOpenAIEndpoints(openAIClient, authenticationFilter, routePrefix);
             });
         }
 
@@ -92,7 +93,10 @@ namespace OpenAI.Proxy
             builder.Services.AddSingleton(openAIClient);
             builder.Services.AddSingleton<IAuthenticationFilter, T>();
             var app = builder.Build();
-            var startup = new OpenAIProxy();
+            var startup = new OpenAIProxy
+            {
+                routePrefix = routePrefix
+            };
             startup.Configure(app, app.Environment);
             return app;
         }
