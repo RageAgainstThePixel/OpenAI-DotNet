@@ -59,6 +59,7 @@ namespace OpenAI.Tests
                 await session.SendAsync(new ConversationItemCreateRequest("Hello!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
                 await session.SendAsync(new InputAudioBufferAppendRequest(new ReadOnlyMemory<byte>(new byte[1024 * 4])), cts.Token);
+                await session.SendAsync(new UpdateSessionRequest(new SessionConfiguration(model: Model.Transcribe_GPT_4o_Mini, instructions: "You are a fearsome dinosaur. Rawr!", tools: tools)), cts.Token);
                 await session.SendAsync(new ConversationItemCreateRequest("Goodbye!"), cts.Token);
                 await session.SendAsync(new CreateResponseRequest(), cts.Token);
 

@@ -180,7 +180,7 @@ namespace OpenAI.Realtime
         [JsonInclude]
         [JsonPropertyName("client_secret")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ClientSecret ClientSecret { get; private set; }
+        public ClientSecret ClientSecret { get; internal set; }
 
         /// <summary>
         /// The set of modalities the model can respond with.
