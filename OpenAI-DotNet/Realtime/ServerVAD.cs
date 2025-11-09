@@ -7,8 +7,8 @@ namespace OpenAI.Realtime
         public ServerVAD() { }
 
         public ServerVAD(
-            bool createResponse = true,
-            bool interruptResponse = true,
+            bool? createResponse = true,
+            bool? interruptResponse = true,
             int? prefixPadding = null,
             int? silenceDuration = null,
             float? detectionThreshold = null)
@@ -27,11 +27,13 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("create_response")]
-        public bool CreateResponse { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? CreateResponse { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("interrupt_response")]
-        public bool InterruptResponse { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? InterruptResponse { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("prefix_padding_ms")]

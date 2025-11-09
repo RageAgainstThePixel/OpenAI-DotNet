@@ -4,8 +4,8 @@
     {
         public TurnDetectionType Type => TurnDetectionType.Disabled;
 
-        public bool CreateResponse => false;
+        public bool? CreateResponse => null;
 
-        public bool InterruptResponse => false;
+        public bool? InterruptResponse => null;
     }
 }
