@@ -6,7 +6,10 @@ namespace OpenAI.Realtime
     {
         public SemanticVAD() { }
 
-        public SemanticVAD(bool createResponse = true, bool interruptResponse = true, VAD_Eagerness eagerness = VAD_Eagerness.Auto)
+        public SemanticVAD(
+            bool? createResponse = true,
+            bool? interruptResponse = true,
+            VAD_Eagerness eagerness = VAD_Eagerness.Auto)
         {
             CreateResponse = createResponse;
             InterruptResponse = interruptResponse;
@@ -20,11 +23,13 @@ namespace OpenAI.Realtime
 
         [JsonInclude]
         [JsonPropertyName("create_response")]
-        public bool CreateResponse { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? CreateResponse { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("interrupt_response")]
-        public bool InterruptResponse { get; private set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? InterruptResponse { get; private set; }
 
         [JsonInclude]
         [JsonPropertyName("eagerness")]
