@@ -13,9 +13,14 @@ namespace OpenAI.Responses
 
         public TextContent() { }
 
-        public TextContent(string text)
+        public TextContent(string text, ResponseContentType type = ResponseContentType.InputText)
         {
-            Type = ResponseContentType.InputText;
+            if (type != ResponseContentType.InputText && type != ResponseContentType.OutputText)
+            {
+                throw new ArgumentException("Invalid response content type. Must be InputText or OutputText.", nameof(type));
+            }
+
+            Type = type;
             Text = text;
         }
 
