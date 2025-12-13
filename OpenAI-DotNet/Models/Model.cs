@@ -76,6 +76,18 @@ namespace OpenAI.Models
         #region Reasoning Models
 
         /// <summary>
+        /// GPT-5.2 pro is available in the Responses API only to enable support for multi-turn model interactions before responding to API requests,
+        /// and other advanced API features in the future. Since GPT-5.2 pro is designed to tackle tough problems,
+        /// some requests may take several minutes to finish. To avoid timeouts, try using background mode.
+        /// GPT-5.2 pro supports reasoning.effort: medium, high, xhigh.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 context window<br/>
+        /// - Max Output Tokens: 128,000 max output tokens
+        /// </remarks>
+        public static Model GPT5_2_Pro { get; } = new("gpt-5.2-pro", "openai");
+
+        /// <summary>
         /// The o1 series of models are trained with reinforcement learning to perform complex reasoning.
         /// o1 models think before they answer, producing a long internal chain of thought before responding to the user.
         /// </summary>
@@ -188,6 +200,15 @@ namespace OpenAI.Models
         #endregion Realtime Models
 
         #region Chat Models
+
+        /// <summary>
+        /// GPT-5.2 is our flagship model for coding and agentic tasks across industries. 
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 context window<br/>
+        /// - Max Output Tokens: 128,000 max output tokens
+        /// </remarks>
+        public static Model GPT5_2 { get; } = new("gpt-5.2", "openai");
 
         /// <summary>
         /// GPT-5 is our flagship model for coding, reasoning, and agentic tasks across domains.
@@ -497,6 +518,35 @@ namespace OpenAI.Models
         #endregion Image Models
 
         #region Specialized Models
+
+        /// <summary>
+        /// GPT‑5.1-Codex-Max is purpose-built for agentic coding.
+        /// It's only available in the Responses API.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 tokens<br/>
+        /// - Max Output Tokens: 128,000 tokens
+        /// </remarks>
+        public static Model GPT5_1_CodexMax { get; } = new("gpt-5.1-codex-max", "openai");
+
+        /// <summary>
+        /// GPT-5.1-Codex is a version of GPT-5 optimized for agentic coding tasks in Codex or similar environments.
+        /// It's available in the Responses API
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 tokens<br/>
+        /// - Max Output Tokens: 128,000 tokens
+        /// </remarks>
+        public static Model GPT5_1_Codex { get; } = new("gpt-5.1-codex", "openai");
+
+        /// <summary>
+        /// GPT-5.1 Codex mini is a smaller, more cost-effective, less-capable version of GPT-5.1-Codex.
+        /// </summary>
+        /// <remarks>
+        /// - Context Window: 400,000 tokens<br/>
+        /// - Max Output Tokens: 128,000 tokens
+        /// </remarks>
+        public static Model GPT5_1_CodexMini { get; } = new("gpt-5.1-codex-mini", "openai");
 
         /// <summary>
         /// GPT-5-Codex is a version of GPT-5 optimized for agentic coding tasks in Codex or similar environments.
