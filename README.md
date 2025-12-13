@@ -65,15 +65,15 @@ dotnet add package OpenAI-DotNet
   - [List Input Items](#list-input-items)
   - [Cancel Response](#cancel-response)
   - [Delete Response](#delete-response)
-- [Conversations](#conversations) :new:
-  - [Create Conversation](#create-conversation) :new:
-  - [Retrieve Conversation](#retrieve-conversation) :new:
-  - [Update Conversation](#update-conversation) :new:
-  - [Delete Conversation](#delete-conversation) :new:
-  - [List Conversation Items](#list-conversation-items) :new:
-  - [Create Conversation Item](#create-conversation-item) :new:
-  - [Retrieve Conversation Item](#retrieve-conversation-item) :new:
-  - [Delete Conversation Item](#delete-conversation-item) :new:
+- [Conversations](#conversations)
+  - [Create Conversation](#create-conversation)
+  - [Retrieve Conversation](#retrieve-conversation)
+  - [Update Conversation](#update-conversation)
+  - [Delete Conversation](#delete-conversation)
+  - [List Conversation Items](#list-conversation-items)
+  - [Create Conversation Item](#create-conversation-item)
+  - [Retrieve Conversation Item](#retrieve-conversation-item)
+  - [Delete Conversation Item](#delete-conversation-item)
 - [Realtime](#realtime)
   - [Create Realtime Session](#create-realtime-session)
   - [Client Events](#client-events)
