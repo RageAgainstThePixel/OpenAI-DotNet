@@ -160,7 +160,7 @@ namespace OpenAI.Responses
         {
             Input = input?.ToArray() ?? throw new ArgumentNullException(nameof(input));
             Model = string.IsNullOrWhiteSpace(model?.Id) && prompt == null
-                ? Models.Model.GPT4oRealtime
+                ? Models.Model.GPT5_Mini
                 : model;
             Background = background;
             Include = include?.ToList();
