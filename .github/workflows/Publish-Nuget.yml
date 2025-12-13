@@ -47,11 +47,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -68,12 +68,13 @@ jobs:
 
     - name: Publish Test Results
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      uses: EnricoMi/publish-unit-test-result-action@34d7c956a59aed1bfebf31df77b8de55db9bbaaf # v2.11.0
       with:
         files: test-results/**/*.trx
         comment_mode: off
         report_individual_runs: true
         compare_to_earlier_commit: false
+        large_files: true
 
     - name: Determine Coverage File Path
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
@@ -84,7 +85,7 @@ jobs:
 
     - name: Code Coverage Summary Report
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
-      uses: irongut/CodeCoverageSummary@v1.3.0
+      uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
       with:
         filename: ${{ env.COVERAGE_FILE_PATH }}
         badge: true
@@ -99,43 +100,50 @@ jobs:
       run: |
         $projectPath = "${{ github.workspace }}\OpenAI-DotNet"
         $proxyProjectPath = "${{ github.workspace }}\OpenAI-DotNet-Proxy"
-
+        
         # pack OpenAI-DotNet
         dotnet pack $projectPath --configuration Release --include-symbols
         $out = "$projectPath\bin\Release"
         $packagePath = Get-ChildItem -Path $out -File -Include '*.nupkg' -Exclude '*symbols*' -Recurse -ErrorAction SilentlyContinue
-
+        
         if ($packagePath) {
           Write-Host Package path: $packagePath
         } else {
           Write-Host Failed to find package at $out
           exit 1
         }
-
+        
         # pack OpenAI-DotNet-Proxy
         dotnet pack $proxyProjectPath --configuration Release --include-symbols
         $proxyOut = "$proxyProjectPath\bin\Release"
         $proxyPackagePath = Get-ChildItem -Path $proxyOut -File -Include '*.nupkg' -Exclude '*symbols*' -Recurse -ErrorAction SilentlyContinue
-
+        
         if ($proxyPackagePath) {
           Write-Host Package path: $proxyPackagePath
         } else {
           Write-Host Failed to find package at $proxyOut
           exit 1
         }
-
+        
         $isRelease = "${{ github.ref == 'refs/heads/main' }}"
-
+        
         if ($isRelease -eq 'true') {
           dotnet nuget push $packagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           dotnet nuget push $proxyPackagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
-
+        
         $version = $packagePath.Name -replace "^OpenAI-DotNet.(.*).nupkg$",'$1'
+        
+        if ($version -eq '') {
+          Write-Host "Failed to extract version from package name."
+          exit 1
+        }
+        
+        echo "Published package version: $version"
         echo "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       shell: pwsh
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       if: always()
       with:
         name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
@@ -156,11 +164,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -169,10 +177,10 @@ jobs:
         dotnet tool update -g docfx
         docfx .docs/docfx.json
 
-    - uses: actions/upload-pages-artifact@v3
+    - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
       with:
         path: '_site'
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4.0.3
+      uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
