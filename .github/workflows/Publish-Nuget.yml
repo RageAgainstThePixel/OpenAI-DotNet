@@ -41,11 +41,10 @@ env:
 jobs:
   build:
     if: ${{ !github.event_name == 'pull_request' || !github.event.pull_request.draft }}
-    env:
-      PACKAGE_VERSION: ''
-      COVERAGE_FILE_PATH: ''
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        shell: pwsh
     steps:
     - uses: actions/checkout@v6
       with:
@@ -56,8 +55,34 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - run: dotnet restore
-
     - run: dotnet build --configuration Release --no-restore
+    
+    - name: Get Version
+      id: version
+      run: |
+        $projectPath = "${{ github.workspace }}\OpenAI-DotNet\OpenAI-DotNet.csproj"
+        
+        if (-Not (Test-Path $projectPath)) {
+          Write-Host "Project file not found at $projectPath"
+          exit 1
+        }
+        
+        [xml]$csproj = Get-Content $projectPath
+        
+        if ($csproj -eq $null) {
+          Write-Host "Failed to load csproj file."
+          exit 1
+        }
+        
+        $version = $csproj.Project.PropertyGroup.Version
+        
+        if ([string]::IsNullOrEmpty($version)) {
+          Write-Host "Version not found in csproj."
+          exit 1
+        }
+        
+        Write-Host "Project Version: $version"
+        echo "PACKAGE_VERSION=$version" >> $GITHUB_OUTPUT
 
     - name: Test Packages
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
@@ -78,22 +103,24 @@ jobs:
 
     - name: Determine Coverage File Path
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
+      id: coverage-path
       shell: bash
       run: |
         COVERAGE_FILE_PATH=$(find ./test-results -name 'coverage.cobertura.xml' | head -n 1)
-        echo "COVERAGE_FILE_PATH=$COVERAGE_FILE_PATH" >> $GITHUB_ENV
+        echo "COVERAGE_FILE_PATH=$COVERAGE_FILE_PATH" >> $GITHUB_OUTPUT
 
     - name: Code Coverage Summary Report
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
       uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
       with:
-        filename: ${{ env.COVERAGE_FILE_PATH }}
+        filename: ${{ steps.coverage-path.outputs.COVERAGE_FILE_PATH }}
         badge: true
-        format: 'markdown'
-        output: 'both'
+        format: markdown
+        output: both
 
     - name: Write Coverage Job Summary
       if: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' && always() }}
+      shell: bash
       run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Pack and Publish NuGet Package
@@ -131,28 +158,17 @@ jobs:
           dotnet nuget push $packagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           dotnet nuget push $proxyPackagePath.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
-        
-        $version = $packagePath.Name -replace "^OpenAI-DotNet.(.*).nupkg$",'$1'
-        
-        if ($version -eq '') {
-          Write-Host "Failed to extract version from package name."
-          exit 1
-        }
-        
-        echo "Published package version: $version"
-        echo "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      shell: pwsh
 
     - uses: actions/upload-artifact@v6
       if: always()
       with:
-        name: OpenAI-DotNet.${{ env.PACKAGE_VERSION }}
+        name: OpenAI-DotNet.${{ steps.version.outputs.PACKAGE_VERSION }}-artifacts
         path: |
           ${{ github.workspace }}/test-results
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.nupkg
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ env.PACKAGE_VERSION }}.symbols.nupkg
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.nupkg
-          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ env.PACKAGE_VERSION }}.symbols.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ steps.version.outputs.PACKAGE_VERSION }}.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet.${{ steps.version.outputs.PACKAGE_VERSION }}.symbols.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ steps.version.outputs.PACKAGE_VERSION }}.nupkg
+          ${{ github.workspace }}/OpenAI-DotNet/bin/Release/OpenAI-DotNet-Proxy.${{ steps.version.outputs.PACKAGE_VERSION }}.symbols.nupkg
         if-no-files-found: ignore
 
   docs:
@@ -162,25 +178,23 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v6
       with:
         fetch-depth: 0
-
     - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-
     - name: build docfx
       run: |
         dotnet tool update -g docfx
         docfx .docs/docfx.json
-
     - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
       with:
         path: '_site'
-
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
