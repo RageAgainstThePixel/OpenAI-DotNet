@@ -108,6 +108,6 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("error")]
-        public string Error { get; private set; }
+        public JsonNode Error { get; private set; }
     }
 }
