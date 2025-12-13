@@ -56,7 +56,7 @@ jobs:
 
     - run: dotnet restore
     - run: dotnet build --configuration Release --no-restore
-    
+
     - name: Get Version
       id: version
       run: |
