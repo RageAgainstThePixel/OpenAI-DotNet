@@ -33,6 +33,11 @@ More context [on Roger Pincombe's blog](https://rogerpincombe.com/openai-dotnet-
     <PackageReleaseNotes>
 Version 8.8.8
 - Allow setting Responses.TextContent.Type to OutputText for Role.Assistant messages
+- Fixed stream consumed with debug logging enabled
+- Fixed wrapped server sent event error object
+- Fixed ability to create MCPApprovalResponse for mcp tool approvals
+- Fixed MCPToolCall.Error deserialization
+- Updated default models
 Version 8.8.7
 - Fix VAD serialization not properly setting disabled values
 Version 8.8.6
