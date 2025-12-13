@@ -520,7 +520,7 @@ namespace OpenAI.Models
         #region Specialized Models
 
         /// <summary>
-        /// GPT‑5.1-Codex-Max is purpose-built for agentic coding.
+        /// GPT-5.1-Codex-Max is purpose-built for agentic coding.
         /// It's only available in the Responses API.
         /// </summary>
         /// <remarks>
