@@ -6,6 +6,14 @@ namespace OpenAI.Responses
 {
     public sealed class MCPApprovalResponse : BaseResponse, IResponseItem
     {
+        public MCPApprovalResponse() { }
+
+        public MCPApprovalResponse(string approvalRequestId, bool approve)
+        {
+            ApprovalRequestId = approvalRequestId;
+            Approve = approve;
+        }
+
         /// <inheritdoc />
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -32,12 +40,12 @@ namespace OpenAI.Responses
 
         [JsonInclude]
         [JsonPropertyName("approval_request_id")]
-        public string ApprovalRequestId { get; }
+        public string ApprovalRequestId { get; private set; }
 
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         [JsonPropertyName("approve")]
-        public bool Approve { get; }
+        public bool Approve { get; private set; }
 
         /// <summary>
         /// Optional reason for the decision.
@@ -45,6 +53,6 @@ namespace OpenAI.Responses
         [JsonInclude]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         [JsonPropertyName("reason")]
-        public string Reason { get; }
+        public string Reason { get; private set; }
     }
 }
