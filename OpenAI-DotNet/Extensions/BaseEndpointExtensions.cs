@@ -34,6 +34,12 @@ namespace OpenAI.Extensions
             request.Content = payload;
             var response = await baseEndpoint.ServerSentEventStreamAsync(request, cancellationToken).ConfigureAwait(false);
             await response.CheckResponseAsync(false, payload, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (baseEndpoint.EnableDebug)
+            {
+                await response.Content.LoadIntoBufferAsync().ConfigureAwait(false);
+            }
+
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var events = new Stack<ServerSentEvent>();
             using var reader = new StreamReader(stream);
