@@ -401,7 +401,8 @@ namespace OpenAI.Responses
                         }
                         case "error":
                         {
-                            serverSentEvent = sseResponse.Deserialize<Error>(ssEvent, client);
+                            var error = @object["error"]?.Deserialize<Error>();
+                            serverSentEvent = error ?? sseResponse.Deserialize<Error>(ssEvent, client);
                             break;
                         }
                         // Event status messages with no data payloads:
